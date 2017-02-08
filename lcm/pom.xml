@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
     Copyright 2017 ZTE Corporation.
 
@@ -24,7 +25,7 @@
     <artifactId>gvnfm-lcm</artifactId>
     <version>1.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>gvnfm-lcm</name>
+    <name>gvnfm-vnflcm/lcm</name>
     <description>gvnfm lcm</description>
     <build>
       <plugins>
