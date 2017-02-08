@@ -13,5 +13,5 @@
 # limitations under the License.
 
 
-class NSLCMException(Exception):
+class NFLCMException(Exception):
     pass
