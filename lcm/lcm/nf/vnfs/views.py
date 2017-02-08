@@ -20,6 +20,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from lcm.pub.database.models import VnfInstModel
+from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.values import ignore_case_get
 
@@ -40,3 +41,20 @@ class CreateVnfIdentifier(APIView):
                      (vnf_inst.id, vnf_inst.name, vnf_inst.vnfd_id, vnf_inst.description, vnf_inst.create_time, vnf_inst.lastuptime))
         rsp = {"vnfInstanceId": self.nf_inst_id}
         return Response(data=rsp, status=status.HTTP_201_CREATED)
+
+
+class InstantiateVnf(APIView):
+    def post(self, request, instanceId):
+        logger.debug("InstantiateVnf--post::> %s" % request.data)
+        data = {'flavourId': ignore_case_get(request.data, 'flavourId'),
+                'instantiationLevelId': ignore_case_get(request.data, 'instantiationLevelId'),
+                'extVirtualLinks': ignore_case_get(request.data, 'extVirtualLinks'),
+                'localizationLanguage': ignore_case_get(request.data, 'localizationLanguage'),
+                'additionalParams': ignore_case_get(request.data, 'additionalParams')}
+        nf_inst_id = instanceId
+        job_id = JobUtil.create_job('NF', 'CREATE', nf_inst_id)
+        JobUtil.add_job_status(job_id, 0, "INST_VNF_READY")
+
+        # CreateVnfs(data, nf_inst_id, job_id).start()
+        rsp = {"jobId": job_id}
+        return Response(data=rsp, status=status.HTTP_202_ACCEPTED)
