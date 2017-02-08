@@ -12,16 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import include, url
-from lcm.pub.config.config import REG_TO_MSB_WHEN_START, REG_TO_MSB_REG_URL, REG_TO_MSB_REG_PARAM
+from django.conf.urls import patterns, url
+from rest_framework.urlpatterns import format_suffix_patterns
 
-urlpatterns = [
-    url(r'^', include('lcm.samples.urls')),
-    url(r'^', include('lcm.nf.vnfs.urls')),
-]
+from lcm.nf.vnfs.views import CreateVnfIdentifier
 
-# regist to MSB when startup
-if REG_TO_MSB_WHEN_START:
-    import json
-    from lcm.pub.utils.restcall import req_by_msb
-    req_by_msb(REG_TO_MSB_REG_URL, "POST", json.JSONEncoder().encode(REG_TO_MSB_REG_PARAM))
+urlpatterns = patterns('',
+                       url(r'^gvnfmapi/lcm/v1/vnf_instances$', CreateVnfIdentifier.as_view()),
+                       )
+
+urlpatterns = format_suffix_patterns(urlpatterns)

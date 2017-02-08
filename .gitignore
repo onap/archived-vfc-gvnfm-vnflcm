@@ -1,8 +1,3 @@
-target/
-coverage-report/
-bin/
-.project
-.settings
-.classpath
-.class
-.checkstyle
+lcm/.idea
+lcm/logs/runtime_lcm.log
+*.pyc

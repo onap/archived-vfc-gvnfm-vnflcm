@@ -19,5 +19,11 @@ class VnfInstModel(models.Model):
         db_table = 'GVNFM_VNFINST'
 
     id = models.CharField(db_column='ID', primary_key=True, max_length=200)
+    name = models.CharField(db_column='NAME', max_length=200)
+    vnfd_id = models.CharField(db_column='VNFDID', max_length=200)
+    description = models.CharField(db_column='DESCRIPTION', max_length=255, null=True, blank=True)
+    status = models.CharField(db_column='STATUS', max_length=200, null=True, blank=True)
+    create_time = models.CharField(db_column='CREATETIME', max_length=200, null=True, blank=True)
+    lastuptime = models.CharField(db_column='LASTUPTIME', max_length=200, null=True, blank=True)
 
 
