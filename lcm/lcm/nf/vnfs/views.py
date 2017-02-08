@@ -58,3 +58,33 @@ class InstantiateVnf(APIView):
         # CreateVnfs(data, nf_inst_id, job_id).start()
         rsp = {"jobId": job_id}
         return Response(data=rsp, status=status.HTTP_202_ACCEPTED)
+
+
+class DeleteVnfIdentifier(APIView):
+    def delete(self, request):
+        logger.debug("DeleteVnfIdentifier--delete::> %s" % request.data)
+        return Response(data='', status=status.HTTP_202_ACCEPTED)
+
+
+class TerminateVnf(APIView):
+    def post(self, request):
+        logger.debug("TerminateVnf--post::> %s" % request.data)
+        return Response(data='', status=status.HTTP_202_ACCEPTED)
+
+
+class QueryMultipleVnf(APIView):
+    def get(self, request):
+        logger.debug("QueryMultipleVnf--get::> %s" % request.data)
+        return Response(data='', status=status.HTTP_202_ACCEPTED)
+
+
+class QuerySingleVnf(APIView):
+    def get(self, request):
+        logger.debug("QuerySingleVnf--get::> %s" % request.data)
+        return Response(data='', status=status.HTTP_202_ACCEPTED)
+
+
+class GetOperationStatus(APIView):
+    def get(self, request):
+        logger.debug("GetOperationStatus--get::> %s" % request.data)
+        return Response(data='', status=status.HTTP_202_ACCEPTED)

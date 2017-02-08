@@ -15,12 +15,21 @@
 from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from lcm.nf.vnfs.views import CreateVnfIdentifier, InstantiateVnf
+from lcm.nf.vnfs.views import CreateVnfIdentifier, InstantiateVnf, DeleteVnfIdentifier, QueryMultipleVnf, TerminateVnf, \
+    QuerySingleVnf, GetOperationStatus
 
 urlpatterns = patterns('',
                        url(r'^gvnfmapi/lcm/v1/vnf_instances$', CreateVnfIdentifier.as_view()),
-                       url(r'^gvnfmapi/lcm/v1/vnf_instances/(?P<instanceId>[0-9a-zA-Z_-]+)/instantiate$',
-                           InstantiateVnf.as_view()),
+                       url(r'^gvnfmapi/lcm/v1/vnf_instances/(?P<instanceId>[0-9a-zA-Z_-]+)/instantiate$', InstantiateVnf.as_view()),
+                       url(r'^gvnfmapi/lcm/v1/vnf_instances/(?P<instanceId>[0-9a-zA-Z_-]+)$',
+                           DeleteVnfIdentifier.as_view()),
+                       url(r'^gvnfmapi/lcm/v1/vnf_instances/(?P<instanceId>[0-9a-zA-Z_-]+)/terminate$',
+                           TerminateVnf.as_view()),
+                       url(r'^gvnfmapi/lcm/v1/vnf_instances$', QueryMultipleVnf.as_view()),
+                       url(r'^gvnfmapi/lcm/v1/vnf_instances/(?P<instanceId>[0-9a-zA-Z_-]+)$', QuerySingleVnf.as_view()),
+                       url(
+                           r'^gvnfmapi/lcm/v1/vnf_lc_ops/(?P<vnfLcOpId>[0-9a-zA-Z_-]+)&responseId=(?P<responseId>[0-9a-zA-Z_-]+)$',
+                           GetOperationStatus.as_view()),
                        )
 
 urlpatterns = format_suffix_patterns(urlpatterns)
