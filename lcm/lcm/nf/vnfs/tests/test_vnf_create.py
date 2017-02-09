@@ -19,8 +19,59 @@ import mock
 from django.test import TestCase, Client
 from rest_framework import status
 
-from lcm.pub.database.models import NfInstModel
+from lcm.nf.vnfs.views import InstantiateVnf
+from lcm.nf.vnfs.vnf_create.create_vnf_identifier import CreateVnf
+from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
+from lcm.pub.database.models import NfInstModel, JobStatusModel
 from lcm.pub.utils import restcall
+from lcm.pub.utils.jobutil import JobUtil
+
+inst_req_data = {
+    "flavourId": "flavour_1",
+    "instantiationLevelId": "instantiationLevel_1",
+    "extVirtualLinks": [
+        {
+            "vlInstanceId": "1",
+            "vim": {
+                "vimInfoId": "1",
+                "vimId": "1",
+                "interfaceInfo": {
+                    "vimType": "vim",
+                    "apiVersion": "v2",
+                    "protocolType": "http"
+                },
+                "accessInfo": {
+                    "tenant": "tenant_vCPE",
+                    "username": "vCPE",
+                    "password": "vCPE_321"
+                },
+                "interfaceEndpoint": "http://10.43.21.105:80/"
+            },
+            "resourceId": "1246",
+            "extCps": [
+                {
+                    "cpdId": "11",
+                    "addresses": [
+                        {
+                            "addressType": "MAC",
+                            "l2AddressData": "00:f3:43:20:a2:a3"
+                        },
+                        {
+                            "addressType": "IP",
+                            "l3AddressData": {
+                                "iPAddressType": "IPv4",
+                                "iPAddress": "192.168.104.2"
+                            }
+                        }
+                    ],
+                    "numDynamicAddresses": 0
+                }
+            ]
+        }
+    ],
+    "localizationLanguage": "en_US",
+    "additionalParams": {}
+}
 
 
 class TestNsInstantiate(TestCase):
@@ -31,11 +82,17 @@ class TestNsInstantiate(TestCase):
     def tearDown(self):
         pass
 
+    def assert_job_result(self, job_id, job_progress, job_detail):
+        jobs = JobStatusModel.objects.filter(
+            jobid=job_id,
+            progress=job_progress,
+            descp=job_detail)
+        self.assertEqual(1, len(jobs))
+
     @mock.patch.object(restcall, 'call_req')
     def test_create_vnf_identifier(self, mock_call_req):
         r1 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
         mock_call_req.side_effect = [r1]
-
         data = {
             "vnfdId": "111",
             "vnfInstanceName": "vFW_01",
@@ -46,54 +103,17 @@ class TestNsInstantiate(TestCase):
         self.assertTrue(NfInstModel.objects.filter(nfinstid=context['vnfInstanceId']).exists())
 
     def test_instantiate_vnf(self):
-        data = {
-            "flavourId": "flavour_1",
-            "instantiationLevelId": "instantiationLevel_1",
-            "extVirtualLinks": [
-                {
-                    "vlInstanceId": "1",
-                    "vim": {
-                        "vimInfoId": "1",
-                        "vimId": "1",
-                        "interfaceInfo": {
-                            "vimType": "vim",
-                            "apiVersion": "v2",
-                            "protocolType": "http"
-                        },
-                        "accessInfo": {
-                            "tenant": "tenant_vCPE",
-                            "username": "vCPE",
-                            "password": "vCPE_321"
-                        },
-                        "interfaceEndpoint": "http://10.43.21.105:80/"
-                    },
-                    "resourceId": "1246",
-                    "extCps": [
-                        {
-                            "cpdId": "11",
-                            "addresses": [
-                                {
-                                    "addressType": "MAC",
-                                    "l2AddressData": "00:f3:43:20:a2:a3"
-                                },
-                                {
-                                    "addressType": "IP",
-                                    "l3AddressData": {
-                                        "iPAddressType": "IPv4",
-                                        "iPAddress": "192.168.104.2"
-                                    }
-                                }
-                            ],
-                            "numDynamicAddresses": 0
-                        }
-                    ]
-                }
-            ],
-            "localizationLanguage": "en_US",
-            "additionalParams": {}
-        }
-        response = self.client.post("/gvnfmapi/lcm/v1/vnf_instances/12/instantiate", data=data, format='json')
+        response = self.client.post("/gvnfmapi/lcm/v1/vnf_instances/12/instantiate", data={}, format='json')
         self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
+
+    def test_instantiate_vnf_when_instid_not_exist(self):
+        self.nf_inst_id = str(uuid.uuid4())
+        self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
+        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+        data = inst_req_data
+        InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
+        self.assert_job_result(self.job_id, 255, "VNF nf_inst_id is not exist.")
+
 
 vnfd_model_dict = {
     'local_storages': [],

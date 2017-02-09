@@ -16,7 +16,11 @@ import logging
 import traceback
 from threading import Thread
 
+import time
+
+from lcm.pub.database.models import NfInstModel, JobStatusModel
 from lcm.pub.exceptions import NFLCMException
+from lcm.pub.utils.jobutil import JobUtil
 
 logger = logging.getLogger(__name__)
 
@@ -30,13 +34,13 @@ class InstVnf(Thread):
 
     def run(self):
         try:
-            args = {}
-            self.inst_pre(args)
-            self.apply_grant(args)
-            self.apply_res(args)
-            self.check_res_status(args)
-            self.wait_inst_finish(args)
-            self.lcm_notify(args)
+            self.inst_pre(self.nf_inst_id)
+
+            # self.apply_grant(args)
+            # self.apply_res(args)
+            # self.check_res_status(args)
+            # self.wait_inst_finish(args)
+            # self.lcm_notify(args)
         except NFLCMException as e:
             self.inst_exception(e.message)
             pass
@@ -47,8 +51,15 @@ class InstVnf(Thread):
     def inst_pre(self, args):
         try:
             logger.info('inst_pre, args=%s' % args)
-            # InstPreTask(args).do_biz()
-            return {'result': '100', 'sessionid': '', 'msg': 'Nf instancing preprocess finish', 'context': {}}
+            is_exist = NfInstModel.objects.filter(nfinstid=self.nf_inst_id).exists()
+            logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)
+            if not is_exist:
+                JobUtil.add_job_status(self.job_id, 255, "VNF nf_inst_id is not exist.")
+                raise NFLCMException('VNF nf_inst_id is not exist.')
+
+            JobUtil.add_job_status(self.job_id, 100, "Instantiate Vnf success.")
+            is_exist = JobStatusModel.objects.filter(jobid=self.job_id).exists()
+            logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)
         except Exception as e:
             logger.error('Nf instancing preprocess exception=%s' % e.message)
             logger.error(traceback.format_exc())
