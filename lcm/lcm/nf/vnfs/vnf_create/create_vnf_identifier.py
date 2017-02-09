@@ -62,4 +62,7 @@ class CreateVnf:
                                    localizationLanguage='EN_US',create_time=now_time())
         is_exist = NfInstModel.objects.filter(nf_name=self.vnf_instance_mame).exists()
         logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)
+        vnf_inst = NfInstModel.objects.get(nfinstid=self.nf_inst_id)
+        logger.debug('id is [%s],name is [%s],vnfd_id is [%s],description is [%s],create_time is [%s]' %
+            (vnf_inst.nfinstid, vnf_inst.nf_name, vnf_inst.vnfdid, vnf_inst.nf_desc, vnf_inst.create_time))
         return self.nf_inst_id
