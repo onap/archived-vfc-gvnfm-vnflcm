@@ -19,6 +19,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from lcm.nf.vnfs.vnf_create.create_vnf_identifier import CreateVnf
+from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.values import ignore_case_get
 
@@ -52,7 +53,7 @@ class InstantiateVnf(APIView):
         job_id = JobUtil.create_job('NF', 'CREATE', nf_inst_id)
         JobUtil.add_job_status(job_id, 0, "INST_VNF_READY")
 
-        # CreateVnfs(data, nf_inst_id, job_id).start()
+        InstVnf(data, nf_inst_id, job_id).start()
         rsp = {"jobId": job_id}
         return Response(data=rsp, status=status.HTTP_202_ACCEPTED)
 
