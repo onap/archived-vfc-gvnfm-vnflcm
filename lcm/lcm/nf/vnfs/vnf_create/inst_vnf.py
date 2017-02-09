@@ -57,6 +57,11 @@ class InstVnf(Thread):
                 JobUtil.add_job_status(self.job_id, 255, "VNF nf_inst_id is not exist.")
                 raise NFLCMException('VNF nf_inst_id is not exist.')
 
+            vnf_inst = NfInstModel.objects.get(nfinstid=self.nf_inst_id)
+            if vnf_inst.instantiationState != 'NOT_INSTANTIATED':
+                JobUtil.add_job_status(self.job_id, 255, "VNF instantiationState is not NOT_INSTANTIATED.")
+                raise NFLCMException('VNF instantiationState is not NOT_INSTANTIATED.')
+
             JobUtil.add_job_status(self.job_id, 100, "Instantiate Vnf success.")
             is_exist = JobStatusModel.objects.filter(jobid=self.job_id).exists()
             logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)

@@ -115,6 +115,21 @@ class TestNsInstantiate(TestCase):
         self.assert_job_result(self.job_id, 255, "VNF nf_inst_id is not exist.")
 
 
+    @mock.patch.object(restcall, 'call_req')
+    def test_instantiate_vnf_success(self, mock_call_req):
+        r1 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
+        mock_call_req.side_effect = [r1]
+        create_data = {
+            "vnfdId": "111",
+            "vnfInstanceName": "vFW_01",
+            "vnfInstanceDescription": " vFW in Nanjing TIC Edge"}
+        self.nf_inst_id = CreateVnf(create_data).do_biz()
+        self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
+        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+        data = inst_req_data
+        InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
+        self.assert_job_result(self.job_id, 100, "Instantiate Vnf success.")
+
 vnfd_model_dict = {
     'local_storages': [],
     'vdus': [
