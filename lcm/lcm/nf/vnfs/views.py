@@ -13,15 +13,13 @@
 # limitations under the License.
 
 import logging
-import uuid
 
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from lcm.pub.database.models import VnfInstModel
+from lcm.nf.vnfs.vnf_create.create_vnf_identifier import CreateVnf
 from lcm.pub.utils.jobutil import JobUtil
-from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.values import ignore_case_get
 
 logger = logging.getLogger(__name__)
@@ -30,15 +28,14 @@ logger = logging.getLogger(__name__)
 class CreateVnfIdentifier(APIView):
     def post(self, request):
         logger.debug("CreateVnfIdentifier--post::> %s" % request.data)
-        self.vnfd_id = ignore_case_get(request.data, "vnfdId")
-        self.vnf_instance_mame = ignore_case_get(request.data, "vnfInstanceName")
-        self.description = ignore_case_get(request.data, "vnfInstanceDescription")
-        self.nf_inst_id = str(uuid.uuid4())
-        VnfInstModel(id=self.nf_inst_id, name=self.vnf_instance_mame, vnfd_id=self.vnfd_id,
-                     description=self.description, status='empty', create_time=now_time(), lastuptime=now_time()).save()
-        vnf_inst = VnfInstModel.objects.get(id=self.nf_inst_id)
-        logger.debug('id is [%s],name is [%s],vnfd_id is [%s],description is [%s],create_time is [%s],lastuptime is [%s],' %
-                     (vnf_inst.id, vnf_inst.name, vnf_inst.vnfd_id, vnf_inst.description, vnf_inst.create_time, vnf_inst.lastuptime))
+        data = {}
+        data["vnfdId"] = ignore_case_get(request.data, "vnfdId")
+        data["vnfInstanceName"] = ignore_case_get(request.data, "vnfInstanceName")
+        data["vnfInstanceDescription"] = ignore_case_get(request.data, "vnfInstanceDescription")
+        try:
+            self.nf_inst_id = CreateVnf(data).do_biz()
+        except Exception as e:
+            return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         rsp = {"vnfInstanceId": self.nf_inst_id}
         return Response(data=rsp, status=status.HTTP_201_CREATED)
 
