@@ -31,19 +31,19 @@ class TestNsInstantiate(TestCase):
     def tearDown(self):
         pass
 
-    # @mock.patch.object(restcall, 'call_req')
-    # def test_create_vnf_identifier(self, mock_call_req):
-    #     r1 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
-    #     mock_call_req.side_effect = [r1]
-    #
-    #     data = {
-    #         "vnfdId": "111",
-    #         "vnfInstanceName": "vFW_01",
-    #         "vnfInstanceDescription": " vFW in Nanjing TIC Edge"}
-    #     response = self.client.post("/gvnfmapi/lcm/v1/vnf_instances", data=data, format='json')
-    #     self.failUnlessEqual(status.HTTP_201_CREATED, response.status_code)
-    #     context = json.loads(response.content)
-    #     self.assertTrue(NfInstModel.objects.filter(nfinstid=context['vnfInstanceId']).exists())
+    @mock.patch.object(restcall, 'call_req')
+    def test_create_vnf_identifier(self, mock_call_req):
+        r1 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
+        mock_call_req.side_effect = [r1]
+
+        data = {
+            "vnfdId": "111",
+            "vnfInstanceName": "vFW_01",
+            "vnfInstanceDescription": " vFW in Nanjing TIC Edge"}
+        response = self.client.post("/gvnfmapi/lcm/v1/vnf_instances", data=data, format='json')
+        self.failUnlessEqual(status.HTTP_201_CREATED, response.status_code)
+        context = json.loads(response.content)
+        self.assertTrue(NfInstModel.objects.filter(nfinstid=context['vnfInstanceId']).exists())
 
     def test_instantiate_vnf(self):
         data = {
@@ -95,3 +95,275 @@ class TestNsInstantiate(TestCase):
         response = self.client.post("/gvnfmapi/lcm/v1/vnf_instances/12/instantiate", data=data, format='json')
         self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
 
+vnfd_model_dict = {
+    'local_storages': [],
+    'vdus': [
+        {
+            'volumn_storages': [],
+            'nfv_compute': {
+                'mem_size': '',
+                'num_cpus': u'2'},
+            'local_storages': [],
+            'vdu_id': u'vdu_omm.001',
+            'image_file': u'opencos_sss_omm_img_release_20150723-1-disk1',
+            'dependencies': [],
+            'vls': [],
+            'cps': [],
+            'properties': {
+                'key_vdu': '',
+                'support_scaling': False,
+                'vdu_type': '',
+                'name': '',
+                'storage_policy': '',
+                'location_info': {
+                    'vimId': '',
+                    'availability_zone': '',
+                    'region': '',
+                    'dc': '',
+                    'host': '',
+                    'tenant': ''},
+                'inject_data_list': [],
+                'watchdog': {
+                    'action': '',
+                    'enabledelay': ''},
+                'local_affinity_antiaffinity_rule': {},
+                'template_id': u'omm.001',
+                'manual_scale_select_vim': False},
+            'description': u'singleommvm'},
+        {
+            'volumn_storages': [],
+            'nfv_compute': {
+                'mem_size': '',
+                'num_cpus': u'4'},
+            'local_storages': [],
+            'vdu_id': u'vdu_1',
+            'image_file': u'sss',
+            'dependencies': [],
+            'vls': [],
+            'cps': [],
+            'properties': {
+                'key_vdu': '',
+                'support_scaling': False,
+                'vdu_type': '',
+                'name': '',
+                'storage_policy': '',
+                'location_info': {
+                    'vimId': '',
+                    'availability_zone': '',
+                    'region': '',
+                    'dc': '',
+                    'host': '',
+                    'tenant': ''},
+                'inject_data_list': [],
+                'watchdog': {
+                    'action': '',
+                    'enabledelay': ''},
+                'local_affinity_antiaffinity_rule': {},
+                'template_id': u'1',
+                'manual_scale_select_vim': False},
+            'description': u'ompvm'},
+        {
+            'volumn_storages': [],
+            'nfv_compute': {
+                'mem_size': '',
+                'num_cpus': u'14'},
+            'local_storages': [],
+            'vdu_id': u'vdu_2',
+            'image_file': u'sss',
+            'dependencies': [],
+            'vls': [],
+            'cps': [],
+            'properties': {
+                'key_vdu': '',
+                'support_scaling': False,
+                'vdu_type': '',
+                'name': '',
+                'storage_policy': '',
+                'location_info': {
+                    'vimId': '',
+                    'availability_zone': '',
+                    'region': '',
+                    'dc': '',
+                    'host': '',
+                    'tenant': ''},
+                'inject_data_list': [],
+                'watchdog': {
+                    'action': '',
+                    'enabledelay': ''},
+                'local_affinity_antiaffinity_rule': {},
+                'template_id': u'2',
+                'manual_scale_select_vim': False},
+            'description': u'ompvm'},
+        {
+            'volumn_storages': [],
+            'nfv_compute': {
+                'mem_size': '',
+                'num_cpus': u'14'},
+            'local_storages': [],
+            'vdu_id': u'vdu_3',
+            'image_file': u'sss',
+            'dependencies': [],
+            'vls': [],
+            'cps': [],
+            'properties': {
+                'key_vdu': '',
+                'support_scaling': False,
+                'vdu_type': '',
+                'name': '',
+                'storage_policy': '',
+                'location_info': {
+                    'vimId': '',
+                    'availability_zone': '',
+                    'region': '',
+                    'dc': '',
+                    'host': '',
+                    'tenant': ''},
+                'inject_data_list': [],
+                'watchdog': {
+                    'action': '',
+                    'enabledelay': ''},
+                'local_affinity_antiaffinity_rule': {},
+                'template_id': u'3',
+                'manual_scale_select_vim': False},
+            'description': u'ompvm'},
+        {
+            'volumn_storages': [],
+            'nfv_compute': {
+                'mem_size': '',
+                'num_cpus': u'4'},
+            'local_storages': [],
+            'vdu_id': u'vdu_10',
+            'image_file': u'sss',
+            'dependencies': [],
+            'vls': [],
+            'cps': [],
+            'properties': {
+                'key_vdu': '',
+                'support_scaling': False,
+                'vdu_type': '',
+                'name': '',
+                'storage_policy': '',
+                'location_info': {
+                    'vimId': '',
+                    'availability_zone': '',
+                    'region': '',
+                    'dc': '',
+                    'host': '',
+                    'tenant': ''},
+                'inject_data_list': [],
+                'watchdog': {
+                    'action': '',
+                    'enabledelay': ''},
+                'local_affinity_antiaffinity_rule': {},
+                'template_id': u'10',
+                'manual_scale_select_vim': False},
+            'description': u'ppvm'},
+        {
+            'volumn_storages': [],
+            'nfv_compute': {
+                'mem_size': '',
+                'num_cpus': u'14'},
+            'local_storages': [],
+            'vdu_id': u'vdu_11',
+            'image_file': u'sss',
+            'dependencies': [],
+            'vls': [],
+            'cps': [],
+            'properties': {
+                'key_vdu': '',
+                'support_scaling': False,
+                'vdu_type': '',
+                'name': '',
+                'storage_policy': '',
+                'location_info': {
+                    'vimId': '',
+                    'availability_zone': '',
+                    'region': '',
+                    'dc': '',
+                    'host': '',
+                    'tenant': ''},
+                'inject_data_list': [],
+                'watchdog': {
+                    'action': '',
+                    'enabledelay': ''},
+                'local_affinity_antiaffinity_rule': {},
+                'template_id': u'11',
+                'manual_scale_select_vim': False},
+            'description': u'ppvm'},
+        {
+            'volumn_storages': [],
+            'nfv_compute': {
+                'mem_size': '',
+                'num_cpus': u'14'},
+            'local_storages': [],
+            'vdu_id': u'vdu_12',
+            'image_file': u'sss',
+            'dependencies': [],
+            'vls': [],
+            'cps': [],
+            'properties': {
+                'key_vdu': '',
+                'support_scaling': False,
+                'vdu_type': '',
+                'name': '',
+                'storage_policy': '',
+                'location_info': {
+                    'vimId': '',
+                    'availability_zone': '',
+                    'region': '',
+                    'dc': '',
+                    'host': '',
+                    'tenant': ''},
+                'inject_data_list': [],
+                'watchdog': {
+                    'action': '',
+                    'enabledelay': ''},
+                'local_affinity_antiaffinity_rule': {},
+                'template_id': u'12',
+                'manual_scale_select_vim': False},
+            'description': u'ppvm'}],
+    'volumn_storages': [],
+    'policies': {
+        'scaling': {
+            'targets': {},
+            'policy_id': u'policy_scale_sss-vnf-template',
+            'properties': {
+                'policy_file': '*-vnfd.zip/*-vnf-policy.xml'},
+            'description': ''}},
+    'image_files': [
+        {
+            'description': '',
+            'properties': {
+                'name': u'opencos_sss_omm_img_release_20150723-1-disk1.vmdk',
+                'checksum': '',
+                'disk_format': u'VMDK',
+                'file_url': u'./zte-cn-sss-main-image/OMM/opencos_sss_omm_img_release_20150723-1-disk1.vmdk',
+                'container_type': 'vm',
+                'version': '',
+                'hypervisor_type': 'kvm'},
+            'image_file_id': u'opencos_sss_omm_img_release_20150723-1-disk1'},
+        {
+            'description': '',
+            'properties': {
+                'name': u'sss.vmdk',
+                'checksum': '',
+                'disk_format': u'VMDK',
+                'file_url': u'./zte-cn-sss-main-image/NE/sss.vmdk',
+                'container_type': 'vm',
+                'version': '',
+                'hypervisor_type': 'kvm'},
+            'image_file_id': u'sss'}],
+    'vls': [],
+    'cps': [],
+    'metadata': {
+        'vendor': u'zte',
+        'is_shared': False,
+        'description': '',
+        'domain_type': u'CN',
+        'version': u'v4.14.10',
+        'vmnumber_overquota_alarm': False,
+        'cross_dc': False,
+        'vnf_type': u'SSS',
+        'vnfd_version': u'V00000001',
+        'id': u'sss-vnf-template',
+        'name': u'sss-vnf-template'}}
