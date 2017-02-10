@@ -16,7 +16,7 @@ import logging
 import traceback
 from threading import Thread
 
-from lcm.pub.database.models import NfInstModel, JobStatusModel
+from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.msapi.nfvolcm import vnfd_rawdata_get
 from lcm.pub.utils.jobutil import JobUtil
@@ -73,6 +73,9 @@ class InstVnf(Thread):
                 logger.error("[%s] is not defined in vnfd_info."%cp)
                 JobUtil.add_job_status(self.job_id, 255, "Input parameter is not defined in vnfd_info.")
                 raise NFLCMException('Input parameter is not defined in vnfd_info.')
+
+        JobUtil.add_job_status(self.job_id, 2, 'GET_NFVO_CONNECTION_INFO')
+        self.load_global_config()
 
         JobUtil.add_job_status(self.job_id, 100, "Instantiate Vnf success.")
         is_exist = JobStatusModel.objects.filter(jobid=self.job_id).exists()
@@ -137,3 +140,14 @@ class InstVnf(Thread):
             logger.error('Nf instancing exception process exception=%s' % e.message)
             logger.error(traceback.format_exc())
             return {'result': '255', 'msg': 'Nf instancing exception process exception', 'context': {}}
+
+    def load_global_config(self):
+        logger.info("[NF instantiation]get nfvo connection info start")
+        reg_info = NfvoRegInfoModel.objects.filter(vnfminstid='vnfm111').first()
+        if reg_info:
+            self.nfvo_reg_info = reg_info.nfvoid
+            logger.info("[NF instantiation] Registered nfvo id is [%s]"%self.nfvo_reg_info)
+        else:
+            JobUtil.add_job_status(self.job_id, 255, "Nfvo was not registered")
+            raise NFLCMException("Nfvo was not registered")
+        logger.info("[NF instantiation]get nfvo connection info end")

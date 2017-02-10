@@ -17,15 +17,12 @@ import uuid
 
 from lcm.pub.database.models import NfInstModel
 from lcm.pub.exceptions import NFLCMException
-from lcm.pub.utils.restcall import req_by_msb
+from lcm.pub.msapi.nfvolcm import vnfd_rawdata_get
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.values import ignore_case_get
 
 logger = logging.getLogger(__name__)
-# Query vnfd_rawdata by vnfdid
-def vnfd_rawdata_get(vnfdid):
-    ret = req_by_msb("openoapi/nslcm/v1/vnfpackage/%s" % vnfdid, "GET")
-    return ret
+
 
 class CreateVnf:
     def __init__(self, data):

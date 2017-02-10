@@ -98,3 +98,17 @@ class JobStatusModel(models.Model):
     def toJSON(self):
         import json
         return json.dumps(dict([(attr, getattr(self, attr)) for attr in [f.name for f in self._meta.fields]]))
+
+class NfvoRegInfoModel(models.Model):
+    class Meta:
+        db_table = 'NFVOREGINFO'
+
+    nfvoid = models.CharField(max_length=255, primary_key=True, db_column='NFVOID')
+    vnfminstid = models.CharField(max_length=255, db_column='VNFMINSTID')
+    apiurl = models.CharField(max_length=255, db_column='URL')
+    nfvouser = models.CharField(max_length=255, db_column='USERNAME', null=True)
+    nfvopassword = models.CharField(max_length=255, db_column='PASSWD', null=True)
+    authtype = models.IntegerField(db_column='AUTHTYPE', default=2)
+    clientcert = models.CharField(max_length=255, db_column='CLIENTCERT', null=True)
+    servercert = models.CharField(max_length=255, db_column='SERVERCERT', null=True)
+    regtime = models.CharField(max_length=255, db_column='REGTIME')
