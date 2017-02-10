@@ -11,15 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import json
 import logging
 import traceback
 from threading import Thread
 
-import time
-
 from lcm.pub.database.models import NfInstModel, JobStatusModel
 from lcm.pub.exceptions import NFLCMException
+from lcm.pub.msapi.nfvolcm import vnfd_rawdata_get
 from lcm.pub.utils.jobutil import JobUtil
 
 logger = logging.getLogger(__name__)
@@ -49,26 +48,35 @@ class InstVnf(Thread):
             self.inst_exception('unexpected exception')
 
     def inst_pre(self, args):
-        try:
-            logger.info('inst_pre, args=%s' % args)
-            is_exist = NfInstModel.objects.filter(nfinstid=self.nf_inst_id).exists()
-            logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)
-            if not is_exist:
-                JobUtil.add_job_status(self.job_id, 255, "VNF nf_inst_id is not exist.")
-                raise NFLCMException('VNF nf_inst_id is not exist.')
+        logger.info('inst_pre, args=%s' % args)
+        is_exist = NfInstModel.objects.filter(nfinstid=self.nf_inst_id).exists()
+        logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)
+        if not is_exist:
+            logger.error("VNF nf_inst_id is not exist.")
+            JobUtil.add_job_status(self.job_id, 255, "VNF nf_inst_id is not exist.")
+            raise NFLCMException('VNF nf_inst_id is not exist.')
 
-            vnf_inst = NfInstModel.objects.get(nfinstid=self.nf_inst_id)
-            if vnf_inst.instantiationState != 'NOT_INSTANTIATED':
-                JobUtil.add_job_status(self.job_id, 255, "VNF instantiationState is not NOT_INSTANTIATED.")
-                raise NFLCMException('VNF instantiationState is not NOT_INSTANTIATED.')
+        vnf_inst = NfInstModel.objects.get(nfinstid=self.nf_inst_id)
+        if vnf_inst.instantiationState != 'NOT_INSTANTIATED':
+            logger.error("VNF instantiationState is not NOT_INSTANTIATED.")
+            JobUtil.add_job_status(self.job_id, 255, "VNF instantiationState is not NOT_INSTANTIATED.")
+            raise NFLCMException('VNF instantiationState is not NOT_INSTANTIATED.')
 
-            JobUtil.add_job_status(self.job_id, 100, "Instantiate Vnf success.")
-            is_exist = JobStatusModel.objects.filter(jobid=self.job_id).exists()
-            logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)
-        except Exception as e:
-            logger.error('Nf instancing preprocess exception=%s' % e.message)
-            logger.error(traceback.format_exc())
-            return {'result': '255', 'msg': 'Nf instancing preprocess exception', 'context': {}}
+        #get rawdata by vnfd_id
+        ret = vnfd_rawdata_get(vnf_inst.vnfdid)
+        if ret[0] != 0:
+            raise NFLCMException("Get vnfd_raw_data failed.")
+        dst_plan = json.JSONDecoder().decode(ret[1])
+        #checkParameterExist
+        for cp in self.data:
+            if cp not in dst_plan:
+                logger.error("[%s] is not defined in vnfd_info."%cp)
+                JobUtil.add_job_status(self.job_id, 255, "Input parameter is not defined in vnfd_info.")
+                raise NFLCMException('Input parameter is not defined in vnfd_info.')
+
+        JobUtil.add_job_status(self.job_id, 100, "Instantiate Vnf success.")
+        is_exist = JobStatusModel.objects.filter(jobid=self.job_id).exists()
+        logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)
 
     def apply_grant(self, args):
         try:

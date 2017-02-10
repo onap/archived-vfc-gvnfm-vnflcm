@@ -19,7 +19,6 @@ import mock
 from django.test import TestCase, Client
 from rest_framework import status
 
-from lcm.nf.vnfs.views import InstantiateVnf
 from lcm.nf.vnfs.vnf_create.create_vnf_identifier import CreateVnf
 from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
 from lcm.pub.database.models import NfInstModel, JobStatusModel
@@ -114,11 +113,11 @@ class TestNsInstantiate(TestCase):
         InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
         self.assert_job_result(self.job_id, 255, "VNF nf_inst_id is not exist.")
 
-
     @mock.patch.object(restcall, 'call_req')
-    def test_instantiate_vnf_success(self, mock_call_req):
+    def test_instantiate_vnf_when_input_para_not_define_in_vnfd(self, mock_call_req):
         r1 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
-        mock_call_req.side_effect = [r1]
+        r2 = [0, json.JSONEncoder().encode(''), '200']
+        mock_call_req.side_effect = [r1, r2]
         create_data = {
             "vnfdId": "111",
             "vnfInstanceName": "vFW_01",
@@ -128,7 +127,8 @@ class TestNsInstantiate(TestCase):
         JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
         data = inst_req_data
         InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        self.assert_job_result(self.job_id, 100, "Instantiate Vnf success.")
+        self.assert_job_result(self.job_id, 255, "Input parameter is not defined in vnfd_info.")
+
 
 vnfd_model_dict = {
     'local_storages': [],
@@ -401,4 +401,49 @@ vnfd_model_dict = {
         'vnf_type': u'SSS',
         'vnfd_version': u'V00000001',
         'id': u'sss-vnf-template',
-        'name': u'sss-vnf-template'}}
+        'name': u'sss-vnf-template'},
+    "flavourId": "flavour_1",
+    "instantiationLevelId": "instantiationLevel_1",
+    "extVirtualLinks": [
+        {
+            "vlInstanceId": "1",
+            "vim": {
+                "vimInfoId": "1",
+                "vimId": "1",
+                "interfaceInfo": {
+                    "vimType": "vim",
+                    "apiVersion": "v2",
+                    "protocolType": "http"
+                },
+                "accessInfo": {
+                    "tenant": "tenant_vCPE",
+                    "username": "vCPE",
+                    "password": "vCPE_321"
+                },
+                "interfaceEndpoint": "http://10.43.21.105:80/"
+            },
+            "resourceId": "1246",
+            "extCps": [
+                {
+                    "cpdId": "11",
+                    "addresses": [
+                        {
+                            "addressType": "MAC",
+                            "l2AddressData": "00:f3:43:20:a2:a3"
+                        },
+                        {
+                            "addressType": "IP",
+                            "l3AddressData": {
+                                "iPAddressType": "IPv4",
+                                "iPAddress": "192.168.104.2"
+                            }
+                        }
+                    ],
+                    "numDynamicAddresses": 0
+                }
+            ]
+        }
+    ],
+    "localizationLanguage": "en_US",
+    "additionalParams": {}
+}
