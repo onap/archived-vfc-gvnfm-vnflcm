@@ -105,7 +105,7 @@ class TestNsInstantiate(TestCase):
         response = self.client.post("/gvnfmapi/lcm/v1/vnf_instances/12/instantiate", data={}, format='json')
         self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
 
-    def test_instantiate_vnf_when_instid_not_exist(self):
+    def test_instantiate_vnf_when_inst_id_not_exist(self):
         self.nf_inst_id = str(uuid.uuid4())
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
         JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
@@ -146,12 +146,32 @@ class TestNsInstantiate(TestCase):
         self.assert_job_result(self.job_id, 255, "Nfvo was not registered")
 
     @mock.patch.object(restcall, 'call_req')
+    def test_instantiate_vnf_when_applay_grant_failed(self, mock_call_req):
+        NfvoRegInfoModel.objects.create(nfvoid='nfvo111', vnfminstid='vnfm111', apiurl='http://10.74.44.11',
+                                        nfvouser='root', nfvopassword='root123')
+        r1 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
+        r2 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
+        r3 = [1, json.JSONEncoder().encode(''), '200']
+        mock_call_req.side_effect = [r1, r2, r3]
+        create_data = {
+            "vnfdId": "111",
+            "vnfInstanceName": "vFW_01",
+            "vnfInstanceDescription": " vFW in Nanjing TIC Edge"}
+        self.nf_inst_id = CreateVnf(create_data).do_biz()
+        self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
+        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+        data = inst_req_data
+        InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
+        self.assert_job_result(self.job_id, 255, "Nf instancing apply grant exception")
+
+    @mock.patch.object(restcall, 'call_req')
     def test_instantiate_vnf_success(self, mock_call_req):
         NfvoRegInfoModel.objects.create(nfvoid='nfvo111', vnfminstid='vnfm111', apiurl='http://10.74.44.11',
                                         nfvouser='root', nfvopassword='root123')
         r1 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
         r2 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
-        mock_call_req.side_effect = [r1, r2]
+        r3 = [0, json.JSONEncoder().encode(''), '200']
+        mock_call_req.side_effect = [r1, r2, r3]
         create_data = {
             "vnfdId": "111",
             "vnfInstanceName": "vFW_01",

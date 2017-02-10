@@ -19,3 +19,7 @@ from lcm.pub.utils.restcall import req_by_msb
 def vnfd_rawdata_get(vnfdid):
     ret = req_by_msb("openoapi/nslcm/v1/vnfpackage/%s" % vnfdid, "GET")
     return ret
+
+def apply_grant_to_nfvo(data):
+    ret = req_by_msb("openoapi/nslcm/v1/vnfpackage" , "GET", data)
+    return ret

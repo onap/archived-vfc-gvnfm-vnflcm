@@ -50,7 +50,7 @@ class InstantiateVnf(APIView):
                 'localizationLanguage': ignore_case_get(request.data, 'localizationLanguage'),
                 'additionalParams': ignore_case_get(request.data, 'additionalParams')}
         nf_inst_id = instanceId
-        job_id = JobUtil.create_job('NF', 'CREATE', nf_inst_id)
+        job_id = JobUtil.create_job('NF', 'INSTANTIATE', nf_inst_id)
         JobUtil.add_job_status(job_id, 0, "INST_VNF_READY")
 
         InstVnf(data, nf_inst_id, job_id).start()
