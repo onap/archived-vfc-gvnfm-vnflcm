@@ -50,7 +50,7 @@ class InstVnf(Thread):
             self.vnf_inst_failed_handle(e.message)
             # self.rollback(e.message)
         except:
-            self.vnf_inst_failed_handle('unexpected exception')
+            # self.vnf_inst_failed_handle('unexpected exception')
             logger.error(traceback.format_exc())
             # self.rollback('unexpected exception')
 

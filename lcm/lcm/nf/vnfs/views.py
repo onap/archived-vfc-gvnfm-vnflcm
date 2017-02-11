@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import json
 import logging
+import os
 import traceback
 
 from rest_framework import status
@@ -80,3 +81,12 @@ class GetOperationStatus(APIView):
     def get(self, request):
         logger.debug("GetOperationStatus--get::> %s" % request.data)
         return Response(data='', status=status.HTTP_202_ACCEPTED)
+
+
+class SwaggerJsonView(APIView):
+    def get(self, request):
+        json_file = os.path.join(os.path.dirname(__file__), 'swagger.json')
+        f = open(json_file)
+        json_data = json.JSONDecoder().decode(f.read())
+        f.close()
+        return Response(json_data)

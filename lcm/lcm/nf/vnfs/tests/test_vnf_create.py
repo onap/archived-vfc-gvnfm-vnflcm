@@ -88,6 +88,10 @@ class TestNsInstantiate(TestCase):
             descp=job_detail)
         self.assertEqual(1, len(jobs))
 
+    def test_swagger_ok(self):
+        response = self.client.get("/gvnfmapi/lcm/v1/swagger.json", format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     @mock.patch.object(restcall, 'call_req')
     def test_create_vnf_identifier(self, mock_call_req):
         r1 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
