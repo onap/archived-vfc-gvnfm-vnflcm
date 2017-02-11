@@ -16,7 +16,7 @@ import logging
 import traceback
 from threading import Thread
 
-from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel
+from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel, VmInstModel, VNFCInstModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.msapi.nfvolcm import vnfd_rawdata_get, apply_grant_to_nfvo, apply_res_to_nfvo
 from lcm.pub.utils.jobutil import JobUtil
@@ -34,13 +34,42 @@ class InstVnf(Thread):
         self.job_id = job_id
         self.nfvo_inst_id = ''
         self.vnfm_inst_id = ''
+        self.create_res_result = {
+            'jobid': 'res_001',
+            'resourceResult': [{'name': 'vm01'}, {'name': 'vm02'}],
+            'resource_result':{
+                'affectedvnfc':[
+                    {
+                        'status':'success',
+                        'vnfcinstanceid':'1',
+                        'computeresource':{'resourceid':'11'},
+                        'vduid':'111',
+                        'vdutype':'1111'
+                    },
+                    {
+                        'status': 'success',
+                        'vnfcinstanceid': '2',
+                        'computeresource': {'resourceid':'22'},
+                        'vduid': '222',
+                        'vdutype': '2222'
+                    }
+                ],
+                'affectedvirtuallink':{
+
+                },
+                'affectedcp':{
+
+                }
+
+            }
+        }
 
     def run(self):
         try:
             self.inst_pre()
             self.apply_grant()
             self.create_res()
-            # self.check_res_status(args)
+            self.check_res_status()
             # self.wait_inst_finish(args)
             # self.lcm_notify(args)
             JobUtil.add_job_status(self.job_id, 100, "Instantiate Vnf success.")
@@ -115,29 +144,74 @@ class InstVnf(Thread):
         logger.info("Nf instancing apply grant finish")
 
     def create_res(self):
-        logger.info("[NF instantiation] send resource apply request start")
-        content_args = {'nfvoInstanceId': self.nfvo_inst_id, 'vnfmInstanceId': self.vnfm_inst_id,
-                        'nfInstanceId': self.nf_inst_id, 'nfDescriptorId': '',
-                        'lifecycleOperation': 'Instantiate', 'jobId': '',
-                        'allocateData': self.vnfd_info}
+        logger.info("[NF instantiation] create resource start")
         volumns = ignore_case_get(self.data, "volumn_storages")
-        #call vim driver api
         #create_volumns(volumns)
         JobUtil.add_job_status(self.job_id, 35, 'Nf instancing create resource(volumn_storages) finish')
-        # create_networks(self.vnfd_info)
-        JobUtil.add_job_status(self.job_id, 45, 'Nf instancing create resource(networks) finish')
-        # create_vdus(self.vnfd_info)
-        JobUtil.add_job_status(self.job_id, 65, 'Nf instancing create resource(vms) finish')
 
-    def check_res_status(self, args):
-        try:
-            logger.info('check_res_status, args=%s' % args)
-            # CheckResStatusTask(args).do_biz()
-            return {'result': '100', 'msg': 'Nf instancing check resource status finish', 'context': {}}
-        except Exception as e:
-            logger.error('Nf instancing check resource status exception=%s' % e.message)
-            logger.error(traceback.format_exc())
-            return {'result': '255', 'msg': 'Nf instancing check resource status exception', 'context': {}}
+        vls = ignore_case_get(self.data, "vls")
+        # create_networks(vls)
+        JobUtil.add_job_status(self.job_id, 55, 'Nf instancing create resource(networks) finish')
+
+        vdus = ignore_case_get(self.data, "vdus")
+        # create_vdus(vdus)
+        JobUtil.add_job_status(self.job_id, 75, 'Nf instancing create resource(vms) finish')
+
+        logger.info("[NF instantiation] create resource end")
+
+    def check_res_status(self):
+        logger.info("[NF instantiation] confirm all vms are active start")
+        vnfcs = self.create_res_result['resource_result']['affectedvnfc']
+        for vnfc in vnfcs:
+            if 'success' != vnfc['status']:
+                logger.error("VNFC_STATUS_IS_NOT_ACTIVE[vduid=%s]" % vnfc['vduId'])
+                raise NFLCMException(msgid="VNFC_STATUS_IS_NOT_ACTIVE[vduid=%s]", args=vnfc['vduId'])
+
+        JobUtil.add_job_status(self.job_id, 80, 'SAVE_VNFC_TO_DB')
+        vls = self.create_res_result['resource_result']['affectedvirtuallink']
+        cps = self.create_res_result['resource_result']['affectedcp']
+
+        for vnfc in vnfcs:
+            if 'failed' == vnfc['status']:
+                continue
+            compute_resource = vnfc['computeresource']
+            vminst = VmInstModel.objects.filter(resouceid=compute_resource['resourceid']).first()
+            VNFCInstModel.objects.create(
+                vnfcinstanceid=vnfc['vnfcinstanceid'],
+                vduid=vnfc['vduid'],
+                vdutype=vnfc['vdutype'],
+                nfinstid=self.nf_inst_id,
+                vmid=vminst.vmid)
+        # for vl in vls:
+        #     if 'failed' == vl['status']:
+        #         continue
+        #     network_resource = vl['networkresource']
+        #     subnet_resource = vl['subnetworkresource']
+        #     networkinst = NetworkInstModel.objects.filter(resouceid=network_resource['resourceid']).first()
+        #     subnetinst = SubNetworkInstModel.objects.filter(resouceid=subnet_resource['resourceid']).first()
+        #     VLInstModel.objects.create(
+        #         vlinstanceid=vl['virtuallinkinstanceid'],
+        #         vldid=vl['virtuallinkdescid'],
+        #         ownertype='0',  # VNF
+        #         ownerid=self.nf_inst_id,
+        #         relatednetworkid=networkinst.networkid,
+        #         relatedsubnetworkid=subnetinst.subnetworkid)
+        # # for vs in vss:
+        # for cp in cps:
+        #     if 'failed' == cp['status']:
+        #         continue
+        #     port_resource = cp['portresource']
+        #     portinst = PortInstModel.objects.filter(resouceid=port_resource['resourceid']).first()
+        #     CPInstModel.objects.create(
+        #         cpinstanceid=cp['cpinstanceid'],
+        #         cpdid=cp['cpdid'],
+        #         relatedtype='2',  # port
+        #         relatedport=portinst.portid,
+        #         ownertype=cp['ownertype'],
+        #         ownerid=cp['ownerid'],
+        #         vlinstanceid=cp['virtuallinkinstanceid'])
+        # self.add_job(43, 'INST_DPLY_VM_PRGS')
+        logger.info("[NF instantiation] confirm all vms are active end")
 
     def wait_inst_finish(self, args):
         try:

@@ -21,7 +21,7 @@ from rest_framework import status
 
 from lcm.nf.vnfs.vnf_create.create_vnf_identifier import CreateVnf
 from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
-from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel
+from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel, VmInstModel
 from lcm.pub.utils import restcall
 from lcm.pub.utils.jobutil import JobUtil
 
@@ -76,7 +76,10 @@ inst_req_data = {
 class TestNsInstantiate(TestCase):
     def setUp(self):
         self.client = Client()
-        self.nsd_id = str(uuid.uuid4())
+        VmInstModel.objects.create(vmid="1", vimid="1", resouceid="11", insttype=0, instid="1", vmname="test_01",
+                                   operationalstate=1)
+        VmInstModel.objects.create(vmid="2", vimid="2", resouceid="22", insttype=0, instid="2", vmname="test_02",
+                               operationalstate=1)
 
     def tearDown(self):
         pass

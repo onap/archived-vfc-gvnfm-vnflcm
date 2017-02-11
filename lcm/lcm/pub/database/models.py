@@ -91,7 +91,7 @@ class JobStatusModel(models.Model):
     jobid = models.CharField(db_column='JOBID', max_length=255)
     status = models.CharField(db_column='STATUS', max_length=255)
     progress = models.IntegerField(db_column='PROGRESS', null=True, blank=True)
-    descp = models.CharField(db_column='DESCP', max_length=1024)
+    descp = models.TextField(db_column='DESCP', max_length=1024)
     errcode = models.CharField(db_column='ERRCODE', max_length=255, null=True, blank=True)
     addtime = models.CharField(db_column='ADDTIME', max_length=255, null=True, blank=True)
 
@@ -112,3 +112,30 @@ class NfvoRegInfoModel(models.Model):
     clientcert = models.CharField(max_length=255, db_column='CLIENTCERT', null=True)
     servercert = models.CharField(max_length=255, db_column='SERVERCERT', null=True)
     regtime = models.CharField(max_length=255, db_column='REGTIME')
+
+class VmInstModel(models.Model):
+    class Meta:
+        db_table = 'VMINST'
+
+    vmid = models.CharField(db_column='VMID', primary_key=True, max_length=255)
+    vimid = models.CharField(db_column='VIMID', max_length=255)
+    resouceid = models.CharField(db_column='RESOURCEID', max_length=255)
+    insttype = models.IntegerField(db_column='INSTTYPE')
+    instid = models.CharField(db_column='INSTID', max_length=255)
+    vmname = models.CharField(db_column='VMNAME', max_length=255)
+    operationalstate = models.IntegerField(db_column='OPERATIONALSTATE', null=True)
+    zoneid = models.CharField(db_column='ZONEID', max_length=255, null=True)
+    tenant = models.CharField(db_column='TENANT', max_length=255, null=True)
+    hostid = models.CharField(db_column='HOSTID', max_length=255, null=True)
+    detailinfo = models.TextField(db_column='DETAILINFO', max_length=8192, null=True)
+    is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
+
+class VNFCInstModel(models.Model):
+    class Meta:
+        db_table = 'VNFCINST'
+
+    vnfcinstanceid = models.CharField(db_column='VNFCINSTANCEID', max_length=255, primary_key=True)
+    vduid = models.CharField(db_column='VDUID', max_length=255)
+    vdutype = models.CharField(db_column='VDUTYPE', max_length=255)
+    nfinstid = models.CharField(db_column='NFINSTID', max_length=255)
+    vmid = models.CharField(db_column='VMID', max_length=255)
