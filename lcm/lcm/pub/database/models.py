@@ -139,3 +139,61 @@ class VNFCInstModel(models.Model):
     vdutype = models.CharField(db_column='VDUTYPE', max_length=255)
     nfinstid = models.CharField(db_column='NFINSTID', max_length=255)
     vmid = models.CharField(db_column='VMID', max_length=255)
+
+class NetworkInstModel(models.Model):
+    class Meta:
+        db_table = 'NETWORKINST'
+
+    networkid = models.CharField(db_column='NETWORKID', primary_key=True, max_length=255)
+    vimid = models.CharField(db_column='VIMID', max_length=255)
+    resouceid = models.CharField(db_column='RESOURCEID', max_length=255)
+    insttype = models.IntegerField(db_column='INSTTYPE')
+    instid = models.CharField(db_column='INSTID', max_length=255)
+    name = models.CharField(db_column='NAME', max_length=255)
+    tenant = models.CharField(db_column='TENANT', max_length=255, null=True)
+    is_shared = models.IntegerField(db_column='ISSHARED', default=0, null=True)
+    is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
+    desc = models.CharField(db_column='DESC', max_length=255, null=True)
+    vendor = models.CharField(db_column='VENDOR', max_length=255, null=True)
+    bandwidth = models.IntegerField(db_column='BANDWIDTH', null=True)
+    mtu = models.IntegerField(db_column='MTU', null=True)
+    network_type = models.CharField(db_column='NETWORKTYPE', max_length=255, null=True)
+    segmentid = models.CharField(db_column='SEGMENTID', max_length=255, null=True)
+    vlantrans = models.IntegerField(db_column='VLANTRANS', null=True)
+    networkqos = models.CharField(db_column='NETWORKQOS', max_length=255, null=True)
+
+
+class SubNetworkInstModel(models.Model):
+    class Meta:
+        db_table = 'SUBNETWORKINST'
+
+    subnetworkid = models.CharField(db_column='SUBNETWORKID', primary_key=True, max_length=255)
+    vimid = models.CharField(db_column='VIMID', max_length=255)
+    resouceid = models.CharField(db_column='RESOURCEID', max_length=255)
+    networkid = models.CharField(db_column='NETWORKID', max_length=255)
+    insttype = models.IntegerField(db_column='INSTTYPE')
+    instid = models.CharField(db_column='INSTID', max_length=255)
+    name = models.CharField(db_column='NAME', max_length=255)
+    ipversion = models.IntegerField(db_column='IPVERSION', null=True)
+    gatewayip = models.CharField(db_column='GATEWAYIP', max_length=255, null=True)
+    isdhcpenabled = models.IntegerField(db_column='ISDHCPENABLED', null=True)
+    cidr = models.CharField(db_column='CIDR', max_length=255)
+    vdsname = models.CharField(db_column='VDSNAME', max_length=255, null=True)
+    operationalstate = models.CharField(db_column='OPERATIONALSTATE', max_length=255, null=True)
+    tenant = models.CharField(db_column='TENANT', max_length=255, null=True)
+    is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
+
+class VLInstModel(models.Model):
+    class Meta:
+        db_table = 'VLINST'
+
+    vlinstanceid = models.CharField(db_column='VLINSTANCEID', max_length=255, primary_key=True)
+    vldid = models.CharField(db_column='VLDID', max_length=255)
+    vlinstancename = models.CharField(db_column='VLINSTANCENAME', max_length=255, blank=True, null=True)
+    ownertype = models.IntegerField(db_column='OWNERTYPE')
+    ownerid = models.CharField(db_column='OWNERID', max_length=255)
+    relatednetworkid = models.CharField(db_column='RELATEDNETWORKID', max_length=255, blank=True, null=True)
+    relatedsubnetworkid = models.CharField(db_column='RELATEDSUBNETWORKID', max_length=255, blank=True, null=True)
+    vltype = models.IntegerField(db_column='VLTYPE', default=0)
+    vimid = models.CharField(db_column='VIMID', max_length=255)
+    tenant = models.CharField(db_column='TENANT', max_length=50)

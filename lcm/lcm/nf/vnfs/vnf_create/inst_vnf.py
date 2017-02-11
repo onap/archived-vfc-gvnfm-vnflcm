@@ -16,7 +16,8 @@ import logging
 import traceback
 from threading import Thread
 
-from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel, VmInstModel, VNFCInstModel
+from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel, VmInstModel, VNFCInstModel, \
+    NetworkInstModel, SubNetworkInstModel, VLInstModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.msapi.nfvolcm import vnfd_rawdata_get, apply_grant_to_nfvo, apply_res_to_nfvo
 from lcm.pub.utils.jobutil import JobUtil
@@ -45,18 +46,17 @@ class InstVnf(Thread):
                         'computeresource':{'resourceid':'11'},
                         'vduid':'111',
                         'vdutype':'1111'
-                    },
-                    {
-                        'status': 'success',
-                        'vnfcinstanceid': '2',
-                        'computeresource': {'resourceid':'22'},
-                        'vduid': '222',
-                        'vdutype': '2222'
                     }
                 ],
-                'affectedvirtuallink':{
-
-                },
+                'affectedvirtuallink':[
+                    {
+                        'status': 'success',
+                        'virtuallinkinstanceid':'',
+                        'networkresource':{'resourceid':'1'},
+                        'subnetworkresource':{'resourceid':'1'},
+                        'virtuallinkdescid': '',
+                    }
+                ],
                 'affectedcp':{
 
                 }
@@ -182,20 +182,21 @@ class InstVnf(Thread):
                 vdutype=vnfc['vdutype'],
                 nfinstid=self.nf_inst_id,
                 vmid=vminst.vmid)
-        # for vl in vls:
-        #     if 'failed' == vl['status']:
-        #         continue
-        #     network_resource = vl['networkresource']
-        #     subnet_resource = vl['subnetworkresource']
-        #     networkinst = NetworkInstModel.objects.filter(resouceid=network_resource['resourceid']).first()
-        #     subnetinst = SubNetworkInstModel.objects.filter(resouceid=subnet_resource['resourceid']).first()
-        #     VLInstModel.objects.create(
-        #         vlinstanceid=vl['virtuallinkinstanceid'],
-        #         vldid=vl['virtuallinkdescid'],
-        #         ownertype='0',  # VNF
-        #         ownerid=self.nf_inst_id,
-        #         relatednetworkid=networkinst.networkid,
-        #         relatedsubnetworkid=subnetinst.subnetworkid)
+        for vl in vls:
+            if 'failed' == vl['status']:
+                continue
+            network_resource = vl['networkresource']
+            subnet_resource = vl['subnetworkresource']
+            networkinst = NetworkInstModel.objects.filter(resouceid=network_resource['resourceid']).first()
+            subnetinst = SubNetworkInstModel.objects.filter(resouceid=subnet_resource['resourceid']).first()
+            VLInstModel.objects.create(
+                vlinstanceid=vl['virtuallinkinstanceid'],
+                vldid=vl['virtuallinkdescid'],
+                ownertype='0',
+                ownerid=self.nf_inst_id,
+                relatednetworkid=networkinst.networkid,
+                relatedsubnetworkid=subnetinst.subnetworkid)
+        pass
         # # for vs in vss:
         # for cp in cps:
         #     if 'failed' == cp['status']:

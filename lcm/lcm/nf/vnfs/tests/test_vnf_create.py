@@ -21,7 +21,8 @@ from rest_framework import status
 
 from lcm.nf.vnfs.vnf_create.create_vnf_identifier import CreateVnf
 from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
-from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel, VmInstModel
+from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel, VmInstModel, NetworkInstModel, \
+    SubNetworkInstModel
 from lcm.pub.utils import restcall
 from lcm.pub.utils.jobutil import JobUtil
 
@@ -80,6 +81,10 @@ class TestNsInstantiate(TestCase):
                                    operationalstate=1)
         VmInstModel.objects.create(vmid="2", vimid="2", resouceid="22", insttype=0, instid="2", vmname="test_02",
                                operationalstate=1)
+        NetworkInstModel.objects.create(networkid='1', vimid='1', resouceid='1', name='pnet_network',
+                                        tenant='admin', insttype=0, instid='1')
+        SubNetworkInstModel.objects.create(subnetworkid='1', vimid='1', resouceid='1', networkid='1',
+                                           name='sub_pnet',tenant='admin', insttype=0, instid='1')
 
     def tearDown(self):
         pass
