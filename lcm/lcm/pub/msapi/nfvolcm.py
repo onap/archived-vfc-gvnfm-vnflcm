@@ -12,14 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Query vnfd_rawdata by vnfdid
 from lcm.pub.utils.restcall import req_by_msb
 
-
+#call gvnfm driver
 def vnfd_rawdata_get(vnfdid):
-    ret = req_by_msb("openoapi/nslcm/v1/vnfpackage/%s" % vnfdid, "GET")
+    ret = req_by_msb("openoapi/nslcm/v1/vnfs/%s" % vnfdid, "GET")
     return ret
 
+#call gvnfm driver
 def apply_grant_to_nfvo(data):
-    ret = req_by_msb("openoapi/nslcm/v1/vnfpackage" , "GET", data)
+    ret = req_by_msb("openoapi/nslcm/v1/grantvnf" , "POST", data)
+    return ret
+
+#call gvnfm driver
+def notify_lcm_to_nfvo(data, nf_inst_id):
+    ret = req_by_msb("openoapi/nslcm/v1/vnfs/%s/Notify"%nf_inst_id, "POST", data)
     return ret

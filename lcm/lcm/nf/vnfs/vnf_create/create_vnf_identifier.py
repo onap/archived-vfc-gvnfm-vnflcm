@@ -27,39 +27,36 @@ logger = logging.getLogger(__name__)
 class CreateVnf:
     def __init__(self, data):
         self.data = data
-
-    def do_biz(self):
-        logger.debug("CreateVnfIdentifier--CreateVnf::> %s" % self.data)
         self.vnfd_id = ignore_case_get(self.data, "vnfdId")
         self.vnf_instance_mame = ignore_case_get(self.data, "vnfInstanceName")
         self.description = ignore_case_get(self.data, "vnfInstanceDescription")
+
+    def do_biz(self):
+        logger.debug("CreateVnfIdentifier--CreateVnf::> %s" % self.data)
         is_exist = NfInstModel.objects.filter(nf_name=self.vnf_instance_mame).exists()
-        logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)
+        logger.debug("check_inst_name_exist::is_exist=%s" % is_exist)
         if is_exist:
             raise NFLCMException('VNF is already exist.')
 
-        #get rawdata by vnfd_id
         ret = vnfd_rawdata_get(self.vnfd_id)
         if ret[0] != 0:
-            raise NFLCMException('Get vnfd_raw_data failed.')
-        dst_plan = json.JSONDecoder().decode(ret[1])
-        self.vnfd_version = dst_plan['metadata']['vnfd_version']
-        self.vendor = dst_plan['metadata']['vendor']
-        self.producttype = dst_plan['metadata']['domain_type']
-        self.netype = dst_plan['metadata']['vnf_type']
-        self.vnfd_model = dst_plan
-        self.vnfSoftwareVersion = dst_plan['metadata']['version']
+            raise NFLCMException('Get vnfd data failed.')
+        vnfd_info = json.JSONDecoder().decode(ret[1])
+        vnfd_version = vnfd_info['metadata']['vnfd_version']
+        vendor = vnfd_info['metadata']['vendor']
+        producttype = vnfd_info['metadata']['domain_type']
+        netype = vnfd_info['metadata']['vnf_type']
+        vnfd_model = vnfd_info
+        vnfsoftwareversion = vnfd_info['metadata']['version']
 
-        self.nf_inst_id = str(uuid.uuid4())
-        NfInstModel.objects.create(nfinstid=self.nf_inst_id, mnfinstid=self.nf_inst_id, nf_name=self.vnf_instance_mame,
-                                   package_id='todo', vnfm_inst_id='todo', version=self.vnfd_version, vendor=self.vendor,
-                                   producttype=self.producttype,netype=self.netype, vnfd_model=self.vnfd_model,
+        nf_inst_id = str(uuid.uuid4())
+        NfInstModel.objects.create(nfinstid=nf_inst_id, mnfinstid=nf_inst_id, nf_name=self.vnf_instance_mame,
+                                   package_id='todo', vnfm_inst_id='todo', version=vnfd_version, vendor=vendor,
+                                   producttype=producttype, netype=netype, vnfd_model=vnfd_model,
                                    instantiationState='NOT_INSTANTIATED', nf_desc=self.description, vnfdid=self.vnfd_id,
-                                   vnfSoftwareVersion=self.vnfSoftwareVersion, vnfConfigurableProperties='todo',
-                                   localizationLanguage='EN_US',create_time=now_time())
-        is_exist = NfInstModel.objects.filter(nf_name=self.vnf_instance_mame).exists()
-        logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)
-        vnf_inst = NfInstModel.objects.get(nfinstid=self.nf_inst_id)
+                                   vnfSoftwareVersion=vnfsoftwareversion, vnfConfigurableProperties='todo',
+                                   localizationLanguage='EN_US', create_time=now_time())
+        vnf_inst = NfInstModel.objects.get(nfinstid=nf_inst_id)
         logger.debug('id is [%s],name is [%s],vnfd_id is [%s],description is [%s],create_time is [%s]' %
-            (vnf_inst.nfinstid, vnf_inst.nf_name, vnf_inst.vnfdid, vnf_inst.nf_desc, vnf_inst.create_time))
-        return self.nf_inst_id
+                     (vnf_inst.nfinstid, vnf_inst.nf_name, vnf_inst.vnfdid, vnf_inst.nf_desc, vnf_inst.create_time))
+        return nf_inst_id

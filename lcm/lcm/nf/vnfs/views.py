@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+import traceback
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -20,8 +21,8 @@ from rest_framework.views import APIView
 
 from lcm.nf.vnfs.vnf_create.create_vnf_identifier import CreateVnf
 from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
+from lcm.pub.exceptions import NFLCMException
 from lcm.pub.utils.jobutil import JobUtil
-from lcm.pub.utils.values import ignore_case_get
 
 logger = logging.getLogger(__name__)
 
@@ -29,31 +30,24 @@ logger = logging.getLogger(__name__)
 class CreateVnfIdentifier(APIView):
     def post(self, request):
         logger.debug("CreateVnfIdentifier--post::> %s" % request.data)
-        data = {}
-        data["vnfdId"] = ignore_case_get(request.data, "vnfdId")
-        data["vnfInstanceName"] = ignore_case_get(request.data, "vnfInstanceName")
-        data["vnfInstanceDescription"] = ignore_case_get(request.data, "vnfInstanceDescription")
         try:
-            self.nf_inst_id = CreateVnf(data).do_biz()
-        except Exception as e:
+            nf_inst_id = CreateVnf(request.data).do_biz()
+        except NFLCMException as e:
+            logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        rsp = {"vnfInstanceId": self.nf_inst_id}
+        except Exception:
+            logger.error(traceback.format_exc())
+            return Response(data='unexpected exception', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        rsp = {"vnfInstanceId": nf_inst_id}
         return Response(data=rsp, status=status.HTTP_201_CREATED)
 
 
 class InstantiateVnf(APIView):
     def post(self, request, instanceId):
         logger.debug("InstantiateVnf--post::> %s" % request.data)
-        data = {'flavourId': ignore_case_get(request.data, 'flavourId'),
-                'instantiationLevelId': ignore_case_get(request.data, 'instantiationLevelId'),
-                'extVirtualLinks': ignore_case_get(request.data, 'extVirtualLinks'),
-                'localizationLanguage': ignore_case_get(request.data, 'localizationLanguage'),
-                'additionalParams': ignore_case_get(request.data, 'additionalParams')}
-        nf_inst_id = instanceId
-        job_id = JobUtil.create_job('NF', 'INSTANTIATE', nf_inst_id)
+        job_id = JobUtil.create_job('NF', 'INSTANTIATE', instanceId)
         JobUtil.add_job_status(job_id, 0, "INST_VNF_READY")
-
-        InstVnf(data, nf_inst_id, job_id).start()
+        InstVnf(request.data, instanceId, job_id).start()
         rsp = {"jobId": job_id}
         return Response(data=rsp, status=status.HTTP_202_ACCEPTED)
 

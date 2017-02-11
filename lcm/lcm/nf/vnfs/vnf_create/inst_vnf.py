@@ -20,6 +20,7 @@ from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoMode
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.msapi.nfvolcm import vnfd_rawdata_get, apply_grant_to_nfvo
 from lcm.pub.utils.jobutil import JobUtil
+from lcm.pub.utils.timeutil import now_time
 
 logger = logging.getLogger(__name__)
 
@@ -33,13 +34,10 @@ class InstVnf(Thread):
         self.nfvo_inst_id = ''
         self.vnfm_inst_id = ''
 
-
     def run(self):
         try:
-            self.inst_pre(self.nf_inst_id)
-
+            self.inst_pre()
             self.apply_grant()
-
             # self.apply_res(args)
             # self.check_res_status(args)
             # self.wait_inst_finish(args)
@@ -48,38 +46,30 @@ class InstVnf(Thread):
             is_exist = JobStatusModel.objects.filter(jobid=self.job_id).exists()
             logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)
         except NFLCMException as e:
-            self.inst_exception(e.message)
-            pass
-        except Exception:
+            self.vnf_inst_failed_handle(e.message)
+            # self.rollback(e.message)
+        except:
+            self.vnf_inst_failed_handle('unexpected exception')
             logger.error(traceback.format_exc())
-            self.inst_exception('unexpected exception')
+            # self.rollback('unexpected exception')
 
-    def inst_pre(self, args):
-        logger.info('inst_pre, args=%s' % args)
-        is_exist = NfInstModel.objects.filter(nfinstid=self.nf_inst_id).exists()
-        logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)
-        if not is_exist:
-            logger.error("VNF nf_inst_id is not exist.")
-            JobUtil.add_job_status(self.job_id, 255, "VNF nf_inst_id is not exist.")
+    def inst_pre(self):
+        vnf_insts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
+        if not vnf_insts.exists():
             raise NFLCMException('VNF nf_inst_id is not exist.')
 
-        vnf_inst = NfInstModel.objects.get(nfinstid=self.nf_inst_id)
-        self.vnfm_inst_id = vnf_inst.vnfm_inst_id
-        if vnf_inst.instantiationState != 'NOT_INSTANTIATED':
-            logger.error("VNF instantiationState is not NOT_INSTANTIATED.")
-            JobUtil.add_job_status(self.job_id, 255, "VNF instantiationState is not NOT_INSTANTIATED.")
+        self.vnfm_inst_id = vnf_insts[0].vnfm_inst_id
+        if vnf_insts[0].instantiationState != 'NOT_INSTANTIATED':
             raise NFLCMException('VNF instantiationState is not NOT_INSTANTIATED.')
 
         #get rawdata by vnfd_id
-        ret = vnfd_rawdata_get(vnf_inst.vnfdid)
+        ret = vnfd_rawdata_get(vnf_insts[0].vnfdid)
         if ret[0] != 0:
             raise NFLCMException("Get vnfd_raw_data failed.")
         self.vnfd_info = json.JSONDecoder().decode(ret[1])
         #checkParameterExist
         for cp in self.data:
             if cp not in self.vnfd_info:
-                logger.error("[%s] is not defined in vnfd_info."%cp)
-                JobUtil.add_job_status(self.job_id, 255, "Input parameter is not defined in vnfd_info.")
                 raise NFLCMException('Input parameter is not defined in vnfd_info.')
         #get nfvo info
         JobUtil.add_job_status(self.job_id, 5, 'GET_NFVO_CONNECTION_INFO')
@@ -107,9 +97,6 @@ class InstVnf(Thread):
         resp = apply_grant_to_nfvo(content_args)
         logger.info("[NF instantiation] get grant response = %s" % resp)
         if resp[0] != 0:
-            err_msg = str(resp[1])
-            logger.error("Nf instancing apply grant exception.[%s]" % err_msg)
-            JobUtil.add_job_status(self.job_id, 255, 'Nf instancing apply grant exception')
             raise NFLCMException('Nf instancing apply grant exception')
 
         #update_resources_table()
@@ -156,7 +143,7 @@ class InstVnf(Thread):
             logger.error(traceback.format_exc())
             return {'result': '255', 'msg': 'Nf instancing lcm notify exception', 'context': {}}
 
-    def inst_exception(self, args):
+    def rollback(self, args):
         try:
             logger.info('inst_exception, args=%s' % args)
             # InstExceptionTask(args).do_biz()
@@ -173,6 +160,12 @@ class InstVnf(Thread):
             self.nfvo_inst_id = reg_info.nfvoid
             logger.info("[NF instantiation] Registered nfvo id is [%s]"%self.nfvo_inst_id)
         else:
-            JobUtil.add_job_status(self.job_id, 255, "Nfvo was not registered")
             raise NFLCMException("Nfvo was not registered")
         logger.info("[NF instantiation]get nfvo connection info end")
+
+    def vnf_inst_failed_handle(self, error_msg):
+        logger.error('VNF instantiation failed, detail message: %s' % error_msg)
+        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='failed', lastuptime=now_time())
+        JobUtil.add_job_status(self.job_id, 255, error_msg)
+        # JobUtil.add_job_status(self.job_id, 255, 'VNF instantiation failed, detail message: %s' % error_msg, 0)
+
