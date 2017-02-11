@@ -24,6 +24,8 @@ def call(vim_id, res, method, data=''):
         raise VimException(ret[1], ret[2])
     return json.JSONDecoder().decode(ret[1]) if ret[1] else {}
 
+######################################################################
+
 def create_image(vim_id, data):
     return call(vim_id, "images", "POST", data)
 
@@ -36,6 +38,8 @@ def get_image(vim_id, image_id):
 def list_image(vim_id):
     return call(vim_id, "images", "GET")
 
+######################################################################
+
 def create_network(vim_id, data):
     return call(vim_id, "networks", "POST", data)
 
@@ -47,7 +51,9 @@ def get_network(vim_id, network_id):
     
 def list_network(vim_id):
     return call(vim_id, "networks", "GET")
-    
+
+######################################################################
+
 def create_subnet(vim_id, data):
     return call(vim_id, "subnets", "POST", data)
 
@@ -60,6 +66,8 @@ def get_subnet(vim_id, subnet_id):
 def list_subnet(vim_id):
     return call(vim_id, "subnets", "GET")
 
+######################################################################
+
 def create_port(vim_id, data):
     return call(vim_id, "ports", "POST", data)
 
@@ -71,7 +79,9 @@ def get_port(vim_id, port_id):
     
 def list_port(vim_id):
     return call(vim_id, "ports", "GET")
-    
+
+######################################################################
+
 def create_flavor(vim_id, data):
     return call(vim_id, "flavors", "POST", data)
 
@@ -83,3 +93,31 @@ def get_flavor(vim_id, flavor_id):
     
 def list_flavor(vim_id):
     return call(vim_id, "flavors", "GET")
+
+######################################################################
+
+def create_vm(vim_id, data):
+    return call(vim_id, "vms", "POST", data)
+
+def delete_vm(vim_id, vm_id):
+    return call(vim_id, "vms/%s" % vm_id, "DELETE")
+    
+def get_vm(vim_id, vm_id):
+    return call(vim_id, "vms/%s" % vm_id, "GET")
+    
+def list_vm(vim_id):
+    return call(vim_id, "vms", "GET")
+
+######################################################################
+
+def create_volume(vim_id, data):
+    return call(vim_id, "volumes", "POST", data)
+
+def delete_volume(vim_id, volume_id):
+    return call(vim_id, "volumes/%s" % volume_id, "DELETE")
+    
+def get_volume(vim_id, volume_id):
+    return call(vim_id, "volumes/%s" % volume_id, "GET")
+    
+def list_volume(vim_id):
+    return call(vim_id, "volumes", "GET")
