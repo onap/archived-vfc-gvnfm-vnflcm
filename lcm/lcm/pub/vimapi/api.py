@@ -59,3 +59,27 @@ def get_subnet(vim_id, subnet_id):
     
 def list_subnet(vim_id):
     return call(vim_id, "subnets", "GET")
+
+def create_port(vim_id, data):
+    return call(vim_id, "ports", "POST", data)
+
+def delete_port(vim_id, port_id):
+    return call(vim_id, "ports/%s" % port_id, "DELETE")
+    
+def get_port(vim_id, port_id):
+    return call(vim_id, "ports/%s" % port_id, "GET")
+    
+def list_port(vim_id):
+    return call(vim_id, "ports", "GET")
+    
+def create_flavor(vim_id, data):
+    return call(vim_id, "flavors", "POST", data)
+
+def delete_flavor(vim_id, flavor_id):
+    return call(vim_id, "flavors/%s" % flavor_id, "DELETE")
+    
+def get_flavor(vim_id, flavor_id):
+    return call(vim_id, "flavors/%s" % flavor_id, "GET")
+    
+def list_flavor(vim_id):
+    return call(vim_id, "flavors", "GET")
