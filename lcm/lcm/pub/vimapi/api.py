@@ -23,3 +23,39 @@ def call(vim_id, res, method, data=''):
     if ret[0] > 0:
         raise VimException(ret[1], ret[2])
     return json.JSONDecoder().decode(ret[1]) if ret[1] else {}
+
+def create_image(vim_id, data):
+    return call(vim_id, "images", "POST", data)
+
+def delete_image(vim_id, image_id):
+    return call(vim_id, "images/%s" % image_id, "DELETE")
+    
+def get_image(vim_id, image_id):
+    return call(vim_id, "images/%s" % image_id, "GET")
+    
+def list_image(vim_id):
+    return call(vim_id, "images", "GET")
+
+def create_network(vim_id, data):
+    return call(vim_id, "networks", "POST", data)
+
+def delete_network(vim_id, network_id):
+    return call(vim_id, "networks/%s" % network_id, "DELETE")
+    
+def get_network(vim_id, network_id):
+    return call(vim_id, "networks/%s" % network_id, "GET")
+    
+def list_network(vim_id):
+    return call(vim_id, "networks", "GET")
+    
+def create_subnet(vim_id, data):
+    return call(vim_id, "subnets", "POST", data)
+
+def delete_subnet(vim_id, subnet_id):
+    return call(vim_id, "subnets/%s" % subnet_id, "DELETE")
+    
+def get_subnet(vim_id, subnet_id):
+    return call(vim_id, "subnets/%s" % subnet_id, "GET")
+    
+def list_subnet(vim_id):
+    return call(vim_id, "subnets", "GET")
