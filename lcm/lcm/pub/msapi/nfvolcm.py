@@ -28,3 +28,8 @@ def apply_grant_to_nfvo(data):
 def notify_lcm_to_nfvo(data, nf_inst_id):
     ret = req_by_msb("openoapi/nslcm/v1/vnfs/%s/Notify"%nf_inst_id, "POST", data)
     return ret
+
+#call gvnfm driver
+def apply_res_to_nfvo(data):
+    ret = req_by_msb("openoapi/nslcm/v1/res" , "POST", data)
+    return ret

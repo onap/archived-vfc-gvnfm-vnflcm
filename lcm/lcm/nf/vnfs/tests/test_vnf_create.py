@@ -101,7 +101,8 @@ class TestNsInstantiate(TestCase):
         context = json.loads(response.content)
         self.assertTrue(NfInstModel.objects.filter(nfinstid=context['vnfInstanceId']).exists())
 
-    def test_instantiate_vnf(self):
+    @mock.patch.object(InstVnf, 'run')
+    def test_instantiate_vnf(self, mock_run):
         response = self.client.post("/gvnfmapi/lcm/v1/vnf_instances/12/instantiate", data={}, format='json')
         self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
 
@@ -170,8 +171,9 @@ class TestNsInstantiate(TestCase):
                                         nfvouser='root', nfvopassword='root123')
         r1 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
         r2 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
-        r3 = [0, json.JSONEncoder().encode(''), '200']
-        mock_call_req.side_effect = [r1, r2, r3]
+        r3 = [0, json.JSONEncoder().encode('Nf instancing apply grant'), '200']
+        r4 = [0, json.JSONEncoder().encode('Nf instancing apply resource'), '200']
+        mock_call_req.side_effect = [r1, r2, r3, r4]
         create_data = {
             "vnfdId": "111",
             "vnfInstanceName": "vFW_01",

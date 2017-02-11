@@ -18,9 +18,10 @@ from threading import Thread
 
 from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel
 from lcm.pub.exceptions import NFLCMException
-from lcm.pub.msapi.nfvolcm import vnfd_rawdata_get, apply_grant_to_nfvo
+from lcm.pub.msapi.nfvolcm import vnfd_rawdata_get, apply_grant_to_nfvo, apply_res_to_nfvo
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
+from lcm.pub.utils.values import ignore_case_get
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +39,7 @@ class InstVnf(Thread):
         try:
             self.inst_pre()
             self.apply_grant()
-            # self.apply_res(args)
+            self.create_res()
             # self.check_res_status(args)
             # self.wait_inst_finish(args)
             # self.lcm_notify(args)
@@ -75,6 +76,15 @@ class InstVnf(Thread):
         JobUtil.add_job_status(self.job_id, 5, 'GET_NFVO_CONNECTION_INFO')
         self.load_nfvo_config()
 
+        #update NfInstModel
+        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(flavour_id=ignore_case_get(self.data, "flavourId"),
+                                                                    vnf_level=ignore_case_get(self.data, 'instantiationLevelId'),
+                                                                    input_params=ignore_case_get(self.data, 'additionalParams'),
+                                                                    extension=ignore_case_get(self.data, ''),
+                                                                    initallocatedata=self.vnfd_info,
+                                                                    localizationLanguage=ignore_case_get(self.data, 'localizationLanguage'),
+                                                                    lastuptime=now_time())
+
     def apply_grant(self):
         logger.info('[NF instantiation] send resource grand request to nfvo start')
         #self.check_vm_capacity()
@@ -100,18 +110,24 @@ class InstVnf(Thread):
             raise NFLCMException('Nf instancing apply grant exception')
 
         #update_resources_table()
+        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(instantiationState='INSTANTIATED', lastuptime=now_time())
         JobUtil.add_job_status(self.job_id, 15, 'Nf instancing apply grant finish')
         logger.info("Nf instancing apply grant finish")
 
-    def apply_res(self, args):
-        try:
-            logger.info('apply_res, args=%s' % args)
-            # ApplyResTask(args).do_biz()
-            return {'result': '100', 'msg': 'Nf instancing apply resource finish', 'context': {}}
-        except Exception as e:
-            logger.error('Nf instancing apply resource exception=%s' % e.message)
-            logger.error(traceback.format_exc())
-            return {'result': '255', 'msg': 'Nf instancing apply resource exception', 'context': {}}
+    def create_res(self):
+        logger.info("[NF instantiation] send resource apply request start")
+        content_args = {'nfvoInstanceId': self.nfvo_inst_id, 'vnfmInstanceId': self.vnfm_inst_id,
+                        'nfInstanceId': self.nf_inst_id, 'nfDescriptorId': '',
+                        'lifecycleOperation': 'Instantiate', 'jobId': '',
+                        'allocateData': self.vnfd_info}
+        volumns = ignore_case_get(self.data, "volumn_storages")
+        #call vim driver api
+        #create_volumns(volumns)
+        JobUtil.add_job_status(self.job_id, 35, 'Nf instancing create resource(volumn_storages) finish')
+        # create_networks(self.vnfd_info)
+        JobUtil.add_job_status(self.job_id, 45, 'Nf instancing create resource(networks) finish')
+        # create_vdus(self.vnfd_info)
+        JobUtil.add_job_status(self.job_id, 65, 'Nf instancing create resource(vms) finish')
 
     def check_res_status(self, args):
         try:
@@ -168,4 +184,5 @@ class InstVnf(Thread):
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='failed', lastuptime=now_time())
         JobUtil.add_job_status(self.job_id, 255, error_msg)
         # JobUtil.add_job_status(self.job_id, 255, 'VNF instantiation failed, detail message: %s' % error_msg, 0)
+
 
