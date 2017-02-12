@@ -12,12 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
+
 from lcm.pub.utils.restcall import req_by_msb
 from .exceptions import VimException
 
 VIM_DRIVER_BASE_URL = "openoapi/vimdriver/v1"
 
 def call(vim_id, res, method, data=''):
+    if data and not isinstance(a, (str, unicode)):
+        data = json.JSONEncoder().encode(data)
     url = "%/%s/%s" % (VIM_DRIVER_BASE_URL, vim_id, res)
     ret = req_by_msb(url, method, data)
     if ret[0] > 0:
