@@ -24,6 +24,7 @@ from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
 from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel, VmInstModel, NetworkInstModel, \
     SubNetworkInstModel, PortInstModel
 from lcm.pub.utils import restcall
+from lcm.pub.vimapi import adaptor
 from lcm.pub.utils.jobutil import JobUtil
 
 inst_req_data = {
@@ -180,14 +181,16 @@ class TestNsInstantiate(TestCase):
         self.assert_job_result(self.job_id, 255, "Nf instancing apply grant exception")
 
     @mock.patch.object(restcall, 'call_req')
-    def test_instantiate_vnf_success(self, mock_call_req):
+    # @mock.patch.object(adaptor, 'create_vim_res')
+    def test_instantiate_vnf_when_create_res_failed(self, mock_call_req):
         NfvoRegInfoModel.objects.create(nfvoid='nfvo111', vnfminstid='vnfm111', apiurl='http://10.74.44.11',
                                         nfvouser='root', nfvopassword='root123')
         r1 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
         r2 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
         r3 = [0, json.JSONEncoder().encode('Nf instancing apply grant'), '200']
-        r4 = [0, json.JSONEncoder().encode('Nf instancing apply resource'), '200']
-        mock_call_req.side_effect = [r1, r2, r3, r4]
+        # r4 = [0, json.JSONEncoder().encode('Nf instancing apply resource'), '200']
+        mock_call_req.side_effect = [r1, r2, r3]
+        # mock_create_vim_res.re.return_value = None
         create_data = {
             "vnfdId": "111",
             "vnfInstanceName": "vFW_01",
@@ -197,7 +200,29 @@ class TestNsInstantiate(TestCase):
         JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
         data = inst_req_data
         InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        self.assert_job_result(self.job_id, 100, "Instantiate Vnf success.")
+        self.assert_job_result(self.job_id, 255, "Create resource failed")
+
+    # @mock.patch.object(restcall, 'call_req')
+    # # @mock.patch.object(adaptor, 'create_vim_res')
+    # def test_instantiate_vnf_success(self, mock_call_req):
+    #     NfvoRegInfoModel.objects.create(nfvoid='nfvo111', vnfminstid='vnfm111', apiurl='http://10.74.44.11',
+    #                                     nfvouser='root', nfvopassword='root123')
+    #     r1 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
+    #     r2 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
+    #     r3 = [0, json.JSONEncoder().encode('Nf instancing apply grant'), '200']
+    #     # r4 = [0, json.JSONEncoder().encode('Nf instancing apply resource'), '200']
+    #     mock_call_req.side_effect = [r1, r2, r3]
+    #     # mock_create_vim_res.re.return_value = None
+    #     create_data = {
+    #         "vnfdId": "111",
+    #         "vnfInstanceName": "vFW_01",
+    #         "vnfInstanceDescription": " vFW in Nanjing TIC Edge"}
+    #     self.nf_inst_id = CreateVnf(create_data).do_biz()
+    #     self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
+    #     JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+    #     data = inst_req_data
+    #     InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
+    #     self.assert_job_result(self.job_id, 100, "Instantiate Vnf success.")
 
 
 vnfd_model_dict = {
