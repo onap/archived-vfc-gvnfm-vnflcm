@@ -13,10 +13,9 @@
 # limitations under the License.
 
 import logging
-import json
-import traceback
 import sys
 import time
+import traceback
 
 from lcm.pub.utils.values import ignore_case_get, set_opt_val
 from . import api
@@ -35,9 +34,9 @@ OPT_CREATE_SUBNET = 40
 OPT_CREATE_PORT = 50
 OPT_CREATE_FLAVOR = 60
 OPT_CREATE_VM = 80
-OPT_END = 100
 
 BOOT_FROM_VOLUME = 1
+
 
 def create_vim_res(data, do_notify, do_rollback):
     try:
@@ -53,14 +52,13 @@ def create_vim_res(data, do_notify, do_rollback):
             create_flavor(flavor, do_notify, OPT_CREATE_FLAVOR)
         for vm in ignore_case_get(data, "vdus"):
             create_vm(vm, do_notify, OPT_CREATE_VM)
-        do_notify(RES_END, {})
     except VimException as e:
         logger.error(e.message)
         do_rollback(e.message)
     except:
         logger.error(traceback.format_exc())
         do_rollback(str(sys.exc_info()))
-    
+
 def delete_vim_res(data, do_notify):
     res_types = ["vm", "flavor", "port", "subnet", "network", "volume"]
     res_del_funs = [api.delete_vm, api.delete_flavor, api.delete_port, 
@@ -130,18 +128,18 @@ def create_subnet(subnet, do_notify, progress):
     if allocation_pool:
         param["allocationPools"] = [allocation_pool]
     set_opt_val(param, "hostRoutes", ignore_case_get(subnet["properties"], "host_routes"))
-    vim_id = network["properties"]["location_info"]["vimid"],
+    vim_id = subnet["properties"]["location_info"]["vimid"],
     ret = api.create_subnet(vim_id, param)
     do_notify(progress, ret)
     
 def create_port(port, do_notify, progress):
     param = {
-        "tenant": subnet["properties"]["location_info"]["tenant"],
-        "networkName": subnet["properties"]["network_name"],
-        "subnetName": subnet["properties"]["name"],
-        "portName": subnet["properties"]["name"]
+        "tenant": port["properties"]["location_info"]["tenant"],
+        "networkName": port["properties"]["network_name"],
+        "subnetName": port["properties"]["name"],
+        "portName": port["properties"]["name"]
     }
-    vim_id = subnet["properties"]["location_info"]["vimid"],
+    vim_id = port["properties"]["location_info"]["vimid"],
     ret = api.create_subnet(vim_id, param)
     do_notify(progress, ret)
 
@@ -152,7 +150,7 @@ def create_flavor(flavor, do_notify, progress):
         "memory": int(flavor["nfv_compute"]["mem_size"].replace('MB', '').strip())
     }
     set_opt_val(param, "extraSpecs", ignore_case_get(flavor["nfv_compute"], "flavor_extra_specs"))
-    vim_id = subnet["properties"]["location_info"]["vimid"],
+    vim_id = flavor["properties"]["location_info"]["vimid"],
     ret = api.create_flavor(vim_id, param)
     do_notify(progress, ret)
     
@@ -178,7 +176,7 @@ def create_vm(vm, do_notify, progress):
     for vol_data in vm["volume_storages"]:
         param["contextArray"].append(vol_data["volume_storage_id"])
     # nicArray TODO:
-    vim_id = subnet["properties"]["location_info"]["vimid"],
+    vim_id = vm["properties"]["location_info"]["vimid"],
     ret = api.create_vm(vim_id, param)
     vm_id, vm_name, return_code = ret["id"], ret["name"], ret["returnCode"]
     opt_vm_status = "Timeout"
