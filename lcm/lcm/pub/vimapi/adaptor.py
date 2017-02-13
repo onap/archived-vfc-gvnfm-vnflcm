@@ -17,7 +17,7 @@ import json
 import traceback
 import sys
 
-from lcm.pub.utils.values import ignore_case_get
+from lcm.pub.utils.values import ignore_case_get, set_opt_val
 from . import api
 from .exceptions import VimException
 
@@ -26,6 +26,9 @@ logger = logging.getLogger(__name__)
 RES_EXIST, RES_NEW = 0, 1
 NET_PRIVATE, NET_SHSRED = 0, 1
 VLAN_TRANSPARENT_NO, VLAN_TRANSPARENT_YES = 0, 1
+IP_V4, IP_V6 = 4, 6
+DHCP_DISABLED, DHCP_ENABLED = 0, 1
+RES_VOLUME, RES_NETWORK, RES_SUBNET, RES_PORT, RES_FLAVOR, RES_VM = range(6)
 
 def create_vim_res(data, do_notify, do_rollback):
     try:
@@ -33,6 +36,9 @@ def create_vim_res(data, do_notify, do_rollback):
             create_volume(vol, do_notify, 10)
         for network in ignore_case_get(data, "vls"):
             create_network(network, do_notify, 20)
+        for subnet in ignore_case_get(data, "vls"):
+            create_subnet(subnet, do_notify, 30)
+            
             
     except VimException as e:
         logger.error(e.message)
@@ -41,17 +47,17 @@ def create_vim_res(data, do_notify, do_rollback):
         logger.error(traceback.format_exc())
         do_rollback(str(sys.exc_info()))
     
-def create_volume(vol, do_notify, progress)
+def create_volume(vol, do_notify, progress):
     param = {
         "tenant": vol["properties"]["location_info"]["tenant"],	
         "volumeName": vol["properties"]["volume_name"],	
-        "volumeSize": int(ignore_case_get(vol["properties"], "size", "0")),
-        "imageName": ignore_case_get(vol, "image_file"),
-        "volumeType": ignore_case_get(vol["properties"], "custom_volume_type")
+        "volumeSize": int(ignore_case_get(vol["properties"], "size", "0"))
     }
-    vim_id = vol["properties"]["location_info"]["vimid"],	
+    set_opt_val(param, "imageName", ignore_case_get(vol, "image_file"))
+    set_opt_val(param, "volumeType", ignore_case_get(vol["properties"], "custom_volume_type"))
+    vim_id = vol["properties"]["location_info"]["vimid"],
     ret = api.create_volume(vim_id, param)
-    do_notify(progress, ret)
+    do_notify(RES_VOLUME, progress, ret)
     
 def create_network(network, do_notify, progress):
     param = {
@@ -61,14 +67,32 @@ def create_network(network, do_notify, progress):
         "networkType": network["properties"]["network_type"],
         "physicalNetwork": ignore_case_get(network["properties"], "physical_network")
     }
-    vlan_transparent = ignore_case_get(network["properties"], "vlan_transparent")
-    if vlan_transparent:
-        param["vlanTransparent"] = VLAN_TRANSPARENT_YES
-    segmentation_id = ignore_case_get(network["properties"], "segmentation_id")
-    if segmentation_id:
-        param["segmentationId"] = int(segmentation_id)
+    set_opt_val(param, "vlanTransparent", 
+        ignore_case_get(network["properties"], "vlan_transparent"), VLAN_TRANSPARENT_YES)
+    set_opt_val(param, "segmentationId", ignore_case_get(network["properties"], "segmentation_id"))
     vim_id = network["properties"]["location_info"]["vimid"],
     ret = api.create_network(vim_id, param)
-    do_notify(progress, ret)
+    do_notify(RES_NETWORK, progress, ret)
     
-
+def create_subnet(subnet, do_notify, progress):
+    param = {
+        "tenant": subnet["properties"]["location_info"]["tenant"],	
+        "networkName": subnet["properties"]["network_name"],
+        "subnetName": subnet["properties"]["name"],
+        "cidr": ignore_case_get(subnet["properties"], "cidr"),
+        "ipVersion": ignore_case_get(subnet["properties"], "ip_version", IP_V4)
+    }
+    set_opt_val(param, "enableDhcp", 
+        ignore_case_get(subnet["properties"], "dhcp_enabled"), DHCP_ENABLED)
+    set_opt_val(param, "gatewayIp", ignore_case_get(subnet["properties"], "gateway_ip"))
+    set_opt_val(param, "dnsNameservers", ignore_case_get(subnet["properties"], "dns_nameservers"))
+    allocation_pool = {}
+    set_opt_val(allocation_pool, "start", ignore_case_get(subnet["properties"], "start_ip"))
+    set_opt_val(allocation_pool, "end", ignore_case_get(subnet["properties"], "end_ip"))
+    if allocation_pool:
+        param["allocationPools"] = [allocation_pool]
+    set_opt_val(param, "hostRoutes", ignore_case_get(subnet["properties"], "host_routes"))
+    vim_id = network["properties"]["location_info"]["vimid"],
+    ret = api.create_subnet(vim_id, param)
+    do_notify(RES_SUBNET, progress, ret)
+    
