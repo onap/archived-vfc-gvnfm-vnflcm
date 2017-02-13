@@ -15,6 +15,6 @@
 from lcm.pub.exceptions import NFLCMException
 
 class VimException(NFLCMException):
-    def __init__(self, error_msg='', http_code=''):
-        self.error_msg = error_msg
+    def __init__(self, message='', http_code=''):
+        self.message = message
         self.http_code = http_code

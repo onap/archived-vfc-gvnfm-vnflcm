@@ -62,17 +62,16 @@ def create_vim_res(data, do_notify, do_rollback):
         do_rollback(str(sys.exc_info()))
     
 def delete_vim_res(data, do_notify):
-    def ignore_exception_call(fun, *args):
-        try:
-            fun(*args)
-        except VimException as e:
-            logger.error(e.message)
     res_types = ["vm", "flavor", "port", "subnet", "network", "volume"]
     res_del_funs = [api.delete_vm, api.delete_flavor, api.delete_port, 
         api.delete_subnet, api.delete_network, api.delete_volume]
     for res_type, res_del_fun in zip(res_types, res_del_funs):
         for res in ignore_case_get(data, res_type):
-            ignore_exception_call(res_del_fun, res["vim_id"], res["res_id"])
+            try:
+                res_del_fun(res["vim_id"], res["res_id"])
+            except VimException as e:
+                logger.error("Failed to delete %s(%s): %s", 
+                    res_type, res["res_id"], e.message)
             do_notify(res_type)
 
 def create_volume(vol, do_notify, progress):
@@ -96,7 +95,7 @@ def create_volume(vol, do_notify, progress):
         retry_count = retry_count + 1
     if return_code == RES_NEW:
         api.delete_volume(vim_id, vol_id)
-    raise VimException("Failed to create Volume(%s): Timeout." % vol_name)
+    raise VimException("Failed to create Volume(%s): Timeout." % vol_name, "500")
     
 def create_network(network, do_notify, progress):
     param = {
@@ -196,4 +195,4 @@ def create_vm(vm, do_notify, progress):
         retry_count = retry_count + 1
     if return_code == RES_NEW:
         api.delete_vm(vim_id, vm_id)
-    raise VimException("Failed to create Vm(%s): %s." % (vm_name, opt_vm_status))
+    raise VimException("Failed to create Vm(%s): %s." % (vm_name, opt_vm_status), "500")
