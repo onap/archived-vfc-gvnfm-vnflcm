@@ -280,6 +280,89 @@ class InstVnf(Thread):
         JobUtil.add_job_status(self.job_id, 255, error_msg)
         # JobUtil.add_job_status(self.job_id, 255, 'VNF instantiation failed, detail message: %s' % error_msg, 0)
 
+    def do_notify(res_type, progress, ret):
+        # logger.info('add job, progress=%s, msgid=%s, args=%s' % (progress, msgid, args_))
+        progress = 20 + int(progress/2)     #20-70
+        if res_type == adaptor.RES_VOLUME:
+            logger.info('Create vloumns!')
+
+            # if ret['rescode'] == 0:#new create
+            #     self.inst_resource['volumn'].append({"vim_id": "1"}, {"res_id": "2"})
+            self.inst_resource['volumn'].append({"vim_id": "1"}, {"res_id": "2"})
+            JobUtil.add_job_status(self.job_id, progress, 'Create vloumns!')
+            StorageInstModel.objects.create(
+                storageid='1',
+                vimid='1',
+                resouceid='1',
+                name='40G',
+                tenant='admin',
+                insttype=0,
+                instid=self.nf_inst_id)
+        elif res_type == adaptor.RES_NETWORK:
+            logger.info('Create networks!')
+            # self.inst_resource['network'] = ret
+            self.inst_resource['network'].append({"vim_id": "1"}, {"res_id": "2"})
+            JobUtil.add_job_status(self.job_id, progress, 'Create networks!')
+            NetworkInstModel.objects.create(
+                networkid='1',
+                vimid='1',
+                resouceid='1',
+                name='pnet_network',
+                tenant='admin',
+                insttype=0,
+                instid=self.nf_inst_id)
+        elif res_type == adaptor.RES_SUBNET:
+            logger.info('Create subnets!')
+            # self.inst_resource['subnet'] = ret
+            self.inst_resource['subnet'].append({"vim_id": "1"}, {"res_id": "2"})
+            JobUtil.add_job_status(self.job_id, progress, 'Create subnets!')
+            SubNetworkInstModel.objects.create(
+                subnetworkid='1',
+                vimid='1',
+                resouceid='1',
+                networkid='1',
+                name='sub_pnet',
+                tenant='admin',
+                insttype=0,
+                instid=self.nf_inst_id)
+        elif res_type == adaptor.RES_PORT:
+            logger.info('Create ports!')
+            # self.inst_resource['port'] = ret
+            self.inst_resource['port'].append({"vim_id": "1"}, {"res_id": "2"})
+            JobUtil.add_job_status(self.job_id, progress, 'Create ports!')
+            PortInstModel.objects.create(
+                portid='1',
+                networkid='1',
+                subnetworkid='1',
+                vimid='1',
+                resouceid='1',
+                name='aaa_pnet_cp',
+                tenant='admin',
+                insttype=0,
+                instid=self.nf_inst_id)
+        elif res_type == adaptor.RES_FLAVOR:
+            logger.info('Create flavors!')
+            # self.inst_resource['flavor'] = ret
+            self.inst_resource['flavor'].append({"vim_id": "1"}, {"res_id": "2"})
+            JobUtil.add_job_status(self.job_id, progress, 'Create flavors!')
+            FlavourInstModel.objects.create(
+                falavourid='1',
+                name='1',
+                vcpu='1',
+                extraspecs='1',
+                instid=self.nf_inst_id)
+        elif res_type == adaptor.RES_VM:
+            logger.info('Create vms!')
+            self.inst_resource['vm'].append({"vim_id": "1"}, {"res_id": "2"})
+            JobUtil.add_job_status(self.job_id, progress, 'Create vms!')
+            VmInstModel.objects.create(
+                vmid="1",
+                vimid="1",
+                resouceid="11",
+                insttype=0,
+                instid=self.nf_inst_id,
+                vmname="test_01",
+                operationalstate=1)
     def do_rollback(self, progress, msgid, args_=None):
         # logger.info('add job, progress=%s, msgid=%s, args=%s' % (progress, msgid, args_))
 
