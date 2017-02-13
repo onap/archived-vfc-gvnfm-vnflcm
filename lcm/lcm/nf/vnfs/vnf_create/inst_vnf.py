@@ -36,6 +36,14 @@ class InstVnf(Thread):
         self.job_id = job_id
         self.nfvo_inst_id = ''
         self.vnfm_inst_id = ''
+        self.vnfd_info = []
+        self.inst_resource = {'volumn':[],#'volumn':[{"vim_id": "1"}, {"res_id": "2"}]
+                              'network':[],
+                              'subnet':[],
+                              'port':[],
+                              'flavor':[],
+                              'vm':[],
+                              }
         self.create_res_result = {
             'jobid': 'res_001',
             'resourceResult': [{'name': 'vm01'}, {'name': 'vm02'}],
@@ -121,6 +129,8 @@ class InstVnf(Thread):
                                                                     initallocatedata=self.vnfd_info,
                                                                     localizationLanguage=ignore_case_get(self.data, 'localizationLanguage'),
                                                                     lastuptime=now_time())
+        JobUtil.add_job_status(self.job_id, 10, 'Nf instancing pre-check finish')
+        logger.info("Nf instancing pre-check finish")
 
     def apply_grant(self):
         logger.info('[NF instantiation] send resource grand request to nfvo start')
@@ -148,7 +158,7 @@ class InstVnf(Thread):
 
         #update_resources_table()
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(instantiationState='INSTANTIATED', lastuptime=now_time())
-        JobUtil.add_job_status(self.job_id, 15, 'Nf instancing apply grant finish')
+        JobUtil.add_job_status(self.job_id, 20, 'Nf instancing apply grant finish')
         logger.info("Nf instancing apply grant finish")
 
     def create_res(self):
@@ -166,6 +176,7 @@ class InstVnf(Thread):
         # create_vdus(vdus)
         JobUtil.add_job_status(self.job_id, 75, 'Nf instancing create resource(vms) finish')
 
+        JobUtil.add_job_status(self.job_id, 20, 'Nf instancing apply grant finish')
         logger.info("[NF instantiation] create resource end")
 
     def check_res_status(self):
@@ -282,5 +293,7 @@ class InstVnf(Thread):
         VmInstModel.objects.filter(instid=self.nf_inst_id).delete()
         JobUtil.add_job_status(self.job_id, 255, 'Create resource failed')
 
+    def do_notify_delete(ret):
+        logger.error('Delete [%s] resource'%ret)
 
 
