@@ -61,6 +61,20 @@ def create_vim_res(data, do_notify, do_rollback):
         logger.error(traceback.format_exc())
         do_rollback(str(sys.exc_info()))
     
+def delete_vim_res(data, do_notify):
+    def ignore_exception_call(fun, *args):
+        try:
+            fun(*args)
+        except VimException as e:
+            logger.error(e.message)
+    res_types = ["vm", "flavor", "port", "subnet", "network", "volume"]
+    res_del_funs = [api.delete_vm, api.delete_flavor, api.delete_port, 
+        api.delete_subnet, api.delete_network, api.delete_volume]
+    for res_type, res_del_fun in zip(res_types, res_del_funs):
+        for res in ignore_case_get(data, res_type):
+            ignore_exception_call(res_del_fun, res["vim_id"], res["res_id"])
+            do_notify(res_type)
+
 def create_volume(vol, do_notify, progress):
     param = {
         "tenant": vol["properties"]["location_info"]["tenant"],	
