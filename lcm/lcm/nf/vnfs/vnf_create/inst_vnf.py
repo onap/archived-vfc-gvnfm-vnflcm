@@ -17,12 +17,13 @@ import traceback
 from threading import Thread
 
 from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel, VmInstModel, VNFCInstModel, \
-    NetworkInstModel, SubNetworkInstModel, VLInstModel, PortInstModel, CPInstModel
+    NetworkInstModel, SubNetworkInstModel, VLInstModel, PortInstModel, CPInstModel, StorageInstModel, FlavourInstModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.msapi.nfvolcm import vnfd_rawdata_get, apply_grant_to_nfvo, apply_res_to_nfvo
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.values import ignore_case_get
+from lcm.pub.vimapi import adaptor
 
 logger = logging.getLogger(__name__)
 
@@ -268,8 +269,18 @@ class InstVnf(Thread):
         JobUtil.add_job_status(self.job_id, 255, error_msg)
         # JobUtil.add_job_status(self.job_id, 255, 'VNF instantiation failed, detail message: %s' % error_msg, 0)
 
-    def add_job_and_update_table(self, progress, msgid, args_=None):
-        logger.info('add job, progress=%s, msgid=%s, args=%s' % (progress, msgid, args_))
-        JobUtil.add_job_status(self.job_id, 90, '')
+    def do_rollback(self, progress, msgid, args_=None):
+        # logger.info('add job, progress=%s, msgid=%s, args=%s' % (progress, msgid, args_))
+
+        # adaptor.delete_vim_res(self.inst_resource, self.do_notify_delete)
+
+        StorageInstModel.objects.filter(instid=self.nf_inst_id).delete()
+        NetworkInstModel.objects.filter(instid=self.nf_inst_id).delete()
+        SubNetworkInstModel.objects.filter(instid=self.nf_inst_id).delete()
+        PortInstModel.objects.filter(instid=self.nf_inst_id).delete()
+        FlavourInstModel.objects.filter(instid=self.nf_inst_id).delete()
+        VmInstModel.objects.filter(instid=self.nf_inst_id).delete()
+        JobUtil.add_job_status(self.job_id, 255, 'Create resource failed')
+
 
 
