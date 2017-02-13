@@ -197,3 +197,45 @@ class VLInstModel(models.Model):
     vltype = models.IntegerField(db_column='VLTYPE', default=0)
     vimid = models.CharField(db_column='VIMID', max_length=255)
     tenant = models.CharField(db_column='TENANT', max_length=50)
+
+class PortInstModel(models.Model):
+    class Meta:
+        db_table = 'PORTINST'
+
+    portid = models.CharField(db_column='PORTID', primary_key=True, max_length=255)
+    networkid = models.CharField(db_column='NETWORKID', max_length=255)
+    subnetworkid = models.CharField(db_column='SUBNETWORKID', max_length=255, null=True)
+    vimid = models.CharField(db_column='VIMID', max_length=255)
+    resouceid = models.CharField(db_column='RESOURCEID', max_length=255)
+    name = models.CharField(db_column='NAME', max_length=255, null=True)
+    insttype = models.IntegerField(db_column='INSTTYPE')
+    instid = models.CharField(db_column='INSTID', max_length=255)
+    cpinstanceid = models.CharField(db_column='CPINSTANCEID', max_length=255, null=True)
+    bandwidth = models.CharField(db_column='BANDWIDTH', max_length=255, null=True)
+    operationalstate = models.CharField(db_column='OPERATIONALSTATE', max_length=255, null=True)
+    ipaddress = models.CharField(db_column='IPADDRESS', max_length=255)
+    macaddress = models.CharField(db_column='MACADDRESS', max_length=255)
+    nicorder = models.CharField(db_column='NICORDER', max_length=255)
+    floatipaddress = models.CharField(db_column='FLOATIPADDRESS', max_length=255, null=True)
+    serviceipaddress = models.CharField(db_column='SERVICEIPADDRESS', max_length=255, null=True)
+    typevirtualnic = models.CharField(db_column='TYPEVIRTUALNIC', max_length=255, null=True)
+    sfcencapsulation = models.CharField(db_column='SFCENCAPSULATION', max_length=255, null=True)
+    direction = models.CharField(db_column='DIRECTION', max_length=255, null=True)
+    tenant = models.CharField(db_column='TENANT', max_length=255, null=True)
+    interfacename = models.CharField(db_column='INTERFACENAME', max_length=255, blank=True, null=True)
+    vmid = models.CharField(db_column='VMID', max_length=255, blank=True, null=True)
+
+class CPInstModel(models.Model):
+    class Meta:
+        db_table = 'CPINST'
+
+    cpinstanceid = models.CharField(db_column='CPINSTANCEID', max_length=255, primary_key=True)
+    cpdid = models.CharField(db_column='CPDID', max_length=255)
+    cpinstancename = models.CharField(db_column='CPINSTANCENAME', max_length=255)
+    vlinstanceid = models.CharField(db_column='VLINSTANCEID', max_length=255)
+    ownertype = models.IntegerField(db_column='OWNERTYPE')
+    ownerid = models.CharField(db_column='OWNERID', max_length=255)
+    relatedtype = models.IntegerField(db_column='RELATEDTYPE')
+    relatedvl = models.CharField(db_column='RELATEDVL', max_length=255, blank=True, null=True)
+    relatedcp = models.CharField(db_column='RELATEDCP', max_length=255, blank=True, null=True)
+    relatedport = models.CharField(db_column='RELATEDPORT', max_length=255, blank=True, null=True)

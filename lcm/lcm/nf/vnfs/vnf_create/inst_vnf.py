@@ -17,7 +17,7 @@ import traceback
 from threading import Thread
 
 from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel, VmInstModel, VNFCInstModel, \
-    NetworkInstModel, SubNetworkInstModel, VLInstModel
+    NetworkInstModel, SubNetworkInstModel, VLInstModel, PortInstModel, CPInstModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.msapi.nfvolcm import vnfd_rawdata_get, apply_grant_to_nfvo, apply_res_to_nfvo
 from lcm.pub.utils.jobutil import JobUtil
@@ -57,9 +57,16 @@ class InstVnf(Thread):
                         'virtuallinkdescid': '',
                     }
                 ],
-                'affectedcp':{
+                'affectedcp':[{
+                    'status': 'success',
+                    'portresource':{'resourceid':'1'},
+                    'cpinstanceid':'2',
+                    'cpdid':'22',
+                    'ownertype':'222',
+                    'ownerid':'2222',
+                    'virtuallinkinstanceid':'22222',
 
-                }
+                }],
 
             }
         }
@@ -146,6 +153,7 @@ class InstVnf(Thread):
     def create_res(self):
         logger.info("[NF instantiation] create resource start")
         volumns = ignore_case_get(self.data, "volumn_storages")
+        #create_vim_res(data, do_notify, do_rollback)
         #create_volumns(volumns)
         JobUtil.add_job_status(self.job_id, 35, 'Nf instancing create resource(volumn_storages) finish')
 
@@ -196,21 +204,21 @@ class InstVnf(Thread):
                 ownerid=self.nf_inst_id,
                 relatednetworkid=networkinst.networkid,
                 relatedsubnetworkid=subnetinst.subnetworkid)
-        pass
         # # for vs in vss:
-        # for cp in cps:
-        #     if 'failed' == cp['status']:
-        #         continue
-        #     port_resource = cp['portresource']
-        #     portinst = PortInstModel.objects.filter(resouceid=port_resource['resourceid']).first()
-        #     CPInstModel.objects.create(
-        #         cpinstanceid=cp['cpinstanceid'],
-        #         cpdid=cp['cpdid'],
-        #         relatedtype='2',  # port
-        #         relatedport=portinst.portid,
-        #         ownertype=cp['ownertype'],
-        #         ownerid=cp['ownerid'],
-        #         vlinstanceid=cp['virtuallinkinstanceid'])
+        for cp in cps:
+            if 'failed' == cp['status']:
+                continue
+            port_resource = cp['portresource']
+            portinst = PortInstModel.objects.filter(resouceid=port_resource['resourceid']).first()
+            ttt = portinst.portid
+            CPInstModel.objects.create(
+                cpinstanceid=cp['cpinstanceid'],
+                cpdid=cp['cpdid'],
+                relatedtype='2',
+                relatedport=portinst.portid,
+                ownertype=cp['ownertype'],
+                ownerid=cp['ownerid'],
+                vlinstanceid=cp['virtuallinkinstanceid'])
         # self.add_job(43, 'INST_DPLY_VM_PRGS')
         logger.info("[NF instantiation] confirm all vms are active end")
 
@@ -259,5 +267,9 @@ class InstVnf(Thread):
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='failed', lastuptime=now_time())
         JobUtil.add_job_status(self.job_id, 255, error_msg)
         # JobUtil.add_job_status(self.job_id, 255, 'VNF instantiation failed, detail message: %s' % error_msg, 0)
+
+    def add_job_and_update_table(self, progress, msgid, args_=None):
+        logger.info('add job, progress=%s, msgid=%s, args=%s' % (progress, msgid, args_))
+        JobUtil.add_job_status(self.job_id, 90, '')
 
 
