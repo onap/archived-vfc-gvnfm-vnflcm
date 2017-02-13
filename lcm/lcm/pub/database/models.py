@@ -113,6 +113,27 @@ class NfvoRegInfoModel(models.Model):
     servercert = models.CharField(max_length=255, db_column='SERVERCERT', null=True)
     regtime = models.CharField(max_length=255, db_column='REGTIME')
 
+class StorageInstModel(models.Model):
+    class Meta:
+        db_table = 'STORAGEINST'
+
+    storageid = models.CharField(db_column='STORAGEID', primary_key=True, max_length=255)
+    vimid = models.CharField(db_column='VIMID', max_length=255)
+    resouceid = models.CharField(db_column='RESOURCEID', max_length=255)
+    insttype = models.IntegerField(db_column='INSTTYPE')
+    instid = models.CharField(db_column='INSTID', max_length=255)
+    name = models.CharField(db_column='NAME', max_length=255, null=True)
+    storagetype = models.CharField(db_column='STORAGETYPE', max_length=255)
+    size = models.CharField(db_column='SIZE', max_length=255)
+    rdmaenabled = models.IntegerField(db_column='RDMAENABLED', null=True)
+    disktype = models.CharField(db_column='DISKTYPE', max_length=255)
+    ownerid = models.CharField(db_column='OWNERID', max_length=255, null=True)
+    zoneid = models.CharField(db_column='ZONEID', max_length=255, null=True)
+    hostid = models.CharField(db_column='HOSTID', max_length=255, null=True)
+    operationalstate = models.CharField(db_column='OPERATIONALSTATE', max_length=255, null=True)
+    tenant = models.CharField(db_column='TENANT', max_length=50, null=True)
+    is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
+
 class VmInstModel(models.Model):
     class Meta:
         db_table = 'VMINST'
@@ -139,6 +160,17 @@ class VNFCInstModel(models.Model):
     vdutype = models.CharField(db_column='VDUTYPE', max_length=255)
     nfinstid = models.CharField(db_column='NFINSTID', max_length=255)
     vmid = models.CharField(db_column='VMID', max_length=255)
+
+class FlavourInstModel(models.Model):
+    class Meta:
+        db_table = 'FLAVOURINST'
+
+    flavourid = models.CharField(db_column='FLAVOURID', max_length=255, primary_key=True)
+    name = models.CharField(db_column='NAME', max_length=255)
+    vcpu = models.CharField(db_column='VCPU', max_length=255)
+    memory = models.CharField(db_column='MEMORY', max_length=255)
+    extraspecs = models.CharField(db_column='EXTRASPECS', max_length=255)
+    instid = models.CharField(db_column='INSTID', max_length=255)
 
 class NetworkInstModel(models.Model):
     class Meta:
