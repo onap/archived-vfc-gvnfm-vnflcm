@@ -16,6 +16,7 @@ import logging
 import json
 import traceback
 import sys
+import time
 
 from lcm.pub.utils.values import ignore_case_get, set_opt_val
 from . import api
@@ -28,18 +29,31 @@ NET_PRIVATE, NET_SHSRED = 0, 1
 VLAN_TRANSPARENT_NO, VLAN_TRANSPARENT_YES = 0, 1
 IP_V4, IP_V6 = 4, 6
 DHCP_DISABLED, DHCP_ENABLED = 0, 1
-RES_VOLUME, RES_NETWORK, RES_SUBNET, RES_PORT, RES_FLAVOR, RES_VM = range(6)
+OPT_CREATE_VOLUME = 20
+OPT_CREATE_NETWORK = 30
+OPT_CREATE_SUBNET = 40
+OPT_CREATE_PORT = 50
+OPT_CREATE_FLAVOR = 60
+OPT_CREATE_VM = 80
+OPT_END = 100
+
+BOOT_FROM_VOLUME = 1
 
 def create_vim_res(data, do_notify, do_rollback):
     try:
         for vol in ignore_case_get(data, "volume_storages"):
-            create_volume(vol, do_notify, 10)
+            create_volume(vol, do_notify, OPT_CREATE_VOLUME)
         for network in ignore_case_get(data, "vls"):
-            create_network(network, do_notify, 20)
+            create_network(network, do_notify, OPT_CREATE_NETWORK)
         for subnet in ignore_case_get(data, "vls"):
-            create_subnet(subnet, do_notify, 30)
-            
-            
+            create_subnet(subnet, do_notify, OPT_CREATE_SUBNET)
+        for port in ignore_case_get(data, "cps"):
+            create_port(port, do_notify, OPT_CREATE_PORT)
+        for flavor in ignore_case_get(data, "vdus"):
+            create_flavor(flavor, do_notify, OPT_CREATE_FLAVOR)
+        for vm in ignore_case_get(data, "vdus"):
+            create_vm(vm, do_notify, OPT_CREATE_VM)
+        do_notify(RES_END, {})
     except VimException as e:
         logger.error(e.message)
         do_rollback(e.message)
@@ -57,7 +71,18 @@ def create_volume(vol, do_notify, progress):
     set_opt_val(param, "volumeType", ignore_case_get(vol["properties"], "custom_volume_type"))
     vim_id = vol["properties"]["location_info"]["vimid"],
     ret = api.create_volume(vim_id, param)
-    do_notify(RES_VOLUME, progress, ret)
+    vol_id, vol_name, return_code = ret["id"], ret["name"], ret["returnCode"]
+    retry_count, max_retry_count = 0, 300
+    while retry_count < max_retry_count:
+        vol_info = api.get_volume(vim_id, vol_id)
+        if vol_info["status"].upper() == "AVAILABLE":
+            do_notify(progress, ret)
+            break
+        time.sleep(2)
+        retry_count = retry_count + 1
+    if return_code == RES_NEW:
+        api.delete_volume(vim_id, vol_id)
+    raise VimException("Failed to create Volume(%s): Timeout." % vol_name)
     
 def create_network(network, do_notify, progress):
     param = {
@@ -72,7 +97,7 @@ def create_network(network, do_notify, progress):
     set_opt_val(param, "segmentationId", ignore_case_get(network["properties"], "segmentation_id"))
     vim_id = network["properties"]["location_info"]["vimid"],
     ret = api.create_network(vim_id, param)
-    do_notify(RES_NETWORK, progress, ret)
+    do_notify(progress, ret)
     
 def create_subnet(subnet, do_notify, progress):
     param = {
@@ -94,5 +119,67 @@ def create_subnet(subnet, do_notify, progress):
     set_opt_val(param, "hostRoutes", ignore_case_get(subnet["properties"], "host_routes"))
     vim_id = network["properties"]["location_info"]["vimid"],
     ret = api.create_subnet(vim_id, param)
-    do_notify(RES_SUBNET, progress, ret)
+    do_notify(progress, ret)
     
+def create_port(port, do_notify, progress):
+    param = {
+        "tenant": subnet["properties"]["location_info"]["tenant"],
+        "networkName": subnet["properties"]["network_name"],
+        "subnetName": subnet["properties"]["name"],
+        "portName": subnet["properties"]["name"]
+    }
+    vim_id = subnet["properties"]["location_info"]["vimid"],
+    ret = api.create_subnet(vim_id, param)
+    do_notify(progress, ret)
+
+def create_flavor(flavor, do_notify, progress):
+    param = {
+        "tenant": flavor["properties"]["location_info"]["tenant"],
+        "vcpu": int(flavor["nfv_compute"]["num_cpus"]),
+        "memory": int(flavor["nfv_compute"]["mem_size"].replace('MB', '').strip())
+    }
+    set_opt_val(param, "extraSpecs", ignore_case_get(flavor["nfv_compute"], "flavor_extra_specs"))
+    vim_id = subnet["properties"]["location_info"]["vimid"],
+    ret = api.create_flavor(vim_id, param)
+    do_notify(progress, ret)
+    
+def create_vm(vm, do_notify, progress):
+    param = {
+        "tenant": vm["properties"]["location_info"]["tenant"],
+        "vmName": vm["properties"]["name"],
+        "boot": {
+            "type": BOOT_FROM_VOLUME,
+            "volumeName": vm["volume_storages"][0]["volume_storage_id"]
+        },
+        "nicArray": [],
+        "contextArray": [],
+        "volumeArray": []
+    }
+    set_opt_val(param, "availabilityZone", 
+        ignore_case_get(vm["properties"]["location_info"], "availability_zone"))
+    for inject_data in ignore_case_get(vm["properties"], "inject_data_list"):
+        param["contextArray"].append({
+            "fileName": inject_data["file_name"],
+            "fileData": inject_data["file_data"]
+        })
+    for vol_data in vm["volume_storages"]:
+        param["contextArray"].append(vol_data["volume_storage_id"])
+    # nicArray TODO:
+    vim_id = subnet["properties"]["location_info"]["vimid"],
+    ret = api.create_vm(vim_id, param)
+    vm_id, vm_name, return_code = ret["id"], ret["name"], ret["returnCode"]
+    opt_vm_status = "Timeout"
+    retry_count, max_retry_count = 0, 100
+    while retry_count < max_retry_count:
+        vm_info = api.get_vm(vim_id, vm_id)
+        if vm_info["status"].upper() == "ACTIVE":
+            do_notify(progress, ret)
+            break
+        if vm_info["status"].upper() == "ERROR":
+            opt_vm_status = vm_info["status"]
+            break
+        time.sleep(2)
+        retry_count = retry_count + 1
+    if return_code == RES_NEW:
+        api.delete_vm(vim_id, vm_id)
+    raise VimException("Failed to create Vm(%s): %s." % (vm_name, opt_vm_status))
