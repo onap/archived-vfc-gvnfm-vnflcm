@@ -45,20 +45,20 @@ class CreateVnfIdentifier(APIView):
 
 
 class InstantiateVnf(APIView):
-    def post(self, request, instanceId):
+    def post(self, request, instanceid):
         logger.debug("InstantiateVnf--post::> %s" % request.data)
-        job_id = JobUtil.create_job('NF', 'INSTANTIATE', instanceId)
+        job_id = JobUtil.create_job('NF', 'INSTANTIATE', instanceid)
         JobUtil.add_job_status(job_id, 0, "INST_VNF_READY")
-        InstVnf(request.data, instanceId, job_id).start()
+        InstVnf(request.data, instanceid, job_id).start()
         rsp = {"jobId": job_id}
         return Response(data=rsp, status=status.HTTP_202_ACCEPTED)
 
 
 class DeleteVnfIdentifier(APIView):
-    def delete(self, request, instanceId):
+    def delete(self, request, instanceid):
         logger.debug("DeleteVnfIdentifier--delete::> %s" % request.data)
         try:
-            DeleteVnf(request.data, instanceId).do_biz()
+            DeleteVnf(request.data, instanceid).do_biz()
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -16,9 +16,9 @@ from lcm.pub.exceptions import NFLCMException
 
 
 class DeleteVnf:
-    def __init__(self, data, instanceId):
+    def __init__(self, data, instanceid):
         self.data = data
-        self.nf_inst_id = instanceId
+        self.nf_inst_id = instanceid
 
     def do_biz(self):
         sel_vnfs = NfInstModel.objects.filter(pk=self.nf_inst_id)
