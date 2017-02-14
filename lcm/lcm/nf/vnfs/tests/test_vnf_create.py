@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import json
 import uuid
 
@@ -24,28 +23,29 @@ from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
 from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel, VmInstModel, NetworkInstModel, \
     SubNetworkInstModel, PortInstModel
 from lcm.pub.utils import restcall
-from lcm.pub.vimapi import adaptor
 from lcm.pub.utils.jobutil import JobUtil
+
 
 class TestNsInstantiate(TestCase):
     def setUp(self):
         self.client = Client()
-        VmInstModel.objects.create(vmid="1", vimid="1", resouceid="11", insttype=0, instid="1", vmname="test_01",
-                                   operationalstate=1)
-        VmInstModel.objects.create(vmid="2", vimid="2", resouceid="22", insttype=0, instid="2", vmname="test_02",
-                               operationalstate=1)
-        NetworkInstModel.objects.create(networkid='1', vimid='1', resouceid='1', name='pnet_network',
-                                        tenant='admin', insttype=0, instid='1')
-        SubNetworkInstModel.objects.create(subnetworkid='1', vimid='1', resouceid='1', networkid='1',
-                                           name='sub_pnet',tenant='admin', insttype=0, instid='1')
-        PortInstModel.objects.create(portid='1', networkid='1', subnetworkid='1', vimid='1', resouceid='1',
-                                     name='aaa_pnet_cp', tenant='admin', insttype=0, instid='1')
+        # VmInstModel.objects.create(vmid="1", vimid="1", resouceid="11", insttype=0, instid="1", vmname="test_01",
+        #                            operationalstate=1)
+        # VmInstModel.objects.create(vmid="2", vimid="2", resouceid="22", insttype=0, instid="2", vmname="test_02",
+        #                        operationalstate=1)
+        # NetworkInstModel.objects.create(networkid='1', vimid='1', resouceid='1', name='pnet_network',
+        #                                 tenant='admin', insttype=0, instid='1')
+        # SubNetworkInstModel.objects.create(subnetworkid='1', vimid='1', resouceid='1', networkid='1',
+        #                                    name='sub_pnet',tenant='admin', insttype=0, instid='1')
+        # PortInstModel.objects.create(portid='1', networkid='1', subnetworkid='1', vimid='1', resouceid='1',
+        #                              name='aaa_pnet_cp', tenant='admin', insttype=0, instid='1')
 
     def tearDown(self):
-        VmInstModel.objects.all().delete()
-        NetworkInstModel.objects.all().delete()
-        SubNetworkInstModel.objects.all().delete()
-        PortInstModel.objects.all().delete()
+        pass
+        # VmInstModel.objects.all().delete()
+        # NetworkInstModel.objects.all().delete()
+        # SubNetworkInstModel.objects.all().delete()
+        # PortInstModel.objects.all().delete()
 
     def assert_job_result(self, job_id, job_progress, job_detail):
         jobs = JobStatusModel.objects.filter(
