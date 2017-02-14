@@ -16,8 +16,8 @@ import logging
 import traceback
 from threading import Thread
 
-from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel, VmInstModel, NetworkInstModel, SubNetworkInstModel, \
-    PortInstModel, StorageInstModel, FlavourInstModel, VNFCInstModel, VLInstModel, CPInstModel
+from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel, VmInstModel, NetworkInstModel, \
+    SubNetworkInstModel, PortInstModel, StorageInstModel, FlavourInstModel, VNFCInstModel, VLInstModel, CPInstModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.msapi.nfvolcm import vnfd_rawdata_get, apply_grant_to_nfvo, notify_lcm_to_nfvo
 from lcm.pub.utils.jobutil import JobUtil
@@ -37,12 +37,12 @@ class InstVnf(Thread):
         self.nfvo_inst_id = ''
         self.vnfm_inst_id = ''
         self.vnfd_info = []
-        self.inst_resource = {'volumn':[],#'volumn':[{"vim_id": "1"}, {"res_id": "2"}]
-                              'network':[],
-                              'subnet':[],
-                              'port':[],
-                              'flavor':[],
-                              'vm':[],
+        self.inst_resource = {'volumn': [],  # [{"vim_id": ignore_case_get(ret, "vim_id")},{}]
+                              'network': [],
+                              'subnet': [],
+                              'port': [],
+                              'flavor': [],
+                              'vm': [],
                               }
         # self.create_res_result = {
         #     'jobid': 'res_001',
@@ -104,47 +104,51 @@ class InstVnf(Thread):
         if not vnf_insts.exists():
             raise NFLCMException('VNF nf_inst_id is not exist.')
 
-        self.vnfm_inst_id = vnf_insts[0].vnfm_inst_id
+        # self.vnfm_inst_id = vnf_insts[0].vnfm_inst_id
         if vnf_insts[0].instantiationState != 'NOT_INSTANTIATED':
             raise NFLCMException('VNF instantiationState is not NOT_INSTANTIATED.')
 
-        #get rawdata by vnfd_id
+        # get rawdata by vnfd_id
         ret = vnfd_rawdata_get(vnf_insts[0].vnfdid)
         if ret[0] != 0:
             raise NFLCMException("Get vnfd_raw_data failed.")
         self.vnfd_info = json.JSONDecoder().decode(ret[1])
-        #checkParameterExist
+        # checkParameterExist
         for cp in self.data:
             if cp not in self.vnfd_info:
                 raise NFLCMException('Input parameter is not defined in vnfd_info.')
-        #get nfvo info
-        JobUtil.add_job_status(self.job_id, 5, 'GET_NFVO_CONNECTION_INFO')
+        # get nfvo info
+        JobUtil.add_job_status(self.job_id, 5, 'Get nfvo connection info')
         self.load_nfvo_config()
 
-        #update NfInstModel
-        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(flavour_id=ignore_case_get(self.data, "flavourId"),
-                                                                    vnf_level=ignore_case_get(self.data, 'instantiationLevelId'),
-                                                                    input_params=ignore_case_get(self.data, 'additionalParams'),
-                                                                    extension=ignore_case_get(self.data, ''),
-                                                                    initallocatedata=self.vnfd_info,
-                                                                    localizationLanguage=ignore_case_get(self.data, 'localizationLanguage'),
-                                                                    lastuptime=now_time())
+        # update NfInstModel
+        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).\
+            update(flavour_id=ignore_case_get(self.data, "flavourId"),
+                   vnf_level=ignore_case_get(self.data, 'instantiationLevelId'),
+                   input_params=ignore_case_get(self.data, 'additionalParams'),
+                   extension=ignore_case_get(self.data, ''),
+                   initallocatedata=self.vnfd_info,
+                   localizationLanguage=ignore_case_get(self.data, 'localizationLanguage'),
+                   lastuptime=now_time())
         JobUtil.add_job_status(self.job_id, 10, 'Nf instancing pre-check finish')
         logger.info("Nf instancing pre-check finish")
 
     def apply_grant(self):
         logger.info('[NF instantiation] send resource grand request to nfvo start')
-        #self.check_vm_capacity()
+        # self.check_vm_capacity()
         content_args = {'nfvoInstanceId': self.nfvo_inst_id, 'vnfmInstanceId': self.vnfm_inst_id,
                         'nfInstanceId': self.nf_inst_id, 'nfDescriptorId': '',
                         'lifecycleOperation': 'Instantiate', 'jobId': self.job_id, 'addResource': [],
                         'removeResource': [], 'placementConstraint': [], 'exVimIdList': [], 'additionalParam': {}}
 
-        vdus = self.vnfd_info['vdus']
+        vdus = ignore_case_get(self.vnfd_info, "vdus")
         res_index = 1
         for vdu in vdus:
-            res_def = {'type': 'VDU', 'resourceDefinitionId': str(res_index), 'vduId': vdu['vdu_id'],
-                       'vimid': '', 'tenant': ''}
+            res_def = {'type': 'VDU',
+                       'resourceDefinitionId': str(res_index),
+                       'vduId': ignore_case_get(vdu, "vdu_id"),
+                       'vimid': '',
+                       'tenant': ''}
             if self.vnfd_info['metadata']['cross_dc']:
                 res_def['vimid'] = vdu['properties']['location_info']['vimId']
                 res_def['tenant'] = vdu['properties']['location_info']['tenant']
@@ -156,8 +160,9 @@ class InstVnf(Thread):
         if resp[0] != 0:
             raise NFLCMException('Nf instancing apply grant exception')
 
-        #update_resources_table()
-        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(instantiationState='INSTANTIATED', lastuptime=now_time())
+        # update_resources_table()
+        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(instantiationState='INSTANTIATED',
+                                                                    lastuptime=now_time())
         JobUtil.add_job_status(self.job_id, 20, 'Nf instancing apply grant finish')
         logger.info("Nf instancing apply grant finish")
 
@@ -238,8 +243,8 @@ class InstVnf(Thread):
         reg_info = NfvoRegInfoModel.objects.filter(vnfminstid=self.vnfm_inst_id).first()
         # vm_info = VmInstModel.objects.filter(nfinstid=self.nf_inst_id)
         vmlist = []
-        nfs = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
-        nf = nfs[0]
+        # nfs = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
+        # nf = nfs[0]
         # allocate_data = json.loads(nf.initallocatedata)
         # vmlist = json.loads(nf.predefinedvm)
         addition_param = {'vmList': vmlist}
@@ -280,7 +285,7 @@ class InstVnf(Thread):
                  'storageResource': {'vimId': vs.vimid, 'resourceId': vs.resouceid,
                                      'resourceName': vs.name, 'tenant': vs.tenant}})
         affected_cp = []
-        #vnfc cps
+        # vnfc cps
         for vnfc in vnfcs:
             cps = CPInstModel.objects.filter(ownerid=vnfc.vnfcinstanceid, ownertype=3)
             for cp in cps:
@@ -294,7 +299,7 @@ class InstVnf(Thread):
                     {'cPInstanceId': cp.cpinstanceid, 'cpdId': cp.cpdid, 'ownerid': cp.ownerid,
                      'ownertype': cp.ownertype, 'changeType': 'added', 'portResource': port_resource,
                      'virtualLinkInstanceId': cp.vlinstanceid})
-        #nf cps
+        # nf cps
         cps = CPInstModel.objects.filter(ownerid=self.nf_inst_id, ownertype=0)
         logger.info('vnf_inst_id=%s, cps size=%s' % (self.nf_inst_id, cps.count()))
         for cp in cps:
@@ -308,7 +313,7 @@ class InstVnf(Thread):
                 {'cPInstanceId': cp.cpinstanceid, 'cpdId': cp.cpdid, 'ownerid': cp.ownerid, 'ownertype': cp.ownertype,
                  'changeType': 'added', 'portResource': port_resource,
                  'virtualLinkInstanceId': cp.vlinstanceid})
-        affectedcapacity = {}
+        # affectedcapacity = {}
         # reserved_total = allocate_data.get('reserved_total', {})
         # affectedcapacity['vm'] = str(reserved_total.get('vmnum', 0))
         # affectedcapacity['vcpu'] = str(reserved_total.get('vcpunum', 0))
@@ -332,7 +337,7 @@ class InstVnf(Thread):
             'affectedVirtualStorage': affected_vs,
             'affectedCp': affected_cp}
         logger.info('content_args=%s' % content_args)
-        #call rest api
+        # call rest api
         resp = notify_lcm_to_nfvo(content_args, self.nf_inst_id)
         logger.info('[NF instantiation] get lcm response %s' % resp)
         if resp[0] != 0:
@@ -356,7 +361,7 @@ class InstVnf(Thread):
         if reg_info:
             self.vnfm_inst_id = reg_info.vnfminstid
             self.nfvo_inst_id = reg_info.nfvoid
-            logger.info("[NF instantiation] Registered nfvo id is [%s]"%self.nfvo_inst_id)
+            logger.info("[NF instantiation] Registered nfvo id is [%s]" % self.nfvo_inst_id)
         else:
             raise NFLCMException("Nfvo was not registered")
         logger.info("[NF instantiation]get nfvo connection info end")
@@ -367,12 +372,13 @@ class InstVnf(Thread):
         JobUtil.add_job_status(self.job_id, 255, error_msg)
 
     def do_notify(self, res_type, progress, ret):
-        logger.info('creating [%s] resource'%res_type)
-        progress = 20 + int(progress/2)     #20-70
-        if res_type == adaptor.RES_VOLUME:
+        logger.info('creating [%s] resource' % res_type)
+        progress = 20 + int(progress/2)     # 20-70
+        if res_type == adaptor.OPT_CREATE_VOLUME:
             logger.info('Create vloumns!')
-            if ret["returnCode"] == adaptor.RES_NEW:#new create
-                self.inst_resource['volumn'].append({"vim_id": ignore_case_get(ret, "vim_id")}, {"res_id": ignore_case_get(ret, "res_id")})
+            if ret["returnCode"] == adaptor.RES_NEW:  # new create
+                self.inst_resource['volumn'].append({"vim_id": ignore_case_get(ret, "vim_id"),
+                                                     "res_id": ignore_case_get(ret, "res_id")})
             JobUtil.add_job_status(self.job_id, progress, 'Create vloumns!')
             StorageInstModel.objects.create(
                 storageid='1',
@@ -382,10 +388,11 @@ class InstVnf(Thread):
                 tenant='admin',
                 insttype=0,
                 instid=self.nf_inst_id)
-        elif res_type == adaptor.RES_NETWORK:
+        elif res_type == adaptor.OPT_CREATE_NETWORK:
             logger.info('Create networks!')
             if ret["returnCode"] == adaptor.RES_NEW:
-                self.inst_resource['network'].append({"vim_id": ignore_case_get(ret, "vim_id")}, {"res_id": ignore_case_get(ret, "res_id")})
+                self.inst_resource['network'].append({"vim_id": ignore_case_get(ret, "vim_id"),
+                                                      "res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['network'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, progress, 'Create networks!')
             NetworkInstModel.objects.create(
@@ -396,10 +403,11 @@ class InstVnf(Thread):
                 tenant='admin',
                 insttype=0,
                 instid=self.nf_inst_id)
-        elif res_type == adaptor.RES_SUBNET:
+        elif res_type == adaptor.OPT_CREATE_SUBNET:
             logger.info('Create subnets!')
             if ret["returnCode"] == adaptor.RES_NEW:
-                self.inst_resource['subnet'].append({"vim_id": ignore_case_get(ret, "vim_id")}, {"res_id": ignore_case_get(ret, "res_id")})
+                self.inst_resource['subnet'].append({"vim_id": ignore_case_get(ret, "vim_id"),
+                                                     "res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['subnet'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, progress, 'Create subnets!')
             SubNetworkInstModel.objects.create(
@@ -411,10 +419,11 @@ class InstVnf(Thread):
                 tenant='admin',
                 insttype=0,
                 instid=self.nf_inst_id)
-        elif res_type == adaptor.RES_PORT:
+        elif res_type == adaptor.OPT_CREATE_PORT:
             logger.info('Create ports!')
             if ret["returnCode"] == adaptor.RES_NEW:
-                self.inst_resource['port'].append({"vim_id": ignore_case_get(ret, "vim_id")}, {"res_id": ignore_case_get(ret, "res_id")})
+                self.inst_resource['port'].append({"vim_id": ignore_case_get(ret, "vim_id"),
+                                                   "res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['port'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, progress, 'Create ports!')
             PortInstModel.objects.create(
@@ -427,10 +436,11 @@ class InstVnf(Thread):
                 tenant='admin',
                 insttype=0,
                 instid=self.nf_inst_id)
-        elif res_type == adaptor.RES_FLAVOR:
+        elif res_type == adaptor.OPT_CREATE_FLAVOR:
             logger.info('Create flavors!')
             if ret["returnCode"] == adaptor.RES_NEW:
-                self.inst_resource['flavor'].append({"vim_id": ignore_case_get(ret, "vim_id")}, {"res_id": ignore_case_get(ret, "res_id")})
+                self.inst_resource['flavor'].append({"vim_id": ignore_case_get(ret, "vim_id"),
+                                                     "res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['flavor'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, progress, 'Create flavors!')
             FlavourInstModel.objects.create(
@@ -439,10 +449,11 @@ class InstVnf(Thread):
                 vcpu='1',
                 extraspecs='1',
                 instid=self.nf_inst_id)
-        elif res_type == adaptor.RES_VM:
+        elif res_type == adaptor.OPT_CREATE_VM:
             logger.info('Create vms!')
             if ret["returnCode"] == adaptor.RES_NEW:
-                self.inst_resource['vm'].append({"vim_id": ignore_case_get(ret, "vim_id")}, {"res_id": ignore_case_get(ret, "res_id")})
+                self.inst_resource['vm'].append({"vim_id": ignore_case_get(ret, "vim_id"),
+                                                 "res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['vm'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, progress, 'Create vms!')
             VmInstModel.objects.create(
@@ -455,7 +466,7 @@ class InstVnf(Thread):
                 operationalstate=1)
 
     def do_rollback(self, args_=None):
-        logger.error('error info : %s'%(args_))
+        logger.error('error info : %s' % args_)
         adaptor.delete_vim_res(self.inst_resource, self.do_notify_delete)
         logger.error('rollback resource complete')
 
@@ -468,7 +479,5 @@ class InstVnf(Thread):
         logger.error('delete table complete')
         raise NFLCMException("Create resource failed")
 
-    def do_notify_delete(ret):
-        logger.error('Deleting [%s] resource'%ret)
-
-
+    def do_notify_delete(self, ret):
+        logger.error('Deleting [%s] resource' % ret)
