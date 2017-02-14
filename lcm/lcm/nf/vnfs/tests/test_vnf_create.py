@@ -90,7 +90,10 @@ class TestNsInstantiate(TestCase):
                                      name='aaa_pnet_cp', tenant='admin', insttype=0, instid='1')
 
     def tearDown(self):
-        pass
+        VmInstModel.objects.all().delete()
+        NetworkInstModel.objects.all().delete()
+        SubNetworkInstModel.objects.all().delete()
+        PortInstModel.objects.all().delete()
 
     def assert_job_result(self, job_id, job_progress, job_detail):
         jobs = JobStatusModel.objects.filter(
@@ -118,6 +121,7 @@ class TestNsInstantiate(TestCase):
 
     @mock.patch.object(InstVnf, 'run')
     def test_instantiate_vnf(self, mock_run):
+        mock_run.re.return_value = None
         response = self.client.post("/gvnfmapi/lcm/v1/vnf_instances/12/instantiate", data={}, format='json')
         self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
 

@@ -288,7 +288,7 @@ class InstVnf(Thread):
         if res_type == adaptor.RES_VOLUME:
             logger.info('Create vloumns!')
             if ret["returnCode"] == adaptor.RES_NEW:#new create
-                self.inst_resource['volumn'].append({"vim_id": ret["vim_id"]}, {"res_id": ret["res_id"]})
+                self.inst_resource['volumn'].append({"vim_id": ignore_case_get(ret, "vim_id")}, {"res_id": ignore_case_get(ret, "res_id")})
             JobUtil.add_job_status(self.job_id, progress, 'Create vloumns!')
             StorageInstModel.objects.create(
                 storageid='1',
@@ -301,7 +301,7 @@ class InstVnf(Thread):
         elif res_type == adaptor.RES_NETWORK:
             logger.info('Create networks!')
             if ret["returnCode"] == adaptor.RES_NEW:
-                self.inst_resource['network'].append({"vim_id": ret["vim_id"]}, {"res_id": ret["res_id"]})
+                self.inst_resource['network'].append({"vim_id": ignore_case_get(ret, "vim_id")}, {"res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['network'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, progress, 'Create networks!')
             NetworkInstModel.objects.create(
@@ -315,7 +315,7 @@ class InstVnf(Thread):
         elif res_type == adaptor.RES_SUBNET:
             logger.info('Create subnets!')
             if ret["returnCode"] == adaptor.RES_NEW:
-                self.inst_resource['subnet'].append({"vim_id": ret["vim_id"]}, {"res_id": ret["res_id"]})
+                self.inst_resource['subnet'].append({"vim_id": ignore_case_get(ret, "vim_id")}, {"res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['subnet'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, progress, 'Create subnets!')
             SubNetworkInstModel.objects.create(
@@ -330,7 +330,7 @@ class InstVnf(Thread):
         elif res_type == adaptor.RES_PORT:
             logger.info('Create ports!')
             if ret["returnCode"] == adaptor.RES_NEW:
-                self.inst_resource['port'].append({"vim_id": ret["vim_id"]}, {"res_id": ret["res_id"]})
+                self.inst_resource['port'].append({"vim_id": ignore_case_get(ret, "vim_id")}, {"res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['port'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, progress, 'Create ports!')
             PortInstModel.objects.create(
@@ -346,7 +346,7 @@ class InstVnf(Thread):
         elif res_type == adaptor.RES_FLAVOR:
             logger.info('Create flavors!')
             if ret["returnCode"] == adaptor.RES_NEW:
-                self.inst_resource['flavor'].append({"vim_id": ret["vim_id"]}, {"res_id": ret["res_id"]})
+                self.inst_resource['flavor'].append({"vim_id": ignore_case_get(ret, "vim_id")}, {"res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['flavor'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, progress, 'Create flavors!')
             FlavourInstModel.objects.create(
@@ -358,7 +358,7 @@ class InstVnf(Thread):
         elif res_type == adaptor.RES_VM:
             logger.info('Create vms!')
             if ret["returnCode"] == adaptor.RES_NEW:
-                self.inst_resource['vm'].append({"vim_id": ret["vim_id"]}, {"res_id": ret["res_id"]})
+                self.inst_resource['vm'].append({"vim_id": ignore_case_get(ret, "vim_id")}, {"res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['vm'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, progress, 'Create vms!')
             VmInstModel.objects.create(
@@ -372,8 +372,8 @@ class InstVnf(Thread):
 
     def do_rollback(self, args_=None):
         logger.error('error info : %s'%(args_))
-
         adaptor.delete_vim_res(self.inst_resource, self.do_notify_delete)
+        logger.error('rollback resource complete')
 
         StorageInstModel.objects.filter(instid=self.nf_inst_id).delete()
         NetworkInstModel.objects.filter(instid=self.nf_inst_id).delete()
@@ -381,10 +381,10 @@ class InstVnf(Thread):
         PortInstModel.objects.filter(instid=self.nf_inst_id).delete()
         FlavourInstModel.objects.filter(instid=self.nf_inst_id).delete()
         VmInstModel.objects.filter(instid=self.nf_inst_id).delete()
-
+        logger.error('delete table complete')
         raise NFLCMException("Create resource failed")
 
     def do_notify_delete(ret):
-        logger.error('Delete [%s] resource'%ret)
+        logger.error('Deleting [%s] resource'%ret)
 
 
