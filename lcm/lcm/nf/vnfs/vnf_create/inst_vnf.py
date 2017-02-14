@@ -163,20 +163,7 @@ class InstVnf(Thread):
 
     def create_res(self):
         logger.info("[NF instantiation] create resource start")
-
         adaptor.create_vim_res(self.vnfd_info, self.do_notify, self.do_rollback)
-
-        # volumns = ignore_case_get(self.data, "volumn_storages")
-        #create_volumns(volumns)
-        # JobUtil.add_job_status(self.job_id, 35, 'Nf instancing create resource(volumn_storages) finish')
-        #
-        # vls = ignore_case_get(self.data, "vls")
-        # # create_networks(vls)
-        # JobUtil.add_job_status(self.job_id, 55, 'Nf instancing create resource(networks) finish')
-        #
-        # vdus = ignore_case_get(self.data, "vdus")
-        # # create_vdus(vdus)
-        # JobUtil.add_job_status(self.job_id, 75, 'Nf instancing create resource(vms) finish')
 
         JobUtil.add_job_status(self.job_id, 70, '[NF instantiation] create resource finish')
         logger.info("[NF instantiation] create resource finish")
@@ -236,35 +223,30 @@ class InstVnf(Thread):
         # self.add_job(43, 'INST_DPLY_VM_PRGS')
         logger.info("[NF instantiation] confirm all vms are active end")
 
-    def wait_inst_finish(self, args):
-        try:
-            logger.info('wait_inst_finish, args=%s' % args)
-            # WaitInstFinishTask(args).do_biz()
-            return {'result': '100', 'msg': 'Nf instancing wait finish', 'context': {}}
-        except Exception as e:
-            logger.error('Nf instancing wait exception=%s' % e.message)
-            logger.error(traceback.format_exc())
-            return {'result': '255', 'msg': 'Nf instancing wait exception', 'context': {}}
+    # def wait_inst_finish(self, args):
+    #     try:
+    #         logger.info('wait_inst_finish, args=%s' % args)
+    #         # WaitInstFinishTask(args).do_biz()
+    #         return {'result': '100', 'msg': 'Nf instancing wait finish', 'context': {}}
+    #     except Exception as e:
+    #         logger.error('Nf instancing wait exception=%s' % e.message)
+    #         logger.error(traceback.format_exc())
+    #         return {'result': '255', 'msg': 'Nf instancing wait exception', 'context': {}}
 
     def lcm_notify(self, args):
-        try:
-            logger.info('lcm_notify, args=%s' % args)
-            # LcmNotifyTask(args).do_biz()
-            return {'result': '100', 'msg': 'Nf instancing lcm notify finish', 'context': {}}
-        except Exception as e:
-            logger.error('Nf instancing lcm notify exception=%s' % e.message)
-            logger.error(traceback.format_exc())
-            return {'result': '255', 'msg': 'Nf instancing lcm notify exception', 'context': {}}
+        logger.info('lcm_notify, args=%s' % args)
+        # LcmNotifyTask(args).do_biz()
+        return {'result': '100', 'msg': 'Nf instancing lcm notify finish', 'context': {}}
 
-    def rollback(self, args):
-        try:
-            logger.info('inst_exception, args=%s' % args)
-            # InstExceptionTask(args).do_biz()
-            return {'result': '100', 'msg': 'Nf instancing exception process finish', 'context': {}}
-        except Exception as e:
-            logger.error('Nf instancing exception process exception=%s' % e.message)
-            logger.error(traceback.format_exc())
-            return {'result': '255', 'msg': 'Nf instancing exception process exception', 'context': {}}
+    # def rollback(self, args):
+    #     try:
+    #         logger.info('inst_exception, args=%s' % args)
+    #         # InstExceptionTask(args).do_biz()
+    #         return {'result': '100', 'msg': 'Nf instancing exception process finish', 'context': {}}
+    #     except Exception as e:
+    #         logger.error('Nf instancing exception process exception=%s' % e.message)
+    #         logger.error(traceback.format_exc())
+    #         return {'result': '255', 'msg': 'Nf instancing exception process exception', 'context': {}}
 
     def load_nfvo_config(self):
         logger.info("[NF instantiation]get nfvo connection info start")
@@ -280,10 +262,9 @@ class InstVnf(Thread):
         logger.error('VNF instantiation failed, detail message: %s' % error_msg)
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='failed', lastuptime=now_time())
         JobUtil.add_job_status(self.job_id, 255, error_msg)
-        # JobUtil.add_job_status(self.job_id, 255, 'VNF instantiation failed, detail message: %s' % error_msg, 0)
 
     def do_notify(self, res_type, progress, ret):
-        # logger.info('add job, progress=%s, msgid=%s, args=%s' % (progress, msgid, args_))
+        logger.info('creating [%s] resource'%res_type)
         progress = 20 + int(progress/2)     #20-70
         if res_type == adaptor.RES_VOLUME:
             logger.info('Create vloumns!')
