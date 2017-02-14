@@ -38,7 +38,7 @@ class CreateVnfIdentifier(APIView):
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception:
             logger.error(traceback.format_exc())
-            return Response(data='unexpected exception', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         rsp = {"vnfInstanceId": nf_inst_id}
         return Response(data=rsp, status=status.HTTP_201_CREATED)
 
