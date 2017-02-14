@@ -87,7 +87,7 @@ class InstVnf(Thread):
             self.create_res()
             # self.check_res_status()
             # self.wait_inst_finish(args)
-            # self.lcm_notify()
+            self.lcm_notify()
             JobUtil.add_job_status(self.job_id, 100, "Instantiate Vnf success.")
             is_exist = JobStatusModel.objects.filter(jobid=self.job_id).exists()
             logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)
@@ -163,7 +163,7 @@ class InstVnf(Thread):
 
     def create_res(self):
         logger.info("[NF instantiation] create resource start")
-        adaptor.create_vim_res(self.vnfd_info, self.do_notify, self.do_rollback)
+        adaptor.create_vim_res('', self.do_notify, self.do_rollback)
 
         JobUtil.add_job_status(self.job_id, 70, '[NF instantiation] create resource finish')
         logger.info("[NF instantiation] create resource finish")
@@ -236,10 +236,12 @@ class InstVnf(Thread):
     def lcm_notify(self):
         logger.info('[NF instantiation] send notify request to nfvo start')
         reg_info = NfvoRegInfoModel.objects.filter(vnfminstid=self.vnfm_inst_id).first()
+        # vm_info = VmInstModel.objects.filter(nfinstid=self.nf_inst_id)
+        vmlist = []
         nfs = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
         nf = nfs[0]
-        allocate_data = json.loads(nf.initallocatedata)
-        vmlist = json.loads(nf.predefinedvm)
+        # allocate_data = json.loads(nf.initallocatedata)
+        # vmlist = json.loads(nf.predefinedvm)
         addition_param = {'vmList': vmlist}
         affected_vnfc = []
         vnfcs = VNFCInstModel.objects.filter(nfinstid=self.nf_inst_id)
@@ -307,15 +309,15 @@ class InstVnf(Thread):
                  'changeType': 'added', 'portResource': port_resource,
                  'virtualLinkInstanceId': cp.vlinstanceid})
         affectedcapacity = {}
-        reserved_total = allocate_data.get('reserved_total', {})
-        affectedcapacity['vm'] = str(reserved_total.get('vmnum', 0))
-        affectedcapacity['vcpu'] = str(reserved_total.get('vcpunum', 0))
-        affectedcapacity['vMemory'] = str(reserved_total.get('memorysize', 0))
-        affectedcapacity['port'] = str(reserved_total.get('portnum', 0))
-        affectedcapacity['localStorage'] = str(reserved_total.get('hdsize', 0))
-        affectedcapacity['sharedStorage'] = str(reserved_total.get('shdsize', 0))
+        # reserved_total = allocate_data.get('reserved_total', {})
+        # affectedcapacity['vm'] = str(reserved_total.get('vmnum', 0))
+        # affectedcapacity['vcpu'] = str(reserved_total.get('vcpunum', 0))
+        # affectedcapacity['vMemory'] = str(reserved_total.get('memorysize', 0))
+        # affectedcapacity['port'] = str(reserved_total.get('portnum', 0))
+        # affectedcapacity['localStorage'] = str(reserved_total.get('hdsize', 0))
+        # affectedcapacity['sharedStorage'] = str(reserved_total.get('shdsize', 0))
         content_args = {
-            "vnfdmodule": allocate_data,
+            # "vnfdmodule": allocate_data,
             "additionalParam": addition_param,
             "nfvoInstanceId": reg_info.nfvoid,
             "vnfmInstanceId": self.vnfm_inst_id,
@@ -323,7 +325,7 @@ class InstVnf(Thread):
             "nfInstanceId": self.nf_inst_id,
             "operation": 'instantiate',
             "jobId": '',
-            'affectedcapacity': affectedcapacity,
+            # 'affectedcapacity': affectedcapacity,
             'affectedService': [],
             'affectedVnfc': affected_vnfc,
             'affectedVirtualLink': affected_vl,

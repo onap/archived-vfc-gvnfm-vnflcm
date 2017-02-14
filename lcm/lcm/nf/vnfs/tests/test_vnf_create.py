@@ -20,7 +20,8 @@ from rest_framework import status
 
 from lcm.nf.vnfs.vnf_create.create_vnf_identifier import CreateVnf
 from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
-from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel
+from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel, VmInstModel, NetworkInstModel, \
+    SubNetworkInstModel, PortInstModel
 from lcm.pub.utils import restcall
 from lcm.pub.utils.jobutil import JobUtil
 
@@ -28,23 +29,23 @@ from lcm.pub.utils.jobutil import JobUtil
 class TestNsInstantiate(TestCase):
     def setUp(self):
         self.client = Client()
-        # VmInstModel.objects.create(vmid="1", vimid="1", resouceid="11", insttype=0, instid="1", vmname="test_01",
-        #                            operationalstate=1)
-        # VmInstModel.objects.create(vmid="2", vimid="2", resouceid="22", insttype=0, instid="2", vmname="test_02",
-        #                        operationalstate=1)
-        # NetworkInstModel.objects.create(networkid='1', vimid='1', resouceid='1', name='pnet_network',
-        #                                 tenant='admin', insttype=0, instid='1')
-        # SubNetworkInstModel.objects.create(subnetworkid='1', vimid='1', resouceid='1', networkid='1',
-        #                                    name='sub_pnet',tenant='admin', insttype=0, instid='1')
-        # PortInstModel.objects.create(portid='1', networkid='1', subnetworkid='1', vimid='1', resouceid='1',
-        #                              name='aaa_pnet_cp', tenant='admin', insttype=0, instid='1')
+        VmInstModel.objects.create(vmid="1", vimid="1", resouceid="11", insttype=0, instid="1", vmname="test_01",
+                                   operationalstate=1)
+        VmInstModel.objects.create(vmid="2", vimid="2", resouceid="22", insttype=0, instid="2", vmname="test_02",
+                               operationalstate=1)
+        NetworkInstModel.objects.create(networkid='1', vimid='1', resouceid='1', name='pnet_network',
+                                        tenant='admin', insttype=0, instid='1')
+        SubNetworkInstModel.objects.create(subnetworkid='1', vimid='1', resouceid='1', networkid='1',
+                                           name='sub_pnet',tenant='admin', insttype=0, instid='1')
+        PortInstModel.objects.create(portid='1', networkid='1', subnetworkid='1', vimid='1', resouceid='1',
+                                     name='aaa_pnet_cp', tenant='admin', insttype=0, instid='1')
 
     def tearDown(self):
         pass
-        # VmInstModel.objects.all().delete()
-        # NetworkInstModel.objects.all().delete()
-        # SubNetworkInstModel.objects.all().delete()
-        # PortInstModel.objects.all().delete()
+        VmInstModel.objects.all().delete()
+        NetworkInstModel.objects.all().delete()
+        SubNetworkInstModel.objects.all().delete()
+        PortInstModel.objects.all().delete()
 
     def assert_job_result(self, job_id, job_progress, job_detail):
         jobs = JobStatusModel.objects.filter(
@@ -135,31 +136,9 @@ class TestNsInstantiate(TestCase):
         InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
         self.assert_job_result(self.job_id, 255, "Nf instancing apply grant exception")
 
-    @mock.patch.object(restcall, 'call_req')
-    # @mock.patch.object(adaptor, 'create_vim_res')
-    def test_instantiate_vnf_when_create_res_failed(self, mock_call_req):
-        NfvoRegInfoModel.objects.create(nfvoid='nfvo111', vnfminstid='vnfm111', apiurl='http://10.74.44.11',
-                                        nfvouser='root', nfvopassword='root123')
-        r1 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
-        r2 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
-        r3 = [0, json.JSONEncoder().encode('Nf instancing apply grant'), '200']
-        # r4 = [0, json.JSONEncoder().encode('Nf instancing apply resource'), '200']
-        mock_call_req.side_effect = [r1, r2, r3]
-        # mock_create_vim_res.re.return_value = None
-        create_data = {
-            "vnfdId": "111",
-            "vnfInstanceName": "vFW_01",
-            "vnfInstanceDescription": " vFW in Nanjing TIC Edge"}
-        self.nf_inst_id = CreateVnf(create_data).do_biz()
-        self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
-        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
-        data = inst_req_data
-        InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        self.assert_job_result(self.job_id, 255, "Create resource failed")
-
     # @mock.patch.object(restcall, 'call_req')
     # # @mock.patch.object(adaptor, 'create_vim_res')
-    # def test_instantiate_vnf_success(self, mock_call_req):
+    # def test_instantiate_vnf_when_create_res_failed(self, mock_call_req):
     #     NfvoRegInfoModel.objects.create(nfvoid='nfvo111', vnfminstid='vnfm111', apiurl='http://10.74.44.11',
     #                                     nfvouser='root', nfvopassword='root123')
     #     r1 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
@@ -177,7 +156,29 @@ class TestNsInstantiate(TestCase):
     #     JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
     #     data = inst_req_data
     #     InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-    #     self.assert_job_result(self.job_id, 100, "Instantiate Vnf success.")
+    #     self.assert_job_result(self.job_id, 255, "Create resource failed")
+
+    @mock.patch.object(restcall, 'call_req')
+    # @mock.patch.object(adaptor, 'create_vim_res')
+    def test_instantiate_vnf_success(self, mock_call_req):
+        NfvoRegInfoModel.objects.create(nfvoid='nfvo111', vnfminstid='vnfm111', apiurl='http://10.74.44.11',
+                                        nfvouser='root', nfvopassword='root123')
+        r1 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
+        r2 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
+        r3 = [0, json.JSONEncoder().encode('Nf instancing apply grant'), '200']
+        r4 = [0, json.JSONEncoder().encode('None'), '200']
+        mock_call_req.side_effect = [r1, r2, r3, r4]
+        # mock_create_vim_res.re.return_value = None
+        create_data = {
+            "vnfdId": "111",
+            "vnfInstanceName": "vFW_01",
+            "vnfInstanceDescription": " vFW in Nanjing TIC Edge"}
+        self.nf_inst_id = CreateVnf(create_data).do_biz()
+        self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
+        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+        data = inst_req_data
+        InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
+        self.assert_job_result(self.job_id, 100, "Instantiate Vnf success.")
 
 inst_req_data = {
     "flavourId": "flavour_1",
