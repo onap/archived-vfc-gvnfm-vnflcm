@@ -37,7 +37,7 @@ class InstVnf(Thread):
         self.nfvo_inst_id = ''
         self.vnfm_inst_id = ''
         self.vnfd_info = []
-        self.inst_resource = {'volumn': [],  # [{"vim_id": ignore_case_get(ret, "vim_id")},{}]11
+        self.inst_resource = {'volumn': [],  # [{"vim_id": ignore_case_get(ret, "vim_id")},{}]
                               'network': [],
                               'subnet': [],
                               'port': [],
