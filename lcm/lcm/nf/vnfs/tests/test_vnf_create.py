@@ -20,8 +20,7 @@ from rest_framework import status
 
 from lcm.nf.vnfs.vnf_create.create_vnf_identifier import CreateVnf
 from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
-from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel, VmInstModel, NetworkInstModel, \
-    SubNetworkInstModel, PortInstModel
+from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel
 from lcm.pub.utils import restcall
 from lcm.pub.utils.jobutil import JobUtil
 

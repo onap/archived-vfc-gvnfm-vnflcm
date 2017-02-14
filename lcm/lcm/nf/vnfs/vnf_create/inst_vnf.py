@@ -17,9 +17,9 @@ import traceback
 from threading import Thread
 
 from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel, VmInstModel, NetworkInstModel, SubNetworkInstModel, \
-    PortInstModel, StorageInstModel, FlavourInstModel
+    PortInstModel, StorageInstModel, FlavourInstModel, VNFCInstModel, VLInstModel, CPInstModel
 from lcm.pub.exceptions import NFLCMException
-from lcm.pub.msapi.nfvolcm import vnfd_rawdata_get, apply_grant_to_nfvo
+from lcm.pub.msapi.nfvolcm import vnfd_rawdata_get, apply_grant_to_nfvo, notify_lcm_to_nfvo
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.values import ignore_case_get
@@ -87,7 +87,7 @@ class InstVnf(Thread):
             self.create_res()
             # self.check_res_status()
             # self.wait_inst_finish(args)
-            # self.lcm_notify(args)
+            # self.lcm_notify()
             JobUtil.add_job_status(self.job_id, 100, "Instantiate Vnf success.")
             is_exist = JobStatusModel.objects.filter(jobid=self.job_id).exists()
             logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)
@@ -233,10 +233,110 @@ class InstVnf(Thread):
     #         logger.error(traceback.format_exc())
     #         return {'result': '255', 'msg': 'Nf instancing wait exception', 'context': {}}
 
-    def lcm_notify(self, args):
-        logger.info('lcm_notify, args=%s' % args)
-        # LcmNotifyTask(args).do_biz()
-        return {'result': '100', 'msg': 'Nf instancing lcm notify finish', 'context': {}}
+    def lcm_notify(self):
+        logger.info('[NF instantiation] send notify request to nfvo start')
+        reg_info = NfvoRegInfoModel.objects.filter(vnfminstid=self.vnfm_inst_id).first()
+        nfs = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
+        nf = nfs[0]
+        allocate_data = json.loads(nf.initallocatedata)
+        vmlist = json.loads(nf.predefinedvm)
+        addition_param = {'vmList': vmlist}
+        affected_vnfc = []
+        vnfcs = VNFCInstModel.objects.filter(nfinstid=self.nf_inst_id)
+        for vnfc in vnfcs:
+            compute_resource = {}
+            if vnfc.vmid:
+                vm = VmInstModel.objects.filter(vmid=vnfc.vmid)
+                if vm:
+                    compute_resource = {'vimId': vm[0].vimid, 'resourceId': vm[0].resouceid,
+                                        'resourceName': vm[0].vmname, 'tenant': vm[0].tenant}
+            affected_vnfc.append(
+                {'vnfcInstanceId': vnfc.vnfcinstanceid, 'vduId': vnfc.vduid, 'changeType': 'added',
+                 'computeResource': compute_resource, 'storageResource': [], 'vduType': vnfc.vdutype})
+        affected_vl = []
+        vls = VLInstModel.objects.filter(ownerid=self.nf_inst_id)
+        for vl in vls:
+            network_resource = {}
+            subnet_resource = {}
+            if vl.relatednetworkid:
+                network = NetworkInstModel.objects.filter(networkid=vl.relatednetworkid)
+                subnet = SubNetworkInstModel.objects.filter(subnetworkid=vl.relatedsubnetworkid)
+                if network:
+                    network_resource = {'vimId': network[0].vimid, 'resourceId': network[0].resouceid,
+                                        'resourceName': network[0].name, 'tenant': network[0].tenant}
+                if subnet:
+                    subnet_resource = {'vimId': subnet[0].vimid, 'resourceId': subnet[0].resouceid,
+                                       'resourceName': subnet[0].name, 'tenant': subnet[0].tenant}
+            affected_vl.append(
+                {'virtualLinkInstanceId': vl.vlinstanceid, 'virtualLinkDescId': vl.vldid, 'changeType': 'added',
+                 'networkResource': network_resource, 'subnetworkResource': subnet_resource, 'tenant': vl.tenant})
+        affected_vs = []
+        vss = StorageInstModel.objects.filter(instid=self.nf_inst_id)
+        for vs in vss:
+            affected_vs.append(
+                {'virtualStorageInstanceId': vs.storageid, 'virtualStorageDescId': '', 'changeType': 'added',
+                 'storageResource': {'vimId': vs.vimid, 'resourceId': vs.resouceid,
+                                     'resourceName': vs.name, 'tenant': vs.tenant}})
+        affected_cp = []
+        #vnfc cps
+        for vnfc in vnfcs:
+            cps = CPInstModel.objects.filter(ownerid=vnfc.vnfcinstanceid, ownertype=3)
+            for cp in cps:
+                port_resource = {}
+                if cp.relatedport:
+                    port = PortInstModel.objects.filter(portid=cp.relatedport)
+                    if port:
+                        port_resource = {'vimId': port[0].vimid, 'resourceId': port[0].resouceid,
+                                         'resourceName': port[0].name, 'tenant': port[0].tenant}
+                affected_cp.append(
+                    {'cPInstanceId': cp.cpinstanceid, 'cpdId': cp.cpdid, 'ownerid': cp.ownerid,
+                     'ownertype': cp.ownertype, 'changeType': 'added', 'portResource': port_resource,
+                     'virtualLinkInstanceId': cp.vlinstanceid})
+        #nf cps
+        cps = CPInstModel.objects.filter(ownerid=self.nf_inst_id, ownertype=0)
+        logger.info('vnf_inst_id=%s, cps size=%s' % (self.nf_inst_id, cps.count()))
+        for cp in cps:
+            port_resource = {}
+            if cp.relatedport:
+                port = PortInstModel.objects.filter(portid=cp.relatedport)
+                if port:
+                    port_resource = {'vimId': port[0].vimid, 'resourceId': port[0].resouceid,
+                                     'resourceName': port[0].name, 'tenant': port[0].tenant}
+            affected_cp.append(
+                {'cPInstanceId': cp.cpinstanceid, 'cpdId': cp.cpdid, 'ownerid': cp.ownerid, 'ownertype': cp.ownertype,
+                 'changeType': 'added', 'portResource': port_resource,
+                 'virtualLinkInstanceId': cp.vlinstanceid})
+        affectedcapacity = {}
+        reserved_total = allocate_data.get('reserved_total', {})
+        affectedcapacity['vm'] = str(reserved_total.get('vmnum', 0))
+        affectedcapacity['vcpu'] = str(reserved_total.get('vcpunum', 0))
+        affectedcapacity['vMemory'] = str(reserved_total.get('memorysize', 0))
+        affectedcapacity['port'] = str(reserved_total.get('portnum', 0))
+        affectedcapacity['localStorage'] = str(reserved_total.get('hdsize', 0))
+        affectedcapacity['sharedStorage'] = str(reserved_total.get('shdsize', 0))
+        content_args = {
+            "vnfdmodule": allocate_data,
+            "additionalParam": addition_param,
+            "nfvoInstanceId": reg_info.nfvoid,
+            "vnfmInstanceId": self.vnfm_inst_id,
+            "status": 'finished',
+            "nfInstanceId": self.nf_inst_id,
+            "operation": 'instantiate',
+            "jobId": '',
+            'affectedcapacity': affectedcapacity,
+            'affectedService': [],
+            'affectedVnfc': affected_vnfc,
+            'affectedVirtualLink': affected_vl,
+            'affectedVirtualStorage': affected_vs,
+            'affectedCp': affected_cp}
+        logger.info('content_args=%s' % content_args)
+        #call rest api
+        resp = notify_lcm_to_nfvo(content_args, self.nf_inst_id)
+        logger.info('[NF instantiation] get lcm response %s' % resp)
+        if resp[0] != 0:
+            logger.error("notify lifecycle to nfvo failed.[%s]" % resp[1])
+            raise NFLCMException("send notify request to nfvo failed")
+        logger.info('[NF instantiation] send notify request to nfvo end')
 
     # def rollback(self, args):
     #     try:
@@ -252,6 +352,7 @@ class InstVnf(Thread):
         logger.info("[NF instantiation]get nfvo connection info start")
         reg_info = NfvoRegInfoModel.objects.filter(vnfminstid='vnfm111').first()
         if reg_info:
+            self.vnfm_inst_id = reg_info.vnfminstid
             self.nfvo_inst_id = reg_info.nfvoid
             logger.info("[NF instantiation] Registered nfvo id is [%s]"%self.nfvo_inst_id)
         else:
