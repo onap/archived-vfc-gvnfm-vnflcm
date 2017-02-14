@@ -56,7 +56,7 @@ class InstantiateVnf(APIView):
 class DeleteVnfIdentifier(APIView):
     def delete(self, request):
         logger.debug("DeleteVnfIdentifier--delete::> %s" % request.data)
-        return Response(data='', status=status.HTTP_202_ACCEPTED)
+        return Response(data='', status=status.HTTP_204_NO_CONTENT)
 
 
 class TerminateVnf(APIView):
