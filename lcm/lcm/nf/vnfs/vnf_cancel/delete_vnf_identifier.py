@@ -11,3 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from lcm.pub.database.models import NfInstModel
+from lcm.pub.exceptions import NFLCMException
+
+
+class DeleteVnf:
+    def __init__(self, data, instanceId):
+        self.data = data
+        self.nf_inst_id = instanceId
+
+    def do_biz(self):
+        sel_vnfs = NfInstModel.objects.filter(pk=self.nf_inst_id)
+        if not sel_vnfs.exists():
+            raise NFLCMException('VnfInst(%s) does not exist.' % self.nf_inst_id)
+        sel_vnf = sel_vnfs[0]
+        if sel_vnf.instantiationState != 'VNF_INSTANTIATED':
+            raise NFLCMException("No instantiated vnf")
+        pass

@@ -20,6 +20,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from lcm.nf.vnfs.vnf_cancel.delete_vnf_identifier import DeleteVnf
 from lcm.nf.vnfs.vnf_create.create_vnf_identifier import CreateVnf
 from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
 from lcm.pub.exceptions import NFLCMException
@@ -54,9 +55,17 @@ class InstantiateVnf(APIView):
 
 
 class DeleteVnfIdentifier(APIView):
-    def delete(self, request):
+    def delete(self, request, instanceId):
         logger.debug("DeleteVnfIdentifier--delete::> %s" % request.data)
-        return Response(data='', status=status.HTTP_204_NO_CONTENT)
+        try:
+            DeleteVnf(request.data, instanceId).do_biz()
+        except NFLCMException as e:
+            logger.error(e.message)
+            return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception:
+            logger.error(traceback.format_exc())
+            return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(data={}, status=status.HTTP_204_NO_CONTENT)
 
 
 class TerminateVnf(APIView):
