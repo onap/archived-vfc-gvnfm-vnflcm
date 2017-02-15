@@ -11,10 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-def enum(**enums):
-    return type('Enum', (), enums)
 
-# [VNF_STATUS]
+from lcm.pub.utils.jobutil import enum
+
 VNF_STATUS = enum(NULL='null', INSTANTIATING="instantiating", INACTIVE='inactive', ACTIVE="active",
                   FAILED="failed", TERMINATING="terminating", SCALING="scaling", OPERATING="operating",
                   UPDATING="updating", HEALING="healing")

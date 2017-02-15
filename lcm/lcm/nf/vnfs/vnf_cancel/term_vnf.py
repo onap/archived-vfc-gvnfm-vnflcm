@@ -15,12 +15,12 @@ import logging
 import traceback
 from threading import Thread
 
-from lcm.pub.config.enum import VNF_STATUS
+from lcm.nf.vnfs.const import VNF_STATUS
 from lcm.pub.database.models import JobStatusModel, NfInstModel, VmInstModel, NetworkInstModel, StorageInstModel, \
-    FlavourInstModel, PortInstModel, SubNetworkInstModel
+    FlavourInstModel, PortInstModel, SubNetworkInstModel, NfvoRegInfoModel
 from lcm.pub.exceptions import NFLCMException
+from lcm.pub.msapi.nfvolcm import apply_grant_to_nfvo
 from lcm.pub.utils.jobutil import JobUtil
-from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.values import ignore_case_get
 
 logger = logging.getLogger(__name__)
@@ -45,8 +45,8 @@ class TermVnf(Thread):
     def run(self):
         try:
             self.term_pre()
-            self.grant_resource()
             self.query_inst_resource(self.nf_inst_id)
+            # self.grant_resource()
             JobUtil.add_job_status(self.job_id, 100, "Terminate Vnf success.")
             is_exist = JobStatusModel.objects.filter(jobid=self.job_id).exists()
             logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)
@@ -68,9 +68,14 @@ class TermVnf(Thread):
             raise NFLCMException("No instantiated vnf")
         if self.terminationType == 'GRACEFUL' and not self.gracefulTerminationTimeout:
             raise NFLCMException("Graceful termination must set timeout")
+        # get nfvo info
+        JobUtil.add_job_status(self.job_id, 5, 'Get nfvo connection info')
+        self.load_nfvo_config()
+
+        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status=VNF_STATUS.TERMINATING)
+
         JobUtil.add_job_status(self.job_id, 10, 'Nf terminating pre-check finish')
         logger.info("Nf terminating pre-check finish")
-        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status=VNF_STATUS.TERMINATING)
 
     def query_inst_resource(self, inst_id):
         logger.info('[query_resource begin]:inst_id=%s' % inst_id)
@@ -147,4 +152,31 @@ class TermVnf(Thread):
         logger.info('[query_vm_resource]:ret_vms=%s' % self.inst_resource['vm'])
 
     def grant_resource(self):
-        pass
+        logger.info("nf_cancel_task grant_resource begin")
+        JobUtil.add_job_status(self.job_id, 30, 'nf_cancel_task grant_resource')
+        reg_info = NfvoRegInfoModel.objects.filter(vnfminstid=self.vnfm_inst_id).first()
+        nf_info = NfInstModel.objects.filter(nfinstid=self.vnf_inst_id).first()
+        content_args = {'nfvoInstanceId': reg_info.nfvoid, 'vnfmInstanceId': self.vnfm_inst_id,
+                        'nfInstanceId': self.vnf_inst_id, 'nfDescriptorId': nf_info.vnf_id,
+                        'lifecycleOperation': 'Terminal', 'jobId': '', 'addResource': [],
+                        'removeResource': [], 'placementConstraint': [], 'exVimIdList': [], 'additionalParam': {}}
+
+        content_args['removeResource'] = self.get_grant_data()
+
+        logger.info('content_args=%s' % content_args)
+        rsp = apply_grant_to_nfvo(content_args)
+        logger.info("nf_cancel_task grant_resource rsp: %s" % rsp)
+        if rsp[0] != 0:
+            logger.error("nf_cancel_task grant_resource failed.[%s]" % str(rsp[1]))
+        logger.info("nf_cancel_task grant_resource end")
+
+    def load_nfvo_config(self):
+        logger.info("[NF instantiation]get nfvo connection info start")
+        reg_info = NfvoRegInfoModel.objects.filter(vnfminstid='vnfm111').first()
+        if reg_info:
+            self.vnfm_inst_id = reg_info.vnfminstid
+            self.nfvo_inst_id = reg_info.nfvoid
+            logger.info("[NF instantiation] Registered nfvo id is [%s]" % self.nfvo_inst_id)
+        else:
+            raise NFLCMException("Nfvo was not registered")
+        logger.info("[NF instantiation]get nfvo connection info end")
