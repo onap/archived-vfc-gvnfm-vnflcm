@@ -18,7 +18,8 @@ from django.test import TestCase, Client
 from rest_framework import status
 
 from lcm.nf.vnfs.vnf_cancel.term_vnf import TermVnf
-from lcm.pub.database.models import NfInstModel, JobStatusModel
+from lcm.pub.database.models import NfInstModel, JobStatusModel, VmInstModel, NetworkInstModel, SubNetworkInstModel, \
+    PortInstModel
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
 
@@ -26,9 +27,22 @@ from lcm.pub.utils.timeutil import now_time
 class TestNFTerminate(TestCase):
     def setUp(self):
         self.client = Client()
+        VmInstModel.objects.create(vmid="1", vimid="1", resouceid="11", insttype=0, instid="1111", vmname="test_01",
+                                   is_predefined=1, operationalstate=1)
+        VmInstModel.objects.create(vmid="2", vimid="2", resouceid="22", insttype=0, instid="1111",
+                                   is_predefined=1, vmname="test_02", operationalstate=1)
+        NetworkInstModel.objects.create(networkid='1', vimid='1', resouceid='1', name='pnet_network',
+                                        is_predefined=1, tenant='admin', insttype=0, instid='1111')
+        SubNetworkInstModel.objects.create(subnetworkid='1', vimid='1', resouceid='1', networkid='1',
+                                           is_predefined=1, name='sub_pnet', tenant='admin', insttype=0, instid='1111')
+        PortInstModel.objects.create(portid='1', networkid='1', subnetworkid='1', vimid='1', resouceid='1',
+                                     is_predefined=1, name='aaa_pnet_cp', tenant='admin', insttype=0, instid='1111')
 
     def tearDown(self):
-        pass
+        VmInstModel.objects.all().delete()
+        NetworkInstModel.objects.all().delete()
+        SubNetworkInstModel.objects.all().delete()
+        PortInstModel.objects.all().delete()
 
     def assert_job_result(self, job_id, job_progress, job_detail):
         jobs = JobStatusModel.objects.filter(

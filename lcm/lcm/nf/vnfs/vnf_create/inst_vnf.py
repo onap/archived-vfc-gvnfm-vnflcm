@@ -387,6 +387,7 @@ class InstVnf(Thread):
                 name='40G',
                 tenant='admin',
                 insttype=0,
+                is_predefined=ret["returnCode"],
                 instid=self.nf_inst_id)
         elif res_type == adaptor.OPT_CREATE_NETWORK:
             logger.info('Create networks!')
@@ -402,6 +403,7 @@ class InstVnf(Thread):
                 name='pnet_network',
                 tenant='admin',
                 insttype=0,
+                is_predefined=ret["returnCode"],
                 instid=self.nf_inst_id)
         elif res_type == adaptor.OPT_CREATE_SUBNET:
             logger.info('Create subnets!')
@@ -418,6 +420,7 @@ class InstVnf(Thread):
                 name='sub_pnet',
                 tenant='admin',
                 insttype=0,
+                is_predefined=ret["returnCode"],
                 instid=self.nf_inst_id)
         elif res_type == adaptor.OPT_CREATE_PORT:
             logger.info('Create ports!')
@@ -435,6 +438,7 @@ class InstVnf(Thread):
                 name='aaa_pnet_cp',
                 tenant='admin',
                 insttype=0,
+                is_predefined=ret["returnCode"],
                 instid=self.nf_inst_id)
         elif res_type == adaptor.OPT_CREATE_FLAVOR:
             logger.info('Create flavors!')
@@ -448,6 +452,7 @@ class InstVnf(Thread):
                 name='1',
                 vcpu='1',
                 extraspecs='1',
+                is_predefined=ret["returnCode"],
                 instid=self.nf_inst_id)
         elif res_type == adaptor.OPT_CREATE_VM:
             logger.info('Create vms!')
@@ -463,6 +468,7 @@ class InstVnf(Thread):
                 insttype=0,
                 instid=self.nf_inst_id,
                 vmname="test_01",
+                is_predefined=ret["returnCode"],
                 operationalstate=1)
 
     def do_rollback(self, args_=None):
