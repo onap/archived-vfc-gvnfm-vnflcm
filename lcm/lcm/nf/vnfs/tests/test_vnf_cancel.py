@@ -78,3 +78,18 @@ class TestNFTerminate(TestCase):
         JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
         TermVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
         self.assert_job_result(self.job_id, 255, "VnfInst(%s) does not exist" % self.nf_inst_id)
+
+    def test_terminate_vnf_success(self):
+        NfInstModel.objects.create(nfinstid='1111', mnfinstid='1111', nf_name='2222',
+                                   package_id='todo', vnfm_inst_id='todo', version='', vendor='',
+                                   producttype='', netype='', vnfd_model='',
+                                   instantiationState='VNF_INSTANTIATED', nf_desc='', vnfdid='',
+                                   vnfSoftwareVersion='', vnfConfigurableProperties='todo',
+                                   localizationLanguage='EN_US', create_time=now_time())
+        data = {"terminationType": "FORCEFUL",
+                "gracefulTerminationTimeout": 120}
+        self.nf_inst_id = '1111'
+        self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
+        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+        TermVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
+        self.assert_job_result(self.job_id, 100, "Terminate Vnf success.")
