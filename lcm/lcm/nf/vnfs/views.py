@@ -21,6 +21,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from lcm.nf.vnfs.vnf_cancel.delete_vnf_identifier import DeleteVnf
+from lcm.nf.vnfs.vnf_cancel.term_vnf import TermVnf
 from lcm.nf.vnfs.vnf_create.create_vnf_identifier import CreateVnf
 from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
 from lcm.pub.exceptions import NFLCMException
@@ -69,9 +70,13 @@ class DeleteVnfIdentifier(APIView):
 
 
 class TerminateVnf(APIView):
-    def post(self, request):
+    def post(self, request, instanceid):
         logger.debug("TerminateVnf--post::> %s" % request.data)
-        return Response(data='', status=status.HTTP_202_ACCEPTED)
+        job_id = JobUtil.create_job('NF', 'TERMINATE', instanceid)
+        JobUtil.add_job_status(job_id, 0, "TERM_VNF_READY")
+        TermVnf(request.data, instanceid, job_id).start()
+        rsp = {"jobId": job_id}
+        return Response(data=rsp, status=status.HTTP_202_ACCEPTED)
 
 
 class QueryMultipleVnf(APIView):
