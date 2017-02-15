@@ -26,7 +26,7 @@ from lcm.pub.utils import restcall
 from lcm.pub.utils.jobutil import JobUtil
 
 
-class TestNsInstantiate(TestCase):
+class TestNFInstantiate(TestCase):
     def setUp(self):
         self.client = Client()
         VmInstModel.objects.create(vmid="1", vimid="1", resouceid="11", insttype=0, instid="1", vmname="test_01",
