@@ -65,7 +65,7 @@ class DeleteVnfIdentifier(APIView):
         except Exception:
             logger.error(traceback.format_exc())
             return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        return Response(data={}, status=status.HTTP_204_NO_CONTENT)
+        return Response(data=None, status=status.HTTP_204_NO_CONTENT)
 
 
 class TerminateVnf(APIView):

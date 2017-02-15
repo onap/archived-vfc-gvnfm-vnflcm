@@ -34,6 +34,7 @@ class TestNFTerminate(TestCase):
                                    localizationLanguage='EN_US', create_time=now_time())
         response = self.client.delete("/openoapi/vnflcm/v1/vnf_instances/1111")
         self.failUnlessEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+        self.assertEqual(None, response.data)
 
     def test_delete_vnf_identifier_when_vnf_not_exist(self):
         response = self.client.delete("/openoapi/vnflcm/v1/vnf_instances/1111")
