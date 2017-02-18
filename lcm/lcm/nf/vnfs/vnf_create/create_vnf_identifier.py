@@ -42,20 +42,18 @@ class CreateVnf:
         if ret[0] != 0:
             raise NFLCMException('Get vnfd data failed.')
         vnfd_info = json.JSONDecoder().decode(ret[1])
-        vnfd_version = vnfd_info['metadata']['vnfd_version']
-        vendor = vnfd_info['metadata']['vendor']
-        producttype = vnfd_info['metadata']['domain_type']
-        netype = vnfd_info['metadata']['vnf_type']
+        metadata = ignore_case_get(vnfd_info, "metadata")
+        version = ignore_case_get(metadata, "vnfd_version")
+        vendor = ignore_case_get(metadata, "vendor")
+        netype = ignore_case_get(metadata, "vnf_type")
+        vnfsoftwareversion = ignore_case_get(metadata, "version")
         vnfd_model = vnfd_info
-        vnfsoftwareversion = vnfd_info['metadata']['version']
 
         nf_inst_id = str(uuid.uuid4())
-        NfInstModel.objects.create(nfinstid=nf_inst_id, mnfinstid=nf_inst_id, nf_name=self.vnf_instance_mame,
-                                   package_id='todo', vnfm_inst_id='todo', version=vnfd_version, vendor=vendor,
-                                   producttype=producttype, netype=netype, vnfd_model=vnfd_model,
-                                   instantiationState='NOT_INSTANTIATED', nf_desc=self.description, vnfdid=self.vnfd_id,
-                                   vnfSoftwareVersion=vnfsoftwareversion, vnfConfigurableProperties='todo',
-                                   localizationLanguage='EN_US', create_time=now_time())
+        NfInstModel.objects.create(nfinstid=nf_inst_id, nf_name=self.vnf_instance_mame, package_id='todo',
+                                   version=version, vendor=vendor, netype=netype, vnfd_model=vnfd_model,
+                                   status='NOT_INSTANTIATED', nf_desc=self.description, vnfdid=self.vnfd_id,
+                                   vnfSoftwareVersion=vnfsoftwareversion, create_time=now_time())
         vnf_inst = NfInstModel.objects.get(nfinstid=nf_inst_id)
         logger.debug('id is [%s],name is [%s],vnfd_id is [%s],description is [%s],create_time is [%s]' %
                      (vnf_inst.nfinstid, vnf_inst.nf_name, vnf_inst.vnfdid, vnf_inst.nf_desc, vnf_inst.create_time))

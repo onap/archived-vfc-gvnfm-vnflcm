@@ -91,10 +91,10 @@ class QuerySingleVnf(APIView):
         return Response(data='', status=status.HTTP_202_ACCEPTED)
 
 
-class GetOperationStatus(APIView):
-    def get(self, request):
-        logger.debug("GetOperationStatus--get::> %s" % request.data)
-        return Response(data='', status=status.HTTP_202_ACCEPTED)
+# class GetOperationStatus(APIView):
+#     def get(self, request):
+#         logger.debug("GetOperationStatus--get::> %s" % request.data)
+#         return Response(data='', status=status.HTTP_202_ACCEPTED)
 
 
 class SwaggerJsonView(APIView):

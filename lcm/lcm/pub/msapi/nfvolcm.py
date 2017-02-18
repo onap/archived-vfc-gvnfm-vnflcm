@@ -20,6 +20,11 @@ def vnfd_rawdata_get(vnfdid):
     return ret
 
 #call gvnfm driver
+def get_packageid_by_vnfdid(vnfdid):
+    ret = req_by_msb("openoapi/nslcm/v1/vnfs/%s" % vnfdid, "GET")
+    return ret
+
+#call gvnfm driver
 def apply_grant_to_nfvo(data):
     ret = req_by_msb("openoapi/nslcm/v1/grantvnf" , "POST", data)
     return ret

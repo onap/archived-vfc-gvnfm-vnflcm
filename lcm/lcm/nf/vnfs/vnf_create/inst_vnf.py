@@ -85,12 +85,10 @@ class InstVnf(Thread):
             self.inst_pre()
             self.apply_grant()
             self.create_res()
-            # self.check_res_status()
-            # self.wait_inst_finish(args)
             self.lcm_notify()
             JobUtil.add_job_status(self.job_id, 100, "Instantiate Vnf success.")
-            is_exist = JobStatusModel.objects.filter(jobid=self.job_id).exists()
-            logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)
+            # is_exist = JobStatusModel.objects.filter(jobid=self.job_id).exists()
+            # logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)
         except NFLCMException as e:
             self.vnf_inst_failed_handle(e.message)
             # self.rollback(e.message)
@@ -228,16 +226,6 @@ class InstVnf(Thread):
     #     # self.add_job(43, 'INST_DPLY_VM_PRGS')
     #     logger.info("[NF instantiation] confirm all vms are active end")
 
-    # def wait_inst_finish(self, args):
-    #     try:
-    #         logger.info('wait_inst_finish, args=%s' % args)
-    #         # WaitInstFinishTask(args).do_biz()
-    #         return {'result': '100', 'msg': 'Nf instancing wait finish', 'context': {}}
-    #     except Exception as e:
-    #         logger.error('Nf instancing wait exception=%s' % e.message)
-    #         logger.error(traceback.format_exc())
-    #         return {'result': '255', 'msg': 'Nf instancing wait exception', 'context': {}}
-
     def lcm_notify(self):
         logger.info('[NF instantiation] send notify request to nfvo start')
         reg_info = NfvoRegInfoModel.objects.filter(vnfminstid=self.vnfm_inst_id).first()
@@ -344,16 +332,6 @@ class InstVnf(Thread):
             logger.error("notify lifecycle to nfvo failed.[%s]" % resp[1])
             raise NFLCMException("send notify request to nfvo failed")
         logger.info('[NF instantiation] send notify request to nfvo end')
-
-    # def rollback(self, args):
-    #     try:
-    #         logger.info('inst_exception, args=%s' % args)
-    #         # InstExceptionTask(args).do_biz()
-    #         return {'result': '100', 'msg': 'Nf instancing exception process finish', 'context': {}}
-    #     except Exception as e:
-    #         logger.error('Nf instancing exception process exception=%s' % e.message)
-    #         logger.error(traceback.format_exc())
-    #         return {'result': '255', 'msg': 'Nf instancing exception process exception', 'context': {}}
 
     def load_nfvo_config(self):
         logger.info("[NF instantiation]get nfvo connection info start")
