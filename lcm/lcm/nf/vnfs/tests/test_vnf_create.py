@@ -54,9 +54,9 @@ class TestNFInstantiate(TestCase):
             descp=job_detail)
         self.assertEqual(1, len(jobs))
 
-    # def test_swagger_ok(self):
-    #     response = self.client.get("/openoapi/vnflcm/v1/swagger.json", format='json')
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_swagger_ok(self):
+        response = self.client.get("/openoapi/vnflcm/v1/swagger.json", format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     @mock.patch.object(restcall, 'call_req')
     def test_create_vnf_identifier(self, mock_call_req):
@@ -71,20 +71,20 @@ class TestNFInstantiate(TestCase):
         context = json.loads(response.content)
         self.assertTrue(NfInstModel.objects.filter(nfinstid=context['vnfInstanceId']).exists())
 
-    # @mock.patch.object(InstVnf, 'run')
-    # def test_instantiate_vnf(self, mock_run):
-    #     mock_run.re.return_value = None
-    #     response = self.client.post("/openoapi/vnflcm/v1/vnf_instances/12/instantiate", data={}, format='json')
-    #     self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
-    #
-    # def test_instantiate_vnf_when_inst_id_not_exist(self):
-    #     self.nf_inst_id = str(uuid.uuid4())
-    #     self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
-    #     JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
-    #     data = inst_req_data
-    #     InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-    #     self.assert_job_result(self.job_id, 255, "VNF nf_inst_id is not exist.")
-    #
+    @mock.patch.object(InstVnf, 'run')
+    def test_instantiate_vnf(self, mock_run):
+        mock_run.re.return_value = None
+        response = self.client.post("/openoapi/vnflcm/v1/vnf_instances/12/instantiate", data={}, format='json')
+        self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
+
+    def test_instantiate_vnf_when_inst_id_not_exist(self):
+        self.nf_inst_id = str(uuid.uuid4())
+        self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
+        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+        data = inst_req_data
+        InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
+        self.assert_job_result(self.job_id, 255, "VNF nf_inst_id is not exist.")
+
     # @mock.patch.object(restcall, 'call_req')
     # def test_instantiate_vnf_when_input_para_not_define_in_vnfd(self, mock_call_req):
     #     r1 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']

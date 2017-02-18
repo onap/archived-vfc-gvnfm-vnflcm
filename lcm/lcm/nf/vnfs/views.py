@@ -47,10 +47,17 @@ class CreateVnfIdentifier(APIView):
 
 class InstantiateVnf(APIView):
     def post(self, request, instanceid):
-        logger.debug("InstantiateVnf--post::> %s" % request.data)
-        job_id = JobUtil.create_job('NF', 'INSTANTIATE', instanceid)
-        JobUtil.add_job_status(job_id, 0, "INST_VNF_READY")
-        InstVnf(request.data, instanceid, job_id).start()
+        try:
+            logger.debug("InstantiateVnf--post::> %s" % request.data)
+            job_id = JobUtil.create_job('NF', 'INSTANTIATE', instanceid)
+            JobUtil.add_job_status(job_id, 0, "INST_VNF_READY")
+            InstVnf(request.data, instanceid, job_id).start()
+        except NFLCMException as e:
+            logger.error(e.message)
+            return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception:
+            logger.error(traceback.format_exc())
+            return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         rsp = {"jobId": job_id}
         return Response(data=rsp, status=status.HTTP_202_ACCEPTED)
 

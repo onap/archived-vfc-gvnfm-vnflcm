@@ -103,7 +103,7 @@ class InstVnf(Thread):
             raise NFLCMException('VNF nf_inst_id is not exist.')
 
         # self.vnfm_inst_id = vnf_insts[0].vnfm_inst_id
-        if vnf_insts[0].instantiationState != 'NOT_INSTANTIATED':
+        if vnf_insts[0].status != 'NOT_INSTANTIATED':
             raise NFLCMException('VNF instantiationState is not NOT_INSTANTIATED.')
 
         # get rawdata by vnfd_id

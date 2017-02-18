@@ -19,16 +19,16 @@ class NfInstModel(models.Model):
         db_table = 'NFINST'
 
     nfinstid = models.CharField(db_column='NFINSTID', max_length=200, primary_key=True)
-    nf_name = models.CharField(db_column='NFNAME', max_length=100, blank=True, null=True) #CreateVnfRequest.vnfInstanceName
+    nf_name = models.CharField(db_column='NFNAME', max_length=100, blank=True, null=True)  # CreateVnfRequest.vnfInstanceName
     package_id = models.CharField(db_column='PACKAGEID', max_length=200, blank=True, null=True)
     status = models.CharField(db_column='STATUS', max_length=20, blank=True, null=True)
-    flavour_id = models.CharField(db_column='FLAVOURID', max_length=200, blank=True, null=True) #InstantiateVnfRequest.flavourId
+    flavour_id = models.CharField(db_column='FLAVOURID', max_length=200, blank=True, null=True)  # InstantiateVnfRequest.flavourId
     location = models.CharField(db_column='LOCATION', max_length=200, blank=True, null=True)
     version = models.CharField(db_column='VERSION', max_length=255, null=True)
     vendor = models.CharField(db_column='VENDOR', max_length=255, null=True, blank=True)
     netype = models.CharField(db_column='NETYPE', max_length=255, null=True)
     vnfd_model = models.TextField(db_column='VNFDMODEL', max_length=20000, blank=True, null=True)
-    input_params = models.TextField(db_column='INPUTPARAMS', max_length=2000, blank=True, null=True)  #InstantiateVnfRequest.additionalParams
+    input_params = models.TextField(db_column='INPUTPARAMS', max_length=2000, blank=True, null=True)  # InstantiateVnfRequest.additionalParams
     create_time = models.CharField(db_column='CREATETIME', max_length=200, null=True, blank=True)
     lastuptime = models.CharField(db_column='LASTUPTIME', max_length=200, blank=True, null=True)
 
