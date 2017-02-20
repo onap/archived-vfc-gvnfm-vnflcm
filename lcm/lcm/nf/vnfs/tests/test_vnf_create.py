@@ -18,6 +18,7 @@ import mock
 from django.test import TestCase, Client
 from rest_framework import status
 
+from lcm.nf.vnfs.const import vnfd_rawdata
 from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
 from lcm.pub.database.models import NfInstModel, JobStatusModel, VmInstModel, NetworkInstModel, \
     SubNetworkInstModel, PortInstModel
@@ -61,7 +62,7 @@ class TestNFInstantiate(TestCase):
     @mock.patch.object(restcall, 'call_req')
     def test_create_vnf_identifier(self, mock_call_req):
         r1 = [0, json.JSONEncoder().encode({'package_id':'222', 'csar_id':'2222'}), '200']  # get csar_id from nslcm by vnfd_id
-        r2 = [0, json.JSONEncoder().encode(vnfd_raw_data), '200']  # get rawdata from catalog by csar_id
+        r2 = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']  # get rawdata from catalog by csar_id
         mock_call_req.side_effect = [r1, r2]
         data = {
             "vnfdId": "111",
@@ -106,7 +107,7 @@ class TestNFInstantiate(TestCase):
                                    version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
                                    nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
         r1 = [0, json.JSONEncoder().encode({'package_id':'222', 'csar_id':'2222'}), '200']  # get csar_id from nslcm by vnfd_id
-        r2 = [1, json.JSONEncoder().encode(vnfd_raw_data), '200']  # get rawdata from catalog by csar_id
+        r2 = [1, json.JSONEncoder().encode(vnfd_rawdata), '200']  # get rawdata from catalog by csar_id
         mock_call_req.side_effect = [r1, r2]
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
@@ -121,7 +122,7 @@ class TestNFInstantiate(TestCase):
                                    version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
                                    nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
         r1 = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']  # get csar_id from nslcm by vnfd_id
-        r2 = [0, json.JSONEncoder().encode(vnfd_raw_data), '200']  # get rawdata from catalog by csar_id
+        r2 = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']  # get rawdata from catalog by csar_id
         r3 = [1, json.JSONEncoder().encode({"vim":
                                                 {
                                                     "vimid": '1',
@@ -135,6 +136,11 @@ class TestNFInstantiate(TestCase):
         data = inst_req_data
         InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
         self.assert_job_result(self.job_id, 255, "Nf instancing apply grant exception")
+
+
+
+
+
 
     # @mock.patch.object(restcall, 'call_req')
     # def test_instantiate_vnf_when_(self, mock_call_req):
@@ -244,434 +250,4 @@ inst_req_data = {
     ],
     "localizationLanguage": "en_US",
     "additionalParams": {}
-}
-
-vnfd_model_dict = {
-    'local_storages': [],
-    'vdus': [
-        {
-            'volumn_storages': [],
-            'nfv_compute': {
-                'mem_size': '',
-                'num_cpus': u'2'},
-            'local_storages': [],
-            'vdu_id': u'vdu_omm.001',
-            'image_file': u'opencos_sss_omm_img_release_20150723-1-disk1',
-            'dependencies': [],
-            'vls': [],
-            'cps': [],
-            'properties': {
-                'key_vdu': '',
-                'support_scaling': False,
-                'vdu_type': '',
-                'name': '',
-                'storage_policy': '',
-                'location_info': {
-                    'vimId': '',
-                    'availability_zone': '',
-                    'region': '',
-                    'dc': '',
-                    'host': '',
-                    'tenant': ''},
-                'inject_data_list': [],
-                'watchdog': {
-                    'action': '',
-                    'enabledelay': ''},
-                'local_affinity_antiaffinity_rule': {},
-                'template_id': u'omm.001',
-                'manual_scale_select_vim': False},
-            'description': u'singleommvm'},
-        {
-            'volumn_storages': [],
-            'nfv_compute': {
-                'mem_size': '',
-                'num_cpus': u'4'},
-            'local_storages': [],
-            'vdu_id': u'vdu_1',
-            'image_file': u'sss',
-            'dependencies': [],
-            'vls': [],
-            'cps': [],
-            'properties': {
-                'key_vdu': '',
-                'support_scaling': False,
-                'vdu_type': '',
-                'name': '',
-                'storage_policy': '',
-                'location_info': {
-                    'vimId': '',
-                    'availability_zone': '',
-                    'region': '',
-                    'dc': '',
-                    'host': '',
-                    'tenant': ''},
-                'inject_data_list': [],
-                'watchdog': {
-                    'action': '',
-                    'enabledelay': ''},
-                'local_affinity_antiaffinity_rule': {},
-                'template_id': u'1',
-                'manual_scale_select_vim': False},
-            'description': u'ompvm'},
-        {
-            'volumn_storages': [],
-            'nfv_compute': {
-                'mem_size': '',
-                'num_cpus': u'14'},
-            'local_storages': [],
-            'vdu_id': u'vdu_2',
-            'image_file': u'sss',
-            'dependencies': [],
-            'vls': [],
-            'cps': [],
-            'properties': {
-                'key_vdu': '',
-                'support_scaling': False,
-                'vdu_type': '',
-                'name': '',
-                'storage_policy': '',
-                'location_info': {
-                    'vimId': '',
-                    'availability_zone': '',
-                    'region': '',
-                    'dc': '',
-                    'host': '',
-                    'tenant': ''},
-                'inject_data_list': [],
-                'watchdog': {
-                    'action': '',
-                    'enabledelay': ''},
-                'local_affinity_antiaffinity_rule': {},
-                'template_id': u'2',
-                'manual_scale_select_vim': False},
-            'description': u'ompvm'},
-        {
-            'volumn_storages': [],
-            'nfv_compute': {
-                'mem_size': '',
-                'num_cpus': u'14'},
-            'local_storages': [],
-            'vdu_id': u'vdu_3',
-            'image_file': u'sss',
-            'dependencies': [],
-            'vls': [],
-            'cps': [],
-            'properties': {
-                'key_vdu': '',
-                'support_scaling': False,
-                'vdu_type': '',
-                'name': '',
-                'storage_policy': '',
-                'location_info': {
-                    'vimId': '',
-                    'availability_zone': '',
-                    'region': '',
-                    'dc': '',
-                    'host': '',
-                    'tenant': ''},
-                'inject_data_list': [],
-                'watchdog': {
-                    'action': '',
-                    'enabledelay': ''},
-                'local_affinity_antiaffinity_rule': {},
-                'template_id': u'3',
-                'manual_scale_select_vim': False},
-            'description': u'ompvm'},
-        {
-            'volumn_storages': [],
-            'nfv_compute': {
-                'mem_size': '',
-                'num_cpus': u'4'},
-            'local_storages': [],
-            'vdu_id': u'vdu_10',
-            'image_file': u'sss',
-            'dependencies': [],
-            'vls': [],
-            'cps': [],
-            'properties': {
-                'key_vdu': '',
-                'support_scaling': False,
-                'vdu_type': '',
-                'name': '',
-                'storage_policy': '',
-                'location_info': {
-                    'vimId': '',
-                    'availability_zone': '',
-                    'region': '',
-                    'dc': '',
-                    'host': '',
-                    'tenant': ''},
-                'inject_data_list': [],
-                'watchdog': {
-                    'action': '',
-                    'enabledelay': ''},
-                'local_affinity_antiaffinity_rule': {},
-                'template_id': u'10',
-                'manual_scale_select_vim': False},
-            'description': u'ppvm'},
-        {
-            'volumn_storages': [],
-            'nfv_compute': {
-                'mem_size': '',
-                'num_cpus': u'14'},
-            'local_storages': [],
-            'vdu_id': u'vdu_11',
-            'image_file': u'sss',
-            'dependencies': [],
-            'vls': [],
-            'cps': [],
-            'properties': {
-                'key_vdu': '',
-                'support_scaling': False,
-                'vdu_type': '',
-                'name': '',
-                'storage_policy': '',
-                'location_info': {
-                    'vimId': '',
-                    'availability_zone': '',
-                    'region': '',
-                    'dc': '',
-                    'host': '',
-                    'tenant': ''},
-                'inject_data_list': [],
-                'watchdog': {
-                    'action': '',
-                    'enabledelay': ''},
-                'local_affinity_antiaffinity_rule': {},
-                'template_id': u'11',
-                'manual_scale_select_vim': False},
-            'description': u'ppvm'},
-        {
-            'volumn_storages': [],
-            'nfv_compute': {
-                'mem_size': '',
-                'num_cpus': u'14'},
-            'local_storages': [],
-            'vdu_id': u'vdu_12',
-            'image_file': u'sss',
-            'dependencies': [],
-            'vls': [],
-            'cps': [],
-            'properties': {
-                'key_vdu': '',
-                'support_scaling': False,
-                'vdu_type': '',
-                'name': '',
-                'storage_policy': '',
-                'location_info': {
-                    'vimId': '',
-                    'availability_zone': '',
-                    'region': '',
-                    'dc': '',
-                    'host': '',
-                    'tenant': ''},
-                'inject_data_list': [],
-                'watchdog': {
-                    'action': '',
-                    'enabledelay': ''},
-                'local_affinity_antiaffinity_rule': {},
-                'template_id': u'12',
-                'manual_scale_select_vim': False},
-            'description': u'ppvm'}],
-    'volumn_storages': [],
-    'policies': {
-        'scaling': {
-            'targets': {},
-            'policy_id': u'policy_scale_sss-vnf-template',
-            'properties': {
-                'policy_file': '*-vnfd.zip/*-vnf-policy.xml'},
-            'description': ''}},
-    'image_files': [
-        {
-            'description': '',
-            'properties': {
-                'name': u'opencos_sss_omm_img_release_20150723-1-disk1.vmdk',
-                'checksum': '',
-                'disk_format': u'VMDK',
-                'file_url': u'./zte-cn-sss-main-image/OMM/opencos_sss_omm_img_release_20150723-1-disk1.vmdk',
-                'container_type': 'vm',
-                'version': '',
-                'hypervisor_type': 'kvm'},
-            'image_file_id': u'opencos_sss_omm_img_release_20150723-1-disk1'},
-        {
-            'description': '',
-            'properties': {
-                'name': u'sss.vmdk',
-                'checksum': '',
-                'disk_format': u'VMDK',
-                'file_url': u'./zte-cn-sss-main-image/NE/sss.vmdk',
-                'container_type': 'vm',
-                'version': '',
-                'hypervisor_type': 'kvm'},
-            'image_file_id': u'sss'}],
-    'vls': [],
-    'cps': [],
-    'metadata': {
-        'vendor': u'zte',
-        'is_shared': False,
-        'description': '',
-        'domain_type': u'CN',
-        'version': u'v4.14.10',
-        'vmnumber_overquota_alarm': False,
-        'cross_dc': False,
-        'vnf_type': u'SSS',
-        'vnfd_version': u'V00000001',
-        'id': u'sss-vnf-template',
-        'name': u'sss-vnf-template'},
-    "flavourId": "flavour_1",
-    "instantiationLevelId": "instantiationLevel_1",
-    "extVirtualLinks": [
-        {
-            "vlInstanceId": "1",
-            "vim": {
-                "vimInfoId": "1",
-                "vimId": "1",
-                "interfaceInfo": {
-                    "vimType": "vim",
-                    "apiVersion": "v2",
-                    "protocolType": "http"
-                },
-                "accessInfo": {
-                    "tenant": "tenant_vCPE",
-                    "username": "vCPE",
-                    "password": "vCPE_321"
-                },
-                "interfaceEndpoint": "http://10.43.21.105:80/"
-            },
-            "resourceId": "1246",
-            "extCps": [
-                {
-                    "cpdId": "11",
-                    "addresses": [
-                        {
-                            "addressType": "MAC",
-                            "l2AddressData": "00:f3:43:20:a2:a3"
-                        },
-                        {
-                            "addressType": "IP",
-                            "l3AddressData": {
-                                "iPAddressType": "IPv4",
-                                "iPAddress": "192.168.104.2"
-                            }
-                        }
-                    ],
-                    "numDynamicAddresses": 0
-                }
-            ]
-        }
-    ],
-    "localizationLanguage": "en_US",
-    "additionalParams": {}
-}
-
-vnfd_raw_data = {
-    "rawData": {
-        "instance": {
-            "metadata": {
-                "is_shared": False,
-                "plugin_info": "vbrasplugin_1.0",
-                "vendor": "zte",
-                "request_reclassification": False,
-                "name": "vbras",
-                "version": 1,
-                "vnf_type": "vbras",
-                "cross_dc": False,
-                "vnfd_version": "1.0.0",
-                "id": "zte_vbras_1.0",
-                "nsh_aware": True
-            },
-            "nodes": [
-                {
-                    "id": "aaa_dnet_cp_0xu2j5sbigxc8h1ega3if0ld1",
-                    "type_name": "tosca.nodes.nfv.ext.zte.CP",
-                    "template_name": "aaa_dnet_cp",
-                    "properties": {
-                        "bandwidth": {
-                            "type_name": "integer",
-                            "value": 0
-                        },
-                        "direction": {
-                            "type_name": "string",
-                            "value": "bidirectional"
-                        },
-                        "vnic_type": {
-                            "type_name": "string",
-                            "value": "normal"
-                        },
-                        "sfc_encapsulation": {
-                            "type_name": "string",
-                            "value": "mac"
-                        },
-                        "order": {
-                            "type_name": "integer",
-                            "value": 2
-                        }
-                    },
-                    "relationships": [
-                        {
-                            "name": "guest_os",
-                            "source_requirement_index": 0,
-                            "target_node_id": "AAA_image_d8aseebr120nbm7bo1ohkj194",
-                            "target_capability_name": "feature"
-                        }
-                    ]
-                },
-                {
-                    "id": "LB_Image_oj5l2ay8l2g6vcq6fsswzduha",
-                    "type_name": "tosca.nodes.nfv.ext.ImageFile",
-                    "template_name": "LB_Image",
-                    "properties": {
-                        "disk_format": {
-                            "type_name": "string",
-                            "value": "qcow2"
-                        },
-                        "file_url": {
-                            "type_name": "string",
-                            "value": "/SoftwareImages/image-lb"
-                        },
-                        "name": {
-                            "type_name": "string",
-                            "value": "image-lb"
-                        }
-                    }
-                }
-            ]
-        },
-        "model": {
-            "metadata": {
-                "is_shared": False,
-                "plugin_info": "vbrasplugin_1.0",
-                "vendor": "zte",
-                "request_reclassification": False,
-                "name": "vbras",
-                "version": 1,
-                "vnf_type": "vbras",
-                "cross_dc": False,
-                "vnfd_version": "1.0.0",
-                "id": "zte_vbras_1.0",
-                "nsh_aware": True
-            },
-            "node_templates": [
-                {
-                    "name": "aaa_dnet_cp",
-                    "type_name": "tosca.nodes.nfv.ext.zte.CP",
-                    "default_instances": 1,
-                    "min_instances": 0,
-                    "properties": {
-                        "bandwidth": {
-                            "type_name": "integer",
-                            "value": 0
-                        }
-                    },
-                    "requirement_templates": [
-                        {
-                            "name": "virtualbinding",
-                            "target_node_template_name": "AAA",
-                            "target_capability_name": "virtualbinding"
-                        }
-                    ]
-                }
-            ]
-        }
-    }
 }
