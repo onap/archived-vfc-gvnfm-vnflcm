@@ -22,6 +22,6 @@ def ignore_case_get(args, key, def_val=""):
             return args[old_key]
     return def_val
 
-def set_opt_val(param, key, val, new_val=None):
-    if val:
-        param[key] = val if new_val == None else new_val
+def set_opt_val(param, key, val):
+    if val or val is False:
+        param[key] = val

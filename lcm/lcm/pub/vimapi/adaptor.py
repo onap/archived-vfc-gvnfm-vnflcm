@@ -24,16 +24,15 @@ from .exceptions import VimException
 logger = logging.getLogger(__name__)
 
 RES_EXIST, RES_NEW = 0, 1
-NET_PRIVATE, NET_SHSRED = 0, 1
-VLAN_TRANSPARENT_NO, VLAN_TRANSPARENT_YES = 0, 1
 IP_V4, IP_V6 = 4, 6
 DHCP_DISABLED, DHCP_ENABLED = 0, 1
-OPT_CREATE_VOLUME = 20
-OPT_CREATE_NETWORK = 30
-OPT_CREATE_SUBNET = 40
-OPT_CREATE_PORT = 50
-OPT_CREATE_FLAVOR = 60
-OPT_CREATE_VM = 80
+RES_VOLUME = "volume"
+RES_NETWORK = "network"
+RES_SUBNET = "subnet"
+RES_PORT = "port"
+RES_FLAVOR = "flavor"
+RES_VM = "vm"
+
 
 BOOT_FROM_VOLUME = 1
 
@@ -49,22 +48,22 @@ def get_tenant_id(vim_cache, vim_id, tenant_name):
     return vim_cache[vim_id][tenant_name]
 
 def create_vim_res(data, do_notify):
-    vim_cache = {}
+    vim_cache, res_cache = {}, {}
     for vol in ignore_case_get(data, "volume_storages"):
-        create_volume(vim_cache, vol, do_notify, OPT_CREATE_VOLUME)
+        create_volume(vim_cache, res_cache, vol, do_notify, RES_VOLUME)
     for network in ignore_case_get(data, "vls"):
-        create_network(vim_cache, network, do_notify, OPT_CREATE_NETWORK)
+        create_network(vim_cache, res_cache, network, do_notify, RES_NETWORK)
     for subnet in ignore_case_get(data, "vls"):
-        create_subnet(vim_cache, subnet, do_notify, OPT_CREATE_SUBNET)
+        create_subnet(vim_cache, res_cache, subnet, do_notify, RES_SUBNET)
     for port in ignore_case_get(data, "cps"):
-        create_port(vim_cache, port, do_notify, OPT_CREATE_PORT)
+        create_port(vim_cache, res_cache, port, do_notify, RES_PORT)
     for flavor in ignore_case_get(data, "vdus"):
-        create_flavor(vim_cache, flavor, do_notify, OPT_CREATE_FLAVOR)
+        create_flavor(vim_cache, res_cache, flavor, do_notify, RES_FLAVOR)
     for vm in ignore_case_get(data, "vdus"):
-        create_vm(vim_cache, vm, do_notify, OPT_CREATE_VM)
+        create_vm(vim_cache, res_cache, vm, do_notify, RES_VM)
 
 def delete_vim_res(data, do_notify):
-    res_types = ["vm", "flavor", "port", "subnet", "network", "volume"]
+    res_types = [RES_VM, RES_FLAVOR, RES_PORT, RES_SUBNET, RES_NETWORK, RES_VOLUME]
     res_del_funs = [api.delete_vm, api.delete_flavor, api.delete_port, 
         api.delete_subnet, api.delete_network, api.delete_volume]
     for res_type, res_del_fun in zip(res_types, res_del_funs):
@@ -76,7 +75,7 @@ def delete_vim_res(data, do_notify):
                 logger.error("%s:%s", e.http_code, e.message)
             do_notify(res_type, res["res_id"])
 
-def create_volume(vim_cache, vol, do_notify, progress):
+def create_volume(vim_cache, res_cache, vol, do_notify, progress):
     param = {
         "name": vol["properties"]["volume_name"],
         "volumeSize": int(ignore_case_get(vol["properties"], "size", "0"))
@@ -101,22 +100,24 @@ def create_volume(vim_cache, vol, do_notify, progress):
         retry_count = retry_count + 1
     raise VimException("Failed to create Volume(%s): Timeout." % vol_name, "500")
     
-def create_network(vim_cache, network, do_notify, progress):
+def create_network(vim_cache, res_cache, network, do_notify, progress):
     param = {
-        "tenant": network["properties"]["location_info"]["tenant"],	
-        "networkName": network["properties"]["network_name"],
-        "shared": NET_PRIVATE,
+        "name": network["properties"]["network_name"],
+        "shared": False,
         "networkType": network["properties"]["network_type"],
         "physicalNetwork": ignore_case_get(network["properties"], "physical_network")
     }
-    set_opt_val(param, "vlanTransparent", 
-        ignore_case_get(network["properties"], "vlan_transparent"), VLAN_TRANSPARENT_YES)
-    set_opt_val(param, "segmentationId", ignore_case_get(network["properties"], "segmentation_id"))
-    vim_id = network["properties"]["location_info"]["vimid"]
-    ret = api.create_network(vim_id, param)
+    location_info = network["properties"]["location_info"]
+    set_opt_val(param, "vlanTransparent", ignore_case_get(network["properties"], "vlan_transparent"))
+    set_opt_val(param, "segmentationId", int(ignore_case_get(network["properties"], "segmentation_id", "0")))
+    set_opt_val(param, "routerExternal", ignore_case_get(network, "route_external"))
+    vim_id = location_info["vimid"]
+    tenant_name = location_info["tenant"]
+    tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
+    ret = api.create_network(vim_id, tenant_id, param)
     do_notify(progress, ret)
     
-def create_subnet(vim_cache, subnet, do_notify, progress):
+def create_subnet(vim_cache, res_cache, subnet, do_notify, progress):
     param = {
         "tenant": subnet["properties"]["location_info"]["tenant"],	
         "networkName": subnet["properties"]["network_name"],
@@ -124,8 +125,7 @@ def create_subnet(vim_cache, subnet, do_notify, progress):
         "cidr": ignore_case_get(subnet["properties"], "cidr"),
         "ipVersion": ignore_case_get(subnet["properties"], "ip_version", IP_V4)
     }
-    set_opt_val(param, "enableDhcp", 
-        ignore_case_get(subnet["properties"], "dhcp_enabled"), DHCP_ENABLED)
+    set_opt_val(param, "enableDhcp", ignore_case_get(subnet["properties"], "dhcp_enabled"))
     set_opt_val(param, "gatewayIp", ignore_case_get(subnet["properties"], "gateway_ip"))
     set_opt_val(param, "dnsNameservers", ignore_case_get(subnet["properties"], "dns_nameservers"))
     allocation_pool = {}
@@ -138,7 +138,7 @@ def create_subnet(vim_cache, subnet, do_notify, progress):
     ret = api.create_subnet(vim_id, param)
     do_notify(progress, ret)
     
-def create_port(vim_cache, port, do_notify, progress):
+def create_port(vim_cache, res_cache, port, do_notify, progress):
     param = {
         "tenant": port["properties"]["location_info"]["tenant"],
         "networkName": port["properties"]["network_name"],
@@ -149,7 +149,7 @@ def create_port(vim_cache, port, do_notify, progress):
     ret = api.create_subnet(vim_id, param)
     do_notify(progress, ret)
 
-def create_flavor(vim_cache, flavor, do_notify, progress):
+def create_flavor(vim_cache, res_cache, flavor, do_notify, progress):
     param = {
         "tenant": flavor["properties"]["location_info"]["tenant"],
         "vcpu": int(flavor["nfv_compute"]["num_cpus"]),
@@ -160,7 +160,7 @@ def create_flavor(vim_cache, flavor, do_notify, progress):
     ret = api.create_flavor(vim_id, param)
     do_notify(progress, ret)
     
-def create_vm(vim_cache, vm, do_notify, progress):
+def create_vm(vim_cache, res_cache, vm, do_notify, progress):
     param = {
         "tenant": vm["properties"]["location_info"]["tenant"],
         "vmName": vm["properties"]["name"],
