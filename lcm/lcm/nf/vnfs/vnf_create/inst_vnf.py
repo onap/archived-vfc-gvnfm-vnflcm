@@ -16,10 +16,12 @@ import logging
 import traceback
 from threading import Thread
 
-from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel, VmInstModel, NetworkInstModel, \
+from lcm.pub.database.models import NfInstModel, NfvoRegInfoModel, VmInstModel, NetworkInstModel, \
     SubNetworkInstModel, PortInstModel, StorageInstModel, FlavourInstModel, VNFCInstModel, VLInstModel, CPInstModel
 from lcm.pub.exceptions import NFLCMException
-from lcm.pub.msapi.nfvolcm import vnfd_rawdata_get, apply_grant_to_nfvo, notify_lcm_to_nfvo
+from lcm.pub.msapi.catalog import query_rawdata_from_catalog
+from lcm.pub.msapi.nfvolcm import vnfd_rawdata_get, apply_grant_to_nfvo, notify_lcm_to_nfvo, get_packageinfo_by_vnfdid
+from lcm.pub.utils import toscautil
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.values import ignore_case_get
@@ -36,6 +38,7 @@ class InstVnf(Thread):
         self.job_id = job_id
         self.nfvo_inst_id = ''
         self.vnfm_inst_id = ''
+        self.csar_id = ''
         self.vnfd_info = []
         self.inst_resource = {'volumn': [],  # [{"vim_id": ignore_case_get(ret, "vim_id")},{}]
                               'network': [],
@@ -106,8 +109,17 @@ class InstVnf(Thread):
         if vnf_insts[0].status != 'NOT_INSTANTIATED':
             raise NFLCMException('VNF instantiationState is not NOT_INSTANTIATED.')
 
-        # get rawdata by vnfd_id
-        ret = vnfd_rawdata_get(vnf_insts[0].vnfdid)
+        # get csar_id from nslcm by vnfd_id
+        self.package_info = get_packageinfo_by_vnfdid(vnf_insts[0].vnfdid)
+        self.package_id = ignore_case_get(self.package_info, "package_id")
+        self.csar_id = ignore_case_get(self.package_info, "csar_id")
+
+        #get rawdata from catalog by csar_id
+        raw_data = query_rawdata_from_catalog(self.csar_id, self.data)
+        self.vnfd = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
+        self.vnfd = json.JSONDecoder().decode(self.vnfd)
+
+        ret = vnfd_rawdata_get(vnf_insts[0].vnfdid, self.data)
         if ret[0] != 0:
             raise NFLCMException("Get vnfd_raw_data failed.")
         self.vnfd_info = json.JSONDecoder().decode(ret[1])

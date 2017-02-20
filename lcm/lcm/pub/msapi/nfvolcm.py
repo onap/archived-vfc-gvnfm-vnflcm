@@ -11,17 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
+import logging
 
+from lcm.pub.exceptions import NFLCMException
 from lcm.pub.utils.restcall import req_by_msb
 
-#call gvnfm driver
-def vnfd_rawdata_get(vnfdid):
-    ret = req_by_msb("openoapi/nslcm/v1/vnfs/%s" % vnfdid, "GET")
-    return ret
+logger = logging.getLogger(__name__)
+
 
 #call gvnfm driver
-def get_packageid_by_vnfdid(vnfdid):
+def get_packageinfo_by_vnfdid(vnfdid):
     ret = req_by_msb("openoapi/nslcm/v1/vnfs/%s" % vnfdid, "GET")
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Failed to query package_info of vnfdid(%s) from nslcm." % vnfdid)
+    return json.JSONDecoder().decode(ret[1])
+
+#call gvnfm driver
+def vnfd_rawdata_get(vnfdid, data):
+    ret = req_by_msb("openoapi/nslcm/v1/vnfs/%s" % vnfdid, "GET", data)
     return ret
 
 #call gvnfm driver

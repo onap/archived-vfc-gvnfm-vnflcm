@@ -17,7 +17,9 @@ import uuid
 
 from lcm.pub.database.models import NfInstModel
 from lcm.pub.exceptions import NFLCMException
-from lcm.pub.msapi.nfvolcm import vnfd_rawdata_get
+from lcm.pub.msapi.catalog import query_rawdata_from_catalog
+from lcm.pub.msapi.nfvolcm import vnfd_rawdata_get, get_packageinfo_by_vnfdid
+from lcm.pub.utils import toscautil
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.values import ignore_case_get
 
@@ -38,10 +40,22 @@ class CreateVnf:
         if is_exist:
             raise NFLCMException('VNF is already exist.')
 
-        ret = vnfd_rawdata_get(self.vnfd_id)
-        if ret[0] != 0:
-            raise NFLCMException('Get vnfd data failed.')
-        vnfd_info = json.JSONDecoder().decode(ret[1])
+        # ret = vnfd_rawdata_get(self.vnfd_id)
+        # if ret[0] != 0:
+        #     raise NFLCMException('Get vnfd data failed.')
+        # vnfd_info = json.JSONDecoder().decode(ret[1])
+
+        # get csar_id from nslcm by vnfd_id
+        self.package_info = get_packageinfo_by_vnfdid(self.vnfd_id)
+        self.package_id = ignore_case_get(self.package_info, "package_id")
+        self.csar_id = ignore_case_get(self.package_info, "csar_id")
+
+        #get rawdata from catalog by csar_id
+        raw_data = query_rawdata_from_catalog(self.csar_id, self.data)
+        # self.vnfd = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
+        # self.vnfd = json.JSONDecoder().decode(self.vnfd)
+
+        vnfd_info = raw_data
         metadata = ignore_case_get(vnfd_info, "metadata")
         version = ignore_case_get(metadata, "vnfd_version")
         vendor = ignore_case_get(metadata, "vendor")

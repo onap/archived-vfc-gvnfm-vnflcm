@@ -18,12 +18,12 @@ import mock
 from django.test import TestCase, Client
 from rest_framework import status
 
-from lcm.nf.vnfs.vnf_create.create_vnf_identifier import CreateVnf
 from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
-from lcm.pub.database.models import NfInstModel, JobStatusModel, NfvoRegInfoModel, VmInstModel, NetworkInstModel, \
+from lcm.pub.database.models import NfInstModel, JobStatusModel, VmInstModel, NetworkInstModel, \
     SubNetworkInstModel, PortInstModel
 from lcm.pub.utils import restcall
 from lcm.pub.utils.jobutil import JobUtil
+from lcm.pub.utils.timeutil import now_time
 
 
 class TestNFInstantiate(TestCase):
@@ -60,12 +60,13 @@ class TestNFInstantiate(TestCase):
 
     @mock.patch.object(restcall, 'call_req')
     def test_create_vnf_identifier(self, mock_call_req):
-        r1 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
-        mock_call_req.side_effect = [r1]
+        r1 = [0, json.JSONEncoder().encode({'package_id':'222', 'csar_id':'2222'}), '200']  # get csar_id from nslcm by vnfd_id
+        r2 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
+        mock_call_req.side_effect = [r1, r2]
         data = {
             "vnfdId": "111",
             "vnfInstanceName": "vFW_01",
-            "vnfInstanceDescription": " vFW in Nanjing TIC Edge"}
+            "vnfInstanceDescription": "vFW in Nanjing TIC Edge"}
         response = self.client.post("/openoapi/vnflcm/v1/vnf_instances", data=data, format='json')
         self.failUnlessEqual(status.HTTP_201_CREATED, response.status_code)
         context = json.loads(response.content)
@@ -84,6 +85,20 @@ class TestNFInstantiate(TestCase):
         data = inst_req_data
         InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
         self.assert_job_result(self.job_id, 255, "VNF nf_inst_id is not exist.")
+
+    @mock.patch.object(restcall, 'call_req')
+    def test_instantiate_vnf_when_get_package_info_by_vnfdid_failed(self, mock_call_req):
+        NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='todo',
+                                   version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
+                                   nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
+        r1 = [1, json.JSONEncoder().encode({'package_id':'222', 'csar_id':'2222'}), '200']  # get csar_id from nslcm by vnfd_id
+        mock_call_req.side_effect = [r1]
+        self.nf_inst_id = '1111'
+        self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
+        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+        data = inst_req_data
+        InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
+        self.assert_job_result(self.job_id, 255, "Failed to query package_info of vnfdid(111) from nslcm.")
 
     # @mock.patch.object(restcall, 'call_req')
     # def test_instantiate_vnf_when_input_para_not_define_in_vnfd(self, mock_call_req):
