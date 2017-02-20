@@ -125,7 +125,7 @@ class InstVnf(Thread):
         self.vnfd_info = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
         self.vnfd_info = json.JSONDecoder().decode(self.vnfd_info)
 
-        # self.vnfd_info = vnfd_model_dict  # just for test
+        self.vnfd_info = vnfd_model_dict  # just for test
 
         self.checkParameterExist()
         # update NfInstModel
@@ -176,7 +176,7 @@ class InstVnf(Thread):
 
     def create_res(self):
         logger.info("[NF instantiation] create resource start")
-        adaptor.create_vim_res('', self.do_notify, self.do_rollback)
+        adaptor.create_vim_res(self.vnfd_info, self.do_notify)
 
         JobUtil.add_job_status(self.job_id, 70, '[NF instantiation] create resource finish')
         logger.info("[NF instantiation] create resource finish")
@@ -359,15 +359,15 @@ class InstVnf(Thread):
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='failed', lastuptime=now_time())
         JobUtil.add_job_status(self.job_id, 255, error_msg)
 
-    def do_notify(self, res_type, progress, ret):
+    def do_notify(self, res_type, ret):
         logger.info('creating [%s] resource' % res_type)
-        progress = 20 + int(progress/2)     # 20-70
-        if res_type == adaptor.OPT_CREATE_VOLUME:
+        # progress = 20 + int(progress/2)     # 20-70
+        if res_type == adaptor.RES_VOLUME:
             logger.info('Create vloumns!')
             if ret["returnCode"] == adaptor.RES_NEW:  # new create
                 self.inst_resource['volumn'].append({"vim_id": ignore_case_get(ret, "vim_id"),
                                                      "res_id": ignore_case_get(ret, "res_id")})
-            JobUtil.add_job_status(self.job_id, progress, 'Create vloumns!')
+            JobUtil.add_job_status(self.job_id, 25, 'Create vloumns!')
             StorageInstModel.objects.create(
                 storageid='1',
                 vimid='1',
@@ -377,13 +377,13 @@ class InstVnf(Thread):
                 insttype=0,
                 is_predefined=ret["returnCode"],
                 instid=self.nf_inst_id)
-        elif res_type == adaptor.OPT_CREATE_NETWORK:
+        elif res_type == adaptor.RES_NETWORK:
             logger.info('Create networks!')
             if ret["returnCode"] == adaptor.RES_NEW:
                 self.inst_resource['network'].append({"vim_id": ignore_case_get(ret, "vim_id"),
                                                       "res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['network'].append({"vim_id": "1"}, {"res_id": "2"})
-            JobUtil.add_job_status(self.job_id, progress, 'Create networks!')
+            JobUtil.add_job_status(self.job_id, 35, 'Create networks!')
             NetworkInstModel.objects.create(
                 networkid='1',
                 vimid='1',
@@ -393,13 +393,13 @@ class InstVnf(Thread):
                 insttype=0,
                 is_predefined=ret["returnCode"],
                 instid=self.nf_inst_id)
-        elif res_type == adaptor.OPT_CREATE_SUBNET:
+        elif res_type == adaptor.RES_SUBNET:
             logger.info('Create subnets!')
             if ret["returnCode"] == adaptor.RES_NEW:
                 self.inst_resource['subnet'].append({"vim_id": ignore_case_get(ret, "vim_id"),
                                                      "res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['subnet'].append({"vim_id": "1"}, {"res_id": "2"})
-            JobUtil.add_job_status(self.job_id, progress, 'Create subnets!')
+            JobUtil.add_job_status(self.job_id, 40, 'Create subnets!')
             SubNetworkInstModel.objects.create(
                 subnetworkid='1',
                 vimid='1',
@@ -410,13 +410,13 @@ class InstVnf(Thread):
                 insttype=0,
                 is_predefined=ret["returnCode"],
                 instid=self.nf_inst_id)
-        elif res_type == adaptor.OPT_CREATE_PORT:
+        elif res_type == adaptor.RES_PORT:
             logger.info('Create ports!')
             if ret["returnCode"] == adaptor.RES_NEW:
                 self.inst_resource['port'].append({"vim_id": ignore_case_get(ret, "vim_id"),
                                                    "res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['port'].append({"vim_id": "1"}, {"res_id": "2"})
-            JobUtil.add_job_status(self.job_id, progress, 'Create ports!')
+            JobUtil.add_job_status(self.job_id, 50, 'Create ports!')
             PortInstModel.objects.create(
                 portid='1',
                 networkid='1',
@@ -426,29 +426,27 @@ class InstVnf(Thread):
                 name='aaa_pnet_cp',
                 tenant='admin',
                 insttype=0,
-                is_predefined=ret["returnCode"],
                 instid=self.nf_inst_id)
-        elif res_type == adaptor.OPT_CREATE_FLAVOR:
+        elif res_type == adaptor.RES_FLAVOR:
             logger.info('Create flavors!')
             if ret["returnCode"] == adaptor.RES_NEW:
                 self.inst_resource['flavor'].append({"vim_id": ignore_case_get(ret, "vim_id"),
                                                      "res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['flavor'].append({"vim_id": "1"}, {"res_id": "2"})
-            JobUtil.add_job_status(self.job_id, progress, 'Create flavors!')
+            JobUtil.add_job_status(self.job_id, 60, 'Create flavors!')
             FlavourInstModel.objects.create(
                 falavourid='1',
                 name='1',
                 vcpu='1',
                 extraspecs='1',
-                is_predefined=ret["returnCode"],
                 instid=self.nf_inst_id)
-        elif res_type == adaptor.OPT_CREATE_VM:
+        elif res_type == adaptor.RES_VM:
             logger.info('Create vms!')
             if ret["returnCode"] == adaptor.RES_NEW:
                 self.inst_resource['vm'].append({"vim_id": ignore_case_get(ret, "vim_id"),
                                                  "res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['vm'].append({"vim_id": "1"}, {"res_id": "2"})
-            JobUtil.add_job_status(self.job_id, progress, 'Create vms!')
+            JobUtil.add_job_status(self.job_id, 70, 'Create vms!')
             VmInstModel.objects.create(
                 vmid="1",
                 vimid="1",

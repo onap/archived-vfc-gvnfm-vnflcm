@@ -150,7 +150,7 @@ class FlavourInstModel(models.Model):
     memory = models.CharField(db_column='MEMORY', max_length=255)
     extraspecs = models.CharField(db_column='EXTRASPECS', max_length=255)
     instid = models.CharField(db_column='INSTID', max_length=255)
-    is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
+    tenant = models.CharField(db_column='TENANT', max_length=255, null=True)
 
 class NetworkInstModel(models.Model):
     class Meta:
@@ -236,7 +236,6 @@ class PortInstModel(models.Model):
     tenant = models.CharField(db_column='TENANT', max_length=255, null=True)
     interfacename = models.CharField(db_column='INTERFACENAME', max_length=255, blank=True, null=True)
     vmid = models.CharField(db_column='VMID', max_length=255, blank=True, null=True)
-    is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
 
 class CPInstModel(models.Model):
     class Meta:
