@@ -53,13 +53,12 @@ class CreateVnf:
         self.vnfd = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
         self.vnfd = json.JSONDecoder().decode(self.vnfd)
 
-        vnfd_info = raw_data
-        metadata = ignore_case_get(vnfd_info, "metadata")
+        metadata = ignore_case_get(self.vnfd, "metadata")
         version = ignore_case_get(metadata, "vnfd_version")
         vendor = ignore_case_get(metadata, "vendor")
         netype = ignore_case_get(metadata, "vnf_type")
         vnfsoftwareversion = ignore_case_get(metadata, "version")
-        vnfd_model = vnfd_info
+        vnfd_model = self.vnfd
 
         nf_inst_id = str(uuid.uuid4())
         NfInstModel.objects.create(nfinstid=nf_inst_id, nf_name=self.vnf_instance_mame, package_id=self.package_id,

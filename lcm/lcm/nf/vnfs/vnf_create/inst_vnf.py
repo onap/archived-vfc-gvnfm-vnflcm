@@ -109,56 +109,49 @@ class InstVnf(Thread):
         if vnf_insts[0].status != 'NOT_INSTANTIATED':
             raise NFLCMException('VNF instantiationState is not NOT_INSTANTIATED.')
 
+        JobUtil.add_job_status(self.job_id, 5, 'Get packageinfo by vnfd_id')
         # get csar_id from nslcm by vnfd_id
         self.package_info = get_packageinfo_by_vnfdid(vnf_insts[0].vnfdid)
         self.package_id = ignore_case_get(self.package_info, "package_id")
         self.csar_id = ignore_case_get(self.package_info, "csar_id")
 
+        JobUtil.add_job_status(self.job_id, 10, 'Get rawdata from catalog by csar_id')
         #get rawdata from catalog by csar_id
-        raw_data = query_rawdata_from_catalog(self.csar_id, self.data)
-        self.vnfd = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
-        self.vnfd = json.JSONDecoder().decode(self.vnfd)
-        self.vnfd_info = self.vnfd
+        input_parameters = []
+        for key, val in self.data['additionalParams'].items():
+            input_parameters.append({"key": key, "value": val})
+        raw_data = query_rawdata_from_catalog(self.csar_id, input_parameters)
+        self.vnfd_info = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
+        self.vnfd_info = json.JSONDecoder().decode(self.vnfd_info)
 
-        # checkParameterExist
-        for cp in self.data:
-            if cp not in self.vnfd_info:
-                raise NFLCMException('Input parameter is not defined in vnfd_info.')
-        # get nfvo info
-        JobUtil.add_job_status(self.job_id, 5, 'Get nfvo connection info')
-        self.load_nfvo_config()
-
+        self.checkParameterExist()
         # update NfInstModel
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).\
             update(flavour_id=ignore_case_get(self.data, "flavourId"),
-                   vnf_level=ignore_case_get(self.data, 'instantiationLevelId'),
-                   input_params=ignore_case_get(self.data, 'additionalParams'),
-                   extension=ignore_case_get(self.data, ''),
-                   initallocatedata=self.vnfd_info,
+                   input_params=self.data,
+                   vnfd_model=self.vnfd_info,
                    localizationLanguage=ignore_case_get(self.data, 'localizationLanguage'),
                    lastuptime=now_time())
-        JobUtil.add_job_status(self.job_id, 10, 'Nf instancing pre-check finish')
+        JobUtil.add_job_status(self.job_id, 15, 'Nf instancing pre-check finish')
         logger.info("Nf instancing pre-check finish")
 
     def apply_grant(self):
         logger.info('[NF instantiation] send resource grand request to nfvo start')
         # self.check_vm_capacity()
-        content_args = {'nfvoInstanceId': self.nfvo_inst_id, 'vnfmInstanceId': self.vnfm_inst_id,
-                        'nfInstanceId': self.nf_inst_id, 'nfDescriptorId': '',
-                        'lifecycleOperation': 'Instantiate', 'jobId': self.job_id, 'addResource': [],
-                        'removeResource': [], 'placementConstraint': [], 'exVimIdList': [], 'additionalParam': {}}
+        content_args = {'vnfInstanceId': self.nf_inst_id, 'vnfDescriptorId': '',
+                        'lifecycleOperation': 'Instantiate', 'jobId': self.job_id,
+                        'addResource': [], 'removeResource': [],
+                        'placementConstraint': [], 'additionalParam': {}}
 
         vdus = ignore_case_get(self.vnfd_info, "vdus")
         res_index = 1
         for vdu in vdus:
+            location_info = ignore_case_get(ignore_case_get(vdu, "properties"), "location_info")
             res_def = {'type': 'VDU',
-                       'resourceDefinitionId': str(res_index),
-                       'vduId': ignore_case_get(vdu, "vdu_id"),
-                       'vimid': '',
-                       'tenant': ''}
-            if self.vnfd_info['metadata']['cross_dc']:
-                res_def['vimid'] = vdu['properties']['location_info']['vimId']
-                res_def['tenant'] = vdu['properties']['location_info']['tenant']
+                       'resDefId': str(res_index),
+                       'resDesId': ignore_case_get(vdu, "vdu_id"),
+                       'vimid': ignore_case_get(location_info, "vimId"),
+                       'tenant': ignore_case_get(location_info, "tenant")}
             content_args['addResource'].append(res_def)
             res_index += 1
         logger.info('content_args=%s' % content_args)
@@ -167,10 +160,9 @@ class InstVnf(Thread):
         if resp[0] != 0:
             raise NFLCMException('Nf instancing apply grant exception')
 
-        # update_resources_table()
-        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(instantiationState='INSTANTIATED',
-                                                                    lastuptime=now_time())
-        JobUtil.add_job_status(self.job_id, 20, 'Nf instancing apply grant finish')
+        # update resources_table
+        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='INSTANTIATED', lastuptime=now_time())
+        JobUtil.add_job_status(self.job_id,20, 'Nf instancing apply grant finish')
         logger.info("Nf instancing apply grant finish")
 
     def create_res(self):
@@ -475,5 +467,7 @@ class InstVnf(Thread):
     def do_notify_delete(self, ret):
         logger.error('Deleting [%s] resource' % ret)
 
-    def checkParameterExist(self, input_para, vnfd_info):
+    def checkParameterExist(self):
+        # if ignore_case_get(self.data, "flavourId") not in self.vnfd_info:
+        #     raise NFLCMException('Input parameter is not defined in vnfd_info.')
         pass

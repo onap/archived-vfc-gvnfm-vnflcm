@@ -115,53 +115,24 @@ class TestNFInstantiate(TestCase):
         InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
         self.assert_job_result(self.job_id, 255, "Failed to query rawdata of CSAR(2222) from catalog.")
 
-    # @mock.patch.object(restcall, 'call_req')
-    # def test_instantiate_vnf_when_get_rawdata_by_csarid_failed(self, mock_call_req):
-    #     NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='222',
-    #                                version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
-    #                                nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
-    #     r1 = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']  # get csar_id from nslcm by vnfd_id
-    #     r2 = [0, json.JSONEncoder().encode(vnfd_raw_data), '200']
-    #     mock_call_req.side_effect = [r1, r2]
-    #     self.nf_inst_id = '1111'
-    #     self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
-    #     JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
-    #     data = inst_req_data
-    #     InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-    #     self.assert_job_result(self.job_id, 255, "Failed to query rawdata of CSAR(2222) from catalog.")
+    @mock.patch.object(restcall, 'call_req')
+    def test_instantiate_vnf_when_failed(self, mock_call_req):
+        NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='222',
+                                   version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
+                                   nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
+        r1 = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']  # get csar_id from nslcm by vnfd_id
+        r2 = [0, json.JSONEncoder().encode(vnfd_raw_data), '200']
+        r3 = [1, json.JSONEncoder().encode(''), '200']
+        mock_call_req.side_effect = [r1, r2, r3]
+        self.nf_inst_id = '1111'
+        self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
+        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+        data = inst_req_data
+        InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
+        self.assert_job_result(self.job_id, 255, "Nf instancing apply grant exception")
 
-    # @mock.patch.object(restcall, 'call_req')
-    # def test_instantiate_vnf_when_input_para_not_define_in_vnfd(self, mock_call_req):
-    #     r1 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
-    #     r2 = [0, json.JSONEncoder().encode(''), '200']
-    #     mock_call_req.side_effect = [r1, r2]
-    #     create_data = {
-    #         "vnfdId": "111",
-    #         "vnfInstanceName": "vFW_01",
-    #         "vnfInstanceDescription": " vFW in Nanjing TIC Edge"}
-    #     self.nf_inst_id = CreateVnf(create_data).do_biz()
-    #     self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
-    #     JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
-    #     data = inst_req_data
-    #     InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-    #     self.assert_job_result(self.job_id, 255, "Input parameter is not defined in vnfd_info.")
-    #
-    # @mock.patch.object(restcall, 'call_req')
-    # def test_instantiate_vnf_when_get_nfvo_config_failed(self, mock_call_req):
-    #     r1 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
-    #     r2 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
-    #     mock_call_req.side_effect = [r1, r2]
-    #     create_data = {
-    #         "vnfdId": "111",
-    #         "vnfInstanceName": "vFW_01",
-    #         "vnfInstanceDescription": " vFW in Nanjing TIC Edge"}
-    #     self.nf_inst_id = CreateVnf(create_data).do_biz()
-    #     self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
-    #     JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
-    #     data = inst_req_data
-    #     InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-    #     self.assert_job_result(self.job_id, 255, "Nfvo was not registered")
-    #
+
+
     # @mock.patch.object(restcall, 'call_req')
     # def test_instantiate_vnf_when_applay_grant_failed(self, mock_call_req):
     #     NfvoRegInfoModel.objects.create(nfvoid='nfvo111', vnfminstid='vnfm111', apiurl='http://10.74.44.11',
