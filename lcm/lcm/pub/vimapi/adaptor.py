@@ -45,8 +45,7 @@ def get_tenant_id(vim_cache, vim_id, tenant_name):
             id, name = tenant["id"], tenant["name"]
             vim_cache[vim_id][name] = id
     if tenant_name not in vim_cache[vim_id]:
-        err_msg = "Tenant(%s) is not found in vim(%s)"
-        raise VimException(err_msg % (tenant_name, vim_id), "500")
+        raise VimException("Tenant(%s) not found in vim(%s)" % (tenant_name, vim_id), "500")
     return vim_cache[vim_id][tenant_name]
 
 def create_vim_res(data, do_notify):
@@ -73,31 +72,33 @@ def delete_vim_res(data, do_notify):
             try:
                 res_del_fun(res["vim_id"], res["tenant_id"], res["res_id"])
             except VimException as e:
-                logger.error("Failed to delete %s(%s): %s", 
-                    res_type, res["res_id"], e.message)
+                logger.error("Failed to delete %s(%s)", res_type, res["res_id"])
+                logger.error("%s:%s", e.http_code, e.message)
             do_notify(res_type, res["res_id"])
 
 def create_volume(vim_cache, vol, do_notify, progress):
     param = {
-        "tenant": vol["properties"]["location_info"]["tenant"],	
-        "volumeName": vol["properties"]["volume_name"],	
+        "name": vol["properties"]["volume_name"],
         "volumeSize": int(ignore_case_get(vol["properties"], "size", "0"))
     }
+    location_info = vol["properties"]["location_info"]
     set_opt_val(param, "imageName", ignore_case_get(vol, "image_file"))
     set_opt_val(param, "volumeType", ignore_case_get(vol["properties"], "custom_volume_type"))
-    vim_id = vol["properties"]["location_info"]["vimid"]
-    ret = api.create_volume(vim_id, param)
+    set_opt_val(param, "availabilityZone", ignore_case_get(location_info, "availability_zone"))
+    vim_id = location_info["vimid"]
+    tenant_name = location_info["tenant"]
+    tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
+    ret = api.create_volume(vim_id, tenant_id, param)
+    do_notify(progress, ret)
     vol_id, vol_name, return_code = ret["id"], ret["name"], ret["returnCode"]
     retry_count, max_retry_count = 0, 300
     while retry_count < max_retry_count:
-        vol_info = api.get_volume(vim_id, vol_id)
+        vol_info = api.get_volume(vim_id, tenant_id, vol_id)
         if vol_info["status"].upper() == "AVAILABLE":
-            do_notify(progress, ret)
-            break
+            logger.debug("Volume(%s) is available", vol_id)
+            return
         time.sleep(2)
         retry_count = retry_count + 1
-    if return_code == RES_NEW:
-        api.delete_volume(vim_id, vol_id)
     raise VimException("Failed to create Volume(%s): Timeout." % vol_name, "500")
     
 def create_network(vim_cache, network, do_notify, progress):
@@ -183,21 +184,20 @@ def create_vm(vim_cache, vm, do_notify, progress):
     # nicArray TODO:
     vim_id = vm["properties"]["location_info"]["vimid"]
     ret = api.create_vm(vim_id, param)
+    do_notify(progress, ret)
     vm_id, vm_name, return_code = ret["id"], ret["name"], ret["returnCode"]
     opt_vm_status = "Timeout"
     retry_count, max_retry_count = 0, 100
     while retry_count < max_retry_count:
         vm_info = api.get_vm(vim_id, vm_id)
         if vm_info["status"].upper() == "ACTIVE":
-            do_notify(progress, ret)
-            break
+            logger.debug("Vm(%s) is active", vim_id)
+            return
         if vm_info["status"].upper() == "ERROR":
             opt_vm_status = vm_info["status"]
             break
         time.sleep(2)
         retry_count = retry_count + 1
-    if return_code == RES_NEW:
-        api.delete_vm(vim_id, vm_id)
     raise VimException("Failed to create Vm(%s): %s." % (vm_name, opt_vm_status), "500")
 
 
