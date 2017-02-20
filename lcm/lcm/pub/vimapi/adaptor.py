@@ -23,6 +23,7 @@ from .exceptions import VimException
 
 logger = logging.getLogger(__name__)
 
+ERR_CODE = "500"
 RES_EXIST, RES_NEW = 0, 1
 IP_V4, IP_V6 = 4, 6
 DHCP_DISABLED, DHCP_ENABLED = 0, 1
@@ -44,8 +45,22 @@ def get_tenant_id(vim_cache, vim_id, tenant_name):
             id, name = tenant["id"], tenant["name"]
             vim_cache[vim_id][name] = id
     if tenant_name not in vim_cache[vim_id]:
-        raise VimException("Tenant(%s) not found in vim(%s)" % (tenant_name, vim_id), "500")
+        raise VimException("Tenant(%s) not found in vim(%s)" % (tenant_name, vim_id), ERR_CODE)
     return vim_cache[vim_id][tenant_name]
+
+def set_res_cache(res_cache, res_type, key, val):
+    if res_type not in res_cache:
+        res_cache[res_type] = {}
+    if key in res_cache[res_type]:
+        raise VimException("Duplicate key(%s) of %s" % (key, res_type), ERR_CODE)
+    res_cache[res_type][key] = val
+
+def get_res_id(res_cache, res_type, key):
+    if res_type not in res_cache:
+        raise VimException("%s not found in cache" % res_type, ERR_CODE)
+    if key not in res_cache[res_type]:
+        raise VimException("%s(%s) not found in cache" % (res_type, key), ERR_CODE)
+    return res_cache[res_type][key]
 
 def create_vim_res(data, do_notify):
     vim_cache, res_cache = {}, {}
@@ -58,7 +73,7 @@ def create_vim_res(data, do_notify):
     for port in ignore_case_get(data, "cps"):
         create_port(vim_cache, res_cache, port, do_notify, RES_PORT)
     for flavor in ignore_case_get(data, "vdus"):
-        create_flavor(vim_cache, res_cache, flavor, do_notify, RES_FLAVOR)
+        create_flavor(vim_cache, res_cache, data, flavor, do_notify, RES_FLAVOR)
     for vm in ignore_case_get(data, "vdus"):
         create_vm(vim_cache, res_cache, vm, do_notify, RES_VM)
 
@@ -75,21 +90,21 @@ def delete_vim_res(data, do_notify):
                 logger.error("%s:%s", e.http_code, e.message)
             do_notify(res_type, res["res_id"])
 
-def create_volume(vim_cache, res_cache, vol, do_notify, progress):
+def create_volume(vim_cache, res_cache, vol, do_notify, res_type):
+    location_info = vol["properties"]["location_info"]
     param = {
         "name": vol["properties"]["volume_name"],
         "volumeSize": int(ignore_case_get(vol["properties"], "size", "0"))
     }
-    location_info = vol["properties"]["location_info"]
     set_opt_val(param, "imageName", ignore_case_get(vol, "image_file"))
     set_opt_val(param, "volumeType", ignore_case_get(vol["properties"], "custom_volume_type"))
     set_opt_val(param, "availabilityZone", ignore_case_get(location_info, "availability_zone"))
-    vim_id = location_info["vimid"]
-    tenant_name = location_info["tenant"]
+    vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
     tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
     ret = api.create_volume(vim_id, tenant_id, param)
-    do_notify(progress, ret)
+    do_notify(res_type, ret)
     vol_id, vol_name, return_code = ret["id"], ret["name"], ret["returnCode"]
+    set_res_cache(res_cache, res_type, vol["volume_storage_id"], vol_id)
     retry_count, max_retry_count = 0, 300
     while retry_count < max_retry_count:
         vol_info = api.get_volume(vim_id, tenant_id, vol_id)
@@ -98,30 +113,31 @@ def create_volume(vim_cache, res_cache, vol, do_notify, progress):
             return
         time.sleep(2)
         retry_count = retry_count + 1
-    raise VimException("Failed to create Volume(%s): Timeout." % vol_name, "500")
+    raise VimException("Failed to create Volume(%s): Timeout." % vol_name, ERR_CODE)
     
-def create_network(vim_cache, res_cache, network, do_notify, progress):
+def create_network(vim_cache, res_cache, network, do_notify, res_type):
+    location_info = network["properties"]["location_info"]
     param = {
         "name": network["properties"]["network_name"],
         "shared": False,
         "networkType": network["properties"]["network_type"],
         "physicalNetwork": ignore_case_get(network["properties"], "physical_network")
     }
-    location_info = network["properties"]["location_info"]
     set_opt_val(param, "vlanTransparent", ignore_case_get(network["properties"], "vlan_transparent"))
     set_opt_val(param, "segmentationId", int(ignore_case_get(network["properties"], "segmentation_id", "0")))
     set_opt_val(param, "routerExternal", ignore_case_get(network, "route_external"))
-    vim_id = location_info["vimid"]
-    tenant_name = location_info["tenant"]
+    vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
     tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
     ret = api.create_network(vim_id, tenant_id, param)
-    do_notify(progress, ret)
+    do_notify(res_type, ret)
+    set_res_cache(res_cache, res_type, network["vl_id"], ret["id"])
     
-def create_subnet(vim_cache, res_cache, subnet, do_notify, progress):
+def create_subnet(vim_cache, res_cache, subnet, do_notify, res_type):
+    location_info = subnet["properties"]["location_info"]
+    network_id = get_res_id(res_cache, RES_NETWORK, subnet["vl_id"])
     param = {
-        "tenant": subnet["properties"]["location_info"]["tenant"],	
-        "networkName": subnet["properties"]["network_name"],
-        "subnetName": subnet["properties"]["name"],
+        "networkId": network_id,
+        "name": subnet["properties"]["name"],
         "cidr": ignore_case_get(subnet["properties"], "cidr"),
         "ipVersion": ignore_case_get(subnet["properties"], "ip_version", IP_V4)
     }
@@ -134,33 +150,64 @@ def create_subnet(vim_cache, res_cache, subnet, do_notify, progress):
     if allocation_pool:
         param["allocationPools"] = [allocation_pool]
     set_opt_val(param, "hostRoutes", ignore_case_get(subnet["properties"], "host_routes"))
-    vim_id = subnet["properties"]["location_info"]["vimid"]
-    ret = api.create_subnet(vim_id, param)
-    do_notify(progress, ret)
+    vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
+    tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
+    ret = api.create_subnet(vim_id, tenant_id, param)
+    do_notify(res_type, ret)
+    set_res_cache(res_cache, res_type, subnet["vl_id"], ret["id"])
     
-def create_port(vim_cache, res_cache, port, do_notify, progress):
+def create_port(vim_cache, res_cache, port, do_notify, res_type):
+    location_info = port["properties"]["location_info"]
+    network_id = get_res_id(res_cache, RES_NETWORK, port["vl_id"])
+    subnet_id = get_res_id(res_cache, RES_SUBNET, port["vl_id"])
     param = {
-        "tenant": port["properties"]["location_info"]["tenant"],
-        "networkName": port["properties"]["network_name"],
-        "subnetName": port["properties"]["name"],
-        "portName": port["properties"]["name"]
+        "networkId": network_id,
+        "subnetId": subnet_id,
+        "name": port["properties"]["name"]
     }
-    vim_id = port["properties"]["location_info"]["vimid"]
-    ret = api.create_subnet(vim_id, param)
-    do_notify(progress, ret)
+    set_opt_val(param, "macAddress", ignore_case_get(port["properties"], "mac_address"))
+    set_opt_val(param, "ip", ignore_case_get(port["properties"], "ip_address"))
+    set_opt_val(param, "vnicType", ignore_case_get(port["properties"], "vnic_type"))
+    set_opt_val(param, "securityGroups", "") # TODO
+    vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
+    tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
+    ret = api.create_subnet(vim_id, tenant_id, param)
+    do_notify(res_type, ret)
+    set_res_cache(res_cache, res_type, subnet["cp_id"], ret["id"])
 
-def create_flavor(vim_cache, res_cache, flavor, do_notify, progress):
+def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
+    location_info = flavor["properties"]["location_info"]
+    local_storages = ignore_case_get(data, "local_storages")
     param = {
-        "tenant": flavor["properties"]["location_info"]["tenant"],
+        "name": "Flavor_%s" % flavor["vdu_id"],
         "vcpu": int(flavor["nfv_compute"]["num_cpus"]),
-        "memory": int(flavor["nfv_compute"]["mem_size"].replace('MB', '').strip())
+        "memory": int(flavor["nfv_compute"]["mem_size"].replace('MB', '').strip()),
+        "isPublic": True
     }
-    set_opt_val(param, "extraSpecs", ignore_case_get(flavor["nfv_compute"], "flavor_extra_specs"))
-    vim_id = flavor["properties"]["location_info"]["vimid"]
-    ret = api.create_flavor(vim_id, param)
-    do_notify(progress, ret)
+    for local_storage_id in ignore_case_get(flavor, "local_storages"):
+        for local_storage in local_storages:
+            if local_storage_id != local_storage["local_storage_id"]:
+                continue
+            disk_type = local_storage["properties"]["disk_type"]
+            disk_size = int(local_storage["properties"]["size"].replace('GB', '').strip())
+            if disk_type == "root":
+                param["disk"] = disk_size
+            elif disk_type == "ephemeral":
+                param["ephemeral"] = disk_size
+            elif disk_type == "swap":
+                param["swap"] = disk_size
+    flavor_extra_specs = ignore_case_get(flavor["nfv_compute"], "flavor_extra_specs")
+    extra_specs = []
+    for es in flavor_extra_specs:
+        extra_specs.append({"keyName": es, "value": flavor_extra_specs[es]})
+    set_opt_val(param, "extraSpecs", extra_specs)
+    vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
+    tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
+    ret = api.create_flavor(vim_id, tenant_id, param)
+    do_notify(res_type, ret)
+    set_res_cache(res_cache, res_type, flavor["vdu_id"], ret["id"])
     
-def create_vm(vim_cache, res_cache, vm, do_notify, progress):
+def create_vm(vim_cache, res_cache, vm, do_notify, res_type):
     param = {
         "tenant": vm["properties"]["location_info"]["tenant"],
         "vmName": vm["properties"]["name"],
@@ -184,7 +231,7 @@ def create_vm(vim_cache, res_cache, vm, do_notify, progress):
     # nicArray TODO:
     vim_id = vm["properties"]["location_info"]["vimid"]
     ret = api.create_vm(vim_id, param)
-    do_notify(progress, ret)
+    do_notify(res_type, ret)
     vm_id, vm_name, return_code = ret["id"], ret["name"], ret["returnCode"]
     opt_vm_status = "Timeout"
     retry_count, max_retry_count = 0, 100
@@ -198,6 +245,6 @@ def create_vm(vim_cache, res_cache, vm, do_notify, progress):
             break
         time.sleep(2)
         retry_count = retry_count + 1
-    raise VimException("Failed to create Vm(%s): %s." % (vm_name, opt_vm_status), "500")
+    raise VimException("Failed to create Vm(%s): %s." % (vm_name, opt_vm_status), ERR_CODE)
 
 
