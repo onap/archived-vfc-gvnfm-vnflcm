@@ -32,6 +32,9 @@ class CreateVnf:
         self.vnfd_id = ignore_case_get(self.data, "vnfdId")
         self.vnf_instance_mame = ignore_case_get(self.data, "vnfInstanceName")
         self.description = ignore_case_get(self.data, "vnfInstanceDescription")
+        self.package_info = ''
+        self.package_id = ''
+        self.csar_id = ''
 
     def do_biz(self):
         logger.debug("CreateVnfIdentifier--CreateVnf::> %s" % self.data)
@@ -40,17 +43,12 @@ class CreateVnf:
         if is_exist:
             raise NFLCMException('VNF is already exist.')
 
-        # ret = vnfd_rawdata_get(self.vnfd_id)
-        # if ret[0] != 0:
-        #     raise NFLCMException('Get vnfd data failed.')
-        # vnfd_info = json.JSONDecoder().decode(ret[1])
-
-        # get csar_id from nslcm by vnfd_id
+        # get package_info from nslcm by vnfd_id
         self.package_info = get_packageinfo_by_vnfdid(self.vnfd_id)
         self.package_id = ignore_case_get(self.package_info, "package_id")
         self.csar_id = ignore_case_get(self.package_info, "csar_id")
 
-        #get rawdata from catalog by csar_id
+        # get rawdata from catalog by csar_id
         raw_data = query_rawdata_from_catalog(self.csar_id, self.data)
         # self.vnfd = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
         # self.vnfd = json.JSONDecoder().decode(self.vnfd)
@@ -64,7 +62,7 @@ class CreateVnf:
         vnfd_model = vnfd_info
 
         nf_inst_id = str(uuid.uuid4())
-        NfInstModel.objects.create(nfinstid=nf_inst_id, nf_name=self.vnf_instance_mame, package_id='todo',
+        NfInstModel.objects.create(nfinstid=nf_inst_id, nf_name=self.vnf_instance_mame, package_id=self.package_id,
                                    version=version, vendor=vendor, netype=netype, vnfd_model=vnfd_model,
                                    status='NOT_INSTANTIATED', nf_desc=self.description, vnfdid=self.vnfd_id,
                                    vnfSoftwareVersion=vnfsoftwareversion, create_time=now_time())
