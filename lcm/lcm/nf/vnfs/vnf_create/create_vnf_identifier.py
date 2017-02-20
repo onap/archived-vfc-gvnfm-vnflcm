@@ -50,8 +50,8 @@ class CreateVnf:
 
         # get rawdata from catalog by csar_id
         raw_data = query_rawdata_from_catalog(self.csar_id, self.data)
-        # self.vnfd = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
-        # self.vnfd = json.JSONDecoder().decode(self.vnfd)
+        self.vnfd = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
+        self.vnfd = json.JSONDecoder().decode(self.vnfd)
 
         vnfd_info = raw_data
         metadata = ignore_case_get(vnfd_info, "metadata")

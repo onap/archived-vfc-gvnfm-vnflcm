@@ -61,7 +61,7 @@ class TestNFInstantiate(TestCase):
     @mock.patch.object(restcall, 'call_req')
     def test_create_vnf_identifier(self, mock_call_req):
         r1 = [0, json.JSONEncoder().encode({'package_id':'222', 'csar_id':'2222'}), '200']  # get csar_id from nslcm by vnfd_id
-        r2 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
+        r2 = [0, json.JSONEncoder().encode(vnfd_raw_data), '200']
         mock_call_req.side_effect = [r1, r2]
         data = {
             "vnfdId": "111",
@@ -88,7 +88,7 @@ class TestNFInstantiate(TestCase):
 
     @mock.patch.object(restcall, 'call_req')
     def test_instantiate_vnf_when_get_package_info_by_vnfdid_failed(self, mock_call_req):
-        NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='todo',
+        NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='222',
                                    version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
                                    nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
         r1 = [1, json.JSONEncoder().encode({'package_id':'222', 'csar_id':'2222'}), '200']  # get csar_id from nslcm by vnfd_id
@@ -102,11 +102,11 @@ class TestNFInstantiate(TestCase):
 
     @mock.patch.object(restcall, 'call_req')
     def test_instantiate_vnf_when_get_rawdata_by_csarid_failed(self, mock_call_req):
-        NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='todo',
+        NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='222',
                                    version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
                                    nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
         r1 = [0, json.JSONEncoder().encode({'package_id':'222', 'csar_id':'2222'}), '200']  # get csar_id from nslcm by vnfd_id
-        r2 = [1, json.JSONEncoder().encode(''), '200']
+        r2 = [1, json.JSONEncoder().encode(vnfd_raw_data), '200']
         mock_call_req.side_effect = [r1, r2]
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
@@ -114,6 +114,21 @@ class TestNFInstantiate(TestCase):
         data = inst_req_data
         InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
         self.assert_job_result(self.job_id, 255, "Failed to query rawdata of CSAR(2222) from catalog.")
+
+    # @mock.patch.object(restcall, 'call_req')
+    # def test_instantiate_vnf_when_get_rawdata_by_csarid_failed(self, mock_call_req):
+    #     NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='222',
+    #                                version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
+    #                                nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
+    #     r1 = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']  # get csar_id from nslcm by vnfd_id
+    #     r2 = [0, json.JSONEncoder().encode(vnfd_raw_data), '200']
+    #     mock_call_req.side_effect = [r1, r2]
+    #     self.nf_inst_id = '1111'
+    #     self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
+    #     JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+    #     data = inst_req_data
+    #     InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
+    #     self.assert_job_result(self.job_id, 255, "Failed to query rawdata of CSAR(2222) from catalog.")
 
     # @mock.patch.object(restcall, 'call_req')
     # def test_instantiate_vnf_when_input_para_not_define_in_vnfd(self, mock_call_req):
@@ -573,4 +588,116 @@ vnfd_model_dict = {
     ],
     "localizationLanguage": "en_US",
     "additionalParams": {}
+}
+
+vnfd_raw_data = {
+    "rawData": {
+        "instance": {
+            "metadata": {
+                "is_shared": False,
+                "plugin_info": "vbrasplugin_1.0",
+                "vendor": "zte",
+                "request_reclassification": False,
+                "name": "vbras",
+                "version": 1,
+                "vnf_type": "vbras",
+                "cross_dc": False,
+                "vnfd_version": "1.0.0",
+                "id": "zte_vbras_1.0",
+                "nsh_aware": True
+            },
+            "nodes": [
+                {
+                    "id": "aaa_dnet_cp_0xu2j5sbigxc8h1ega3if0ld1",
+                    "type_name": "tosca.nodes.nfv.ext.zte.CP",
+                    "template_name": "aaa_dnet_cp",
+                    "properties": {
+                        "bandwidth": {
+                            "type_name": "integer",
+                            "value": 0
+                        },
+                        "direction": {
+                            "type_name": "string",
+                            "value": "bidirectional"
+                        },
+                        "vnic_type": {
+                            "type_name": "string",
+                            "value": "normal"
+                        },
+                        "sfc_encapsulation": {
+                            "type_name": "string",
+                            "value": "mac"
+                        },
+                        "order": {
+                            "type_name": "integer",
+                            "value": 2
+                        }
+                    },
+                    "relationships": [
+                        {
+                            "name": "guest_os",
+                            "source_requirement_index": 0,
+                            "target_node_id": "AAA_image_d8aseebr120nbm7bo1ohkj194",
+                            "target_capability_name": "feature"
+                        }
+                    ]
+                },
+                {
+                    "id": "LB_Image_oj5l2ay8l2g6vcq6fsswzduha",
+                    "type_name": "tosca.nodes.nfv.ext.ImageFile",
+                    "template_name": "LB_Image",
+                    "properties": {
+                        "disk_format": {
+                            "type_name": "string",
+                            "value": "qcow2"
+                        },
+                        "file_url": {
+                            "type_name": "string",
+                            "value": "/SoftwareImages/image-lb"
+                        },
+                        "name": {
+                            "type_name": "string",
+                            "value": "image-lb"
+                        }
+                    }
+                }
+            ]
+        },
+        "model": {
+            "metadata": {
+                "is_shared": False,
+                "plugin_info": "vbrasplugin_1.0",
+                "vendor": "zte",
+                "request_reclassification": False,
+                "name": "vbras",
+                "version": 1,
+                "vnf_type": "vbras",
+                "cross_dc": False,
+                "vnfd_version": "1.0.0",
+                "id": "zte_vbras_1.0",
+                "nsh_aware": True
+            },
+            "node_templates": [
+                {
+                    "name": "aaa_dnet_cp",
+                    "type_name": "tosca.nodes.nfv.ext.zte.CP",
+                    "default_instances": 1,
+                    "min_instances": 0,
+                    "properties": {
+                        "bandwidth": {
+                            "type_name": "integer",
+                            "value": 0
+                        }
+                    },
+                    "requirement_templates": [
+                        {
+                            "name": "virtualbinding",
+                            "target_node_template_name": "AAA",
+                            "target_capability_name": "virtualbinding"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
 }

@@ -118,11 +118,8 @@ class InstVnf(Thread):
         raw_data = query_rawdata_from_catalog(self.csar_id, self.data)
         self.vnfd = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
         self.vnfd = json.JSONDecoder().decode(self.vnfd)
+        self.vnfd_info = self.vnfd
 
-        ret = vnfd_rawdata_get(vnf_insts[0].vnfdid, self.data)
-        if ret[0] != 0:
-            raise NFLCMException("Get vnfd_raw_data failed.")
-        self.vnfd_info = json.JSONDecoder().decode(ret[1])
         # checkParameterExist
         for cp in self.data:
             if cp not in self.vnfd_info:
@@ -477,3 +474,6 @@ class InstVnf(Thread):
 
     def do_notify_delete(self, ret):
         logger.error('Deleting [%s] resource' % ret)
+
+    def checkParameterExist(self, input_para, vnfd_info):
+        pass
