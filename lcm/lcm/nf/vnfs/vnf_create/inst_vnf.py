@@ -159,6 +159,7 @@ class InstVnf(Thread):
         self.apply_result = apply_grant_to_nfvo(content_args)
         vim_info = ignore_case_get(self.apply_result, "vim")
 
+        # update vnfd_info
         for vdu in self.vnfd_info["vdus"]:
             if "location_info" in vdu["properties"]:
                 vdu["properties"]["location_info"]["vimid"] = ignore_case_get(vim_info, "vimid")
@@ -364,115 +365,118 @@ class InstVnf(Thread):
         # progress = 20 + int(progress/2)     # 20-70
         if res_type == adaptor.RES_VOLUME:
             logger.info('Create vloumns!')
-            if ret["returnCode"] == adaptor.RES_NEW:  # new create
-                self.inst_resource['volumn'].append({"vim_id": ignore_case_get(ret, "vim_id"),
-                                                     "res_id": ignore_case_get(ret, "res_id")})
+            # if ret["returnCode"] == adaptor.RES_NEW:  # new create
+            #     self.inst_resource['volumn'].append({"vim_id": ignore_case_get(ret, "vim_id"),
+            #                                          "res_id": ignore_case_get(ret, "res_id")})
             JobUtil.add_job_status(self.job_id, 25, 'Create vloumns!')
             StorageInstModel.objects.create(
-                storageid='1',
-                vimid='1',
-                resouceid='1',
-                name='40G',
-                tenant='admin',
+                storageid=ret["id"],
+                vimid=ret["vimId"],
+                resouceid=ret["id"],
+                name=ret["name"],
+                tenant=ret["tenatId"],
                 insttype=0,
                 is_predefined=ret["returnCode"],
                 instid=self.nf_inst_id)
         elif res_type == adaptor.RES_NETWORK:
             logger.info('Create networks!')
-            if ret["returnCode"] == adaptor.RES_NEW:
-                self.inst_resource['network'].append({"vim_id": ignore_case_get(ret, "vim_id"),
-                                                      "res_id": ignore_case_get(ret, "res_id")})
+            # if ret["returnCode"] == adaptor.RES_NEW:
+            #     self.inst_resource['network'].append({"vim_id": ignore_case_get(ret, "vim_id"),
+            #                                           "res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['network'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, 35, 'Create networks!')
             NetworkInstModel.objects.create(
-                networkid='1',
-                vimid='1',
-                resouceid='1',
-                name='pnet_network',
-                tenant='admin',
-                insttype=0,
-                is_predefined=ret["returnCode"],
-                instid=self.nf_inst_id)
+                networkid=ret["id"],
+                vimid = ret["vimId"],
+                resouceid = ret["id"],
+                name = ret["name"],
+                tenant = ret["tenatId"],
+                insttype = 0,
+                is_predefined = ret["returnCode"],
+                instid = self.nf_inst_id)
         elif res_type == adaptor.RES_SUBNET:
             logger.info('Create subnets!')
-            if ret["returnCode"] == adaptor.RES_NEW:
-                self.inst_resource['subnet'].append({"vim_id": ignore_case_get(ret, "vim_id"),
-                                                     "res_id": ignore_case_get(ret, "res_id")})
+            # if ret["returnCode"] == adaptor.RES_NEW:
+            #     self.inst_resource['subnet'].append({"vim_id": ignore_case_get(ret, "vim_id"),
+            #                                          "res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['subnet'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, 40, 'Create subnets!')
             SubNetworkInstModel.objects.create(
-                subnetworkid='1',
-                vimid='1',
-                resouceid='1',
-                networkid='1',
-                name='sub_pnet',
-                tenant='admin',
+                subnetworkid=ret["id"],
+                vimid=ret["vimId"],
+                resouceid=ret["id"],
+                name=ret["name"],
+                tenant=ret["tenatId"],
                 insttype=0,
                 is_predefined=ret["returnCode"],
                 instid=self.nf_inst_id)
         elif res_type == adaptor.RES_PORT:
             logger.info('Create ports!')
-            if ret["returnCode"] == adaptor.RES_NEW:
-                self.inst_resource['port'].append({"vim_id": ignore_case_get(ret, "vim_id"),
-                                                   "res_id": ignore_case_get(ret, "res_id")})
+            # if ret["returnCode"] == adaptor.RES_NEW:
+            #     self.inst_resource['port'].append({"vim_id": ignore_case_get(ret, "vim_id"),
+            #                                        "res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['port'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, 50, 'Create ports!')
             PortInstModel.objects.create(
-                portid='1',
-                networkid='1',
-                subnetworkid='1',
-                vimid='1',
-                resouceid='1',
-                name='aaa_pnet_cp',
-                tenant='admin',
+                portid=ret["id"],
+                networkid=ret["networkId"],
+                subnetworkid=ret["subnetId"],
+                vimid=ret["vimId"],
+                resouceid=ret["id"],
+                name=ret["name"],
+                tenant=ret["tenatId"],
                 insttype=0,
+                is_predefined=ret["returnCode"],
                 instid=self.nf_inst_id)
         elif res_type == adaptor.RES_FLAVOR:
             logger.info('Create flavors!')
-            if ret["returnCode"] == adaptor.RES_NEW:
-                self.inst_resource['flavor'].append({"vim_id": ignore_case_get(ret, "vim_id"),
-                                                     "res_id": ignore_case_get(ret, "res_id")})
+            # if ret["returnCode"] == adaptor.RES_NEW:
+            #     self.inst_resource['flavor'].append({"vim_id": ignore_case_get(ret, "vim_id"),
+            #                                          "res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['flavor'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, 60, 'Create flavors!')
             FlavourInstModel.objects.create(
-                falavourid='1',
-                name='1',
-                vcpu='1',
-                extraspecs='1',
+                falavourid=ret["id"],
+                name=ret["name"],
+                vcpu=ret["vcpu"],
+                memory=ret["memory"],
+                extraspecs=ret["extraSpecs"],
+                is_predefined=ret["returnCode"],
+                tenant=ret["tenatId"],
+                vimid=ret["vimId"],
                 instid=self.nf_inst_id)
         elif res_type == adaptor.RES_VM:
             logger.info('Create vms!')
-            if ret["returnCode"] == adaptor.RES_NEW:
-                self.inst_resource['vm'].append({"vim_id": ignore_case_get(ret, "vim_id"),
-                                                 "res_id": ignore_case_get(ret, "res_id")})
+            # if ret["returnCode"] == adaptor.RES_NEW:
+            #     self.inst_resource['vm'].append({"vim_id": ignore_case_get(ret, "vim_id"),
+            #                                      "res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['vm'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, 70, 'Create vms!')
             VmInstModel.objects.create(
-                vmid="1",
-                vimid="1",
-                resouceid="11",
+                vmid=ret["id"],
+                vimid=ret["vimId"],
+                resouceid=ret["id"],
                 insttype=0,
                 instid=self.nf_inst_id,
-                vmname="test_01",
-                is_predefined=ret["returnCode"],
-                operationalstate=1)
+                vmname=ret["name"],
+                is_predefined=ret["returnCode"])
 
-    def do_rollback(self, args_=None):
-        logger.error('error info : %s' % args_)
-        adaptor.delete_vim_res(self.inst_resource, self.do_notify_delete)
-        logger.error('rollback resource complete')
-
-        StorageInstModel.objects.filter(instid=self.nf_inst_id).delete()
-        NetworkInstModel.objects.filter(instid=self.nf_inst_id).delete()
-        SubNetworkInstModel.objects.filter(instid=self.nf_inst_id).delete()
-        PortInstModel.objects.filter(instid=self.nf_inst_id).delete()
-        FlavourInstModel.objects.filter(instid=self.nf_inst_id).delete()
-        VmInstModel.objects.filter(instid=self.nf_inst_id).delete()
-        logger.error('delete table complete')
-        raise NFLCMException("Create resource failed")
-
-    def do_notify_delete(self, ret):
-        logger.error('Deleting [%s] resource' % ret)
+    # def do_rollback(self, args_=None):
+    #     logger.error('error info : %s' % args_)
+    #     adaptor.delete_vim_res(self.inst_resource, self.do_notify_delete)
+    #     logger.error('rollback resource complete')
+    #
+    #     StorageInstModel.objects.filter(instid=self.nf_inst_id).delete()
+    #     NetworkInstModel.objects.filter(instid=self.nf_inst_id).delete()
+    #     SubNetworkInstModel.objects.filter(instid=self.nf_inst_id).delete()
+    #     PortInstModel.objects.filter(instid=self.nf_inst_id).delete()
+    #     FlavourInstModel.objects.filter(instid=self.nf_inst_id).delete()
+    #     VmInstModel.objects.filter(instid=self.nf_inst_id).delete()
+    #     logger.error('delete table complete')
+    #     raise NFLCMException("Create resource failed")
+    #
+    # def do_notify_delete(self, ret):
+    #     logger.error('Deleting [%s] resource' % ret)
 
     def checkParameterExist(self):
         # if ignore_case_get(self.data, "flavourId") not in self.vnfd_info:

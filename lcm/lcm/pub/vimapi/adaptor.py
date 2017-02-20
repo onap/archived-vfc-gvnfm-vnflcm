@@ -173,7 +173,7 @@ def create_port(vim_cache, res_cache, port, do_notify, res_type):
     tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
     ret = api.create_subnet(vim_id, tenant_id, param)
     do_notify(res_type, ret)
-    set_res_cache(res_cache, res_type, subnet["cp_id"], ret["id"])
+    set_res_cache(res_cache, res_type, port["cp_id"], ret["id"])
 
 def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
     location_info = flavor["properties"]["location_info"]
@@ -181,7 +181,7 @@ def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
     param = {
         "name": "Flavor_%s" % flavor["vdu_id"],
         "vcpu": int(flavor["nfv_compute"]["num_cpus"]),
-        "memory": int(flavor["nfv_compute"]["mem_size"].replace('MB', '').strip()),
+        "memory": '',
         "isPublic": True
     }
     for local_storage_id in ignore_case_get(flavor, "local_storages"):

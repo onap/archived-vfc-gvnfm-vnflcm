@@ -151,6 +151,7 @@ class FlavourInstModel(models.Model):
     extraspecs = models.CharField(db_column='EXTRASPECS', max_length=255)
     instid = models.CharField(db_column='INSTID', max_length=255)
     tenant = models.CharField(db_column='TENANT', max_length=255, null=True)
+    vmid = models.CharField(db_column='VMID', max_length=255)
 
 class NetworkInstModel(models.Model):
     class Meta:
