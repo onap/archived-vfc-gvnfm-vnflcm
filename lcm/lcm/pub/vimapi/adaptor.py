@@ -38,26 +38,19 @@ OPT_CREATE_VM = 80
 BOOT_FROM_VOLUME = 1
 
 
-def create_vim_res(data, do_notify, do_rollback):
-    try:
-        for vol in ignore_case_get(data, "volume_storages"):
-            create_volume(vol, do_notify, OPT_CREATE_VOLUME)
-        for network in ignore_case_get(data, "vls"):
-            create_network(network, do_notify, OPT_CREATE_NETWORK)
-        for subnet in ignore_case_get(data, "vls"):
-            create_subnet(subnet, do_notify, OPT_CREATE_SUBNET)
-        for port in ignore_case_get(data, "cps"):
-            create_port(port, do_notify, OPT_CREATE_PORT)
-        for flavor in ignore_case_get(data, "vdus"):
-            create_flavor(flavor, do_notify, OPT_CREATE_FLAVOR)
-        for vm in ignore_case_get(data, "vdus"):
-            create_vm(vm, do_notify, OPT_CREATE_VM)
-    except VimException as e:
-        logger.error(e.message)
-        do_rollback(e.message)
-    except:
-        logger.error(traceback.format_exc())
-        do_rollback(str(sys.exc_info()))
+def create_vim_res(data, do_notify):
+    for vol in ignore_case_get(data, "volume_storages"):
+        create_volume(vol, do_notify, OPT_CREATE_VOLUME)
+    for network in ignore_case_get(data, "vls"):
+        create_network(network, do_notify, OPT_CREATE_NETWORK)
+    for subnet in ignore_case_get(data, "vls"):
+        create_subnet(subnet, do_notify, OPT_CREATE_SUBNET)
+    for port in ignore_case_get(data, "cps"):
+        create_port(port, do_notify, OPT_CREATE_PORT)
+    for flavor in ignore_case_get(data, "vdus"):
+        create_flavor(flavor, do_notify, OPT_CREATE_FLAVOR)
+    for vm in ignore_case_get(data, "vdus"):
+        create_vm(vm, do_notify, OPT_CREATE_VM)
 
 def delete_vim_res(data, do_notify):
     res_types = ["vm", "flavor", "port", "subnet", "network", "volume"]
