@@ -37,20 +37,32 @@ OPT_CREATE_VM = 80
 
 BOOT_FROM_VOLUME = 1
 
+def get_tenant_id(vim_cache, vim_id, tenant_name):
+    if vim_id not in vim_cache:
+        tenants = api.list_tenant(vim_id)
+        vim_cache[vim_id] = {}
+        for tenant in tenants["tenants"]:
+            id, name = tenant["id"], tenant["name"]
+            vim_cache[vim_id][name] = id
+    if tenant_name not in vim_cache[vim_id]:
+        err_msg = "Tenant(%s) is not found in vim(%s)"
+        raise VimException(err_msg % (tenant_name, vim_id), "500")
+    return vim_cache[vim_id][tenant_name]
 
 def create_vim_res(data, do_notify):
+    vim_cache = {}
     for vol in ignore_case_get(data, "volume_storages"):
-        create_volume(vol, do_notify, OPT_CREATE_VOLUME)
+        create_volume(vim_cache, vol, do_notify, OPT_CREATE_VOLUME)
     for network in ignore_case_get(data, "vls"):
-        create_network(network, do_notify, OPT_CREATE_NETWORK)
+        create_network(vim_cache, network, do_notify, OPT_CREATE_NETWORK)
     for subnet in ignore_case_get(data, "vls"):
-        create_subnet(subnet, do_notify, OPT_CREATE_SUBNET)
+        create_subnet(vim_cache, subnet, do_notify, OPT_CREATE_SUBNET)
     for port in ignore_case_get(data, "cps"):
-        create_port(port, do_notify, OPT_CREATE_PORT)
+        create_port(vim_cache, port, do_notify, OPT_CREATE_PORT)
     for flavor in ignore_case_get(data, "vdus"):
-        create_flavor(flavor, do_notify, OPT_CREATE_FLAVOR)
+        create_flavor(vim_cache, flavor, do_notify, OPT_CREATE_FLAVOR)
     for vm in ignore_case_get(data, "vdus"):
-        create_vm(vm, do_notify, OPT_CREATE_VM)
+        create_vm(vim_cache, vm, do_notify, OPT_CREATE_VM)
 
 def delete_vim_res(data, do_notify):
     res_types = ["vm", "flavor", "port", "subnet", "network", "volume"]
@@ -59,13 +71,13 @@ def delete_vim_res(data, do_notify):
     for res_type, res_del_fun in zip(res_types, res_del_funs):
         for res in ignore_case_get(data, res_type):
             try:
-                res_del_fun(res["vim_id"], res["res_id"])
+                res_del_fun(res["vim_id"], res["tenant_id"], res["res_id"])
             except VimException as e:
                 logger.error("Failed to delete %s(%s): %s", 
                     res_type, res["res_id"], e.message)
-            do_notify(res_type)
+            do_notify(res_type, res["res_id"])
 
-def create_volume(vol, do_notify, progress):
+def create_volume(vim_cache, vol, do_notify, progress):
     param = {
         "tenant": vol["properties"]["location_info"]["tenant"],	
         "volumeName": vol["properties"]["volume_name"],	
@@ -73,7 +85,7 @@ def create_volume(vol, do_notify, progress):
     }
     set_opt_val(param, "imageName", ignore_case_get(vol, "image_file"))
     set_opt_val(param, "volumeType", ignore_case_get(vol["properties"], "custom_volume_type"))
-    vim_id = vol["properties"]["location_info"]["vimid"],
+    vim_id = vol["properties"]["location_info"]["vimid"]
     ret = api.create_volume(vim_id, param)
     vol_id, vol_name, return_code = ret["id"], ret["name"], ret["returnCode"]
     retry_count, max_retry_count = 0, 300
@@ -88,7 +100,7 @@ def create_volume(vol, do_notify, progress):
         api.delete_volume(vim_id, vol_id)
     raise VimException("Failed to create Volume(%s): Timeout." % vol_name, "500")
     
-def create_network(network, do_notify, progress):
+def create_network(vim_cache, network, do_notify, progress):
     param = {
         "tenant": network["properties"]["location_info"]["tenant"],	
         "networkName": network["properties"]["network_name"],
@@ -99,11 +111,11 @@ def create_network(network, do_notify, progress):
     set_opt_val(param, "vlanTransparent", 
         ignore_case_get(network["properties"], "vlan_transparent"), VLAN_TRANSPARENT_YES)
     set_opt_val(param, "segmentationId", ignore_case_get(network["properties"], "segmentation_id"))
-    vim_id = network["properties"]["location_info"]["vimid"],
+    vim_id = network["properties"]["location_info"]["vimid"]
     ret = api.create_network(vim_id, param)
     do_notify(progress, ret)
     
-def create_subnet(subnet, do_notify, progress):
+def create_subnet(vim_cache, subnet, do_notify, progress):
     param = {
         "tenant": subnet["properties"]["location_info"]["tenant"],	
         "networkName": subnet["properties"]["network_name"],
@@ -121,33 +133,33 @@ def create_subnet(subnet, do_notify, progress):
     if allocation_pool:
         param["allocationPools"] = [allocation_pool]
     set_opt_val(param, "hostRoutes", ignore_case_get(subnet["properties"], "host_routes"))
-    vim_id = subnet["properties"]["location_info"]["vimid"],
+    vim_id = subnet["properties"]["location_info"]["vimid"]
     ret = api.create_subnet(vim_id, param)
     do_notify(progress, ret)
     
-def create_port(port, do_notify, progress):
+def create_port(vim_cache, port, do_notify, progress):
     param = {
         "tenant": port["properties"]["location_info"]["tenant"],
         "networkName": port["properties"]["network_name"],
         "subnetName": port["properties"]["name"],
         "portName": port["properties"]["name"]
     }
-    vim_id = port["properties"]["location_info"]["vimid"],
+    vim_id = port["properties"]["location_info"]["vimid"]
     ret = api.create_subnet(vim_id, param)
     do_notify(progress, ret)
 
-def create_flavor(flavor, do_notify, progress):
+def create_flavor(vim_cache, flavor, do_notify, progress):
     param = {
         "tenant": flavor["properties"]["location_info"]["tenant"],
         "vcpu": int(flavor["nfv_compute"]["num_cpus"]),
         "memory": int(flavor["nfv_compute"]["mem_size"].replace('MB', '').strip())
     }
     set_opt_val(param, "extraSpecs", ignore_case_get(flavor["nfv_compute"], "flavor_extra_specs"))
-    vim_id = flavor["properties"]["location_info"]["vimid"],
+    vim_id = flavor["properties"]["location_info"]["vimid"]
     ret = api.create_flavor(vim_id, param)
     do_notify(progress, ret)
     
-def create_vm(vm, do_notify, progress):
+def create_vm(vim_cache, vm, do_notify, progress):
     param = {
         "tenant": vm["properties"]["location_info"]["tenant"],
         "vmName": vm["properties"]["name"],
@@ -169,7 +181,7 @@ def create_vm(vm, do_notify, progress):
     for vol_data in vm["volume_storages"]:
         param["contextArray"].append(vol_data["volume_storage_id"])
     # nicArray TODO:
-    vim_id = vm["properties"]["location_info"]["vimid"],
+    vim_id = vm["properties"]["location_info"]["vimid"]
     ret = api.create_vm(vim_id, param)
     vm_id, vm_name, return_code = ret["id"], ret["name"], ret["returnCode"]
     opt_vm_status = "Timeout"
@@ -187,3 +199,5 @@ def create_vm(vm, do_notify, progress):
     if return_code == RES_NEW:
         api.delete_vm(vim_id, vm_id)
     raise VimException("Failed to create Vm(%s): %s." % (vm_name, opt_vm_status), "500")
+
+
