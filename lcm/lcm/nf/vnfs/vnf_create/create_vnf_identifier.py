@@ -18,7 +18,7 @@ import uuid
 from lcm.pub.database.models import NfInstModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.msapi.catalog import query_rawdata_from_catalog
-from lcm.pub.msapi.nfvolcm import vnfd_rawdata_get, get_packageinfo_by_vnfdid
+from lcm.pub.msapi.nfvolcm import get_packageinfo_by_vnfdid
 from lcm.pub.utils import toscautil
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.values import ignore_case_get

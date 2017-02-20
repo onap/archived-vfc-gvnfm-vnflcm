@@ -29,14 +29,12 @@ def get_packageinfo_by_vnfdid(vnfdid):
     return json.JSONDecoder().decode(ret[1])
 
 #call gvnfm driver
-def vnfd_rawdata_get(vnfdid, data):
-    ret = req_by_msb("openoapi/nslcm/v1/vnfs/%s" % vnfdid, "GET", data)
-    return ret
-
-#call gvnfm driver
 def apply_grant_to_nfvo(data):
     ret = req_by_msb("openoapi/nslcm/v1/grantvnf" , "POST", data)
-    return ret
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Nf instancing apply grant exception")
+    return json.JSONDecoder().decode(ret[1])
 
 #call gvnfm driver
 def notify_lcm_to_nfvo(data, nf_inst_id):

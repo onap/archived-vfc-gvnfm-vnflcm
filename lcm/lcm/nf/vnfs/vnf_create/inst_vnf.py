@@ -16,11 +16,12 @@ import logging
 import traceback
 from threading import Thread
 
+from lcm.nf.vnfs.const import vnfd_model_dict
 from lcm.pub.database.models import NfInstModel, NfvoRegInfoModel, VmInstModel, NetworkInstModel, \
     SubNetworkInstModel, PortInstModel, StorageInstModel, FlavourInstModel, VNFCInstModel, VLInstModel, CPInstModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.msapi.catalog import query_rawdata_from_catalog
-from lcm.pub.msapi.nfvolcm import vnfd_rawdata_get, apply_grant_to_nfvo, notify_lcm_to_nfvo, get_packageinfo_by_vnfdid
+from lcm.pub.msapi.nfvolcm import apply_grant_to_nfvo, notify_lcm_to_nfvo, get_packageinfo_by_vnfdid
 from lcm.pub.utils import toscautil
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
@@ -116,13 +117,15 @@ class InstVnf(Thread):
         self.csar_id = ignore_case_get(self.package_info, "csar_id")
 
         JobUtil.add_job_status(self.job_id, 10, 'Get rawdata from catalog by csar_id')
-        #get rawdata from catalog by csar_id
+        # get rawdata from catalog by csar_id
         input_parameters = []
         for key, val in self.data['additionalParams'].items():
             input_parameters.append({"key": key, "value": val})
         raw_data = query_rawdata_from_catalog(self.csar_id, input_parameters)
         self.vnfd_info = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
         self.vnfd_info = json.JSONDecoder().decode(self.vnfd_info)
+
+        self.vnfd_info = vnfd_model_dict
 
         self.checkParameterExist()
         # update NfInstModel
@@ -146,19 +149,25 @@ class InstVnf(Thread):
         vdus = ignore_case_get(self.vnfd_info, "vdus")
         res_index = 1
         for vdu in vdus:
-            location_info = ignore_case_get(ignore_case_get(vdu, "properties"), "location_info")
             res_def = {'type': 'VDU',
                        'resDefId': str(res_index),
-                       'resDesId': ignore_case_get(vdu, "vdu_id"),
-                       'vimid': ignore_case_get(location_info, "vimId"),
-                       'tenant': ignore_case_get(location_info, "tenant")}
+                       'resDesId': ignore_case_get(vdu, "vdu_id")}
             content_args['addResource'].append(res_def)
             res_index += 1
+
         logger.info('content_args=%s' % content_args)
-        resp = apply_grant_to_nfvo(content_args)
-        logger.info("[NF instantiation] get grant response = %s" % resp)
-        if resp[0] != 0:
-            raise NFLCMException('Nf instancing apply grant exception')
+        self.apply_result = apply_grant_to_nfvo(content_args)
+        vim_info = ignore_case_get(self.apply_result, "vim")
+
+        for vdu in self.vnfd_info["vdus"]:
+            if "location_info" in vdu["properties"]:
+                vdu["properties"]["location_info"]["vimid"] = ignore_case_get(vim_info, "vimid")
+                vdu["properties"]["location_info"]["tenant"] = ignore_case_get(
+                    ignore_case_get(vim_info, "accessinfo"), "tenant")
+            else:
+                vdu["properties"]["location_info"] = {"vimid":ignore_case_get(vim_info, "vimid"),
+                                                      "tenant":ignore_case_get(
+                                                          ignore_case_get(vim_info, "accessinfo"), "tenant")}
 
         # update resources_table
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='INSTANTIATED', lastuptime=now_time())
