@@ -404,7 +404,7 @@ vnfd_model_dict = {
             'description': u'ppvm'
         }
     ],
-    'volumn_storages': [
+    'volume_storages': [
         {
             "volume_storage_id": "volume_storage1",
             "description": "",
@@ -416,8 +416,8 @@ vnfd_model_dict = {
                 "disk_type": "data",
                 "delete_on_termination_vm": True,
                 "location_info": {
-                    "vimid": "vimid",
-                    "tenant": "tenantname",
+                    "vimid": "vimid_1",
+                    "tenant": "tenantname_1",
                     "availability_zone": "zone1"
                 },
                 "is_predefined": False,

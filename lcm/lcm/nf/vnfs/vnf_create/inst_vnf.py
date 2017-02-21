@@ -374,7 +374,7 @@ class InstVnf(Thread):
                 vimid=ret["vimId"],
                 resouceid=ret["id"],
                 name=ret["name"],
-                tenant=ret["tenatId"],
+                tenant=ret["tenantId"],
                 insttype=0,
                 is_predefined=ret["returnCode"],
                 instid=self.nf_inst_id)
@@ -386,13 +386,13 @@ class InstVnf(Thread):
             # self.inst_resource['network'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, 35, 'Create networks!')
             NetworkInstModel.objects.create(
-                networkid=ret["id"],
-                vimid = ret["vimId"],
-                resouceid = ret["id"],
-                name = ret["name"],
-                tenant = ret["tenatId"],
+                networkid= ignore_case_get(ret, "id"),
+                vimid = ignore_case_get(ret, "vimId"),
+                resouceid = ignore_case_get(ret, "id"),
+                name = ignore_case_get(ret, "name"),
+                tenant = ignore_case_get(ret, "tenatId"),
                 insttype = 0,
-                is_predefined = ret["returnCode"],
+                is_predefined = ignore_case_get(ret, "returnCode"),
                 instid = self.nf_inst_id)
         elif res_type == adaptor.RES_SUBNET:
             logger.info('Create subnets!')
