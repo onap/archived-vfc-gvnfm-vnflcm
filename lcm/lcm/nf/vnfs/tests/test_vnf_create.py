@@ -25,6 +25,8 @@ from lcm.pub.database.models import NfInstModel, JobStatusModel, VmInstModel, Ne
 from lcm.pub.utils import restcall
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
+from lcm.pub.vimapi import adaptor
+from lcm.pub.vimapi import api
 
 
 class TestNFInstantiate(TestCase):
@@ -137,26 +139,60 @@ class TestNFInstantiate(TestCase):
         InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
         self.assert_job_result(self.job_id, 255, "Nf instancing apply grant exception")
 
+    @mock.patch.object(restcall, 'call_req')
+    @mock.patch.object(api, 'call')
+    def test_instantiate_vnf_when_(self, mock_call, mock_call_req):
+        NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='222',
+                                   version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
+                                   nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
+        r1 = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']  # get csar_id from nslcm by vnfd_id
+        r2 = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']  # get rawdata from catalog by csar_id
+        r3 = [0, json.JSONEncoder().encode({"vim":{"vimid": '1', "accessinfo": {"tenant": '2'}}}), '200']  # apply_grant_to_nfvo
+        mock_call_req.side_effect = [r1, r2, r3]
+        c1_data = {  # get_tenant_id
+            "tenants": [
+                {
+                    "id": "1",
+                    "name": "tenantname_1"
+                }
+            ]
+        }
+        c2_data = {  # create_volume
+            "id": "bc9eebdbbfd356458269340b9ea6fb73",
+            "name": "volume1",
+            # "returnCode": 1,
+            "vimId": "vim_volume_1",
+            "vimName": "vim_volume_1",
+            "tenantId": "vim_volume_1",
+            "volumeType": "123",
+            "availabilityZone": "availabilityZone",
+            "status": "avaluable"
+        }
+        c3_data = {  # get_volume
+            "status": "available11",
+            "name": "wangsong",
+            "attachments": [
+                {
+                    "device": "/dev/vdc",
+                    "serverId": "3030e666-528e-4954-88f5-cc21dab1262b",
+                    "volumeId": "4bd3e9eb-cd8b-456a-8589-910836a0ab31",
+                    "hostName": None,
+                    "id": "4bd3e9eb-cd8b-456a-8589-910836a0ab31"
+                }
+            ],
+            "createTime": "2015-12-02T06:39:40.000000",
+            "type": None,
+            "id": "4bd3e9eb-cd8b-456a-8589-910836a0ab31",
+            "size": 40
+        }
+        mock_call.side_effect = [c1_data, c2_data, c3_data]
 
-
-
-
-
-    # @mock.patch.object(restcall, 'call_req')
-    # def test_instantiate_vnf_when_(self, mock_call_req):
-    #     NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='222',
-    #                                version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
-    #                                nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
-    #     r1 = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']  # get csar_id from nslcm by vnfd_id
-    #     r2 = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']  # get rawdata from catalog by csar_id
-    #     r3 = [0, json.JSONEncoder().encode({"vim":{"vimid": '1', "accessinfo": {"tenant": '2'}}}), '200']  # apply_grant_to_nfvo
-    #     mock_call_req.side_effect = [r1, r2, r3]
-    #     self.nf_inst_id = '1111'
-    #     self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
-    #     JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
-    #     data = inst_req_data
-    #     InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-    #     self.assert_job_result(self.job_id, 255, "Nf instancing apply grant exception")
+        self.nf_inst_id = '1111'
+        self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
+        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+        data = inst_req_data
+        InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
+        self.assert_job_result(self.job_id, 255, "unexpected exception")
 
 
 
