@@ -105,16 +105,16 @@ def list_flavor(vim_id, tenant_id):
 ######################################################################
 
 def create_vm(vim_id, tenant_id, data):
-    return call(vim_id, tenant_id, "vms", "POST", data)
+    return call(vim_id, tenant_id, "servers", "POST", data)
 
 def delete_vm(vim_id, tenant_id, vm_id):
-    return call(vim_id, tenant_id, "vms/%s" % vm_id, "DELETE")
+    return call(vim_id, tenant_id, "servers/%s" % vm_id, "DELETE")
     
 def get_vm(vim_id, tenant_id, vm_id):
-    return call(vim_id, tenant_id, "vms/%s" % vm_id, "GET")
+    return call(vim_id, tenant_id, "servers/%s" % vm_id, "GET")
     
 def list_vm(vim_id, tenant_id):
-    return call(vim_id, tenant_id, "vms", "GET")
+    return call(vim_id, tenant_id, "servers", "GET")
 
 ######################################################################
 

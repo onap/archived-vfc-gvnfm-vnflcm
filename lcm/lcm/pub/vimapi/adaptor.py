@@ -26,6 +26,8 @@ logger = logging.getLogger(__name__)
 ERR_CODE = "500"
 RES_EXIST, RES_NEW = 0, 1
 IP_V4, IP_V6 = 4, 6
+BOOT_FROM_VOLUME, BOOT_FROM_IMAGE = 1, 2
+
 RES_VOLUME = "volume"
 RES_NETWORK = "network"
 RES_SUBNET = "subnet"
@@ -33,8 +35,6 @@ RES_PORT = "port"
 RES_FLAVOR = "flavor"
 RES_VM = "vm"
 
-
-BOOT_FROM_VOLUME = 1
 
 def get_tenant_id(vim_cache, vim_id, tenant_name):
     if vim_id not in vim_cache:
@@ -74,7 +74,7 @@ def create_vim_res(data, do_notify):
     for flavor in ignore_case_get(data, "vdus"):
         create_flavor(vim_cache, res_cache, data, flavor, do_notify, RES_FLAVOR)
     for vm in ignore_case_get(data, "vdus"):
-        create_vm(vim_cache, res_cache, vm, do_notify, RES_VM)
+        create_vm(vim_cache, res_cache, data, vm, do_notify, RES_VM)
 
 def delete_vim_res(data, do_notify):
     res_types = [RES_VM, RES_FLAVOR, RES_PORT, RES_SUBNET, RES_NETWORK, RES_VOLUME]
@@ -206,30 +206,64 @@ def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
     do_notify(res_type, ret)
     set_res_cache(res_cache, res_type, flavor["vdu_id"], ret["id"])
     
-def create_vm(vim_cache, res_cache, vm, do_notify, res_type):
+def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
     location_info = vm["properties"]["location_info"]
+    vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
+    tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
     param = {
-        "vmName": vm["properties"]["name"],
-        "boot": {
-            "type": BOOT_FROM_VOLUME,
-            "volumeName": vm["volume_storages"][0]["volume_storage_id"]
-        },
+        "name": vm["properties"]["name"],
+        "flavorId": get_res_id(res_cache, RES_FLAVOR, vm["vdu_id"]),
+        "boot": {},
         "nicArray": [],
         "contextArray": [],
         "volumeArray": []
     }
-    set_opt_val(param, "availabilityZone", 
-        ignore_case_get(vm["properties"]["location_info"], "availability_zone"))
+    # set boot param
+    if "image_file" in vm and vm["image_file"]:
+        param["boot"]["type"] = BOOT_FROM_IMAGE
+        img_name = ""
+        for img in ignore_case_get(data, "image_files"):
+            if vm["image_file"] == img["image_file_id"]:
+               img_name = img["properties"]["name"]
+               break
+        if not img_name:
+            raise VimException("Undefined image(%s)" % vm["image_file"], ERR_CODE)
+        images = api.list_image(vim_id, tenant_id)
+        for image in images["imageList"]:
+            if img_name == image["name"]:
+                param["boot"]["imageId"] = image["id"]
+                break
+        if "imageId" not in param["boot"]:
+            raise VimException("Image(%s) not found in Vim(%s)" % (img_name, vim_id), ERR_CODE)
+    elif vm["volume_storages"]:
+        param["boot"]["type"] = BOOT_FROM_VOLUME
+        vol_id = vm["volume_storages"][0]["volume_storage_id"]
+        param["boot"]["volumeId"] = get_res_id(res_cache, RES_VOLUME, vol_id)
+    else:
+        raise VimException("No image and volume defined", ERR_CODE)
+
+    for cp_id in ignore_case_get(vm, "cps"):
+        param["nicArray"].append({
+            "portId": get_res_id(res_cache, RES_PORT, cp_id)
+        })
     for inject_data in ignore_case_get(vm["properties"], "inject_data_list"):
         param["contextArray"].append({
             "fileName": inject_data["file_name"],
             "fileData": inject_data["file_data"]
         })
     for vol_data in vm["volume_storages"]:
-        param["contextArray"].append(vol_data["volume_storage_id"])
-    # nicArray TODO:
-    vim_id = vm["properties"]["location_info"]["vimid"]
-    ret = api.create_vm(vim_id, param)
+        vol_id = vol_data["volume_storage_id"]
+        param["volumeArray"].append({
+            "volumeId": get_res_id(res_cache, RES_VOLUME, vol_id)
+        })
+
+    set_opt_val(param, "availabilityZone", ignore_case_get(location_info, "availability_zone"))
+    set_opt_val(param, "userdata", "") # TODO Configuration information or scripts to use upon launch
+    set_opt_val(param, "metadata", "") # TODO [{"keyName": "foo", "value": "foo value"}]
+    set_opt_val(param, "securityGroups", "") # TODO List of names of security group
+    set_opt_val(param, "serverGroup", "") # TODO the ServerGroup for anti-affinity and affinity
+    
+    ret = api.create_vm(vim_id, tenant_id, param)
     do_notify(res_type, ret)
     vm_id, vm_name, return_code = ret["id"], ret["name"], ret["returnCode"]
     opt_vm_status = "Timeout"
@@ -245,5 +279,3 @@ def create_vm(vim_cache, res_cache, vm, do_notify, res_type):
         time.sleep(2)
         retry_count = retry_count + 1
     raise VimException("Failed to create Vm(%s): %s." % (vm_name, opt_vm_status), ERR_CODE)
-
-
