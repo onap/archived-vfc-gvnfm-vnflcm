@@ -147,8 +147,7 @@ class TestNFInstantiate(TestCase):
     #     NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='222',
     #                                version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
     #                                nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
-    #     r1 = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}),
-    #           '200']  # get csar_id from nslcm by vnfd_id
+    #     r1 = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']  # get csar_id from nslcm by vnfd_id
     #     r2 = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']  # get rawdata from catalog by csar_id
     #     r3 = [0, json.JSONEncoder().encode({"vim":{"vimid": '1', "accessinfo": {"tenant": '2'}}}), '200']  # apply_grant_to_nfvo
     #     mock_call_req.side_effect = [r1, r2, r3]
