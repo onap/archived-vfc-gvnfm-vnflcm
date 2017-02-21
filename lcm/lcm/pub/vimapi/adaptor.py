@@ -26,7 +26,6 @@ logger = logging.getLogger(__name__)
 ERR_CODE = "500"
 RES_EXIST, RES_NEW = 0, 1
 IP_V4, IP_V6 = 4, 6
-DHCP_DISABLED, DHCP_ENABLED = 0, 1
 RES_VOLUME = "volume"
 RES_NETWORK = "network"
 RES_SUBNET = "subnet"
@@ -94,7 +93,7 @@ def create_volume(vim_cache, res_cache, vol, do_notify, res_type):
     location_info = vol["properties"]["location_info"]
     param = {
         "name": vol["properties"]["volume_name"],
-        "volumeSize": int(ignore_case_get(vol["properties"], "size", "0"))
+        "volumeSize": int(ignore_case_get(vol["properties"], "size", "0").replace('GB', '').strip())
     }
     set_opt_val(param, "imageName", ignore_case_get(vol, "image_file"))
     set_opt_val(param, "volumeType", ignore_case_get(vol["properties"], "custom_volume_type"))
@@ -181,7 +180,7 @@ def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
     param = {
         "name": "Flavor_%s" % flavor["vdu_id"],
         "vcpu": int(flavor["nfv_compute"]["num_cpus"]),
-        "memory": '',
+        "memory": int(flavor["nfv_compute"]["mem_size"].replace('MB', '').strip()),
         "isPublic": True
     }
     for local_storage_id in ignore_case_get(flavor, "local_storages"):
@@ -208,8 +207,8 @@ def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
     set_res_cache(res_cache, res_type, flavor["vdu_id"], ret["id"])
     
 def create_vm(vim_cache, res_cache, vm, do_notify, res_type):
+    location_info = vm["properties"]["location_info"]
     param = {
-        "tenant": vm["properties"]["location_info"]["tenant"],
         "vmName": vm["properties"]["name"],
         "boot": {
             "type": BOOT_FROM_VOLUME,
