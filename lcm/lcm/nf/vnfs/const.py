@@ -501,8 +501,8 @@ vnfd_model_dict = {
                     }
                 ],
                 "location_info": {
-                    "vimid": "vimid",
-                    "tenant": "tenantname"
+                    "vimid": "vimid_1",
+                    "tenant": "tenantname_1"
                 },
                 "cloud_type": "IaaS"
             },

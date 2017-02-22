@@ -14,6 +14,7 @@
 import json
 import logging
 import traceback
+import uuid
 from threading import Thread
 
 from lcm.nf.vnfs.const import vnfd_model_dict
@@ -25,7 +26,7 @@ from lcm.pub.msapi.nfvolcm import apply_grant_to_nfvo, notify_lcm_to_nfvo, get_p
 from lcm.pub.utils import toscautil
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
-from lcm.pub.utils.values import ignore_case_get
+from lcm.pub.utils.values import ignore_case_get, get_none, get_boolean
 from lcm.pub.vimapi import adaptor
 
 logger = logging.getLogger(__name__)
@@ -98,6 +99,7 @@ class InstVnf(Thread):
             # self.rollback(e.message)
         except:
             self.vnf_inst_failed_handle('unexpected exception')
+            tt= traceback.format_exc()
             logger.error(traceback.format_exc())
             # self.rollback('unexpected exception')
 
@@ -370,13 +372,16 @@ class InstVnf(Thread):
             #                                          "res_id": ignore_case_get(ret, "res_id")})
             JobUtil.add_job_status(self.job_id, 25, 'Create vloumns!')
             StorageInstModel.objects.create(
-                storageid=ret["id"],
-                vimid=ret["vimId"],
-                resouceid=ret["id"],
-                name=ret["name"],
-                tenant=ret["tenantId"],
+                storageid=str(uuid.uuid4()),
+                vimid=ignore_case_get(ret, "vimId"),
+                resouceid=ignore_case_get(ret, "id"),
+                name=ignore_case_get(ret, "name"),
+                tenant=ignore_case_get(ret, "tenantId"),
+                create_time=ignore_case_get(ret, "createTime"),
+                storagetype=get_none(ignore_case_get(ret, "type")),
+                size=ignore_case_get(ret, "size"),
                 insttype=0,
-                is_predefined=ret["returnCode"],
+                is_predefined=ignore_case_get(ret, "returnCode"),
                 instid=self.nf_inst_id)
         elif res_type == adaptor.RES_NETWORK:
             logger.info('Create networks!')
@@ -386,13 +391,19 @@ class InstVnf(Thread):
             # self.inst_resource['network'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, 35, 'Create networks!')
             NetworkInstModel.objects.create(
-                networkid= ignore_case_get(ret, "id"),
-                vimid = ignore_case_get(ret, "vimId"),
-                resouceid = ignore_case_get(ret, "id"),
-                name = ignore_case_get(ret, "name"),
-                tenant = ignore_case_get(ret, "tenatId"),
+                networkid=str(uuid.uuid4()),
+                name=ignore_case_get(ret, "name"),
+                vimid=ignore_case_get(ret, "vimId"),
+                resouceid=ignore_case_get(ret, "id"),
+                tenant=ignore_case_get(ret, "tenantId"),
+                segmentid=str(ignore_case_get(ret, "segmentationId")),
+                network_type=ignore_case_get(ret, "networkType"),
+                physicalNetwork=ignore_case_get(ret, "physicalNetwork"),
+                vlantrans=get_boolean(ignore_case_get(ret, "vlanTransparent")),
+                is_shared=get_boolean(ignore_case_get(ret, "shared")),
+                routerExternal=get_boolean(ignore_case_get(ret, "routerExternal")),
                 insttype = 0,
-                is_predefined = ignore_case_get(ret, "returnCode"),
+                is_predefined=ignore_case_get(ret, "returnCode"),
                 instid = self.nf_inst_id)
         elif res_type == adaptor.RES_SUBNET:
             logger.info('Create subnets!')
@@ -402,11 +413,11 @@ class InstVnf(Thread):
             # self.inst_resource['subnet'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, 40, 'Create subnets!')
             SubNetworkInstModel.objects.create(
-                subnetworkid=ret["id"],
+                subnetworkid=str(uuid.uuid4()),
                 vimid=ret["vimId"],
                 resouceid=ret["id"],
                 name=ret["name"],
-                tenant=ret["tenatId"],
+                tenant=ret["tenantId"],
                 insttype=0,
                 is_predefined=ret["returnCode"],
                 instid=self.nf_inst_id)
@@ -418,7 +429,7 @@ class InstVnf(Thread):
             # self.inst_resource['port'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, 50, 'Create ports!')
             PortInstModel.objects.create(
-                portid=ret["id"],
+                portid=str(uuid.uuid4()),
                 networkid=ret["networkId"],
                 subnetworkid=ret["subnetId"],
                 vimid=ret["vimId"],
@@ -436,7 +447,7 @@ class InstVnf(Thread):
             # self.inst_resource['flavor'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, 60, 'Create flavors!')
             FlavourInstModel.objects.create(
-                falavourid=ret["id"],
+                falavourid=str(uuid.uuid4()),
                 name=ret["name"],
                 vcpu=ret["vcpu"],
                 memory=ret["memory"],
@@ -453,7 +464,7 @@ class InstVnf(Thread):
             # self.inst_resource['vm'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, 70, 'Create vms!')
             VmInstModel.objects.create(
-                vmid=ret["id"],
+                vmid=str(uuid.uuid4()),
                 vimid=ret["vimId"],
                 resouceid=ret["id"],
                 insttype=0,

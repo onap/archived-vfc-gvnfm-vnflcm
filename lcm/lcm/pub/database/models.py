@@ -104,14 +104,15 @@ class StorageInstModel(models.Model):
     name = models.CharField(db_column='NAME', max_length=255, null=True)
     storagetype = models.CharField(db_column='STORAGETYPE', max_length=255)
     size = models.CharField(db_column='SIZE', max_length=255)
-    rdmaenabled = models.IntegerField(db_column='RDMAENABLED', null=True)
-    disktype = models.CharField(db_column='DISKTYPE', max_length=255)
-    ownerid = models.CharField(db_column='OWNERID', max_length=255, null=True)
-    zoneid = models.CharField(db_column='ZONEID', max_length=255, null=True)
-    hostid = models.CharField(db_column='HOSTID', max_length=255, null=True)
-    operationalstate = models.CharField(db_column='OPERATIONALSTATE', max_length=255, null=True)
+    # rdmaenabled = models.IntegerField(db_column='RDMAENABLED', null=True)
+    # disktype = models.CharField(db_column='DISKTYPE', max_length=255)
+    # ownerid = models.CharField(db_column='OWNERID', max_length=255, null=True)
+    # zoneid = models.CharField(db_column='ZONEID', max_length=255, null=True)
+    # hostid = models.CharField(db_column='HOSTID', max_length=255, null=True)
+    # operationalstate = models.CharField(db_column='OPERATIONALSTATE', max_length=255, null=True)
     tenant = models.CharField(db_column='TENANT', max_length=50, null=True)
     is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
+    create_time = models.CharField(db_column='CREATETIME', max_length=200, null=True, blank=True)
 
 class VmInstModel(models.Model):
     class Meta:
@@ -129,6 +130,7 @@ class VmInstModel(models.Model):
     hostid = models.CharField(db_column='HOSTID', max_length=255, null=True)
     detailinfo = models.TextField(db_column='DETAILINFO', max_length=8192, null=True)
     is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
+    create_time = models.CharField(db_column='CREATETIME', max_length=200, null=True, blank=True)
 
 class VNFCInstModel(models.Model):
     class Meta:
@@ -152,6 +154,7 @@ class FlavourInstModel(models.Model):
     instid = models.CharField(db_column='INSTID', max_length=255)
     tenant = models.CharField(db_column='TENANT', max_length=255, null=True)
     vmid = models.CharField(db_column='VMID', max_length=255)
+    create_time = models.CharField(db_column='CREATETIME', max_length=200, null=True, blank=True)
 
 class NetworkInstModel(models.Model):
     class Meta:
@@ -164,7 +167,6 @@ class NetworkInstModel(models.Model):
     instid = models.CharField(db_column='INSTID', max_length=255)
     name = models.CharField(db_column='NAME', max_length=255)
     tenant = models.CharField(db_column='TENANT', max_length=255, null=True)
-    is_shared = models.IntegerField(db_column='ISSHARED', default=0, null=True)
     is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
     desc = models.CharField(db_column='DESC', max_length=255, null=True)
     vendor = models.CharField(db_column='VENDOR', max_length=255, null=True)
@@ -172,8 +174,12 @@ class NetworkInstModel(models.Model):
     mtu = models.IntegerField(db_column='MTU', null=True)
     network_type = models.CharField(db_column='NETWORKTYPE', max_length=255, null=True)
     segmentid = models.CharField(db_column='SEGMENTID', max_length=255, null=True)
-    vlantrans = models.IntegerField(db_column='VLANTRANS', null=True)
     networkqos = models.CharField(db_column='NETWORKQOS', max_length=255, null=True)
+    create_time = models.CharField(db_column='CREATETIME', max_length=200, null=True, blank=True)
+    physicalNetwork = models.CharField(db_column='PHYNETWORK', max_length=255, null=True)
+    is_shared = models.IntegerField(db_column='ISSHARED', default=0, null=True)
+    vlantrans = models.IntegerField(db_column='VLANTRANS', null=True)
+    routerExternal = models.IntegerField(db_column='ROUTEREXTERNAL', default=0, null=True)
 
 
 class SubNetworkInstModel(models.Model):
@@ -195,6 +201,7 @@ class SubNetworkInstModel(models.Model):
     operationalstate = models.CharField(db_column='OPERATIONALSTATE', max_length=255, null=True)
     tenant = models.CharField(db_column='TENANT', max_length=255, null=True)
     is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
+    create_time = models.CharField(db_column='CREATETIME', max_length=200, null=True, blank=True)
 
 class VLInstModel(models.Model):
     class Meta:
@@ -237,6 +244,7 @@ class PortInstModel(models.Model):
     tenant = models.CharField(db_column='TENANT', max_length=255, null=True)
     interfacename = models.CharField(db_column='INTERFACENAME', max_length=255, blank=True, null=True)
     vmid = models.CharField(db_column='VMID', max_length=255, blank=True, null=True)
+    create_time = models.CharField(db_column='CREATETIME', max_length=200, null=True, blank=True)
 
 class CPInstModel(models.Model):
     class Meta:
