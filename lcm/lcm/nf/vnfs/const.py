@@ -553,3 +553,99 @@ vnfd_model_dict = {
 
     ],
 }
+
+c1_data_get_tenant_id = {  # get_tenant_id
+    "tenants": [
+        {
+            "id": "1",
+            "name": "tenantname_1"
+        }
+    ]
+}
+c2_data_create_volume = {
+    "id": "4bd3e9eb-cd8b-456a-8589-910836a0ab31",
+    "name": "volume1",
+    "returnCode": 1,
+    "vimId": "vim_volume_1",
+    "vimName": "vim_volume_1",
+    "tenantId": "vim_volume_1",
+    "volumeType": "123",
+    "availabilityZone": "availabilityZone",
+    "status": "availuable",
+    "createTime": "2015-12-02T06:39:40.000000",
+    "type": None,
+    "size": 40
+}
+c3_data_get_volume = {  # get_volume
+    "status": "available",
+    "name": "wangsong",
+    "attachments": [
+        {
+            "device": "/dev/vdc",
+            "serverId": "3030e666-528e-4954-88f5-cc21dab1262b",
+            "volumeId": "4bd3e9eb-cd8b-456a-8589-910836a0ab31",
+            "hostName": None,
+            "id": "4bd3e9eb-cd8b-456a-8589-910836a0ab31"
+        }
+    ],
+    "createTime": "2015-12-02T06:39:40.000000",
+    "type": None,
+    "id": "4bd3e9eb-cd8b-456a-8589-910836a0ab31",
+    "size": 40
+}
+c4_data_create_network = {  # create_network
+    "returnCode": 0,
+    "vimId": "11111",
+    "vimName": "11111",
+    "status": "ACTIVE",
+    "id": "3c9eebdbbfd345658269340b9ea6fb73",
+    "name": "net1",
+    "tenantId": "tenant1",
+    "networkName": "ommnet",
+    "shared": True,
+    "vlanTransparent": True,
+    "networkType": "vlan",
+    "segmentationId": 202,
+    "physicalNetwork": "ctrl",
+    "routerExternal": False
+}
+c5_data_create_subnet = {
+    "returnCode": 0,
+    "vimId": "11111",
+    "vimName": "11111",
+    "status": " ACTIVE",
+    "id": "d62019d3-bc6e-4319-9c1d-6722fc136a23",
+    "tenantId": "tenant1",
+    "networkId": "d32019d3-bc6e-4319-9c1d-6722fc136a22",
+    "networkName": "networkName",
+    "name": "subnet1",
+    "cidr": "10.43.35.0/24",
+    "ipVersion": 4,
+    "enableDhcp": 1,
+    "gatewayIp": "10.43.35.1",
+    "dnsNameservers": [],
+    "allocationPools": [
+        {
+            "start": "192.168.199.2",
+            "end": "192.168.199.254"
+        }
+    ],
+    "hostRoutes": []
+}
+c6_data_create_port = {
+    "returnCode": 0,
+    "vimId": "11111",
+    "vimName": "11111",
+    "status": " ACTIVE",
+    "id": " 872019d3-bc6e-4319-9c1d-6722fc136afg",
+    "tenantId": "tenant1",
+    "name": "subnet1",
+    "networkId": "d32019d3-bc6e-4319-9c1d-6722fc136a22",
+    "networkName": "networkName",
+    "subnetId": "d62019d3-bc6e-4319-9c1d-6722fc136a23",
+    "subnetName": "subnet1",
+    "macAddress": "212.12.61.23",
+    "ip": "10.43.38.11",
+    "vnicType": "normal",
+    "securityGroups": ""
+}
