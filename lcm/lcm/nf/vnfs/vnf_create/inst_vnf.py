@@ -414,10 +414,18 @@ class InstVnf(Thread):
             JobUtil.add_job_status(self.job_id, 40, 'Create subnets!')
             SubNetworkInstModel.objects.create(
                 subnetworkid=str(uuid.uuid4()),
-                vimid=ret["vimId"],
-                resouceid=ret["id"],
-                name=ret["name"],
-                tenant=ret["tenantId"],
+                name=ignore_case_get(ret, "name"),
+                vimid=ignore_case_get(ret, "vimId"),
+                resouceid=ignore_case_get(ret, "id"),
+                tenant=ignore_case_get(ret, "tenantId"),
+                networkid=ignore_case_get(ret, "networkId"),
+                cidr=ignore_case_get(ret, "cidr"),
+                ipversion=ignore_case_get(ret, "ipversion"),
+                isdhcpenabled=ignore_case_get(ret, "enableDhcp"),
+                gatewayip=ignore_case_get(ret, "gatewayIp"),
+                dnsNameservers=ignore_case_get(ret, "dnsNameservers"),
+                hostRoutes=ignore_case_get(ret, "hostRoutes"),
+                allocationPools=ignore_case_get(ret, "allocationPools"),
                 insttype=0,
                 is_predefined=ret["returnCode"],
                 instid=self.nf_inst_id)

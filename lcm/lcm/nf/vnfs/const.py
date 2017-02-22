@@ -545,8 +545,8 @@ vnfd_model_dict = {
                 "is_virtual": False,
                 "function": "control"
             },
-            "vl_id": "vlid1",
-            "vdu_id": "vdu_id1"
+            "vl_id": "vldId1",
+            "vdu_id": u'vdu_omm.001'
         }
     ],
     'local_storages': [

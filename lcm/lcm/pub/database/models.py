@@ -181,7 +181,6 @@ class NetworkInstModel(models.Model):
     vlantrans = models.IntegerField(db_column='VLANTRANS', null=True)
     routerExternal = models.IntegerField(db_column='ROUTEREXTERNAL', default=0, null=True)
 
-
 class SubNetworkInstModel(models.Model):
     class Meta:
         db_table = 'SUBNETWORKINST'
@@ -202,6 +201,9 @@ class SubNetworkInstModel(models.Model):
     tenant = models.CharField(db_column='TENANT', max_length=255, null=True)
     is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
     create_time = models.CharField(db_column='CREATETIME', max_length=200, null=True, blank=True)
+    dnsNameservers = models.TextField(db_column='DNSNAMESERVERS', max_length=1024)
+    hostRoutes = models.TextField(db_column='HOSTROUTES', max_length=1024)
+    allocationPools = models.TextField(db_column='ALLOCATIONPOOLS', max_length=1024)
 
 class VLInstModel(models.Model):
     class Meta:

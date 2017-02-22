@@ -70,7 +70,7 @@ def create_vim_res(data, do_notify):
     for subnet in ignore_case_get(data, "vls"):
         create_subnet(vim_cache, res_cache, subnet, do_notify, RES_SUBNET)
     for port in ignore_case_get(data, "cps"):
-        create_port(vim_cache, res_cache, port, do_notify, RES_PORT)
+        create_port(vim_cache, res_cache, data, port, do_notify, RES_PORT)
     for flavor in ignore_case_get(data, "vdus"):
         create_flavor(vim_cache, res_cache, data, flavor, do_notify, RES_FLAVOR)
     for vm in ignore_case_get(data, "vdus"):
@@ -155,8 +155,16 @@ def create_subnet(vim_cache, res_cache, subnet, do_notify, res_type):
     do_notify(res_type, ret)
     set_res_cache(res_cache, res_type, subnet["vl_id"], ret["id"])
     
-def create_port(vim_cache, res_cache, port, do_notify, res_type):
-    location_info = port["properties"]["location_info"]
+def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
+    location_info = None
+    port_ref_vdu_id = ignore_case_get(port, "vdu_id")
+    for vdu in ignore_case_get(data, "vdus"):
+        if vdu["vdu_id"] == port_ref_vdu_id:
+            location_info = vdu["properties"]["location_info"]
+            break
+    if not location_info:
+        err_msg = "vdu_id(%s) for cp(%s) is not defined"
+        raise VimException(err_msg % (port_ref_vdu_id, port["cp_id"]), ERR_CODE)
     network_id = get_res_id(res_cache, RES_NETWORK, port["vl_id"])
     subnet_id = get_res_id(res_cache, RES_SUBNET, port["vl_id"])
     param = {
