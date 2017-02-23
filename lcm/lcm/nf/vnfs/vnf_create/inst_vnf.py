@@ -18,8 +18,8 @@ import uuid
 from threading import Thread
 
 from lcm.nf.vnfs.const import vnfd_model_dict
-from lcm.pub.database.models import NfInstModel, NfvoRegInfoModel, VmInstModel, NetworkInstModel, \
-    SubNetworkInstModel, PortInstModel, StorageInstModel, FlavourInstModel, VNFCInstModel, VLInstModel, CPInstModel
+from lcm.pub.database.models import NfInstModel, VmInstModel, NetworkInstModel, \
+    SubNetworkInstModel, PortInstModel, StorageInstModel, FlavourInstModel, VNFCInstModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.msapi.catalog import query_rawdata_from_catalog
 from lcm.pub.msapi.nfvolcm import apply_grant_to_nfvo, notify_lcm_to_nfvo, get_packageinfo_by_vnfdid
@@ -42,48 +42,13 @@ class InstVnf(Thread):
         self.vnfm_inst_id = ''
         self.csar_id = ''
         self.vnfd_info = []
-        self.inst_resource = {'volumn': [],  # [{"vim_id": ignore_case_get(ret, "vim_id")},{}]
-                              'network': [],
-                              'subnet': [],
-                              'port': [],
-                              'flavor': [],
-                              'vm': [],
-                              }
-        # self.create_res_result = {
-        #     'jobid': 'res_001',
-        #     'resourceResult': [{'name': 'vm01'}, {'name': 'vm02'}],
-        #     'resource_result':{
-        #         'affectedvnfc':[
-        #             {
-        #                 'status':'success',
-        #                 'vnfcinstanceid':'1',
-        #                 'computeresource':{'resourceid':'11'},
-        #                 'vduid':'111',
-        #                 'vdutype':'1111'
-        #             }
-        #         ],
-        #         'affectedvirtuallink':[
-        #             {
-        #                 'status': 'success',
-        #                 'virtuallinkinstanceid':'',
-        #                 'networkresource':{'resourceid':'1'},
-        #                 'subnetworkresource':{'resourceid':'1'},
-        #                 'virtuallinkdescid': '',
-        #             }
-        #         ],
-        #         'affectedcp':[{
-        #             'status': 'success',
-        #             'portresource':{'resourceid':'1'},
-        #             'cpinstanceid':'2',
-        #             'cpdid':'22',
-        #             'ownertype':'222',
-        #             'ownerid':'2222',
-        #             'virtuallinkinstanceid':'22222',
-        #
-        #         }],
-        #
-        #     }
-        # }
+        # self.inst_resource = {'volumn': [],  # [{"vim_id": ignore_case_get(ret, "vim_id")},{}]
+        #                       'network': [],
+        #                       'subnet': [],
+        #                       'port': [],
+        #                       'flavor': [],
+        #                       'vm': [],
+        #                       }
 
     def run(self):
         try:
@@ -92,8 +57,6 @@ class InstVnf(Thread):
             self.create_res()
             self.lcm_notify()
             JobUtil.add_job_status(self.job_id, 100, "Instantiate Vnf success.")
-            # is_exist = JobStatusModel.objects.filter(jobid=self.job_id).exists()
-            # logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)
         except NFLCMException as e:
             self.vnf_inst_failed_handle(e.message)
             # self.rollback(e.message)
@@ -184,71 +147,8 @@ class InstVnf(Thread):
         JobUtil.add_job_status(self.job_id, 70, '[NF instantiation] create resource finish')
         logger.info("[NF instantiation] create resource finish")
 
-    # def check_res_status(self):
-    #     logger.info("[NF instantiation] confirm all vms are active start")
-    #     vnfcs = self.create_res_result['resource_result']['affectedvnfc']
-    #     for vnfc in vnfcs:
-    #         if 'success' != vnfc['status']:
-    #             logger.error("VNFC_STATUS_IS_NOT_ACTIVE[vduid=%s]" % vnfc['vduId'])
-    #             raise NFLCMException(msgid="VNFC_STATUS_IS_NOT_ACTIVE[vduid=%s]", args=vnfc['vduId'])
-    #
-    #     JobUtil.add_job_status(self.job_id, 80, 'SAVE_VNFC_TO_DB')
-    #     vls = self.create_res_result['resource_result']['affectedvirtuallink']
-    #     cps = self.create_res_result['resource_result']['affectedcp']
-    #
-    #     for vnfc in vnfcs:
-    #         if 'failed' == vnfc['status']:
-    #             continue
-    #         compute_resource = vnfc['computeresource']
-    #         vminst = VmInstModel.objects.filter(resouceid=compute_resource['resourceid']).first()
-    #         VNFCInstModel.objects.create(
-    #             vnfcinstanceid=vnfc['vnfcinstanceid'],
-    #             vduid=vnfc['vduid'],
-    #             vdutype=vnfc['vdutype'],
-    #             nfinstid=self.nf_inst_id,
-    #             vmid=vminst.vmid)
-    #     for vl in vls:
-    #         if 'failed' == vl['status']:
-    #             continue
-    #         network_resource = vl['networkresource']
-    #         subnet_resource = vl['subnetworkresource']
-    #         networkinst = NetworkInstModel.objects.filter(resouceid=network_resource['resourceid']).first()
-    #         subnetinst = SubNetworkInstModel.objects.filter(resouceid=subnet_resource['resourceid']).first()
-    #         VLInstModel.objects.create(
-    #             vlinstanceid=vl['virtuallinkinstanceid'],
-    #             vldid=vl['virtuallinkdescid'],
-    #             ownertype='0',
-    #             ownerid=self.nf_inst_id,
-    #             relatednetworkid=networkinst.networkid,
-    #             relatedsubnetworkid=subnetinst.subnetworkid)
-    #     # # for vs in vss:
-    #     for cp in cps:
-    #         if 'failed' == cp['status']:
-    #             continue
-    #         port_resource = cp['portresource']
-    #         portinst = PortInstModel.objects.filter(resouceid=port_resource['resourceid']).first()
-    #         ttt = portinst.portid
-    #         CPInstModel.objects.create(
-    #             cpinstanceid=cp['cpinstanceid'],
-    #             cpdid=cp['cpdid'],
-    #             relatedtype='2',
-    #             relatedport=portinst.portid,
-    #             ownertype=cp['ownertype'],
-    #             ownerid=cp['ownerid'],
-    #             vlinstanceid=cp['virtuallinkinstanceid'])
-    #     # self.add_job(43, 'INST_DPLY_VM_PRGS')
-    #     logger.info("[NF instantiation] confirm all vms are active end")
-
     def lcm_notify(self):
         logger.info('[NF instantiation] send notify request to nfvo start')
-        # reg_info = NfvoRegInfoModel.objects.filter(vnfminstid=self.vnfm_inst_id).first()
-        # vm_info = VmInstModel.objects.filter(nfinstid=self.nf_inst_id)
-        # vmlist = []
-        # nfs = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
-        # nf = nfs[0]
-        # allocate_data = json.loads(nf.initallocatedata)
-        # vmlist = json.loads(nf.predefinedvm)
-        # addition_param = {'vmList': vmlist}
         affected_vnfc = []
         vnfcs = VNFCInstModel.objects.filter(nfinstid=self.nf_inst_id)
         for vnfc in vnfcs:
@@ -282,22 +182,6 @@ class InstVnf(Thread):
                  'changeType': 'added',
                  'storageResource': {'vimId': port.vimid, 'resourceId': port.resouceid,
                                      'resourceName': port.name, 'resourceType': 'port'}})
-        # vls = VLInstModel.objects.filter(ownerid=self.nf_inst_id)
-        # for vl in vls:
-        #     network_resource = {}
-        #     subnet_resource = {}
-        #     if vl.relatednetworkid:
-        #         network = NetworkInstModel.objects.filter(networkid=vl.relatednetworkid)
-        #         subnet = SubNetworkInstModel.objects.filter(subnetworkid=vl.relatedsubnetworkid)
-        #         if network:
-        #             network_resource = {'vimId': network[0].vimid, 'resourceId': network[0].resouceid,
-        #                                 'resourceName': network[0].name, 'tenant': network[0].tenant}
-        #         if subnet:
-        #             subnet_resource = {'vimId': subnet[0].vimid, 'resourceId': subnet[0].resouceid,
-        #                                'resourceName': subnet[0].name, 'tenant': subnet[0].tenant}
-        #     affected_vl.append(
-        #         {'virtualLinkInstanceId': vl.vlinstanceid, 'virtualLinkDescId': vl.vldid, 'changeType': 'added',
-        #          'networkResource': network_resource, 'subnetworkResource': subnet_resource, 'tenant': vl.tenant})
         affected_vs = []
         vss = StorageInstModel.objects.filter(instid=self.nf_inst_id)
         for vs in vss:
@@ -307,47 +191,6 @@ class InstVnf(Thread):
                  'changeType': 'added',
                  'storageResource': {'vimId': vs.vimid, 'resourceId': vs.resouceid,
                                      'resourceName': vs.name, 'resourceType': 'volume'}})
-        # affected_cp = []
-        # # vnfc cps
-        # for vnfc in vnfcs:
-        #     cps = CPInstModel.objects.filter(ownerid=vnfc.vnfcinstanceid, ownertype=3)
-        #     for cp in cps:
-        #         port_resource = {}
-        #         if cp.relatedport:
-        #             port = PortInstModel.objects.filter(portid=cp.relatedport)
-        #             if port:
-        #                 port_resource = {'vimId': port[0].vimid, 'resourceId': port[0].resouceid,
-        #                                  'resourceName': port[0].name, 'tenant': port[0].tenant}
-        #         affected_cp.append(
-        #             {'cPInstanceId': cp.cpinstanceid, 'cpdId': cp.cpdid, 'ownerid': cp.ownerid,
-        #              'ownertype': cp.ownertype, 'changeType': 'added', 'portResource': port_resource,
-        #              'virtualLinkInstanceId': cp.vlinstanceid})
-
-
-        # # nf cps
-        # affected_cp = []
-        # cps = PortInstModel.objects.filter(instid=self.nf_inst_id)
-        # # cps = CPInstModel.objects.filter(ownerid=self.nf_inst_id)
-        # logger.info('vnf_inst_id=%s, cps size=%s' % (self.nf_inst_id, cps.count()))
-        # for cp in cps:
-        #     port_resource = {}
-        #     if cp.relatedport:
-        #         port = PortInstModel.objects.filter(portid=cp.relatedport)
-        #         if port:
-        #             port_resource = {'vimId': port[0].vimid, 'resourceId': port[0].resouceid,
-        #                              'resourceName': port[0].name, 'tenant': port[0].tenant}
-        #     affected_cp.append(
-        #         {'cPInstanceId': cp.cpinstanceid, 'cpdId': cp.cpdid, 'ownerid': cp.ownerid, 'ownertype': cp.ownertype,
-        #          'changeType': 'added', 'portResource': port_resource,
-        #          'virtualLinkInstanceId': cp.vlinstanceid})
-        # affectedcapacity = {}
-        # reserved_total = allocate_data.get('reserved_total', {})
-        # affectedcapacity['vm'] = str(reserved_total.get('vmnum', 0))
-        # affectedcapacity['vcpu'] = str(reserved_total.get('vcpunum', 0))
-        # affectedcapacity['vMemory'] = str(reserved_total.get('memorysize', 0))
-        # affectedcapacity['port'] = str(reserved_total.get('portnum', 0))
-        # affectedcapacity['localStorage'] = str(reserved_total.get('hdsize', 0))
-        # affectedcapacity['sharedStorage'] = str(reserved_total.get('shdsize', 0))
         content_args = {
             "status": 'result',
             "nfInstanceId": self.nf_inst_id,
@@ -373,16 +216,16 @@ class InstVnf(Thread):
             raise NFLCMException("send notify request to nfvo failed")
         logger.info('[NF instantiation] send notify request to nfvo end')
 
-    def load_nfvo_config(self):
-        logger.info("[NF instantiation]get nfvo connection info start")
-        reg_info = NfvoRegInfoModel.objects.filter(vnfminstid='vnfm111').first()
-        if reg_info:
-            self.vnfm_inst_id = reg_info.vnfminstid
-            self.nfvo_inst_id = reg_info.nfvoid
-            logger.info("[NF instantiation] Registered nfvo id is [%s]" % self.nfvo_inst_id)
-        else:
-            raise NFLCMException("Nfvo was not registered")
-        logger.info("[NF instantiation]get nfvo connection info end")
+    # def load_nfvo_config(self):
+    #     logger.info("[NF instantiation]get nfvo connection info start")
+    #     reg_info = NfvoRegInfoModel.objects.filter(vnfminstid='vnfm111').first()
+    #     if reg_info:
+    #         self.vnfm_inst_id = reg_info.vnfminstid
+    #         self.nfvo_inst_id = reg_info.nfvoid
+    #         logger.info("[NF instantiation] Registered nfvo id is [%s]" % self.nfvo_inst_id)
+    #     else:
+    #         raise NFLCMException("Nfvo was not registered")
+    #     logger.info("[NF instantiation]get nfvo connection info end")
 
     def vnf_inst_failed_handle(self, error_msg):
         logger.error('VNF instantiation failed, detail message: %s' % error_msg)

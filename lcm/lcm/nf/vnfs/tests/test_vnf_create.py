@@ -20,7 +20,7 @@ from rest_framework import status
 
 from lcm.nf.vnfs.const import vnfd_rawdata, c1_data_get_tenant_id, c4_data_create_network, c2_data_create_volume, \
     c5_data_create_subnet, c3_data_get_volume, c6_data_create_port, c7_data_create_flavor, c8_data_list_image, c9_data_create_vm, \
-    c10_data_get_vm
+    c10_data_get_vm, inst_req_data
 from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
 from lcm.pub.database.models import NfInstModel, JobStatusModel, VmInstModel, NetworkInstModel, \
     SubNetworkInstModel, PortInstModel
@@ -131,12 +131,7 @@ class TestNFInstantiate(TestCase):
                                    nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
         r1 = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']  # get csar_id from nslcm by vnfd_id
         r2 = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']  # get rawdata from catalog by csar_id
-        r3 = [1, json.JSONEncoder().encode({"vim":
-                                                {
-                                                    "vimid": '1',
-                                                    "accessinfo": {"tenant": '2'}
-                                                 }
-                                            }), '200']  # apply_grant_to_nfvo
+        r3 = [1, json.JSONEncoder().encode({"vim":{"vimid": '1', "accessinfo": {"tenant": '2'}}}), '200']  # apply_grant_to_nfvo
         mock_call_req.side_effect = [r1, r2, r3]
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
@@ -155,60 +150,13 @@ class TestNFInstantiate(TestCase):
         r2 = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']  # get rawdata from catalog by csar_id
         r3 = [0, json.JSONEncoder().encode({"vim":{"vimid": '1', "accessinfo": {"tenant": '2'}}}), '200']  # apply_grant_to_nfvo
         mock_call_req.side_effect = [r1, r2, r3]
-        c1_data = {  # get_tenant_id
-            "tenants": [
-                {
-                    "id": "1",
-                    "name": "tenantname_1"
-                }
-            ]
-        }
-        c2_data = {
-            "returnCode": 0,
-            "vimId": "11111",
-            "vimName": "11111",
-            "status": "ACTIVE",
-            "id": "3c9eebdbbfd345658269340b9ea6fb73",
-            "name": "net1",
-            "tenantId": "tenant1",
-            "networkName": "ommnet",
-            "shared": 1,
-            "vlanTransparent": 1,
-            "networkType": "vlan",
-            "segmentationId": 202,
-            "physicalNetwork": "ctrl",
-            "routerExternal": 0
-        }
-        c3_data = {  # get_volume
-            "status": "available11",
-            "name": "wangsong",
-            "attachments": [
-                {
-                    "device": "/dev/vdc",
-                    "serverId": "3030e666-528e-4954-88f5-cc21dab1262b",
-                    "volumeId": "4bd3e9eb-cd8b-456a-8589-910836a0ab31",
-                    "hostName": None,
-                    "id": "4bd3e9eb-cd8b-456a-8589-910836a0ab31"
-                }
-            ],
-            "createTime": "2015-12-02T06:39:40.000000",
-            "type": None,
-            "id": "4bd3e9eb-cd8b-456a-8589-910836a0ab31",
-            "size": 40
-        }
-        mock_call.side_effect = [c1_data, c2_data, c3_data]
-
+        mock_call.side_effect = [c1_data_get_tenant_id, c2_data_create_volume, c3_data_get_volume]
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
         JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
         data = inst_req_data
         InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
         self.assert_job_result(self.job_id, 255, "unexpected exception")
-
-
-
-
-
 
     @mock.patch.object(restcall, 'call_req')
     @mock.patch.object(api, 'call')
@@ -226,104 +174,9 @@ class TestNFInstantiate(TestCase):
         mock_call.side_effect = [c1_data_get_tenant_id, c2_data_create_volume, c3_data_get_volume,
                                  c4_data_create_network, c5_data_create_subnet, c6_data_create_port,
                                  c7_data_create_flavor, c8_data_list_image, c9_data_create_vm, c10_data_get_vm]
-
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
         JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
         data = inst_req_data
         InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
         self.assert_job_result(self.job_id, 100, "Instantiate Vnf success.")
-
-
-
-
-    # @mock.patch.object(restcall, 'call_req')
-    # # @mock.patch.object(adaptor, 'create_vim_res')
-    # def test_instantiate_vnf_when_create_res_failed(self, mock_call_req):
-    #     NfvoRegInfoModel.objects.create(nfvoid='nfvo111', vnfminstid='vnfm111', apiurl='http://10.74.44.11',
-    #                                     nfvouser='root', nfvopassword='root123')
-    #     r1 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
-    #     r2 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
-    #     r3 = [0, json.JSONEncoder().encode('Nf instancing apply grant'), '200']
-    #     # r4 = [0, json.JSONEncoder().encode('Nf instancing apply resource'), '200']
-    #     mock_call_req.side_effect = [r1, r2, r3]
-    #     # mock_create_vim_res.re.return_value = None
-    #     create_data = {
-    #         "vnfdId": "111",
-    #         "vnfInstanceName": "vFW_01",
-    #         "vnfInstanceDescription": " vFW in Nanjing TIC Edge"}
-    #     self.nf_inst_id = CreateVnf(create_data).do_biz()
-    #     self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
-    #     JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
-    #     data = inst_req_data
-    #     InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-    #     self.assert_job_result(self.job_id, 255, "Create resource failed")
-
-    # @mock.patch.object(restcall, 'call_req')
-    # # @mock.patch.object(adaptor, 'create_vim_res')
-    # def test_instantiate_vnf_success(self, mock_call_req):
-    #     NfvoRegInfoModel.objects.create(nfvoid='nfvo111', vnfminstid='vnfm111', apiurl='http://10.74.44.11',
-    #                                     nfvouser='root', nfvopassword='root123')
-    #     r1 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
-    #     r2 = [0, json.JSONEncoder().encode(vnfd_model_dict), '200']
-    #     r3 = [0, json.JSONEncoder().encode('Nf instancing apply grant'), '200']
-    #     r4 = [0, json.JSONEncoder().encode('None'), '200']
-    #     mock_call_req.side_effect = [r1, r2, r3, r4]
-    #     # mock_create_vim_res.re.return_value = None
-    #     create_data = {
-    #         "vnfdId": "111",
-    #         "vnfInstanceName": "vFW_01",
-    #         "vnfInstanceDescription": " vFW in Nanjing TIC Edge"}
-    #     self.nf_inst_id = CreateVnf(create_data).do_biz()
-    #     self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
-    #     JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
-    #     data = inst_req_data
-    #     InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-    #     self.assert_job_result(self.job_id, 100, "Instantiate Vnf success.")
-
-inst_req_data = {
-    "flavourId": "flavour_1",
-    "instantiationLevelId": "instantiationLevel_1",
-    "extVirtualLinks": [
-        {
-            "vlInstanceId": "1",
-            "vim": {
-                "vimInfoId": "1",
-                "vimId": "1",
-                "interfaceInfo": {
-                    "vimType": "vim",
-                    "apiVersion": "v2",
-                    "protocolType": "http"
-                },
-                "accessInfo": {
-                    "tenant": "tenant_vCPE",
-                    "username": "vCPE",
-                    "password": "vCPE_321"
-                },
-                "interfaceEndpoint": "http://10.43.21.105:80/"
-            },
-            "resourceId": "1246",
-            "extCps": [
-                {
-                    "cpdId": "11",
-                    "addresses": [
-                        {
-                            "addressType": "MAC",
-                            "l2AddressData": "00:f3:43:20:a2:a3"
-                        },
-                        {
-                            "addressType": "IP",
-                            "l3AddressData": {
-                                "iPAddressType": "IPv4",
-                                "iPAddress": "192.168.104.2"
-                            }
-                        }
-                    ],
-                    "numDynamicAddresses": 0
-                }
-            ]
-        }
-    ],
-    "localizationLanguage": "en_US",
-    "additionalParams": {}
-}
