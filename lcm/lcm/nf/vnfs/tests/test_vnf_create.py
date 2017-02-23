@@ -19,14 +19,14 @@ from django.test import TestCase, Client
 from rest_framework import status
 
 from lcm.nf.vnfs.const import vnfd_rawdata, c1_data_get_tenant_id, c4_data_create_network, c2_data_create_volume, \
-    c5_data_create_subnet, c3_data_get_volume, c6_data_create_port, c1_data_create_flavor
+    c5_data_create_subnet, c3_data_get_volume, c6_data_create_port, c7_data_create_flavor, c8_data_list_image, c9_data_create_vm, \
+    c10_data_get_vm
 from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
 from lcm.pub.database.models import NfInstModel, JobStatusModel, VmInstModel, NetworkInstModel, \
     SubNetworkInstModel, PortInstModel
 from lcm.pub.utils import restcall
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
-from lcm.pub.vimapi import adaptor
 from lcm.pub.vimapi import api
 
 
@@ -224,14 +224,14 @@ class TestNFInstantiate(TestCase):
         mock_call_req.side_effect = [r1, r2, r3]
         mock_call.side_effect = [c1_data_get_tenant_id, c2_data_create_volume, c3_data_get_volume,
                                  c4_data_create_network, c5_data_create_subnet, c6_data_create_port,
-                                 c1_data_create_flavor]
+                                 c7_data_create_flavor, c8_data_list_image, c9_data_create_vm, c10_data_get_vm]
 
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
         JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
         data = inst_req_data
         InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        self.assert_job_result(self.job_id, 255, "Undefined image(omm_image)")
+        self.assert_job_result(self.job_id, 100, "Instantiate Vnf success.")
 
 
 

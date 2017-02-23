@@ -277,7 +277,7 @@ def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
     opt_vm_status = "Timeout"
     retry_count, max_retry_count = 0, 100
     while retry_count < max_retry_count:
-        vm_info = api.get_vm(vim_id, vm_id)
+        vm_info = api.get_vm(vim_id, tenant_id, vm_id)
         if vm_info["status"].upper() == "ACTIVE":
             logger.debug("Vm(%s) is active", vim_id)
             return

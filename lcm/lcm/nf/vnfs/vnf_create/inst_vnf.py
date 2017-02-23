@@ -90,7 +90,7 @@ class InstVnf(Thread):
             self.inst_pre()
             self.apply_grant()
             self.create_res()
-            self.lcm_notify()
+            # self.lcm_notify()
             JobUtil.add_job_status(self.job_id, 100, "Instantiate Vnf success.")
             # is_exist = JobStatusModel.objects.filter(jobid=self.job_id).exists()
             # logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)
@@ -482,12 +482,21 @@ class InstVnf(Thread):
             JobUtil.add_job_status(self.job_id, 70, 'Create vms!')
             VmInstModel.objects.create(
                 vmid=str(uuid.uuid4()),
-                vimid=ret["vimId"],
-                resouceid=ret["id"],
+                vmname=ignore_case_get(ret, "name"),
+                vimid=ignore_case_get(ret, "vimId"),
+                resouceid=ignore_case_get(ret, "id"),
+                tenant=ignore_case_get(ret, "tenantId"),
+                nic_array=ignore_case_get(ret, "nicArray"),
+                metadata=ignore_case_get(ret, "metadata"),
+                volume_array=ignore_case_get(ret, "volumeArray"),
+                server_group=ignore_case_get(ret, "serverGroup"),
+                availability_zone=ignore_case_get(ret, "availabilityZone"),
+                flavor_id=ignore_case_get(ret, "flavorId"),
+                security_groups=ignore_case_get(ret, "securityGroups"),
+                operationalstate=ignore_case_get(ret, "status"),
                 insttype=0,
-                instid=self.nf_inst_id,
-                vmname=ret["name"],
-                is_predefined=ret["returnCode"])
+                is_predefined=ignore_case_get(ret, "returnCode"),
+                instid=self.nf_inst_id)
 
     # def do_rollback(self, args_=None):
     #     logger.error('error info : %s' % args_)

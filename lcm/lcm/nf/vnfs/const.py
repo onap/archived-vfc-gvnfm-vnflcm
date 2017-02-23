@@ -345,14 +345,14 @@ vnfd_model_dict = {
                 "inner_hugepage_size": "2048",
                 "action": "add"
             },
-            "image_file": "omm_image",
+            "image_file": u'sss',
             "local_storages": [
                 "local_storage_id1",
                 "local_storage_id2"
             ],
             "volume_storages": [
                 {
-                    "volume_storage_id": "volume_storage_id1",
+                    "volume_storage_id": "volume_storage1",
                     "location": "/usr/data",
                     "device": "/dev/hda1"
                 }
@@ -386,11 +386,9 @@ vnfd_model_dict = {
             },
             "vls": [
                 "vlId1",
-                "vlIdN"
             ],
             "cps": [
                 "cpId1",
-                "cpIdN"
             ],
             "scalable": {
                 "min_instances": 1,
@@ -555,7 +553,7 @@ vnfd_model_dict = {
     ],
     'cps': [
         {
-            "cp_id": "cpId",
+            "cp_id": "cpId1",
             "description": "",
             "properties": {
                 "name": "",
@@ -692,7 +690,7 @@ c6_data_create_port = {
     "vnicType": "normal",
     "securityGroups": ""
 }
-c1_data_create_flavor ={
+c7_data_create_flavor ={
     "returnCode": 0,
     "vimId": "11111",
     "vimName": "11111",
@@ -706,4 +704,43 @@ c1_data_create_flavor ={
     "swap": 20,
     "isPublic": True,
     "extraSpecs": "testtt"
+}
+
+c8_data_list_image = {
+    "vimid": "",
+    "vimname": "",
+    "imageList": [
+        {
+            "status": "active",
+            "id": "5e2757c1-f846-4727-915c-9a872553ed75",
+            "size": 862016,
+            "name": u'sss.vmdk'
+        }
+    ]
+}
+c9_data_create_vm = {
+    "returnCode": 1,
+    "id": "3c9eebdbbfd345658269340b9ea6fb73",
+    "name": "vm1",
+    "vimId": "11111",
+    "vimName": "11111",
+    "tenantId": "tenant1",
+    "boot": "boot_1",
+    "nicArray": "dfdf",
+    "volumeArray": "dfdf",
+    "availabilityZone": "fdvfdv",
+    "flavorId": "fdvfdv",
+    "metadata": "fdvfdv",
+    "securityGroups": "fdvfdv",
+    "serverGroup": "fdvfdv",
+    "status": "ACTIVE"
+}
+c10_data_get_vm = {
+    "returnCode": 1,
+    "id": "3c9eebdbbfd345658269340b9ea6fb73",
+    "name": "vm1",
+    "vimId": "11111",
+    "vimName": "11111",
+    "tenantId": "tenant1",
+    "status": "ACTIVE"
 }
