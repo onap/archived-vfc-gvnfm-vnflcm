@@ -90,7 +90,7 @@ class InstVnf(Thread):
             self.inst_pre()
             self.apply_grant()
             self.create_res()
-            # self.lcm_notify()
+            self.lcm_notify()
             JobUtil.add_job_status(self.job_id, 100, "Instantiate Vnf success.")
             # is_exist = JobStatusModel.objects.filter(jobid=self.job_id).exists()
             # logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)
@@ -241,79 +241,105 @@ class InstVnf(Thread):
 
     def lcm_notify(self):
         logger.info('[NF instantiation] send notify request to nfvo start')
-        reg_info = NfvoRegInfoModel.objects.filter(vnfminstid=self.vnfm_inst_id).first()
+        # reg_info = NfvoRegInfoModel.objects.filter(vnfminstid=self.vnfm_inst_id).first()
         # vm_info = VmInstModel.objects.filter(nfinstid=self.nf_inst_id)
-        vmlist = []
+        # vmlist = []
         # nfs = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
         # nf = nfs[0]
         # allocate_data = json.loads(nf.initallocatedata)
         # vmlist = json.loads(nf.predefinedvm)
-        addition_param = {'vmList': vmlist}
+        # addition_param = {'vmList': vmlist}
         affected_vnfc = []
         vnfcs = VNFCInstModel.objects.filter(nfinstid=self.nf_inst_id)
         for vnfc in vnfcs:
-            compute_resource = {}
+            vmResource = {}
             if vnfc.vmid:
                 vm = VmInstModel.objects.filter(vmid=vnfc.vmid)
                 if vm:
-                    compute_resource = {'vimId': vm[0].vimid, 'resourceId': vm[0].resouceid,
-                                        'resourceName': vm[0].vmname, 'tenant': vm[0].tenant}
+                    vmResource = {'vimId': vm[0].vimid, 'resourceId': vm[0].resouceid,
+                                  'resourceName': vm[0].vmname, 'resourceType': 'vm'}
             affected_vnfc.append(
-                {'vnfcInstanceId': vnfc.vnfcinstanceid, 'vduId': vnfc.vduid, 'changeType': 'added',
-                 'computeResource': compute_resource, 'storageResource': [], 'vduType': vnfc.vdutype})
+                {'vnfcInstanceId': vnfc.vnfcinstanceid,
+                 'vduId': vnfc.vduid,
+                 'changeType': 'added',
+                 'computeResource': vmResource})
         affected_vl = []
-        vls = VLInstModel.objects.filter(ownerid=self.nf_inst_id)
-        for vl in vls:
-            network_resource = {}
-            subnet_resource = {}
-            if vl.relatednetworkid:
-                network = NetworkInstModel.objects.filter(networkid=vl.relatednetworkid)
-                subnet = SubNetworkInstModel.objects.filter(subnetworkid=vl.relatedsubnetworkid)
-                if network:
-                    network_resource = {'vimId': network[0].vimid, 'resourceId': network[0].resouceid,
-                                        'resourceName': network[0].name, 'tenant': network[0].tenant}
-                if subnet:
-                    subnet_resource = {'vimId': subnet[0].vimid, 'resourceId': subnet[0].resouceid,
-                                       'resourceName': subnet[0].name, 'tenant': subnet[0].tenant}
+        networks = NetworkInstModel.objects.filter(instid=self.nf_inst_id)
+        for network in networks:
+            network_resource = {'vimId': network.vimid, 'resourceId': network.resouceid,
+                                'resourceName': network.name, 'resourceType': 'network'}
             affected_vl.append(
-                {'virtualLinkInstanceId': vl.vlinstanceid, 'virtualLinkDescId': vl.vldid, 'changeType': 'added',
-                 'networkResource': network_resource, 'subnetworkResource': subnet_resource, 'tenant': vl.tenant})
+                {'vlInstanceId': network.networkid,
+                 'vldid': network.nodeId,
+                 'changeType': 'added',
+                 'networkResource': network_resource})
+        affected_cp = []
+        ports = PortInstModel.objects.filter(instid=self.nf_inst_id)
+        for port in ports:
+            affected_cp.append(
+                {'vsInstanceId': port.portid,
+                 'cpdid': port.nodeId,
+                 'changeType': 'added',
+                 'storageResource': {'vimId': port.vimid, 'resourceId': port.resouceid,
+                                     'resourceName': port.name, 'resourceType': 'port'}})
+        # vls = VLInstModel.objects.filter(ownerid=self.nf_inst_id)
+        # for vl in vls:
+        #     network_resource = {}
+        #     subnet_resource = {}
+        #     if vl.relatednetworkid:
+        #         network = NetworkInstModel.objects.filter(networkid=vl.relatednetworkid)
+        #         subnet = SubNetworkInstModel.objects.filter(subnetworkid=vl.relatedsubnetworkid)
+        #         if network:
+        #             network_resource = {'vimId': network[0].vimid, 'resourceId': network[0].resouceid,
+        #                                 'resourceName': network[0].name, 'tenant': network[0].tenant}
+        #         if subnet:
+        #             subnet_resource = {'vimId': subnet[0].vimid, 'resourceId': subnet[0].resouceid,
+        #                                'resourceName': subnet[0].name, 'tenant': subnet[0].tenant}
+        #     affected_vl.append(
+        #         {'virtualLinkInstanceId': vl.vlinstanceid, 'virtualLinkDescId': vl.vldid, 'changeType': 'added',
+        #          'networkResource': network_resource, 'subnetworkResource': subnet_resource, 'tenant': vl.tenant})
         affected_vs = []
         vss = StorageInstModel.objects.filter(instid=self.nf_inst_id)
         for vs in vss:
             affected_vs.append(
-                {'virtualStorageInstanceId': vs.storageid, 'virtualStorageDescId': '', 'changeType': 'added',
+                {'vsInstanceId': vs.storageid,
+                 'vsdId': vs.nodeId,
+                 'changeType': 'added',
                  'storageResource': {'vimId': vs.vimid, 'resourceId': vs.resouceid,
-                                     'resourceName': vs.name, 'tenant': vs.tenant}})
-        affected_cp = []
-        # vnfc cps
-        for vnfc in vnfcs:
-            cps = CPInstModel.objects.filter(ownerid=vnfc.vnfcinstanceid, ownertype=3)
-            for cp in cps:
-                port_resource = {}
-                if cp.relatedport:
-                    port = PortInstModel.objects.filter(portid=cp.relatedport)
-                    if port:
-                        port_resource = {'vimId': port[0].vimid, 'resourceId': port[0].resouceid,
-                                         'resourceName': port[0].name, 'tenant': port[0].tenant}
-                affected_cp.append(
-                    {'cPInstanceId': cp.cpinstanceid, 'cpdId': cp.cpdid, 'ownerid': cp.ownerid,
-                     'ownertype': cp.ownertype, 'changeType': 'added', 'portResource': port_resource,
-                     'virtualLinkInstanceId': cp.vlinstanceid})
-        # nf cps
-        cps = CPInstModel.objects.filter(ownerid=self.nf_inst_id, ownertype=0)
-        logger.info('vnf_inst_id=%s, cps size=%s' % (self.nf_inst_id, cps.count()))
-        for cp in cps:
-            port_resource = {}
-            if cp.relatedport:
-                port = PortInstModel.objects.filter(portid=cp.relatedport)
-                if port:
-                    port_resource = {'vimId': port[0].vimid, 'resourceId': port[0].resouceid,
-                                     'resourceName': port[0].name, 'tenant': port[0].tenant}
-            affected_cp.append(
-                {'cPInstanceId': cp.cpinstanceid, 'cpdId': cp.cpdid, 'ownerid': cp.ownerid, 'ownertype': cp.ownertype,
-                 'changeType': 'added', 'portResource': port_resource,
-                 'virtualLinkInstanceId': cp.vlinstanceid})
+                                     'resourceName': vs.name, 'resourceType': 'volume'}})
+        # affected_cp = []
+        # # vnfc cps
+        # for vnfc in vnfcs:
+        #     cps = CPInstModel.objects.filter(ownerid=vnfc.vnfcinstanceid, ownertype=3)
+        #     for cp in cps:
+        #         port_resource = {}
+        #         if cp.relatedport:
+        #             port = PortInstModel.objects.filter(portid=cp.relatedport)
+        #             if port:
+        #                 port_resource = {'vimId': port[0].vimid, 'resourceId': port[0].resouceid,
+        #                                  'resourceName': port[0].name, 'tenant': port[0].tenant}
+        #         affected_cp.append(
+        #             {'cPInstanceId': cp.cpinstanceid, 'cpdId': cp.cpdid, 'ownerid': cp.ownerid,
+        #              'ownertype': cp.ownertype, 'changeType': 'added', 'portResource': port_resource,
+        #              'virtualLinkInstanceId': cp.vlinstanceid})
+
+
+        # # nf cps
+        # affected_cp = []
+        # cps = PortInstModel.objects.filter(instid=self.nf_inst_id)
+        # # cps = CPInstModel.objects.filter(ownerid=self.nf_inst_id)
+        # logger.info('vnf_inst_id=%s, cps size=%s' % (self.nf_inst_id, cps.count()))
+        # for cp in cps:
+        #     port_resource = {}
+        #     if cp.relatedport:
+        #         port = PortInstModel.objects.filter(portid=cp.relatedport)
+        #         if port:
+        #             port_resource = {'vimId': port[0].vimid, 'resourceId': port[0].resouceid,
+        #                              'resourceName': port[0].name, 'tenant': port[0].tenant}
+        #     affected_cp.append(
+        #         {'cPInstanceId': cp.cpinstanceid, 'cpdId': cp.cpdid, 'ownerid': cp.ownerid, 'ownertype': cp.ownertype,
+        #          'changeType': 'added', 'portResource': port_resource,
+        #          'virtualLinkInstanceId': cp.vlinstanceid})
         # affectedcapacity = {}
         # reserved_total = allocate_data.get('reserved_total', {})
         # affectedcapacity['vm'] = str(reserved_total.get('vmnum', 0))
@@ -323,20 +349,21 @@ class InstVnf(Thread):
         # affectedcapacity['localStorage'] = str(reserved_total.get('hdsize', 0))
         # affectedcapacity['sharedStorage'] = str(reserved_total.get('shdsize', 0))
         content_args = {
-            # "vnfdmodule": allocate_data,
-            "additionalParam": addition_param,
-            "nfvoInstanceId": reg_info.nfvoid,
-            "vnfmInstanceId": self.vnfm_inst_id,
-            "status": 'finished',
+            "status": 'result',
             "nfInstanceId": self.nf_inst_id,
             "operation": 'instantiate',
-            "jobId": '',
-            # 'affectedcapacity': affectedcapacity,
-            'affectedService': [],
+            "jobId": self.job_id,
             'affectedVnfc': affected_vnfc,
             'affectedVirtualLink': affected_vl,
             'affectedVirtualStorage': affected_vs,
-            'affectedCp': affected_cp}
+            # "vnfdmodule": allocate_data,
+            # "additionalParam": addition_param,
+            # "nfvoInstanceId": self.nfvo_inst_id,
+            # "vnfmInstanceId": self.vnfm_inst_id,
+            # 'affectedcapacity': affectedcapacity,
+            # 'affectedService': [],
+            'affectedCp': affected_cp
+            }
         logger.info('content_args=%s' % content_args)
         # call rest api
         resp = notify_lcm_to_nfvo(content_args, self.nf_inst_id)
@@ -382,6 +409,7 @@ class InstVnf(Thread):
                 size=ignore_case_get(ret, "size"),
                 insttype=0,
                 is_predefined=ignore_case_get(ret, "returnCode"),
+                nodeId=ignore_case_get(ret, "nodeId"),
                 instid=self.nf_inst_id)
         elif res_type == adaptor.RES_NETWORK:
             logger.info('Create networks!')
@@ -404,6 +432,7 @@ class InstVnf(Thread):
                 routerExternal=get_boolean(ignore_case_get(ret, "routerExternal")),
                 insttype = 0,
                 is_predefined=ignore_case_get(ret, "returnCode"),
+                nodeId=ignore_case_get(ret, "nodeId"),
                 instid = self.nf_inst_id)
         elif res_type == adaptor.RES_SUBNET:
             logger.info('Create subnets!')
@@ -427,7 +456,7 @@ class InstVnf(Thread):
                 hostRoutes=ignore_case_get(ret, "hostRoutes"),
                 allocationPools=ignore_case_get(ret, "allocationPools"),
                 insttype=0,
-                is_predefined=ret["returnCode"],
+                is_predefined=ignore_case_get(ret, "returnCode"),
                 instid=self.nf_inst_id)
         elif res_type == adaptor.RES_PORT:
             logger.info('Create ports!')
@@ -450,6 +479,7 @@ class InstVnf(Thread):
                 securityGroups=ignore_case_get(ret, "securityGroups"),
                 insttype=0,
                 is_predefined=ignore_case_get(ret, "returnCode"),
+                nodeId=ignore_case_get(ret, "nodeId"),
                 instid=self.nf_inst_id)
         elif res_type == adaptor.RES_FLAVOR:
             logger.info('Create flavors!')
@@ -480,8 +510,9 @@ class InstVnf(Thread):
             #                                      "res_id": ignore_case_get(ret, "res_id")})
             # self.inst_resource['vm'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, 70, 'Create vms!')
+            vm_id = str(uuid.uuid4())
             VmInstModel.objects.create(
-                vmid=str(uuid.uuid4()),
+                vmid=vm_id,
                 vmname=ignore_case_get(ret, "name"),
                 vimid=ignore_case_get(ret, "vimId"),
                 resouceid=ignore_case_get(ret, "id"),
@@ -497,6 +528,12 @@ class InstVnf(Thread):
                 insttype=0,
                 is_predefined=ignore_case_get(ret, "returnCode"),
                 instid=self.nf_inst_id)
+            VNFCInstModel.objects.create(
+                vnfcinstanceid=str(uuid.uuid4()),
+                vduid=ignore_case_get(ret, "id"),
+                # vdutype='AAA',
+                nfinstid=self.nf_inst_id,
+                vmid=vm_id)
 
     # def do_rollback(self, args_=None):
     #     logger.error('error info : %s' % args_)

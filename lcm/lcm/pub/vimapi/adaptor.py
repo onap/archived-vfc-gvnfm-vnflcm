@@ -101,6 +101,7 @@ def create_volume(vim_cache, res_cache, vol, do_notify, res_type):
     vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
     tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
     ret = api.create_volume(vim_id, tenant_id, param)
+    ret["nodeId"] = vol["volume_storage_id"]
     do_notify(res_type, ret)
     vol_id, vol_name, return_code = ret["id"], ret["name"], ret["returnCode"]
     set_res_cache(res_cache, res_type, vol["volume_storage_id"], vol_id)
@@ -128,6 +129,7 @@ def create_network(vim_cache, res_cache, network, do_notify, res_type):
     vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
     tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
     ret = api.create_network(vim_id, tenant_id, param)
+    ret["nodeId"] = network["vl_id"]
     do_notify(res_type, ret)
     set_res_cache(res_cache, res_type, network["vl_id"], ret["id"])
     
@@ -179,6 +181,7 @@ def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
     vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
     tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
     ret = api.create_subnet(vim_id, tenant_id, param)
+    ret["nodeId"] = port["cp_id"]
     do_notify(res_type, ret)
     set_res_cache(res_cache, res_type, port["cp_id"], ret["id"])
 

@@ -113,6 +113,7 @@ class StorageInstModel(models.Model):
     tenant = models.CharField(db_column='TENANT', max_length=50, null=True)
     is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
     create_time = models.CharField(db_column='CREATETIME', max_length=200, null=True, blank=True)
+    nodeId = models.CharField(db_column='NODEID', max_length=255, null=True)
 
 class VmInstModel(models.Model):
     class Meta:
@@ -190,6 +191,7 @@ class NetworkInstModel(models.Model):
     is_shared = models.IntegerField(db_column='ISSHARED', default=0, null=True)
     vlantrans = models.IntegerField(db_column='VLANTRANS', null=True)
     routerExternal = models.IntegerField(db_column='ROUTEREXTERNAL', default=0, null=True)
+    nodeId = models.CharField(db_column='NODEID', max_length=255, null=True)
 
 class SubNetworkInstModel(models.Model):
     class Meta:
@@ -259,6 +261,7 @@ class PortInstModel(models.Model):
     create_time = models.CharField(db_column='CREATETIME', max_length=200, null=True, blank=True)
     securityGroups = models.CharField(db_column='SECURITYGROUPS', max_length=255)
     is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
+    nodeId = models.CharField(db_column='NODEID', max_length=255, null=True)
 
 class CPInstModel(models.Model):
     class Meta:

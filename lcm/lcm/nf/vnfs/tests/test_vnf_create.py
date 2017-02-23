@@ -221,7 +221,8 @@ class TestNFInstantiate(TestCase):
         r2 = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']  # get rawdata from catalog by csar_id
         r3 = [0, json.JSONEncoder().encode({"vim": {"vimid": 'vimid_1', "accessinfo": {"tenant": 'tenantname_1'}}}),
               '200']  # apply_grant_to_nfvo
-        mock_call_req.side_effect = [r1, r2, r3]
+        r4 = [0, None, '200']
+        mock_call_req.side_effect = [r1, r2, r3, r4]
         mock_call.side_effect = [c1_data_get_tenant_id, c2_data_create_volume, c3_data_get_volume,
                                  c4_data_create_network, c5_data_create_subnet, c6_data_create_port,
                                  c7_data_create_flavor, c8_data_list_image, c9_data_create_vm, c10_data_get_vm]
