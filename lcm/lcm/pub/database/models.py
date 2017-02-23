@@ -147,14 +147,20 @@ class FlavourInstModel(models.Model):
         db_table = 'FLAVOURINST'
 
     flavourid = models.CharField(db_column='FLAVOURID', max_length=255, primary_key=True)
+    vimid = models.CharField(db_column='VIMID', max_length=255)
+    resouceid = models.CharField(db_column='RESOURCEID', max_length=255)
     name = models.CharField(db_column='NAME', max_length=255)
-    vcpu = models.CharField(db_column='VCPU', max_length=255)
-    memory = models.CharField(db_column='MEMORY', max_length=255)
+    tenant = models.CharField(db_column='TENANT', max_length=255, null=True)
+    vcpu = models.IntegerField(db_column='VCPU')
+    memory = models.IntegerField(db_column='MEMORY')
+    disk = models.IntegerField(db_column='DISK')
+    ephemeral = models.IntegerField(db_column='EPHEMERAL')
+    swap = models.IntegerField(db_column='SWAP')
+    isPublic = models.IntegerField(db_column='ISPUBLIC')
     extraspecs = models.CharField(db_column='EXTRASPECS', max_length=255)
     instid = models.CharField(db_column='INSTID', max_length=255)
-    tenant = models.CharField(db_column='TENANT', max_length=255, null=True)
-    vmid = models.CharField(db_column='VMID', max_length=255)
     create_time = models.CharField(db_column='CREATETIME', max_length=200, null=True, blank=True)
+    is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
 
 class NetworkInstModel(models.Model):
     class Meta:

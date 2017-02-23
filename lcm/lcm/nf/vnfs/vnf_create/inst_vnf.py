@@ -459,14 +459,19 @@ class InstVnf(Thread):
             # self.inst_resource['flavor'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, 60, 'Create flavors!')
             FlavourInstModel.objects.create(
-                falavourid=str(uuid.uuid4()),
-                name=ret["name"],
-                vcpu=ret["vcpu"],
-                memory=ret["memory"],
-                extraspecs=ret["extraSpecs"],
-                is_predefined=ret["returnCode"],
-                tenant=ret["tenatId"],
-                vimid=ret["vimId"],
+                flavourid=str(uuid.uuid4()),
+                name=ignore_case_get(ret, "name"),
+                vimid=ignore_case_get(ret, "vimId"),
+                resouceid=ignore_case_get(ret, "id"),
+                tenant=ignore_case_get(ret, "tenantId"),
+                vcpu=ignore_case_get(ret, "vcpu"),
+                memory=ignore_case_get(ret, "memory"),
+                disk=ignore_case_get(ret, "disk"),
+                ephemeral=ignore_case_get(ret, "ephemeral"),
+                swap=ignore_case_get(ret, "swap"),
+                isPublic=get_boolean(ignore_case_get(ret, "isPublic")),
+                extraspecs=ignore_case_get(ret, "extraSpecs"),
+                is_predefined=ignore_case_get(ret, "returnCode"),
                 instid=self.nf_inst_id)
         elif res_type == adaptor.RES_VM:
             logger.info('Create vms!')

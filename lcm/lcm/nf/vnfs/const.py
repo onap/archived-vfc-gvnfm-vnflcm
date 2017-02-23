@@ -302,106 +302,149 @@ vnfd_model_dict = {
     },
     'vdus': [
         {
-            'volumn_storages': [
-
-            ],
-            'nfv_compute': {
-                'mem_size': '',
-                'num_cpus': u'2'
-            },
-            'local_storages': [
-
-            ],
-            'vdu_id': u'vdu_omm.001',
-            'image_file': u'opencos_sss_omm_img_release_20150723-1-disk1',
-            'dependencies': [
-
-            ],
-            'vls': [
-
-            ],
-            'cps': [
-
-            ],
-            'properties': {
-                'key_vdu': '',
-                'support_scaling': False,
-                'vdu_type': '',
-                'name': '',
-                'storage_policy': '',
-                'location_info': {
-                    'vimId': '',
-                    'availability_zone': '',
-                    'region': '',
-                    'dc': '',
-                    'host': '',
-                    'tenant': ''
+            "vdu_id": "vdu1Id",
+            "description": "vdu description",
+            "properties": {
+                "name": "vduinstname",
+                "vdu_type": "OMP",
+                "key_vdu": True,
+                "support_scaling": True,
+                "location_info": {
+                    "vimid": "vimid",
+                    "tenant": "tenantname",
+                    "availability_zone": "zone1",
+                    "host": "host1"
                 },
-                'inject_data_list': [
-
+                "local_affinity_antiaffinity_rule": [
+                    {
+                        "affinity_antiaffinity": "anti-affinity",
+                        "scope": "node"
+                    },
+                    {
+                        "affinity_antiaffinity": "affinity",
+                        "scope": "zone"
+                    }
                 ],
-                'watchdog': {
-                    'action': '',
-                    'enabledelay': ''
-                },
-                'local_affinity_antiaffinity_rule': {
-
-                },
-                'template_id': u'omm.001',
-                'manual_scale_select_vim': False
-            },
-            'description': u'singleommvm'
-        },
-        {
-            'volumn_storages': [
-
-            ],
-            'nfv_compute': {
-                'mem_size': '',
-                'num_cpus': u'14'
-            },
-            'local_storages': [
-
-            ],
-            'vdu_id': u'vdu_12',
-            'image_file': u'sss',
-            'dependencies': [
-
-            ],
-            'vls': [
-
-            ],
-            'cps': [
-
-            ],
-            'properties': {
-                'key_vdu': '',
-                'support_scaling': False,
-                'vdu_type': '',
-                'name': '',
-                'storage_policy': '',
-                'location_info': {
-                    'vimId': '',
-                    'availability_zone': '',
-                    'region': '',
-                    'dc': '',
-                    'host': '',
-                    'tenant': ''
-                },
-                'inject_data_list': [
-
+                "inject_data_list": [
+                    {
+                        "file_name": "abc.xml",
+                        "file_data": "<a>xxx</a><b>ssss</b>"
+                    }
                 ],
-                'watchdog': {
-                    'action': '',
-                    'enabledelay': ''
+                "storage_policy": "HIGH",
+                "template_id": "26",
+                "manual_scale_select_vim": False,
+                "watchdog": {
+                    "enabledelay": 600000,
+                    "action": "reset"
                 },
-                'local_affinity_antiaffinity_rule': {
-
-                },
-                'template_id': u'12',
-                'manual_scale_select_vim': False
+                "is_predefined": False,
+                "allow_scale_updown": False,
+                "inject_network_address": True,
+                "inner_hugepage_num": 100,
+                "inner_hugepage_size": "2048",
+                "action": "add"
             },
-            'description': u'ppvm'
+            "image_file": "omm_image",
+            "local_storages": [
+                "local_storage_id1",
+                "local_storage_id2"
+            ],
+            "volume_storages": [
+                {
+                    "volume_storage_id": "volume_storage_id1",
+                    "location": "/usr/data",
+                    "device": "/dev/hda1"
+                }
+            ],
+            "dependencies": [
+                "vdu1Id",
+                "vduNId"
+            ],
+            "nfv_compute": {
+                "num_cpus": 4,
+                "mem_size": "1024MB",
+                "cpu_frequency": "1GHz",
+                "flavor_extra_specs": {
+                    "hw: cpu_policy": "shared",
+                    "hw: cpu_max_threads": 50,
+                    "hw: cpu_sockets": 10,
+                    "hw: cpu_max_sockets": 20,
+                    "hw: cpu_max_cores": 8,
+                    "hw: cpu_threads": 30,
+                    "hw: numa_mem.0": 12288,
+                    "hw: hugepage_num": 100,
+                    "hw: high_performance": "dvs_high",
+                    "hw: numa_nodes": 1,
+                    "hw: numa_cpus.0": "2,4,8",
+                    "hw: numa_pci": True,
+                    "hw: cpu_cores": 4,
+                    "pci_passthrough: alias": "ColetoCreek: 1",
+                    "hw: mem_page_size": "large",
+                    "hw: mem_paging_mechanism": "EPT"
+                }
+            },
+            "vls": [
+                "vlId1",
+                "vlIdN"
+            ],
+            "cps": [
+                "cpId1",
+                "cpIdN"
+            ],
+            "scalable": {
+                "min_instances": 1,
+                "max_instances": 2,
+                "default_instances": 1
+            },
+            "interfaces": {
+                "Standard": {
+                    "create": {
+                        "implementation": "<implementationScript>",
+                        "inputs": {
+                            "param1Name": "value1",
+                            "paramNName": "valueN"
+                        }
+                    },
+                    "configure": {
+                        "implementation": "<implementationScript>",
+                        "inputs": {
+                            "param1Name": "value1",
+                            "paramNName": "valueN"
+                        }
+                    },
+                    "start": {
+                        "implementation": "<implementationScript>",
+                        "inputs": {
+                            "param1Name": "value1",
+                            "paramNName": "valueN"
+                        }
+                    },
+                    "stop": {
+                        "implementation": "<implementationScript>",
+                        "inputs": {
+                            "param1Name": "value1",
+                            "paramNName": "valueN"
+                        }
+                    },
+                    "delete": {
+                        "implementation": "<implementationScript>",
+                        "inputs": {
+                            "param1Name": "value1",
+                            "paramNName": "valueN"
+                        }
+                    }
+                }
+            },
+            "artifacts": [
+                {
+                    "artifact_name": "software_version_file",
+                    "type": "tosca.artifacts.Deployment",
+                    "file": "AppSoftwares/zte-cn-xgw-V5.16.11_NFV-version.zip",
+                    "repository": "",
+                    "deploy_path": ""
+                }
+            ]
         }
     ],
     'volume_storages': [
@@ -546,7 +589,7 @@ vnfd_model_dict = {
                 "function": "control"
             },
             "vl_id": "vldId1",
-            "vdu_id": u'vdu_omm.001'
+            "vdu_id": "vdu1Id"
         }
     ],
     'local_storages': [
@@ -648,4 +691,19 @@ c6_data_create_port = {
     "ip": "10.43.38.11",
     "vnicType": "normal",
     "securityGroups": ""
+}
+c1_data_create_flavor ={
+    "returnCode": 0,
+    "vimId": "11111",
+    "vimName": "11111",
+    "id": "142019d3-bc6e-4319-9c1d-6722fc136afg",
+    "tenantId": "tenant1",
+    "name": "subnet1",
+    "vcpu": 5,
+    "memory": 2,
+    "disk": 40,
+    "ephemeral": 40,
+    "swap": 20,
+    "isPublic": True,
+    "extraSpecs": "testtt"
 }
