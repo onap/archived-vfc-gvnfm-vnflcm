@@ -438,14 +438,18 @@ class InstVnf(Thread):
             JobUtil.add_job_status(self.job_id, 50, 'Create ports!')
             PortInstModel.objects.create(
                 portid=str(uuid.uuid4()),
-                networkid=ret["networkId"],
-                subnetworkid=ret["subnetId"],
-                vimid=ret["vimId"],
-                resouceid=ret["id"],
-                name=ret["name"],
-                tenant=ret["tenatId"],
+                networkid=ignore_case_get(ret, "networkId"),
+                subnetworkid=ignore_case_get(ret, "subnetId"),
+                name=ignore_case_get(ret, "name"),
+                vimid=ignore_case_get(ret, "vimId"),
+                resouceid=ignore_case_get(ret, "id"),
+                tenant=ignore_case_get(ret, "tenantId"),
+                macaddress = ignore_case_get(ret, "macAddress"),
+                ipaddress = ignore_case_get(ret, "ip"),
+                typevirtualnic=ignore_case_get(ret, "vnicType"),
+                securityGroups=ignore_case_get(ret, "securityGroups"),
                 insttype=0,
-                is_predefined=ret["returnCode"],
+                is_predefined=ignore_case_get(ret, "returnCode"),
                 instid=self.nf_inst_id)
         elif res_type == adaptor.RES_FLAVOR:
             logger.info('Create flavors!')

@@ -247,6 +247,8 @@ class PortInstModel(models.Model):
     interfacename = models.CharField(db_column='INTERFACENAME', max_length=255, blank=True, null=True)
     vmid = models.CharField(db_column='VMID', max_length=255, blank=True, null=True)
     create_time = models.CharField(db_column='CREATETIME', max_length=200, null=True, blank=True)
+    securityGroups = models.CharField(db_column='SECURITYGROUPS', max_length=255)
+    is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
 
 class CPInstModel(models.Model):
     class Meta:
