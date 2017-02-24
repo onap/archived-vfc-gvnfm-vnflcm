@@ -19,11 +19,10 @@ from django.test import TestCase, Client
 from rest_framework import status
 
 from lcm.nf.vnfs.const import vnfd_rawdata, c1_data_get_tenant_id, c4_data_create_network, c2_data_create_volume, \
-    c5_data_create_subnet, c3_data_get_volume, c6_data_create_port, c7_data_create_flavor, c8_data_list_image, c9_data_create_vm, \
-    c10_data_get_vm, inst_req_data
+    c5_data_create_subnet, c3_data_get_volume, c6_data_create_port, c7_data_create_flavor, c8_data_list_image, \
+    c9_data_create_vm, c10_data_get_vm, inst_req_data
 from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
-from lcm.pub.database.models import NfInstModel, JobStatusModel, VmInstModel, NetworkInstModel, \
-    SubNetworkInstModel, PortInstModel
+from lcm.pub.database.models import NfInstModel, JobStatusModel
 from lcm.pub.utils import restcall
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
@@ -33,23 +32,23 @@ from lcm.pub.vimapi import api
 class TestNFInstantiate(TestCase):
     def setUp(self):
         self.client = Client()
-        VmInstModel.objects.create(vmid="1", vimid="1", resouceid="11", insttype=0, instid="1", vmname="test_01",
-                                   operationalstate=1)
-        VmInstModel.objects.create(vmid="2", vimid="2", resouceid="22", insttype=0, instid="2",
-                                   vmname="test_02", operationalstate=1)
-        NetworkInstModel.objects.create(networkid='1', vimid='1', resouceid='1', name='pnet_network',
-                                        tenant='admin', insttype=0, instid='1')
-        SubNetworkInstModel.objects.create(subnetworkid='1', vimid='1', resouceid='1', networkid='1',
-                                           name='sub_pnet', tenant='admin', insttype=0, instid='1')
-        PortInstModel.objects.create(portid='1', networkid='1', subnetworkid='1', vimid='1', resouceid='1',
-                                     name='aaa_pnet_cp', tenant='admin', insttype=0, instid='1')
+        # VmInstModel.objects.create(vmid="1", vimid="1", resouceid="11", insttype=0, instid="1", vmname="test_01",
+        #                            operationalstate=1)
+        # VmInstModel.objects.create(vmid="2", vimid="2", resouceid="22", insttype=0, instid="2",
+        #                            vmname="test_02", operationalstate=1)
+        # NetworkInstModel.objects.create(networkid='1', vimid='1', resouceid='1', name='pnet_network',
+        #                                 tenant='admin', insttype=0, instid='1')
+        # SubNetworkInstModel.objects.create(subnetworkid='1', vimid='1', resouceid='1', networkid='1',
+        #                                    name='sub_pnet', tenant='admin', insttype=0, instid='1')
+        # PortInstModel.objects.create(portid='1', networkid='1', subnetworkid='1', vimid='1', resouceid='1',
+        #                              name='aaa_pnet_cp', tenant='admin', insttype=0, instid='1')
 
     def tearDown(self):
         pass
-        VmInstModel.objects.all().delete()
-        NetworkInstModel.objects.all().delete()
-        SubNetworkInstModel.objects.all().delete()
-        PortInstModel.objects.all().delete()
+        # VmInstModel.objects.all().delete()
+        # NetworkInstModel.objects.all().delete()
+        # SubNetworkInstModel.objects.all().delete()
+        # PortInstModel.objects.all().delete()
 
     def assert_job_result(self, job_id, job_progress, job_detail):
         jobs = JobStatusModel.objects.filter(
@@ -64,9 +63,9 @@ class TestNFInstantiate(TestCase):
 
     @mock.patch.object(restcall, 'call_req')
     def test_create_vnf_identifier(self, mock_call_req):
-        r1 = [0, json.JSONEncoder().encode({'package_id':'222', 'csar_id':'2222'}), '200']  # get csar_id from nslcm by vnfd_id
-        r2 = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']  # get rawdata from catalog by csar_id
-        mock_call_req.side_effect = [r1, r2]
+        r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']
+        r2_get_rawdata_from_catalog = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']
+        mock_call_req.side_effect = [r1_get_csarid_by_vnfdid, r2_get_rawdata_from_catalog]
         data = {
             "vnfdId": "111",
             "vnfInstanceName": "vFW_01",
@@ -100,8 +99,8 @@ class TestNFInstantiate(TestCase):
         NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='222',
                                    version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
                                    nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
-        r1 = [1, json.JSONEncoder().encode({'package_id':'222', 'csar_id':'2222'}), '200']  # get csar_id from nslcm by vnfd_id
-        mock_call_req.side_effect = [r1]
+        r1_get_csarid_by_vnfdid = [1, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']
+        mock_call_req.side_effect = [r1_get_csarid_by_vnfdid]
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
         JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
@@ -114,9 +113,9 @@ class TestNFInstantiate(TestCase):
         NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='222',
                                    version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
                                    nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
-        r1 = [0, json.JSONEncoder().encode({'package_id':'222', 'csar_id':'2222'}), '200']  # get csar_id from nslcm by vnfd_id
-        r2 = [1, json.JSONEncoder().encode(vnfd_rawdata), '200']  # get rawdata from catalog by csar_id
-        mock_call_req.side_effect = [r1, r2]
+        r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']
+        r2_get_rawdata_from_catalog = [1, json.JSONEncoder().encode(vnfd_rawdata), '200']
+        mock_call_req.side_effect = [r1_get_csarid_by_vnfdid, r2_get_rawdata_from_catalog]
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
         JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
@@ -129,10 +128,11 @@ class TestNFInstantiate(TestCase):
         NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='222',
                                    version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
                                    nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
-        r1 = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']  # get csar_id from nslcm by vnfd_id
-        r2 = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']  # get rawdata from catalog by csar_id
-        r3 = [1, json.JSONEncoder().encode({"vim":{"vimid": '1', "accessinfo": {"tenant": '2'}}}), '200']  # apply_grant_to_nfvo
-        mock_call_req.side_effect = [r1, r2, r3]
+        r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']
+        r2_get_rawdata_from_catalog = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']
+        r3_apply_grant_result = [1, json.JSONEncoder().encode(
+            {"vim": {"vimid": 'vimid_1', "accessinfo": {"tenant": 'tenantname_1'}}}), '200']
+        mock_call_req.side_effect = [r1_get_csarid_by_vnfdid, r2_get_rawdata_from_catalog, r3_apply_grant_result]
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
         JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
@@ -146,10 +146,11 @@ class TestNFInstantiate(TestCase):
         NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='222',
                                    version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
                                    nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
-        r1 = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']  # get csar_id from nslcm by vnfd_id
-        r2 = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']  # get rawdata from catalog by csar_id
-        r3 = [0, json.JSONEncoder().encode({"vim":{"vimid": '1', "accessinfo": {"tenant": '2'}}}), '200']  # apply_grant_to_nfvo
-        mock_call_req.side_effect = [r1, r2, r3]
+        r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']
+        r2_get_rawdata_from_catalog = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']
+        r3_apply_grant_result = [0, json.JSONEncoder().encode(
+            {"vim": {"vimid": 'vimid_1', "accessinfo": {"tenant": 'tenantname_1'}}}), '200']
+        mock_call_req.side_effect = [r1_get_csarid_by_vnfdid, r2_get_rawdata_from_catalog, r3_apply_grant_result]
         mock_call.side_effect = [c1_data_get_tenant_id, c2_data_create_volume, c3_data_get_volume]
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
@@ -164,13 +165,13 @@ class TestNFInstantiate(TestCase):
         NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='222',
                                    version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
                                    nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
-        r1 = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}),
-              '200']  # get csar_id from nslcm by vnfd_id
-        r2 = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']  # get rawdata from catalog by csar_id
-        r3 = [0, json.JSONEncoder().encode({"vim": {"vimid": 'vimid_1', "accessinfo": {"tenant": 'tenantname_1'}}}),
-              '200']  # apply_grant_to_nfvo
-        r4 = [0, None, '200']
-        mock_call_req.side_effect = [r1, r2, r3, r4]
+        r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']
+        r2_get_rawdata_from_catalog = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']
+        r3_apply_grant_result = [0, json.JSONEncoder().encode(
+            {"vim": {"vimid": 'vimid_1', "accessinfo": {"tenant": 'tenantname_1'}}}), '200']
+        r4_lcm_notify_result = [0, None, '200']
+        mock_call_req.side_effect = [r1_get_csarid_by_vnfdid, r2_get_rawdata_from_catalog,
+                                     r3_apply_grant_result, r4_lcm_notify_result]
         mock_call.side_effect = [c1_data_get_tenant_id, c2_data_create_volume, c3_data_get_volume,
                                  c4_data_create_network, c5_data_create_subnet, c6_data_create_port,
                                  c7_data_create_flavor, c8_data_list_image, c9_data_create_vm, c10_data_get_vm]
