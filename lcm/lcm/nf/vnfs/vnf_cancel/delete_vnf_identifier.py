@@ -29,6 +29,6 @@ class DeleteVnf:
         if not vnf_insts.exists():
             raise NFLCMException('VnfInst(%s) does not exist' % self.nf_inst_id)
         sel_vnf = vnf_insts[0]
-        if sel_vnf.instantiationState != 'VNF_INSTANTIATED':
-            raise NFLCMException("No instantiated vnf")
+        if sel_vnf.status != 'VNF_INSTANTIATED':
+            raise NFLCMException("Don't allow to delete vnf(status:[%s])" % sel_vnf.status)
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).delete()
