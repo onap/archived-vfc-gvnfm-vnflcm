@@ -45,7 +45,7 @@ class TermVnf(Thread):
     def run(self):
         try:
             self.term_pre()
-            self.query_inst_resource(self.nf_inst_id)
+            # self.query_inst_resource(self.nf_inst_id)
             # self.grant_resource()
             JobUtil.add_job_status(self.job_id, 100, "Terminate Vnf success.")
             is_exist = JobStatusModel.objects.filter(jobid=self.job_id).exists()
@@ -60,20 +60,16 @@ class TermVnf(Thread):
             logger.error(traceback.format_exc())
 
     def term_pre(self):
-        vnf_insts = NfInstModel.objects.filter(pk=self.nf_inst_id)
+        vnf_insts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
         if not vnf_insts.exists():
             raise NFLCMException('VnfInst(%s) does not exist' % self.nf_inst_id)
         sel_vnf = vnf_insts[0]
-        if sel_vnf.instantiationState != 'VNF_INSTANTIATED':
-            raise NFLCMException("No instantiated vnf")
+        if sel_vnf.status != 'VNF_INSTANTIATED':
+            raise NFLCMException("Don't allow to delete vnf(status:[%s])" % sel_vnf.status)
         if self.terminationType == 'GRACEFUL' and not self.gracefulTerminationTimeout:
             raise NFLCMException("Graceful termination must set timeout")
-        # get nfvo info
-        JobUtil.add_job_status(self.job_id, 5, 'Get nfvo connection info')
-        self.load_nfvo_config()
 
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status=VNF_STATUS.TERMINATING)
-
         JobUtil.add_job_status(self.job_id, 10, 'Nf terminating pre-check finish')
         logger.info("Nf terminating pre-check finish")
 
@@ -170,13 +166,13 @@ class TermVnf(Thread):
             logger.error("nf_cancel_task grant_resource failed.[%s]" % str(rsp[1]))
         logger.info("nf_cancel_task grant_resource end")
 
-    def load_nfvo_config(self):
-        logger.info("[NF instantiation]get nfvo connection info start")
-        reg_info = NfvoRegInfoModel.objects.filter(vnfminstid='vnfm111').first()
-        if reg_info:
-            self.vnfm_inst_id = reg_info.vnfminstid
-            self.nfvo_inst_id = reg_info.nfvoid
-            logger.info("[NF instantiation] Registered nfvo id is [%s]" % self.nfvo_inst_id)
-        else:
-            raise NFLCMException("Nfvo was not registered")
-        logger.info("[NF instantiation]get nfvo connection info end")
+    # def load_nfvo_config(self):
+    #     logger.info("[NF instantiation]get nfvo connection info start")
+    #     reg_info = NfvoRegInfoModel.objects.filter(vnfminstid='vnfm111').first()
+    #     if reg_info:
+    #         self.vnfm_inst_id = reg_info.vnfminstid
+    #         self.nfvo_inst_id = reg_info.nfvoid
+    #         logger.info("[NF instantiation] Registered nfvo id is [%s]" % self.nfvo_inst_id)
+    #     else:
+    #         raise NFLCMException("Nfvo was not registered")
+    #     logger.info("[NF instantiation]get nfvo connection info end")

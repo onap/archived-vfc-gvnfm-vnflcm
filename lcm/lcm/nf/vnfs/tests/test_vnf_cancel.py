@@ -74,49 +74,32 @@ class TestNFTerminate(TestCase):
         self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
         self.assertEqual("Don't allow to delete vnf(status:[NOT_INSTANTIATED])", response.data["error"])
 
-#     @mock.patch.object(TermVnf, 'run')
-#     def test_terminate_vnf(self, mock_run):
-#         mock_run.re.return_value = None
-#         response = self.client.post("/openoapi/vnflcm/v1/vnf_instances/12/terminate", data={}, format='json')
-#         self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
-#
-#     def test_terminate_vnf_when_inst_id_not_exist(self):
-#         data = {"terminationType": "GRACEFUL",
-#                 "gracefulTerminationTimeout": 120}
-#         self.nf_inst_id = str(uuid.uuid4())
-#         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
-#         JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
-#         TermVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-#         self.assert_job_result(self.job_id, 255, "VnfInst(%s) does not exist" % self.nf_inst_id)
-#
-#     def test_instantiate_vnf_when_get_nfvo_config_failed(self):
-#         NfInstModel.objects.create(nfinstid='1111', mnfinstid='1111', nf_name='2222',
-#                                    package_id='todo', vnfm_inst_id='todo', version='', vendor='',
-#                                    producttype='', netype='', vnfd_model='',
-#                                    instantiationState='VNF_INSTANTIATED', nf_desc='', vnfdid='',
-#                                    vnfSoftwareVersion='', vnfConfigurableProperties='todo',
-#                                    localizationLanguage='EN_US', create_time=now_time())
-#         data = {"terminationType": "FORCEFUL",
-#                 "gracefulTerminationTimeout": 120}
-#         self.nf_inst_id = '1111'
-#         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
-#         JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
-#         TermVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-#         self.assert_job_result(self.job_id, 255, "Nfvo was not registered")
-#
-#     def test_terminate_vnf_success(self):
-#         NfInstModel.objects.create(nfinstid='1111', mnfinstid='1111', nf_name='2222',
-#                                    package_id='todo', vnfm_inst_id='todo', version='', vendor='',
-#                                    producttype='', netype='', vnfd_model='',
-#                                    instantiationState='VNF_INSTANTIATED', nf_desc='', vnfdid='',
-#                                    vnfSoftwareVersion='', vnfConfigurableProperties='todo',
-#                                    localizationLanguage='EN_US', create_time=now_time())
-#         NfvoRegInfoModel.objects.create(nfvoid='nfvo111', vnfminstid='vnfm111', apiurl='http://10.74.44.11',
-#                                         nfvouser='root', nfvopassword='root123')
-#         data = {"terminationType": "FORCEFUL",
-#                 "gracefulTerminationTimeout": 120}
-#         self.nf_inst_id = '1111'
-#         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
-#         JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
-#         TermVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-#         self.assert_job_result(self.job_id, 100, "Terminate Vnf success.")
+    @mock.patch.object(TermVnf, 'run')
+    def test_terminate_vnf(self, mock_run):
+        mock_run.re.return_value = None
+        response = self.client.post("/openoapi/vnflcm/v1/vnf_instances/12/terminate", data={}, format='json')
+        self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
+
+    def test_terminate_vnf_when_inst_id_not_exist(self):
+        data = {"terminationType": "GRACEFUL",
+                "gracefulTerminationTimeout": 120}
+        self.nf_inst_id = str(uuid.uuid4())
+        self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
+        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+        TermVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
+        self.assert_job_result(self.job_id, 255, "VnfInst(%s) does not exist" % self.nf_inst_id)
+
+
+
+    def test_terminate_vnf_success(self):
+        NfInstModel.objects.create(nfinstid='1111', nf_name='2222', package_id='todo', version='', vendor='',
+                                   netype='', vnfd_model='', status='VNF_INSTANTIATED', nf_desc='', vnfdid='',
+                                   vnfSoftwareVersion='', vnfConfigurableProperties='todo',
+                                   localizationLanguage='EN_US', create_time=now_time())
+        data = {"terminationType": "FORCEFUL",
+                "gracefulTerminationTimeout": 120}
+        self.nf_inst_id = '1111'
+        self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
+        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+        TermVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
+        self.assert_job_result(self.job_id, 100, "Terminate Vnf success.")
