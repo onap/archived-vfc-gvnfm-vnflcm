@@ -11,6 +11,7 @@
 # # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # # See the License for the specific language governing permissions and
 # # limitations under the License.
+import json
 import uuid
 
 import mock
@@ -20,6 +21,7 @@ from rest_framework import status
 from lcm.nf.vnfs.vnf_cancel.term_vnf import TermVnf
 from lcm.pub.database.models import NfInstModel, JobStatusModel, VmInstModel, NetworkInstModel, SubNetworkInstModel, \
     PortInstModel, NfvoRegInfoModel
+from lcm.pub.utils import restcall
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
 
@@ -90,12 +92,15 @@ class TestNFTerminate(TestCase):
         self.assert_job_result(self.job_id, 255, "VnfInst(%s) does not exist" % self.nf_inst_id)
 
 
-
-    def test_terminate_vnf_success(self):
+    @mock.patch.object(restcall, 'call_req')
+    def test_terminate_vnf_success(self, mock_call_req):
         NfInstModel.objects.create(nfinstid='1111', nf_name='2222', package_id='todo', version='', vendor='',
                                    netype='', vnfd_model='', status='VNF_INSTANTIATED', nf_desc='', vnfdid='',
                                    vnfSoftwareVersion='', vnfConfigurableProperties='todo',
                                    localizationLanguage='EN_US', create_time=now_time())
+        t1_apply_grant_result = [0, json.JSONEncoder().encode(
+            {"vim": {"vimid": 'vimid_1', "accessinfo": {"tenant": 'tenantname_1'}}}), '200']
+        mock_call_req.side_effect = [t1_apply_grant_result]
         data = {"terminationType": "FORCEFUL",
                 "gracefulTerminationTimeout": 120}
         self.nf_inst_id = '1111'
