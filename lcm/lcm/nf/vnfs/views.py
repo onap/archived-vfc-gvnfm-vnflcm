@@ -27,7 +27,6 @@ from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
 from lcm.nf.vnfs.vnf_query.query_vnf import QueryVnf
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.utils.jobutil import JobUtil
-from lcm.pub.utils.values import ignore_case_get
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +41,6 @@ class CreateVnfAndQueryVnfs(APIView):
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except:
             logger.error(traceback.format_exc())
-            tt = traceback.format_exc()
             return Response(data={'error': 'Failed to get Vnfs'},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(data=resp_data, status=status.HTTP_200_OK)
@@ -119,26 +117,6 @@ class QueryMultipleVnf(APIView):
     def get(self, request):
         logger.debug("QueryMultipleVnf--get::> %s" % request.data)
         return Response(data='', status=status.HTTP_202_ACCEPTED)
-
-# class QuerySingleVnf(APIView):
-#     def get(self, request, instanceid):
-#         logger.debug("QuerySingleVnf--get::> %s" % request.data)
-#         try:
-#             resp_data = QueryVnf(request.data, instanceid).query_single_vnf(instanceid)
-#         except NFLCMException as e:
-#             logger.error(e.message)
-#             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-#         except:
-#             logger.error(traceback.format_exc())
-#             return Response(data={'error': 'Failed to get Vnf(%s)' % instanceid},
-#                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-#         return Response(data=resp_data, status=status.HTTP_202_ACCEPTED)
-
-
-# class GetOperationStatus(APIView):
-#     def get(self, request):
-#         logger.debug("GetOperationStatus--get::> %s" % request.data)
-#         return Response(data='', status=status.HTTP_202_ACCEPTED)
 
 
 class SwaggerJsonView(APIView):

@@ -15,8 +15,7 @@
 from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from lcm.nf.vnfs.views import InstantiateVnf, QueryMultipleVnf,\
-    TerminateVnf, SwaggerJsonView, DeleteVnfAndQueryVnf, CreateVnfAndQueryVnfs
+from lcm.nf.vnfs.views import InstantiateVnf, TerminateVnf, SwaggerJsonView, DeleteVnfAndQueryVnf, CreateVnfAndQueryVnfs
 
 urlpatterns = patterns('',
                        url(r'^openoapi/vnflcm/v1/vnf_instances$', CreateVnfAndQueryVnfs.as_view()),
@@ -26,11 +25,6 @@ urlpatterns = patterns('',
                            DeleteVnfAndQueryVnf.as_view()),
                        url(r'^openoapi/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)/terminate$',
                            TerminateVnf.as_view()),
-                       # url(r'^openoapi/vnflcm/v1/vnf_instances$', QueryMultipleVnf.as_view()),
-                       # url(r'^openoapi/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)$',
-                       #     QuerySingleVnf.as_view()),
-                       # url(r'^openoapi/vnflcm/v1/vnf_lc_ops/(?P<vnfLcOpId>[0-9a-zA-Z_-]+)&'
-                       #     r'responseId=(?P<responseId>[0-9a-zA-Z_-]+)$', GetOperationStatus.as_view()),
                        url(r'^openoapi/vnflcm/v1/swagger.json$', SwaggerJsonView.as_view()),
                        )
 
