@@ -62,7 +62,6 @@ class InstVnf(Thread):
             # self.rollback(e.message)
         except:
             self.vnf_inst_failed_handle('unexpected exception')
-            tt= traceback.format_exc()
             logger.error(traceback.format_exc())
             # self.rollback('unexpected exception')
 
@@ -150,7 +149,7 @@ class InstVnf(Thread):
     def lcm_notify(self):
         logger.info('[NF instantiation] send notify request to nfvo start')
         affected_vnfc = []
-        vnfcs = VNFCInstModel.objects.filter(nfinstid=self.nf_inst_id)
+        vnfcs = VNFCInstModel.objects.filter(instid=self.nf_inst_id)
         for vnfc in vnfcs:
             vmResource = {}
             if vnfc.vmid:
@@ -374,8 +373,8 @@ class InstVnf(Thread):
             VNFCInstModel.objects.create(
                 vnfcinstanceid=str(uuid.uuid4()),
                 vduid=ignore_case_get(ret, "id"),
-                # vdutype='AAA',
-                nfinstid=self.nf_inst_id,
+                is_predefined=ignore_case_get(ret, "returnCode"),
+                instid=self.nf_inst_id,
                 vmid=vm_id)
 
     # def do_rollback(self, args_=None):

@@ -72,7 +72,7 @@ class QueryVnf:
             }
             vl_arr.append(v_dic)
         logger.info('Get VNFCInstModel of list.')
-        vnfc_insts = VNFCInstModel.objects.filter(nfinstid=vnf.nfinstid)
+        vnfc_insts = VNFCInstModel.objects.filter(instid=vnf.nfinstid)
         vnfc_arr = []
         for vnfc in vnfc_insts:
             vm = VmInstModel.objects.filter(vmid=vnfc.vmid)

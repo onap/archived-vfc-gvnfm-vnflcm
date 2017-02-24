@@ -136,6 +136,7 @@ class VmInstModel(models.Model):
     is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
     create_time = models.CharField(db_column='CREATETIME', max_length=200, null=True, blank=True)
     instid = models.CharField(db_column='INSTID', max_length=255)
+    nodeId = models.CharField(db_column='NODEID', max_length=255, null=True)
 
 class VNFCInstModel(models.Model):
     class Meta:
@@ -144,8 +145,9 @@ class VNFCInstModel(models.Model):
     vnfcinstanceid = models.CharField(db_column='VNFCINSTANCEID', max_length=255, primary_key=True)
     vduid = models.CharField(db_column='VDUID', max_length=255)
     vdutype = models.CharField(db_column='VDUTYPE', max_length=255)
-    nfinstid = models.CharField(db_column='NFINSTID', max_length=255)
+    instid = models.CharField(db_column='NFINSTID', max_length=255)
     vmid = models.CharField(db_column='VMID', max_length=255)
+    is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
 
 class FlavourInstModel(models.Model):
     class Meta:
