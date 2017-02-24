@@ -32,7 +32,21 @@ from lcm.pub.utils.values import ignore_case_get
 logger = logging.getLogger(__name__)
 
 
-class CreateVnfIdentifier(APIView):
+class CreateVnfAndQueryVnfs(APIView):
+    def get(self, request):
+        logger.debug("QuerySingleVnf--get::> %s" % request.data)
+        try:
+            resp_data = QueryVnf(request.data).query_multi_vnf()
+        except NFLCMException as e:
+            logger.error(e.message)
+            return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except:
+            logger.error(traceback.format_exc())
+            tt = traceback.format_exc()
+            return Response(data={'error': 'Failed to get Vnfs'},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(data=resp_data, status=status.HTTP_200_OK)
+
     def post(self, request):
         logger.debug("CreateVnfIdentifier--post::> %s" % request.data)
         try:
@@ -64,7 +78,7 @@ class InstantiateVnf(APIView):
         return Response(data=rsp, status=status.HTTP_202_ACCEPTED)
 
 
-class DetailVnf(APIView):
+class DeleteVnfAndQueryVnf(APIView):
     def get(self, request, instanceid):
         logger.debug("QuerySingleVnf--get::> %s" % request.data)
         try:
@@ -74,7 +88,6 @@ class DetailVnf(APIView):
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except:
             logger.error(traceback.format_exc())
-            tt = traceback.format_exc()
             return Response(data={'error': 'Failed to get Vnf(%s)' % instanceid},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(data=resp_data, status=status.HTTP_200_OK)

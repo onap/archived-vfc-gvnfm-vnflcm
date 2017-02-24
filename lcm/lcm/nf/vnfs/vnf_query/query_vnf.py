@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 class QueryVnf:
-    def __init__(self, data, instanceid):
+    def __init__(self, data, instanceid=''):
         self.vnf_inst_id = instanceid
         self.data = data
         pass
@@ -34,7 +34,13 @@ class QueryVnf:
         return resp_data
 
     def query_multi_vnf(self):
-        pass
+        vnf_insts = NfInstModel.objects.all()
+        if not vnf_insts:
+            raise NFLCMException('VnfInsts does not exist')
+        resp_data = []
+        for vnf_inst in vnf_insts:
+            resp_data.append(self.fill_resp_data(vnf_inst))
+        return  resp_data
 
     def fill_resp_data(self, vnf):
         logger.info('Get the list of vloumes')
