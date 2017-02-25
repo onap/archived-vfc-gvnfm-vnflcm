@@ -17,7 +17,7 @@ from threading import Thread
 
 from lcm.nf.vnfs.const import VNF_STATUS
 from lcm.pub.database.models import JobStatusModel, NfInstModel, VmInstModel, NetworkInstModel, StorageInstModel, \
-    FlavourInstModel, PortInstModel, SubNetworkInstModel, NfvoRegInfoModel, VNFCInstModel
+    FlavourInstModel, PortInstModel, SubNetworkInstModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.msapi.nfvolcm import apply_grant_to_nfvo
 from lcm.pub.utils.jobutil import JobUtil
@@ -47,20 +47,15 @@ class TermVnf(Thread):
         try:
             self.term_pre()
             self.grant_resource()
-            # self.query_inst_resource()
+            self.query_inst_resource()
+            # self.delete_resource()
+            # self.lcm_notify()
             JobUtil.add_job_status(self.job_id, 100, "Terminate Vnf success.")
-            is_exist = JobStatusModel.objects.filter(jobid=self.job_id).exists()
-            logger.debug("check_ns_inst_name_exist::is_exist=%s" % is_exist)
         except NFLCMException as e:
-            self.vnf_inst_failed_handle(e.message)
+            self.vnf_term_failed_handle(e.message)
         except:
             logger.error(traceback.format_exc())
-            self.vnf_inst_failed_handle(traceback.format_exc())
-
-    def vnf_inst_failed_handle(self, error_msg):
-        logger.error('VNF termination failed, detail message: %s' % error_msg)
-        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='failed', lastuptime=now_time())
-        JobUtil.add_job_status(self.job_id, 255, error_msg)
+            self.vnf_term_failed_handle(traceback.format_exc())
 
     def term_pre(self):
         vnf_insts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
@@ -75,74 +70,6 @@ class TermVnf(Thread):
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status=VNF_STATUS.TERMINATING)
         JobUtil.add_job_status(self.job_id, 10, 'Nf terminating pre-check finish')
         logger.info("Nf terminating pre-check finish")
-
-    def query_inst_resource(self):
-        logger.info('[query_resource begin]:inst_id=%s' % self.nf_inst_id)
-        # query_volumn_resource
-        vol_list = StorageInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
-        for vol in vol_list:
-            vol_info = {}
-            if not vol.resouceid:
-                continue
-            vol_info["res_id"] = vol.resouceid
-            vol_info["vim_id"] = vol.vimid
-            self.inst_resource['volumn'].append(vol_info)
-        logger.info('[query_volumn_resource]:ret_volumns=%s' % self.inst_resource['volumn'])
-
-        # query_network_resource
-        network_list = NetworkInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
-        for network in network_list:
-            network_info = {}
-            if not network.resouceid:
-                continue
-            network_info["res_id"] = network.resouceid
-            network_info["vim_id"] = network.vimid
-            self.inst_resource['network'].append(network_info)
-        logger.info('[query_network_resource]:ret_networks=%s' % self.inst_resource['network'])
-
-        # query_subnetwork_resource
-        subnetwork_list = SubNetworkInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
-        for subnetwork in subnetwork_list:
-            subnetwork_info = {}
-            if not subnetwork.resouceid:
-                continue
-            subnetwork_info["res_id"] = subnetwork.resouceid
-            subnetwork_info["vim_id"] = subnetwork.vimid
-            self.inst_resource['subnet'].append(subnetwork_info)
-        logger.info('[query_subnetwork_resource]:ret_networks=%s' % self.inst_resource['subnet'])
-
-        # query_port_resource
-        port_list = PortInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
-        for port in port_list:
-            port_info = {}
-            if not port.resouceid:
-                continue
-            port_info["res_id"] = port.resouceid
-            port_info["vim_id"] = port.vimid
-            self.inst_resource['port'].append(port_info)
-        logger.info('[query_port_resource]:ret_networks=%s' % self.inst_resource['port'])
-
-        # query_flavor_resource
-        flavor_list = FlavourInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
-        for flavor in flavor_list:
-            flavor_info = {}
-            if not flavor.resouceid:
-                continue
-            flavor_info["res_id"] = flavor.resouceid
-            flavor_info["vim_id"] = flavor.vimid
-            self.inst_resource['flavor'].append(flavor_info)
-        logger.info('[query_flavor_resource]:ret_networks=%s' % self.inst_resource['flavor'])
-
-        # query_vm_resource
-        vm_list = VmInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
-        for vm in vm_list:
-            vm_info = {}
-            if not vm.resouceid:
-                continue
-            vm_info["res_id"] = vm.resouceid
-            vm_info["vim_id"] = vm.vimid
-            self.inst_resource['vm'].append(vm_info)
-        logger.info('[query_vm_resource]:ret_vms=%s' % self.inst_resource['vm'])
 
     def grant_resource(self):
         logger.info("nf_cancel_task grant_resource begin")
@@ -164,6 +91,87 @@ class TermVnf(Thread):
         self.apply_result = apply_grant_to_nfvo(content_args)
         vim_info = ignore_case_get(self.apply_result, "vim")
         logger.info("nf_cancel_task grant_resource end")
+        JobUtil.add_job_status(self.job_id, 20, 'Nf terminating grant_resource finish')
+
+    def query_inst_resource(self):
+        logger.info('[query_resource begin]:inst_id=%s' % self.nf_inst_id)
+        # query_volumn_resource
+        vol_list = StorageInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
+        for vol in vol_list:
+            vol_info = {}
+            if not vol.resouceid:
+                continue
+            vol_info["vim_id"] = vol.vimid
+            vol_info["tenant_id"] = vol.tenant
+            vol_info["res_id"] = vol.resouceid
+            self.inst_resource['volumn'].append(vol_info)
+        logger.info('[query_volumn_resource]:ret_volumns=%s' % self.inst_resource['volumn'])
+
+        # query_network_resource
+        network_list = NetworkInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
+        for network in network_list:
+            network_info = {}
+            if not network.resouceid:
+                continue
+            network_info["vim_id"] = network.vimid
+            network_info["tenant_id"] = network.tenant
+            network_info["res_id"] = network.resouceid
+            self.inst_resource['network'].append(network_info)
+        logger.info('[query_network_resource]:ret_networks=%s' % self.inst_resource['network'])
+
+        # query_subnetwork_resource
+        subnetwork_list = SubNetworkInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
+        for subnetwork in subnetwork_list:
+            subnetwork_info = {}
+            if not subnetwork.resouceid:
+                continue
+            subnetwork_info["vim_id"] = subnetwork.vimid
+            subnetwork_info["tenant_id"] = subnetwork.tenant
+            subnetwork_info["res_id"] = subnetwork.resouceid
+            self.inst_resource['subnet'].append(subnetwork_info)
+        logger.info('[query_subnetwork_resource]:ret_networks=%s' % self.inst_resource['subnet'])
+
+        # query_port_resource
+        port_list = PortInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
+        for port in port_list:
+            port_info = {}
+            if not port.resouceid:
+                continue
+            port_info["vim_id"] = port.vimid
+            port_info["tenant_id"] = port.tenant
+            port_info["res_id"] = port.resouceid
+            self.inst_resource['port'].append(port_info)
+        logger.info('[query_port_resource]:ret_networks=%s' % self.inst_resource['port'])
+
+        # query_flavor_resource
+        flavor_list = FlavourInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
+        for flavor in flavor_list:
+            flavor_info = {}
+            if not flavor.resouceid:
+                continue
+            flavor_info["vim_id"] = flavor.vimid
+            flavor_info["tenant_id"] = flavor.tenant
+            flavor_info["res_id"] = flavor.resouceid
+            self.inst_resource['flavor'].append(flavor_info)
+        logger.info('[query_flavor_resource]:ret_networks=%s' % self.inst_resource['flavor'])
+
+        # query_vm_resource
+        vm_list = VmInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
+        for vm in vm_list:
+            vm_info = {}
+            if not vm.resouceid:
+                continue
+            vm_info["vim_id"] = vm.vimid
+            vm_info["tenant_id"] = vm.tenant
+            vm_info["res_id"] = vm.resouceid
+            self.inst_resource['vm'].append(vm_info)
+        logger.info('[query_vm_resource]:ret_vms=%s' % self.inst_resource['vm'])
+
+    def delete_resource(self):
+        pass
+
+    def lcm_notify(self):
+        pass
 
     # def load_nfvo_config(self):
     #     logger.info("[NF instantiation]get nfvo connection info start")
@@ -175,3 +183,8 @@ class TermVnf(Thread):
     #     else:
     #         raise NFLCMException("Nfvo was not registered")
     #     logger.info("[NF instantiation]get nfvo connection info end")
+
+    def vnf_term_failed_handle(self, error_msg):
+        logger.error('VNF termination failed, detail message: %s' % error_msg)
+        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='failed', lastuptime=now_time())
+        JobUtil.add_job_status(self.job_id, 255, error_msg)
