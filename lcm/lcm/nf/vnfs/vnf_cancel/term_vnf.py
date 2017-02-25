@@ -49,7 +49,7 @@ class TermVnf(Thread):
             self.term_pre()
             self.grant_resource()
             self.query_inst_resource()
-            # self.delete_resource()
+            self.delete_resource()
             # self.lcm_notify()
             JobUtil.add_job_status(self.job_id, 100, "Terminate Vnf success.")
         except NFLCMException as e:
@@ -169,35 +169,27 @@ class TermVnf(Thread):
         logger.info('[query_vm_resource]:ret_vms=%s' % self.inst_resource['vm'])
 
     def delete_resource(self):
+        logger.error('rollback resource begin')
         adaptor.delete_vim_res(self.inst_resource, self.do_notify_delete)
         logger.error('rollback resource complete')
 
-        StorageInstModel.objects.filter(instid=self.nf_inst_id).delete()
-        NetworkInstModel.objects.filter(instid=self.nf_inst_id).delete()
-        SubNetworkInstModel.objects.filter(instid=self.nf_inst_id).delete()
-        PortInstModel.objects.filter(instid=self.nf_inst_id).delete()
-        FlavourInstModel.objects.filter(instid=self.nf_inst_id).delete()
-        VmInstModel.objects.filter(instid=self.nf_inst_id).delete()
-        logger.error('delete table complete')
-        raise NFLCMException("Delete resource failed")
-
-    def do_notify_delete(self, ret):
-        logger.error('Deleting [%s] resource' % ret)
-        pass
+    def do_notify_delete(self, res_type, res_id):
+        logger.error('Deleting [%s] resource:resourceid [%s]' % (res_type, res_id))
+        if res_type == adaptor.RES_VM:
+            VmInstModel.objects.filter(instid=self.nf_inst_id, resouceid=res_id).delete()
+        elif res_type == adaptor.RES_FLAVOR:
+            FlavourInstModel.objects.filter(instid=self.nf_inst_id, resouceid=res_id).delete()
+        elif res_type == adaptor.RES_PORT:
+            PortInstModel.objects.filter(instid=self.nf_inst_id, resouceid=res_id).delete()
+        elif res_type == adaptor.RES_SUBNET:
+            SubNetworkInstModel.objects.filter(instid=self.nf_inst_id, resouceid=res_id).delete()
+        elif res_type == adaptor.RES_NETWORK:
+            NetworkInstModel.objects.filter(instid=self.nf_inst_id, resouceid=res_id).delete()
+        elif res_type == adaptor.RES_VOLUME:
+            StorageInstModel.objects.filter(instid=self.nf_inst_id, resouceid=res_id).delete()
 
     def lcm_notify(self):
         pass
-
-    # def load_nfvo_config(self):
-    #     logger.info("[NF instantiation]get nfvo connection info start")
-    #     reg_info = NfvoRegInfoModel.objects.filter(vnfminstid='vnfm111').first()
-    #     if reg_info:
-    #         self.vnfm_inst_id = reg_info.vnfminstid
-    #         self.nfvo_inst_id = reg_info.nfvoid
-    #         logger.info("[NF instantiation] Registered nfvo id is [%s]" % self.nfvo_inst_id)
-    #     else:
-    #         raise NFLCMException("Nfvo was not registered")
-    #     logger.info("[NF instantiation]get nfvo connection info end")
 
     def vnf_term_failed_handle(self, error_msg):
         logger.error('VNF termination failed, detail message: %s' % error_msg)

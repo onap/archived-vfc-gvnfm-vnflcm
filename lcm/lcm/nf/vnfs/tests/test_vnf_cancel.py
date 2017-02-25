@@ -24,6 +24,7 @@ from lcm.pub.database.models import NfInstModel, JobStatusModel, VmInstModel, Ne
 from lcm.pub.utils import restcall
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
+from lcm.pub.vimapi import api
 
 
 class TestNFTerminate(TestCase):
@@ -54,47 +55,48 @@ class TestNFTerminate(TestCase):
             descp=job_detail)
         self.assertEqual(1, len(jobs))
 
-    # def test_delete_vnf_identifier(self):
-    #     NfInstModel.objects.create(nfinstid='1111', nf_name='2222', package_id='todo', version='', vendor='',
-    #                                netype='', vnfd_model='', status='VNF_INSTANTIATED', nf_desc='', vnfdid='',
-    #                                vnfSoftwareVersion='', vnfConfigurableProperties='todo',
-    #                                localizationLanguage='EN_US', create_time=now_time())
-    #     response = self.client.delete("/openoapi/vnflcm/v1/vnf_instances/1111")
-    #     self.failUnlessEqual(status.HTTP_204_NO_CONTENT, response.status_code)
-    #     self.assertEqual(None, response.data)
-    #
-    # def test_delete_vnf_identifier_when_vnf_not_exist(self):
-    #     response = self.client.delete("/openoapi/vnflcm/v1/vnf_instances/1111")
-    #     self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
-    #     self.assertEqual("VnfInst(1111) does not exist", response.data["error"])
-    #
-    # def test_delete_vnf_identifier_when_status_check_failed(self):
-    #     NfInstModel.objects.create(nfinstid='1111', nf_name='2222', package_id='todo', version='', vendor='',
-    #                                netype='', vnfd_model='', status='NOT_INSTANTIATED', nf_desc='', vnfdid='',
-    #                                vnfSoftwareVersion='', vnfConfigurableProperties='todo',
-    #                                localizationLanguage='EN_US', create_time=now_time())
-    #     response = self.client.delete("/openoapi/vnflcm/v1/vnf_instances/1111")
-    #     self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
-    #     self.assertEqual("Don't allow to delete vnf(status:[NOT_INSTANTIATED])", response.data["error"])
-    #
-    # @mock.patch.object(TermVnf, 'run')
-    # def test_terminate_vnf(self, mock_run):
-    #     mock_run.re.return_value = None
-    #     response = self.client.post("/openoapi/vnflcm/v1/vnf_instances/12/terminate", data={}, format='json')
-    #     self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
-    #
-    # def test_terminate_vnf_when_inst_id_not_exist(self):
-    #     data = {"terminationType": "GRACEFUL",
-    #             "gracefulTerminationTimeout": 120}
-    #     self.nf_inst_id = str(uuid.uuid4())
-    #     self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
-    #     JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
-    #     TermVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-    #     self.assert_job_result(self.job_id, 255, "VnfInst(%s) does not exist" % self.nf_inst_id)
+    def test_delete_vnf_identifier(self):
+        NfInstModel.objects.create(nfinstid='1111', nf_name='2222', package_id='todo', version='', vendor='',
+                                   netype='', vnfd_model='', status='VNF_INSTANTIATED', nf_desc='', vnfdid='',
+                                   vnfSoftwareVersion='', vnfConfigurableProperties='todo',
+                                   localizationLanguage='EN_US', create_time=now_time())
+        response = self.client.delete("/openoapi/vnflcm/v1/vnf_instances/1111")
+        self.failUnlessEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+        self.assertEqual(None, response.data)
+
+    def test_delete_vnf_identifier_when_vnf_not_exist(self):
+        response = self.client.delete("/openoapi/vnflcm/v1/vnf_instances/1111")
+        self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
+        self.assertEqual("VnfInst(1111) does not exist", response.data["error"])
+
+    def test_delete_vnf_identifier_when_status_check_failed(self):
+        NfInstModel.objects.create(nfinstid='1111', nf_name='2222', package_id='todo', version='', vendor='',
+                                   netype='', vnfd_model='', status='NOT_INSTANTIATED', nf_desc='', vnfdid='',
+                                   vnfSoftwareVersion='', vnfConfigurableProperties='todo',
+                                   localizationLanguage='EN_US', create_time=now_time())
+        response = self.client.delete("/openoapi/vnflcm/v1/vnf_instances/1111")
+        self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
+        self.assertEqual("Don't allow to delete vnf(status:[NOT_INSTANTIATED])", response.data["error"])
+
+    @mock.patch.object(TermVnf, 'run')
+    def test_terminate_vnf(self, mock_run):
+        mock_run.re.return_value = None
+        response = self.client.post("/openoapi/vnflcm/v1/vnf_instances/12/terminate", data={}, format='json')
+        self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
+
+    def test_terminate_vnf_when_inst_id_not_exist(self):
+        data = {"terminationType": "GRACEFUL",
+                "gracefulTerminationTimeout": 120}
+        self.nf_inst_id = str(uuid.uuid4())
+        self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
+        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+        TermVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
+        self.assert_job_result(self.job_id, 255, "VnfInst(%s) does not exist" % self.nf_inst_id)
 
 
     @mock.patch.object(restcall, 'call_req')
-    def test_terminate_vnf_success(self, mock_call_req):
+    @mock.patch.object(api, 'call')
+    def test_terminate_vnf_success(self, mock_call, mock_call_req):
         NfInstModel.objects.create(nfinstid='1111', nf_name='2222', package_id='todo', version='', vendor='',
                                    netype='', vnfd_model='', status='VNF_INSTANTIATED', nf_desc='', vnfdid='',
                                    vnfSoftwareVersion='', vnfConfigurableProperties='todo',
@@ -102,6 +104,7 @@ class TestNFTerminate(TestCase):
         t1_apply_grant_result = [0, json.JSONEncoder().encode(
             {"vim": {"vimid": 'vimid_1', "accessinfo": {"tenant": 'tenantname_1'}}}), '200']
         mock_call_req.side_effect = [t1_apply_grant_result]
+        mock_call.return_value = None
         data = {"terminationType": "FORCEFUL",
                 "gracefulTerminationTimeout": 120}
         self.nf_inst_id = '1111'
