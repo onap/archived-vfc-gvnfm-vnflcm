@@ -20,7 +20,7 @@ from rest_framework import status
 
 from lcm.nf.vnfs.vnf_cancel.term_vnf import TermVnf
 from lcm.pub.database.models import NfInstModel, JobStatusModel, VmInstModel, NetworkInstModel, SubNetworkInstModel, \
-    PortInstModel, NfvoRegInfoModel, FlavourInstModel, StorageInstModel
+    PortInstModel, FlavourInstModel, StorageInstModel
 from lcm.pub.utils import restcall
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time

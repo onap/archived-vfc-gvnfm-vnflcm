@@ -36,6 +36,8 @@ class TermVnf(Thread):
         self.job_id = job_id
         self.terminationType = ignore_case_get(self.data, "terminationType")
         self.gracefulTerminationTimeout = ignore_case_get(self.data, "gracefulTerminationTimeout")
+        self.apply_result = None
+        self.notify_data = None
         self.inst_resource = {'volumn': [],  # [{"vim_id": ignore_case_get(ret, "vim_id")},{}]
                               'network': [],
                               'subnet': [],
@@ -43,7 +45,6 @@ class TermVnf(Thread):
                               'flavor': [],
                               'vm': [],
                               }
-        self.notify_data = None
 
     def run(self):
         try:
@@ -57,7 +58,6 @@ class TermVnf(Thread):
         except NFLCMException as e:
             self.vnf_term_failed_handle(e.message)
         except:
-            logger.error(traceback.format_exc())
             self.vnf_term_failed_handle(traceback.format_exc())
 
     def term_pre(self):
@@ -92,7 +92,6 @@ class TermVnf(Thread):
 
         logger.info('content_args=%s' % content_args)
         self.apply_result = apply_grant_to_nfvo(content_args)
-        vim_info = ignore_case_get(self.apply_result, "vim")
         logger.info("nf_cancel_task grant_resource end")
         JobUtil.add_job_status(self.job_id, 20, 'Nf terminating grant_resource finish')
 
@@ -175,17 +174,17 @@ class TermVnf(Thread):
         affected_vnfc = []
         vnfcs = VNFCInstModel.objects.filter(instid=self.nf_inst_id)
         for vnfc in vnfcs:
-            vmResource = {}
+            vm_resource = {}
             if vnfc.vmid:
                 vm = VmInstModel.objects.filter(vmid=vnfc.vmid)
                 if vm:
-                    vmResource = {'vimId': vm[0].vimid, 'resourceId': vm[0].resouceid,
-                                  'resourceName': vm[0].vmname, 'resourceType': 'vm'}
+                    vm_resource = {'vimId': vm[0].vimid, 'resourceId': vm[0].resouceid,
+                                   'resourceName': vm[0].vmname, 'resourceType': 'vm'}
             affected_vnfc.append(
                 {'vnfcInstanceId': vnfc.vnfcinstanceid,
                  'vduId': vnfc.vduid,
                  'changeType': 'removed',
-                 'computeResource': vmResource})
+                 'computeResource': vm_resource})
         affected_vl = []
         networks = NetworkInstModel.objects.filter(instid=self.nf_inst_id)
         for network in networks:
@@ -253,6 +252,7 @@ class TermVnf(Thread):
             StorageInstModel.objects.filter(instid=self.nf_inst_id, resouceid=res_id).delete()
 
     def lcm_notify(self):
+        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='NOT_INSTANTIATED', lastuptime=now_time())
         logger.info('[NF termination] send notify request to nfvo end')
         resp = notify_lcm_to_nfvo(self.notify_data, self.nf_inst_id)
         logger.info('[NF termination] get lcm response %s' % resp)

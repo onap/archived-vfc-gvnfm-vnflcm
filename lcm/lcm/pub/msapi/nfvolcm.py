@@ -20,7 +20,6 @@ from lcm.pub.utils.restcall import req_by_msb
 logger = logging.getLogger(__name__)
 
 
-#call gvnfm driver
 def get_packageinfo_by_vnfdid(vnfdid):
     ret = req_by_msb("openoapi/nslcm/v1/vnfs/%s" % vnfdid, "GET")
     if ret[0] != 0:
@@ -28,23 +27,18 @@ def get_packageinfo_by_vnfdid(vnfdid):
         raise NFLCMException("Failed to query package_info of vnfdid(%s) from nslcm." % vnfdid)
     return json.JSONDecoder().decode(ret[1])
 
-#call gvnfm driver
+
 def apply_grant_to_nfvo(data):
-    ret = req_by_msb("openoapi/nslcm/v1/grantvnf" , "POST", data)
+    ret = req_by_msb("openoapi/nslcm/v1/grantvnf", "POST", data)
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Nf instancing apply grant exception")
     return json.JSONDecoder().decode(ret[1])
 
-#call gvnfm driver
+
 def notify_lcm_to_nfvo(data, nf_inst_id):
-    ret = req_by_msb("openoapi/nslcm/v1/vnfs/%s/Notify"%nf_inst_id, "POST", data)
+    ret = req_by_msb("openoapi/nslcm/v1/vnfs/%s/Notify" % nf_inst_id, "POST", data)
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Nf lcm notify exception")
     return json.JSONDecoder().decode(ret[1])
-
-#call gvnfm driver
-def apply_res_to_nfvo(data):
-    ret = req_by_msb("openoapi/nslcm/v1/res" , "POST", data)
-    return ret
