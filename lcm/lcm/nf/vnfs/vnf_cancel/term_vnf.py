@@ -23,6 +23,7 @@ from lcm.pub.msapi.nfvolcm import apply_grant_to_nfvo
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.values import ignore_case_get
+from lcm.pub.vimapi import adaptor
 
 logger = logging.getLogger(__name__)
 
@@ -168,6 +169,20 @@ class TermVnf(Thread):
         logger.info('[query_vm_resource]:ret_vms=%s' % self.inst_resource['vm'])
 
     def delete_resource(self):
+        adaptor.delete_vim_res(self.inst_resource, self.do_notify_delete)
+        logger.error('rollback resource complete')
+
+        StorageInstModel.objects.filter(instid=self.nf_inst_id).delete()
+        NetworkInstModel.objects.filter(instid=self.nf_inst_id).delete()
+        SubNetworkInstModel.objects.filter(instid=self.nf_inst_id).delete()
+        PortInstModel.objects.filter(instid=self.nf_inst_id).delete()
+        FlavourInstModel.objects.filter(instid=self.nf_inst_id).delete()
+        VmInstModel.objects.filter(instid=self.nf_inst_id).delete()
+        logger.error('delete table complete')
+        raise NFLCMException("Delete resource failed")
+
+    def do_notify_delete(self, ret):
+        logger.error('Deleting [%s] resource' % ret)
         pass
 
     def lcm_notify(self):
