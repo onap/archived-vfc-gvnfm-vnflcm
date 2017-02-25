@@ -59,11 +59,8 @@ class InstVnf(Thread):
             JobUtil.add_job_status(self.job_id, 100, "Instantiate Vnf success.")
         except NFLCMException as e:
             self.vnf_inst_failed_handle(e.message)
-            # self.rollback(e.message)
         except:
             self.vnf_inst_failed_handle('unexpected exception')
-            logger.error(traceback.format_exc())
-            # self.rollback('unexpected exception')
 
     def inst_pre(self):
         vnf_insts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
