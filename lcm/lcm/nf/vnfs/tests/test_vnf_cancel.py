@@ -103,7 +103,8 @@ class TestNFTerminate(TestCase):
                                    localizationLanguage='EN_US', create_time=now_time())
         t1_apply_grant_result = [0, json.JSONEncoder().encode(
             {"vim": {"vimid": 'vimid_1', "accessinfo": {"tenant": 'tenantname_1'}}}), '200']
-        mock_call_req.side_effect = [t1_apply_grant_result]
+        t2_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
+        mock_call_req.side_effect = [t1_apply_grant_result, t2_lcm_notify_result]
         mock_call.return_value = None
         data = {"terminationType": "FORCEFUL",
                 "gracefulTerminationTimeout": 120}

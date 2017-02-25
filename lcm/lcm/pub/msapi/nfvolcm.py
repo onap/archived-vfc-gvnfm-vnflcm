@@ -39,7 +39,10 @@ def apply_grant_to_nfvo(data):
 #call gvnfm driver
 def notify_lcm_to_nfvo(data, nf_inst_id):
     ret = req_by_msb("openoapi/nslcm/v1/vnfs/%s/Notify"%nf_inst_id, "POST", data)
-    return ret
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Nf lcm notify exception")
+    return json.JSONDecoder().decode(ret[1])
 
 #call gvnfm driver
 def apply_res_to_nfvo(data):
