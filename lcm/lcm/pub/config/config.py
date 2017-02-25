@@ -40,7 +40,7 @@ REG_TO_MSB_REG_PARAM = {
     "visualRange": "1",
     "nodes": [{
         "ip": "127.0.0.1",
-        "port": "8703",
+        "port": "8801",
         "ttl": 0
     }]
 }
