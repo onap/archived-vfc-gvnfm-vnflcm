@@ -210,9 +210,6 @@ class InstVnf(Thread):
         # call rest api
         resp = notify_lcm_to_nfvo(content_args, self.nf_inst_id)
         logger.info('[NF instantiation] get lcm response %s' % resp)
-        if resp[0] != 0:
-            logger.error("notify lifecycle to nfvo failed.[%s]" % resp[1])
-            raise NFLCMException("send notify request to nfvo failed")
         logger.info('[NF instantiation] send notify request to nfvo end')
 
     # def load_nfvo_config(self):

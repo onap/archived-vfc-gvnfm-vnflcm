@@ -161,7 +161,7 @@ class TestNFInstantiate(TestCase):
 
     @mock.patch.object(restcall, 'call_req')
     @mock.patch.object(api, 'call')
-    def test_instantiate_vnf_when_111(self, mock_call, mock_call_req):
+    def test_instantiate_vnf_success(self, mock_call, mock_call_req):
         NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='222',
                                    version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
                                    nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
@@ -169,7 +169,7 @@ class TestNFInstantiate(TestCase):
         r2_get_rawdata_from_catalog = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']
         r3_apply_grant_result = [0, json.JSONEncoder().encode(
             {"vim": {"vimid": 'vimid_1', "accessinfo": {"tenant": 'tenantname_1'}}}), '200']
-        r4_lcm_notify_result = [0, None, '200']
+        r4_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
         mock_call_req.side_effect = [r1_get_csarid_by_vnfdid, r2_get_rawdata_from_catalog,
                                      r3_apply_grant_result, r4_lcm_notify_result]
         mock_call.side_effect = [c1_data_get_tenant_id, c2_data_create_volume, c3_data_get_volume,

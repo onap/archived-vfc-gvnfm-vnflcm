@@ -17,9 +17,9 @@ from threading import Thread
 
 from lcm.nf.vnfs.const import VNF_STATUS
 from lcm.pub.database.models import JobStatusModel, NfInstModel, VmInstModel, NetworkInstModel, StorageInstModel, \
-    FlavourInstModel, PortInstModel, SubNetworkInstModel
+    FlavourInstModel, PortInstModel, SubNetworkInstModel, VNFCInstModel
 from lcm.pub.exceptions import NFLCMException
-from lcm.pub.msapi.nfvolcm import apply_grant_to_nfvo
+from lcm.pub.msapi.nfvolcm import apply_grant_to_nfvo, notify_lcm_to_nfvo
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.values import ignore_case_get
@@ -43,14 +43,16 @@ class TermVnf(Thread):
                               'flavor': [],
                               'vm': [],
                               }
+        self.notify_data = None
 
     def run(self):
         try:
             self.term_pre()
             self.grant_resource()
             self.query_inst_resource()
+            self.query_notify_data()
             self.delete_resource()
-            # self.lcm_notify()
+            self.lcm_notify()
             JobUtil.add_job_status(self.job_id, 100, "Terminate Vnf success.")
         except NFLCMException as e:
             self.vnf_term_failed_handle(e.message)
@@ -168,6 +170,68 @@ class TermVnf(Thread):
             self.inst_resource['vm'].append(vm_info)
         logger.info('[query_vm_resource]:ret_vms=%s' % self.inst_resource['vm'])
 
+    def query_notify_data(self):
+        logger.info('[NF instantiation] send notify request to nfvo start')
+        affected_vnfc = []
+        vnfcs = VNFCInstModel.objects.filter(instid=self.nf_inst_id)
+        for vnfc in vnfcs:
+            vmResource = {}
+            if vnfc.vmid:
+                vm = VmInstModel.objects.filter(vmid=vnfc.vmid)
+                if vm:
+                    vmResource = {'vimId': vm[0].vimid, 'resourceId': vm[0].resouceid,
+                                  'resourceName': vm[0].vmname, 'resourceType': 'vm'}
+            affected_vnfc.append(
+                {'vnfcInstanceId': vnfc.vnfcinstanceid,
+                 'vduId': vnfc.vduid,
+                 'changeType': 'removed',
+                 'computeResource': vmResource})
+        affected_vl = []
+        networks = NetworkInstModel.objects.filter(instid=self.nf_inst_id)
+        for network in networks:
+            network_resource = {'vimId': network.vimid, 'resourceId': network.resouceid,
+                                'resourceName': network.name, 'resourceType': 'network'}
+            affected_vl.append(
+                {'vlInstanceId': network.networkid,
+                 'vldid': network.nodeId,
+                 'changeType': 'removed',
+                 'networkResource': network_resource})
+        affected_cp = []
+        ports = PortInstModel.objects.filter(instid=self.nf_inst_id)
+        for port in ports:
+            affected_cp.append(
+                {'vsInstanceId': port.portid,
+                 'cpdid': port.nodeId,
+                 'changeType': 'removed',
+                 'storageResource': {'vimId': port.vimid, 'resourceId': port.resouceid,
+                                     'resourceName': port.name, 'resourceType': 'port'}})
+        affected_vs = []
+        vss = StorageInstModel.objects.filter(instid=self.nf_inst_id)
+        for vs in vss:
+            affected_vs.append(
+                {'vsInstanceId': vs.storageid,
+                 'vsdId': vs.nodeId,
+                 'changeType': 'removed',
+                 'storageResource': {'vimId': vs.vimid, 'resourceId': vs.resouceid,
+                                     'resourceName': vs.name, 'resourceType': 'volume'}})
+        self.notify_data = {
+            "status": 'result',
+            "nfInstanceId": self.nf_inst_id,
+            "operation": 'Terminal',
+            "jobId": self.job_id,
+            'affectedVnfc': affected_vnfc,
+            'affectedVirtualLink': affected_vl,
+            'affectedVirtualStorage': affected_vs,
+            # "vnfdmodule": allocate_data,
+            # "additionalParam": addition_param,
+            # "nfvoInstanceId": self.nfvo_inst_id,
+            # "vnfmInstanceId": self.vnfm_inst_id,
+            # 'affectedcapacity': affectedcapacity,
+            # 'affectedService': [],
+            'affectedCp': affected_cp
+            }
+        logger.info('content_args=%s' % self.notify_data)
+
     def delete_resource(self):
         logger.error('rollback resource begin')
         adaptor.delete_vim_res(self.inst_resource, self.do_notify_delete)
@@ -189,7 +253,10 @@ class TermVnf(Thread):
             StorageInstModel.objects.filter(instid=self.nf_inst_id, resouceid=res_id).delete()
 
     def lcm_notify(self):
-        pass
+        logger.info('[NF termination] send notify request to nfvo end')
+        resp = notify_lcm_to_nfvo(self.notify_data, self.nf_inst_id)
+        logger.info('[NF termination] get lcm response %s' % resp)
+        logger.info('[NF termination] send notify request to nfvo end')
 
     def vnf_term_failed_handle(self, error_msg):
         logger.error('VNF termination failed, detail message: %s' % error_msg)
