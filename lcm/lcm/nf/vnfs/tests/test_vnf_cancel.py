@@ -57,7 +57,7 @@ class TestNFTerminate(TestCase):
 
     def test_delete_vnf_identifier(self):
         NfInstModel.objects.create(nfinstid='1111', nf_name='2222', package_id='todo', version='', vendor='',
-                                   netype='', vnfd_model='', status='VNF_INSTANTIATED', nf_desc='', vnfdid='',
+                                   netype='', vnfd_model='', status='NOT_INSTANTIATED', nf_desc='', vnfdid='',
                                    vnfSoftwareVersion='', vnfConfigurableProperties='todo',
                                    localizationLanguage='EN_US', create_time=now_time())
         response = self.client.delete("/openoapi/vnflcm/v1/vnf_instances/1111")
@@ -71,12 +71,12 @@ class TestNFTerminate(TestCase):
 
     def test_delete_vnf_identifier_when_status_check_failed(self):
         NfInstModel.objects.create(nfinstid='1111', nf_name='2222', package_id='todo', version='', vendor='',
-                                   netype='', vnfd_model='', status='NOT_INSTANTIATED', nf_desc='', vnfdid='',
+                                   netype='', vnfd_model='', status='VNF_INSTANTIATED', nf_desc='', vnfdid='',
                                    vnfSoftwareVersion='', vnfConfigurableProperties='todo',
                                    localizationLanguage='EN_US', create_time=now_time())
         response = self.client.delete("/openoapi/vnflcm/v1/vnf_instances/1111")
         self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
-        self.assertEqual("Don't allow to delete vnf(status:[NOT_INSTANTIATED])", response.data["error"])
+        self.assertEqual("Don't allow to delete vnf(status:[VNF_INSTANTIATED])", response.data["error"])
 
     @mock.patch.object(TermVnf, 'run')
     def test_terminate_vnf(self, mock_run):

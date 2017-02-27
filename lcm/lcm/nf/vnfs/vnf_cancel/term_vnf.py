@@ -66,7 +66,7 @@ class TermVnf(Thread):
             raise NFLCMException('VnfInst(%s) does not exist' % self.nf_inst_id)
         sel_vnf = vnf_insts[0]
         if sel_vnf.status != 'VNF_INSTANTIATED':
-            raise NFLCMException("Don't allow to delete vnf(status:[%s])" % sel_vnf.status)
+            raise NFLCMException("Don't allow to terminate vnf(status:[%s])" % sel_vnf.status)
         if self.terminationType == 'GRACEFUL' and not self.gracefulTerminationTimeout:
             raise NFLCMException("Graceful termination must set timeout")
 
