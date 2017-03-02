@@ -14,7 +14,7 @@
 import logging
 
 from lcm.pub.database.models import NfInstModel, StorageInstModel, VLInstModel, NetworkInstModel, VNFCInstModel, \
-    VmInstModel, VimModel, VimUserModel
+    VmInstModel
 from lcm.pub.exceptions import NFLCMException
 
 logger = logging.getLogger(__name__)
@@ -93,28 +93,29 @@ class QueryVnf:
             vnfc_arr.append(vnfc_dic)
         logger.info('Get the VimInstModel of list.')
         vms = VmInstModel.objects.filter(instid=vnf.nfinstid)
-        vim_arr = []
-        # The 'vimInfoId' and 'vimId' each value are same
+        vm_arr = []
         for vm in vms:
-            vims = VimModel.objects.filter(vimid=vm.vimid)
-            for vim in vims:
-                vim_users = VimUserModel.objects.filter(vimid=vim.vimid)
-                vim_dic = {
-                    "vimInfoId": vim.vimid,
-                    "vimId": vim.vimid,
-                    "interfaceInfo": {
-                        "vimType": vim.type,
-                        "apiVersion": vim.version,
-                        "protocolType": (vim.apiurl.split(':')[0] if vim.apiurl and vim.apiurl.index(':') else 'http')
-                    },
-                    "accessInfo": {
-                        "tenant": (vim_users[0].defaulttenant if vim_users and vim_users[0].defaulttenant else ''),
-                        "username": (vim_users[0].username if vim_users and vim_users[0].username else ''),
-                        "password": (vim_users[0].password if vim_users and vim_users[0].password else '')
-                    },
-                    "interfaceEndpoint": vim.apiurl
-                }
-                vim_arr.append(vim_dic)
+            vm_dic = {
+                "vmid": vm.vmid,
+                "vimid": vm.vimid,
+                "tenant": vm.tenant,
+                "resouceid": vm.resouceid,
+                "vmname": vm.vmname,
+                "nic_array": vm.nic_array,
+                "metadata": vm.metadata,
+                "volume_array": vm.volume_array,
+                "server_group": vm.server_group,
+                "availability_zone": vm.availability_zone,
+                "flavor_id": vm.flavor_id,
+                "security_groups": vm.security_groups,
+                "operationalstate": vm.operationalstate,
+                "insttype": vm.insttype,
+                "is_predefined": vm.is_predefined,
+                "create_time": vm.create_time,
+                "instid": vm.instid,
+                "nodeId": vm.nodeId
+            }
+            vm_arr.append(vm_dic)
 
         resp_data = {
             "vnfInstanceId": vnf.nfinstid,
@@ -136,7 +137,7 @@ class QueryVnf:
                 "extVirtualLink": [],
                 "monitoringParameters": {},
                 # "localizationLanguage": vnf.localizationLanguage,
-                "vimInfo": vim_arr,
+                "vimInfo": vm_arr,
                 "vnfcResourceInfo": vnfc_arr,
                 "virtualLinkResourceInfo": vl_arr,
                 "virtualStorageResourceInfo": arr

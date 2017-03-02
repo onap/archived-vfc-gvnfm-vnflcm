@@ -279,36 +279,3 @@ class CPInstModel(models.Model):
     relatedvl = models.CharField(db_column='RELATEDVL', max_length=255, blank=True, null=True)
     relatedcp = models.CharField(db_column='RELATEDCP', max_length=255, blank=True, null=True)
     relatedport = models.CharField(db_column='RELATEDPORT', max_length=255, blank=True, null=True)
-
-class VimModel(models.Model):
-    vimid = models.IntegerField(db_column='CMSERVERID', primary_key=True)
-    name = models.CharField(db_column='NAME', max_length=255, blank=True, null=True)
-    type = models.CharField(db_column='CMSTYPE', max_length=255, blank=True, null=True)
-    imageurl = models.CharField(db_column='IMAGEURL', max_length=1024, blank=True, null=True)
-    apiurl = models.CharField(db_column='APIURL', max_length=1024, blank=True, null=True)
-    version = models.CharField(db_column='VER', max_length=1024, blank=True, null=True)
-    supportnotification = models.IntegerField(db_column='SUPPORTNOTIFICATION', default=0)
-    longitude = models.CharField(db_column='LONGITUDE', max_length=1024, blank=True, null=True)
-    latitude = models.CharField(db_column='LATITUDE', max_length=1024, blank=True, null=True)
-    grantexclude = models.CharField(db_column='GRANTEXCLUDE', max_length=1, default='0', blank=True, null=True)
-    slalevel = models.IntegerField(db_column='SLALEVEL', default=0)
-
-    class Meta:
-        db_table = 'CMSSERVER'
-
-    def __unicode__(self):
-        return '%s' % self.name
-
-
-class VimUserModel(models.Model):
-    class Meta:
-        db_table = 'CMSSERVER_USER'
-
-    uuid = models.CharField(db_column='UUID', primary_key=True, max_length=255)
-    vimid = models.IntegerField(db_column='CMSERVERID')
-    username = models.CharField(db_column='USERNAME', max_length=255)
-    password = models.CharField(db_column='PWD', max_length=255, blank=True)
-    defaulttenant = models.CharField(db_column='TENANT', max_length=255, blank=True)
-
-    def __unicode__(self):
-        return '%s' % self.username
