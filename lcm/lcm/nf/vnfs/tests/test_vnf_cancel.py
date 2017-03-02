@@ -93,7 +93,6 @@ class TestNFTerminate(TestCase):
         TermVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
         self.assert_job_result(self.job_id, 255, "VnfInst(%s) does not exist" % self.nf_inst_id)
 
-
     @mock.patch.object(restcall, 'call_req')
     @mock.patch.object(api, 'call')
     def test_terminate_vnf_success(self, mock_call, mock_call_req):

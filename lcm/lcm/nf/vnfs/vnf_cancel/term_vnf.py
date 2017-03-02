@@ -16,7 +16,7 @@ import traceback
 from threading import Thread
 
 from lcm.nf.vnfs.const import VNF_STATUS
-from lcm.pub.database.models import JobStatusModel, NfInstModel, VmInstModel, NetworkInstModel, StorageInstModel, \
+from lcm.pub.database.models import NfInstModel, VmInstModel, NetworkInstModel, StorageInstModel, \
     FlavourInstModel, PortInstModel, SubNetworkInstModel, VNFCInstModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.msapi.nfvolcm import apply_grant_to_nfvo, notify_lcm_to_nfvo
@@ -38,7 +38,7 @@ class TermVnf(Thread):
         self.gracefulTerminationTimeout = ignore_case_get(self.data, "gracefulTerminationTimeout")
         self.apply_result = None
         self.notify_data = None
-        self.inst_resource = {'volumn': [],  # [{"vim_id": ignore_case_get(ret, "vim_id")},{}]
+        self.inst_resource = {'volumn': [],
                               'network': [],
                               'subnet': [],
                               'port': [],
@@ -97,7 +97,6 @@ class TermVnf(Thread):
 
     def query_inst_resource(self):
         logger.info('[query_resource begin]:inst_id=%s' % self.nf_inst_id)
-        # query_volumn_resource
         vol_list = StorageInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
         for vol in vol_list:
             vol_info = {}
@@ -109,7 +108,6 @@ class TermVnf(Thread):
             self.inst_resource['volumn'].append(vol_info)
         logger.info('[query_volumn_resource]:ret_volumns=%s' % self.inst_resource['volumn'])
 
-        # query_network_resource
         network_list = NetworkInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
         for network in network_list:
             network_info = {}
@@ -121,7 +119,6 @@ class TermVnf(Thread):
             self.inst_resource['network'].append(network_info)
         logger.info('[query_network_resource]:ret_networks=%s' % self.inst_resource['network'])
 
-        # query_subnetwork_resource
         subnetwork_list = SubNetworkInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
         for subnetwork in subnetwork_list:
             subnetwork_info = {}
@@ -133,7 +130,6 @@ class TermVnf(Thread):
             self.inst_resource['subnet'].append(subnetwork_info)
         logger.info('[query_subnetwork_resource]:ret_networks=%s' % self.inst_resource['subnet'])
 
-        # query_port_resource
         port_list = PortInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
         for port in port_list:
             port_info = {}
@@ -145,7 +141,6 @@ class TermVnf(Thread):
             self.inst_resource['port'].append(port_info)
         logger.info('[query_port_resource]:ret_networks=%s' % self.inst_resource['port'])
 
-        # query_flavor_resource
         flavor_list = FlavourInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
         for flavor in flavor_list:
             flavor_info = {}
@@ -157,7 +152,6 @@ class TermVnf(Thread):
             self.inst_resource['flavor'].append(flavor_info)
         logger.info('[query_flavor_resource]:ret_networks=%s' % self.inst_resource['flavor'])
 
-        # query_vm_resource
         vm_list = VmInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
         for vm in vm_list:
             vm_info = {}
@@ -221,12 +215,6 @@ class TermVnf(Thread):
             'affectedVnfc': affected_vnfc,
             'affectedVirtualLink': affected_vl,
             'affectedVirtualStorage': affected_vs,
-            # "vnfdmodule": allocate_data,
-            # "additionalParam": addition_param,
-            # "nfvoInstanceId": self.nfvo_inst_id,
-            # "vnfmInstanceId": self.vnfm_inst_id,
-            # 'affectedcapacity': affectedcapacity,
-            # 'affectedService': [],
             'affectedCp': affected_cp
             }
         logger.info('content_args=%s' % self.notify_data)

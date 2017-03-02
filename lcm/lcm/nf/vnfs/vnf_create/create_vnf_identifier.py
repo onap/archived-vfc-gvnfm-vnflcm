@@ -32,6 +32,7 @@ class CreateVnf:
         self.vnfd_id = ignore_case_get(self.data, "vnfdId")
         self.vnf_instance_mame = ignore_case_get(self.data, "vnfInstanceName")
         self.description = ignore_case_get(self.data, "vnfInstanceDescription")
+        self.vnfd = None
         self.package_info = ''
         self.package_id = ''
         self.csar_id = ''
@@ -45,14 +46,12 @@ class CreateVnf:
 
         nf_inst_id = str(uuid.uuid4())
         try:
-            # get package_info from nslcm by vnfd_id
             self.package_info = get_packageinfo_by_vnfdid(self.vnfd_id)
             for val in self.package_info:
                 if self.vnfd_id == ignore_case_get(val, "vnfd_id"):
                     self.package_id = ignore_case_get(val, "csar_id")
                     break
 
-            # get rawdata from catalog by csar_id
             raw_data = query_rawdata_from_catalog(self.package_id, self.data)
             self.vnfd = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
             self.vnfd = json.JSONDecoder().decode(self.vnfd)
@@ -74,6 +73,8 @@ class CreateVnf:
                                        vnfSoftwareVersion='', create_time=now_time())
 
         vnf_inst = NfInstModel.objects.get(nfinstid=nf_inst_id)
-        logger.debug('id is [%s],name is [%s],vnfd_id is [%s],vnfd_model is [%s],description is [%s],create_time is [%s]' %
-                     (vnf_inst.nfinstid, vnf_inst.nf_name, vnf_inst.vnfdid, vnf_inst.vnfd_model, vnf_inst.nf_desc, vnf_inst.create_time))
+        logger.debug('id is [%s],name is [%s],vnfd_id is [%s],vnfd_model is [%s],'
+                     'description is [%s],create_time is [%s]' %
+                     (vnf_inst.nfinstid, vnf_inst.nf_name, vnf_inst.vnfdid,
+                      vnf_inst.vnfd_model, vnf_inst.nf_desc, vnf_inst.create_time))
         return nf_inst_id

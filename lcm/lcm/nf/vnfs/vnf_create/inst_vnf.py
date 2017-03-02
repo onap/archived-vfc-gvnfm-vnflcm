@@ -41,15 +41,9 @@ class InstVnf(Thread):
         self.vnfd_id = ''
         self.nfvo_inst_id = ''
         self.vnfm_inst_id = ''
-        self.csar_id = ''
+        self.package_id = ''
+        # self.csar_id = ''
         self.vnfd_info = []
-        # self.inst_resource = {'volumn': [],  # [{"vim_id": ignore_case_get(ret, "vim_id")},{}]
-        #                       'network': [],
-        #                       'subnet': [],
-        #                       'port': [],
-        #                       'flavor': [],
-        #                       'vm': [],
-        #                       }
 
     def run(self):
         try:
@@ -61,6 +55,7 @@ class InstVnf(Thread):
         except NFLCMException as e:
             self.vnf_inst_failed_handle(e.message)
         except:
+            logger.error(traceback.format_exc())
             self.vnf_inst_failed_handle('unexpected exception')
 
     def inst_pre(self):
@@ -68,21 +63,18 @@ class InstVnf(Thread):
         if not vnf_insts.exists():
             raise NFLCMException('VNF nf_inst_id is not exist.')
 
-        # self.vnfm_inst_id = vnf_insts[0].vnfm_inst_id
         if vnf_insts[0].status != 'NOT_INSTANTIATED':
             raise NFLCMException('VNF instantiationState is not NOT_INSTANTIATED.')
 
         JobUtil.add_job_status(self.job_id, 5, 'Get packageinfo by vnfd_id')
-        # get csar_id from nslcm by vnfd_id
         self.vnfd_id = vnf_insts[0].vnfdid
-        self.package_info = get_packageinfo_by_vnfdid(self.vnfd_id)
-        for val in self.package_info:
+        package_info = get_packageinfo_by_vnfdid(self.vnfd_id)
+        for val in package_info:
             if self.vnfd_id == ignore_case_get(val, "vnfd_id"):
                 self.package_id = ignore_case_get(val, "csar_id")
                 break
 
         JobUtil.add_job_status(self.job_id, 10, 'Get rawdata from catalog by csar_id')
-        # get rawdata from catalog by csar_id
         input_parameters = []
         for key, val in self.data['additionalParams'].items():
             input_parameters.append({"key": key, "value": val})
@@ -93,8 +85,7 @@ class InstVnf(Thread):
         self.vnfd_info = vnfd_model_dict  # just for test
         self.update_cps()
 
-        self.checkParameterExist()
-        # update NfInstModel
+        self.check_parameter_exist()
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).\
             update(flavour_id=ignore_case_get(self.data, "flavourId"),
                    input_params=self.data,
@@ -106,7 +97,6 @@ class InstVnf(Thread):
 
     def apply_grant(self):
         logger.info('[NF instantiation] send resource grand request to nfvo start')
-        # self.check_vm_capacity()
         content_args = {'vnfInstanceId': self.nf_inst_id, 'vnfDescriptorId': '',
                         'lifecycleOperation': 'Instantiate', 'jobId': self.job_id,
                         'addResource': [], 'removeResource': [],
@@ -122,23 +112,21 @@ class InstVnf(Thread):
             res_index += 1
 
         logger.info('content_args=%s' % content_args)
-        self.apply_result = apply_grant_to_nfvo(content_args)
-        vim_info = ignore_case_get(self.apply_result, "vim")
+        apply_result = apply_grant_to_nfvo(content_args)
+        vim_info = ignore_case_get(apply_result, "vim")
 
-        # update vnfd_info
-        for vdu in self.vnfd_info["vdus"]:
+        for vdu in ignore_case_get(self.vnfd_info, "vdus"):
             if "location_info" in vdu["properties"]:
                 vdu["properties"]["location_info"]["vimid"] = ignore_case_get(vim_info, "vimid")
                 vdu["properties"]["location_info"]["tenant"] = ignore_case_get(
                     ignore_case_get(vim_info, "accessinfo"), "tenant")
             else:
-                vdu["properties"]["location_info"] = {"vimid":ignore_case_get(vim_info, "vimid"),
-                                                      "tenant":ignore_case_get(
-                                                          ignore_case_get(vim_info, "accessinfo"), "tenant")}
+                vdu["properties"]["location_info"] = {
+                    "vimid": ignore_case_get(vim_info, "vimid"),
+                    "tenant": ignore_case_get(ignore_case_get(vim_info, "accessinfo"), "tenant")}
 
-        # update resources_table
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='INSTANTIATED', lastuptime=now_time())
-        JobUtil.add_job_status(self.job_id,20, 'Nf instancing apply grant finish')
+        JobUtil.add_job_status(self.job_id, 20, 'Nf instancing apply grant finish')
         logger.info("Nf instancing apply grant finish")
 
     def create_res(self):
@@ -153,17 +141,17 @@ class InstVnf(Thread):
         affected_vnfc = []
         vnfcs = VNFCInstModel.objects.filter(instid=self.nf_inst_id)
         for vnfc in vnfcs:
-            vmResource = {}
+            vm_resource = {}
             if vnfc.vmid:
                 vm = VmInstModel.objects.filter(vmid=vnfc.vmid)
                 if vm:
-                    vmResource = {'vimId': vm[0].vimid, 'resourceId': vm[0].resouceid,
-                                  'resourceName': vm[0].vmname, 'resourceType': 'vm'}
+                    vm_resource = {'vimId': vm[0].vimid, 'resourceId': vm[0].resouceid,
+                                   'resourceName': vm[0].vmname, 'resourceType': 'vm'}
             affected_vnfc.append(
                 {'vnfcInstanceId': vnfc.vnfcinstanceid,
                  'vduId': vnfc.vduid,
                  'changeType': 'added',
-                 'computeResource': vmResource})
+                 'computeResource': vm_resource})
         affected_vl = []
         networks = NetworkInstModel.objects.filter(instid=self.nf_inst_id)
         for network in networks:
@@ -200,30 +188,12 @@ class InstVnf(Thread):
             'affectedVnfc': affected_vnfc,
             'affectedVirtualLink': affected_vl,
             'affectedVirtualStorage': affected_vs,
-            # "vnfdmodule": allocate_data,
-            # "additionalParam": addition_param,
-            # "nfvoInstanceId": self.nfvo_inst_id,
-            # "vnfmInstanceId": self.vnfm_inst_id,
-            # 'affectedcapacity': affectedcapacity,
-            # 'affectedService': [],
             'affectedCp': affected_cp
             }
         logger.info('content_args=%s' % content_args)
-        # call rest api
         resp = notify_lcm_to_nfvo(content_args)
         logger.info('[NF instantiation] get lcm response %s' % resp)
         logger.info('[NF instantiation] send notify request to nfvo end')
-
-    # def load_nfvo_config(self):
-    #     logger.info("[NF instantiation]get nfvo connection info start")
-    #     reg_info = NfvoRegInfoModel.objects.filter(vnfminstid='vnfm111').first()
-    #     if reg_info:
-    #         self.vnfm_inst_id = reg_info.vnfminstid
-    #         self.nfvo_inst_id = reg_info.nfvoid
-    #         logger.info("[NF instantiation] Registered nfvo id is [%s]" % self.nfvo_inst_id)
-    #     else:
-    #         raise NFLCMException("Nfvo was not registered")
-    #     logger.info("[NF instantiation]get nfvo connection info end")
 
     def vnf_inst_failed_handle(self, error_msg):
         logger.error('VNF instantiation failed, detail message: %s' % error_msg)
@@ -232,12 +202,8 @@ class InstVnf(Thread):
 
     def do_notify(self, res_type, ret):
         logger.info('creating [%s] resource' % res_type)
-        # progress = 20 + int(progress/2)     # 20-70
         if res_type == adaptor.RES_VOLUME:
             logger.info('Create vloumns!')
-            # if ret["returnCode"] == adaptor.RES_NEW:  # new create
-            #     self.inst_resource['volumn'].append({"vim_id": ignore_case_get(ret, "vim_id"),
-            #                                          "res_id": ignore_case_get(ret, "res_id")})
             JobUtil.add_job_status(self.job_id, 25, 'Create vloumns!')
             StorageInstModel.objects.create(
                 storageid=str(uuid.uuid4()),
@@ -254,10 +220,6 @@ class InstVnf(Thread):
                 instid=self.nf_inst_id)
         elif res_type == adaptor.RES_NETWORK:
             logger.info('Create networks!')
-            # if ret["returnCode"] == adaptor.RES_NEW:
-            #     self.inst_resource['network'].append({"vim_id": ignore_case_get(ret, "vim_id"),
-            #                                           "res_id": ignore_case_get(ret, "res_id")})
-            # self.inst_resource['network'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, 35, 'Create networks!')
             NetworkInstModel.objects.create(
                 networkid=str(uuid.uuid4()),
@@ -271,16 +233,12 @@ class InstVnf(Thread):
                 vlantrans=get_boolean(ignore_case_get(ret, "vlanTransparent")),
                 is_shared=get_boolean(ignore_case_get(ret, "shared")),
                 routerExternal=get_boolean(ignore_case_get(ret, "routerExternal")),
-                insttype = 0,
+                insttype=0,
                 is_predefined=ignore_case_get(ret, "returnCode"),
                 nodeId=ignore_case_get(ret, "nodeId"),
-                instid = self.nf_inst_id)
+                instid=self.nf_inst_id)
         elif res_type == adaptor.RES_SUBNET:
             logger.info('Create subnets!')
-            # if ret["returnCode"] == adaptor.RES_NEW:
-            #     self.inst_resource['subnet'].append({"vim_id": ignore_case_get(ret, "vim_id"),
-            #                                          "res_id": ignore_case_get(ret, "res_id")})
-            # self.inst_resource['subnet'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, 40, 'Create subnets!')
             SubNetworkInstModel.objects.create(
                 subnetworkid=str(uuid.uuid4()),
@@ -301,10 +259,6 @@ class InstVnf(Thread):
                 instid=self.nf_inst_id)
         elif res_type == adaptor.RES_PORT:
             logger.info('Create ports!')
-            # if ret["returnCode"] == adaptor.RES_NEW:
-            #     self.inst_resource['port'].append({"vim_id": ignore_case_get(ret, "vim_id"),
-            #                                        "res_id": ignore_case_get(ret, "res_id")})
-            # self.inst_resource['port'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, 50, 'Create ports!')
             PortInstModel.objects.create(
                 portid=str(uuid.uuid4()),
@@ -314,8 +268,8 @@ class InstVnf(Thread):
                 vimid=ignore_case_get(ret, "vimId"),
                 resouceid=ignore_case_get(ret, "id"),
                 tenant=ignore_case_get(ret, "tenantId"),
-                macaddress = ignore_case_get(ret, "macAddress"),
-                ipaddress = ignore_case_get(ret, "ip"),
+                macaddress=ignore_case_get(ret, "macAddress"),
+                ipaddress=ignore_case_get(ret, "ip"),
                 typevirtualnic=ignore_case_get(ret, "vnicType"),
                 securityGroups=ignore_case_get(ret, "securityGroups"),
                 insttype=0,
@@ -324,10 +278,6 @@ class InstVnf(Thread):
                 instid=self.nf_inst_id)
         elif res_type == adaptor.RES_FLAVOR:
             logger.info('Create flavors!')
-            # if ret["returnCode"] == adaptor.RES_NEW:
-            #     self.inst_resource['flavor'].append({"vim_id": ignore_case_get(ret, "vim_id"),
-            #                                          "res_id": ignore_case_get(ret, "res_id")})
-            # self.inst_resource['flavor'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, 60, 'Create flavors!')
             FlavourInstModel.objects.create(
                 flavourid=str(uuid.uuid4()),
@@ -346,10 +296,6 @@ class InstVnf(Thread):
                 instid=self.nf_inst_id)
         elif res_type == adaptor.RES_VM:
             logger.info('Create vms!')
-            # if ret["returnCode"] == adaptor.RES_NEW:
-            #     self.inst_resource['vm'].append({"vim_id": ignore_case_get(ret, "vim_id"),
-            #                                      "res_id": ignore_case_get(ret, "res_id")})
-            # self.inst_resource['vm'].append({"vim_id": "1"}, {"res_id": "2"})
             JobUtil.add_job_status(self.job_id, 70, 'Create vms!')
             vm_id = str(uuid.uuid4())
             VmInstModel.objects.create(
@@ -376,34 +322,14 @@ class InstVnf(Thread):
                 instid=self.nf_inst_id,
                 vmid=vm_id)
 
-    # def do_rollback(self, args_=None):
-    #     logger.error('error info : %s' % args_)
-    #     adaptor.delete_vim_res(self.inst_resource, self.do_notify_delete)
-    #     logger.error('rollback resource complete')
-    #
-    #     StorageInstModel.objects.filter(instid=self.nf_inst_id).delete()
-    #     NetworkInstModel.objects.filter(instid=self.nf_inst_id).delete()
-    #     SubNetworkInstModel.objects.filter(instid=self.nf_inst_id).delete()
-    #     PortInstModel.objects.filter(instid=self.nf_inst_id).delete()
-    #     FlavourInstModel.objects.filter(instid=self.nf_inst_id).delete()
-    #     VmInstModel.objects.filter(instid=self.nf_inst_id).delete()
-    #     logger.error('delete table complete')
-    #     raise NFLCMException("Create resource failed")
-    #
-    # def do_notify_delete(self, ret):
-    #     logger.error('Deleting [%s] resource' % ret)
-
     def update_cps(self):
         for extlink in ignore_case_get(self.data, "extVirtualLinks"):
-            for cp in self.vnfd_info["cps"]:
+            for cp in ignore_case_get(self.vnfd_info, "cps"):
                 cpdid = ignore_case_get(extlink, "cpdId")
                 if cpdid == ignore_case_get(cp, "cp_id"):
                     cp["networkId"] = ignore_case_get(extlink, "resourceId")
                     cp["subnetId"] = ignore_case_get(extlink, "resourceSubnetId")
                     break
-        pass
 
-    def checkParameterExist(self):
-        # if ignore_case_get(self.data, "flavourId") not in self.vnfd_info:
-        #     raise NFLCMException('Input parameter is not defined in vnfd_info.')
+    def check_parameter_exist(self):
         pass
