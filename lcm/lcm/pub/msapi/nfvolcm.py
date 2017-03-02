@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_packageinfo_by_vnfdid(vnfdid):
-    ret = req_by_msb("openoapi/gvnfmdriver/v1/%s" % vnfdid, "GET")  # TODO
+    ret = req_by_msb("openoapi/gvnfmdriver/v1/vnfpackages", "GET")  # TODO
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Failed to query package_info of vnfdid(%s) from nslcm." % vnfdid)

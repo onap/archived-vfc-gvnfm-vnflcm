@@ -91,6 +91,7 @@ class InstVnf(Thread):
         self.vnfd_info = json.JSONDecoder().decode(self.vnfd_info)
 
         self.vnfd_info = vnfd_model_dict  # just for test
+        self.update_cps()
 
         self.checkParameterExist()
         # update NfInstModel
@@ -391,6 +392,16 @@ class InstVnf(Thread):
     #
     # def do_notify_delete(self, ret):
     #     logger.error('Deleting [%s] resource' % ret)
+
+    def update_cps(self):
+        for extlink in ignore_case_get(self.data, "extVirtualLinks"):
+            for cp in self.vnfd_info["cps"]:
+                cpdid = ignore_case_get(extlink, "cpdId")
+                if cpdid == ignore_case_get(cp, "cp_id"):
+                    cp["networkId"] = ignore_case_get(extlink, "resourceId")
+                    cp["subnetId"] = ignore_case_get(extlink, "resourceSubnetId")
+                    break
+        pass
 
     def checkParameterExist(self):
         # if ignore_case_get(self.data, "flavourId") not in self.vnfd_info:
