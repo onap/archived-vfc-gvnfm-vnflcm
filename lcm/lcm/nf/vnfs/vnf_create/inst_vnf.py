@@ -205,7 +205,7 @@ class InstVnf(Thread):
             }
         logger.info('content_args=%s' % content_args)
         # call rest api
-        resp = notify_lcm_to_nfvo(content_args, self.nf_inst_id)
+        resp = notify_lcm_to_nfvo(content_args)
         logger.info('[NF instantiation] get lcm response %s' % resp)
         logger.info('[NF instantiation] send notify request to nfvo end')
 
