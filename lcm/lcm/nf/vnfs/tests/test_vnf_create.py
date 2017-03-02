@@ -49,7 +49,7 @@ class TestNFInstantiate(TestCase):
 
     @mock.patch.object(restcall, 'call_req')
     def test_create_vnf_identifier(self, mock_call_req):
-        r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']
+        r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode([{'package_id': '222', 'csar_id': '2222','vnfd_id':'111'}]), '200']
         r2_get_rawdata_from_catalog = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']
         mock_call_req.side_effect = [r1_get_csarid_by_vnfdid, r2_get_rawdata_from_catalog]
         data = {
@@ -85,7 +85,7 @@ class TestNFInstantiate(TestCase):
         NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='222',
                                    version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
                                    nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
-        r1_get_csarid_by_vnfdid = [1, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']
+        r1_get_csarid_by_vnfdid = [1, json.JSONEncoder().encode([{'package_id': '222', 'csar_id': '2222','vnfd_id':'111'}]), '200']
         mock_call_req.side_effect = [r1_get_csarid_by_vnfdid]
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
@@ -99,7 +99,7 @@ class TestNFInstantiate(TestCase):
         NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='222',
                                    version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
                                    nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
-        r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']
+        r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode([{'package_id': '222', 'csar_id': '2222','vnfd_id':'111'}]), '200']
         r2_get_rawdata_from_catalog = [1, json.JSONEncoder().encode(vnfd_rawdata), '200']
         mock_call_req.side_effect = [r1_get_csarid_by_vnfdid, r2_get_rawdata_from_catalog]
         self.nf_inst_id = '1111'
@@ -114,7 +114,7 @@ class TestNFInstantiate(TestCase):
         NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='222',
                                    version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
                                    nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
-        r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']
+        r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode([{'package_id': '222', 'csar_id': '2222','vnfd_id':'111'}]), '200']
         r2_get_rawdata_from_catalog = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']
         r3_apply_grant_result = [1, json.JSONEncoder().encode(
             {"vim": {"vimid": 'vimid_1', "accessinfo": {"tenant": 'tenantname_1'}}}), '200']
@@ -132,7 +132,7 @@ class TestNFInstantiate(TestCase):
         NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='222',
                                    version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
                                    nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
-        r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']
+        r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode([{'package_id': '222', 'csar_id': '2222','vnfd_id':'111'}]), '200']
         r2_get_rawdata_from_catalog = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']
         r3_apply_grant_result = [0, json.JSONEncoder().encode(
             {"vim": {"vimid": 'vimid_1', "accessinfo": {"tenant": 'tenantname_1'}}}), '200']
@@ -151,7 +151,7 @@ class TestNFInstantiate(TestCase):
         NfInstModel.objects.create(nfinstid='1111', nf_name='vFW_01', package_id='222',
                                    version='', vendor='', netype='', vnfd_model='', status='NOT_INSTANTIATED',
                                    nf_desc='vFW in Nanjing TIC Edge', vnfdid='111', create_time=now_time())
-        r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode({'package_id': '222', 'csar_id': '2222'}), '200']
+        r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode([{'package_id': '222', 'csar_id': '2222','vnfd_id':'111'}]), '200']
         r2_get_rawdata_from_catalog = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']
         r3_apply_grant_result = [0, json.JSONEncoder().encode(
             {"vim": {"vimid": 'vimid_1', "accessinfo": {"tenant": 'tenantname_1'}}}), '200']

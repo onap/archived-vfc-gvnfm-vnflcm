@@ -38,6 +38,7 @@ class InstVnf(Thread):
         self.data = data
         self.nf_inst_id = nf_inst_id
         self.job_id = job_id
+        self.vnfd_id = ''
         self.nfvo_inst_id = ''
         self.vnfm_inst_id = ''
         self.csar_id = ''
@@ -73,9 +74,13 @@ class InstVnf(Thread):
 
         JobUtil.add_job_status(self.job_id, 5, 'Get packageinfo by vnfd_id')
         # get csar_id from nslcm by vnfd_id
-        self.package_info = get_packageinfo_by_vnfdid(vnf_insts[0].vnfdid)
-        self.package_id = ignore_case_get(self.package_info, "package_id")
-        self.csar_id = ignore_case_get(self.package_info, "csar_id")
+        self.vnfd_id = vnf_insts[0].vnfdid
+        self.package_info = get_packageinfo_by_vnfdid(self.vnfd_id)
+        for val in self.package_info:
+            if self.vnfd_id == ignore_case_get(val, "vnfd_id"):
+                self.package_id = ignore_case_get(val, "package_id")
+                self.csar_id = ignore_case_get(val, "csar_id")
+                break
 
         JobUtil.add_job_status(self.job_id, 10, 'Get rawdata from catalog by csar_id')
         # get rawdata from catalog by csar_id
