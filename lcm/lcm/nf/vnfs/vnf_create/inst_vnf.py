@@ -78,8 +78,7 @@ class InstVnf(Thread):
         self.package_info = get_packageinfo_by_vnfdid(self.vnfd_id)
         for val in self.package_info:
             if self.vnfd_id == ignore_case_get(val, "vnfd_id"):
-                self.package_id = ignore_case_get(val, "package_id")
-                self.csar_id = ignore_case_get(val, "csar_id")
+                self.package_id = ignore_case_get(val, "csar_id")
                 break
 
         JobUtil.add_job_status(self.job_id, 10, 'Get rawdata from catalog by csar_id')
@@ -87,7 +86,7 @@ class InstVnf(Thread):
         input_parameters = []
         for key, val in self.data['additionalParams'].items():
             input_parameters.append({"key": key, "value": val})
-        raw_data = query_rawdata_from_catalog(self.csar_id, input_parameters)
+        raw_data = query_rawdata_from_catalog(self.package_id, input_parameters)
         self.vnfd_info = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
         self.vnfd_info = json.JSONDecoder().decode(self.vnfd_info)
 

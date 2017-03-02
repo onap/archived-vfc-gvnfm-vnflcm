@@ -49,15 +49,11 @@ class CreateVnf:
             self.package_info = get_packageinfo_by_vnfdid(self.vnfd_id)
             for val in self.package_info:
                 if self.vnfd_id == ignore_case_get(val, "vnfd_id"):
-                    self.package_id = ignore_case_get(val, "package_id")
-                    self.csar_id = ignore_case_get(val, "csar_id")
+                    self.package_id = ignore_case_get(val, "csar_id")
                     break
-            # self.package_info = get_packageinfo_by_vnfdid(self.vnfd_id)
-            # self.package_id = ignore_case_get(self.package_info, "package_id")
-            # self.csar_id = ignore_case_get(self.package_info, "csar_id")
 
             # get rawdata from catalog by csar_id
-            raw_data = query_rawdata_from_catalog(self.csar_id, self.data)
+            raw_data = query_rawdata_from_catalog(self.package_id, self.data)
             self.vnfd = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
             self.vnfd = json.JSONDecoder().decode(self.vnfd)
 
