@@ -71,7 +71,16 @@ inst_req_data = {
         }
     ],
     "localizationLanguage": "en_US",
-    "additionalParams": {}
+    "additionalParams": {"inputs": {"key1":"test1","key2":"test2"},
+                         "extVirtualLinks": [{
+                            "vlInstanceId": '55',
+                            "resourceId": '55_network',
+                            "resourceSubnetId": '55_subnet',
+                            "cpdId": 'cpId1',
+                            "vim": {
+                                "vimid": '55_vimid'
+                            }
+                        }]}
 }
 
 vnfd_rawdata = {

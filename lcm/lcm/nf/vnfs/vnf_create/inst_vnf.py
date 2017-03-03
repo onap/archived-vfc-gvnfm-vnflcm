@@ -76,7 +76,8 @@ class InstVnf(Thread):
 
         JobUtil.add_job_status(self.job_id, 10, 'Get rawdata from catalog by csar_id')
         input_parameters = []
-        for key, val in self.data['additionalParams'].items():
+        inputs = ignore_case_get(self.data['additionalParams'], "inputs")
+        for key, val in inputs.items():
             input_parameters.append({"key": key, "value": val})
         raw_data = query_rawdata_from_catalog(self.package_id, input_parameters)
         self.vnfd_info = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
