@@ -86,12 +86,17 @@ class InstVnf(Thread):
         self.update_cps()
 
         self.check_parameter_exist()
+        metadata = ignore_case_get(self.vnfd_info, "metadata")
+        version = ignore_case_get(metadata, "vnfd_version")
+        vendor = ignore_case_get(metadata, "vendor")
+        netype = ignore_case_get(metadata, "vnf_type")
+        vnfsoftwareversion = ignore_case_get(metadata, "version")
+        vnfd_model = self.vnfd_info
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).\
-            update(flavour_id=ignore_case_get(self.data, "flavourId"),
-                   input_params=self.data,
-                   vnfd_model=self.vnfd_info,
-                   localizationLanguage=ignore_case_get(self.data, 'localizationLanguage'),
-                   lastuptime=now_time())
+            update(package_id=self.package_id, flavour_id=ignore_case_get(self.data, "flavourId"), version=version,
+                   vendor=vendor, netype=netype, vnfd_model=vnfd_model, status='NOT_INSTANTIATED', vnfdid=self.vnfd_id,
+                   localizationLanguage=ignore_case_get(self.data, 'localizationLanguage'), input_params=self.data,
+                   vnfSoftwareVersion=vnfsoftwareversion, lastuptime=now_time())
         JobUtil.add_job_status(self.job_id, 15, 'Nf instancing pre-check finish')
         logger.info("Nf instancing pre-check finish")
 
