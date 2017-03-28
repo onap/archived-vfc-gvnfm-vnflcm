@@ -26,7 +26,7 @@ from lcm.pub.msapi.gvnfmdriver import apply_grant_to_nfvo, notify_lcm_to_nfvo, g
 from lcm.pub.utils import toscautil
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
-from lcm.pub.utils.values import ignore_case_get, get_none, get_boolean
+from lcm.pub.utils.values import ignore_case_get, get_none, get_boolean, get_integer
 from lcm.pub.vimapi import adaptor
 
 logger = logging.getLogger(__name__)
@@ -118,7 +118,7 @@ class InstVnf(Thread):
             res_index += 1
 
         logger.info('content_args=%s' % content_args)
-        apply_result = apply_grant_to_nfvo(content_args)
+        apply_result = apply_grant_to_nfvo(json.dumps(content_args))
         vim_info = ignore_case_get(apply_result, "vim")
 
         for vdu in ignore_case_get(self.vnfd_info, "vdus"):
@@ -197,7 +197,7 @@ class InstVnf(Thread):
             'affectedCp': affected_cp
             }
         logger.info('content_args=%s' % content_args)
-        resp = notify_lcm_to_nfvo(content_args)
+        resp = notify_lcm_to_nfvo(json.dumps(content_args))
         logger.info('[NF instantiation] get lcm response %s' % resp)
         logger.info('[NF instantiation] send notify request to nfvo end')
 
@@ -291,11 +291,11 @@ class InstVnf(Thread):
                 vimid=ignore_case_get(ret, "vimId"),
                 resouceid=ignore_case_get(ret, "id"),
                 tenant=ignore_case_get(ret, "tenantId"),
-                vcpu=ignore_case_get(ret, "vcpu"),
-                memory=ignore_case_get(ret, "memory"),
-                disk=ignore_case_get(ret, "disk"),
-                ephemeral=ignore_case_get(ret, "ephemeral"),
-                swap=ignore_case_get(ret, "swap"),
+                vcpu=get_integer(ignore_case_get(ret, "vcpu")),
+                memory=get_integer(ignore_case_get(ret, "memory")),
+                disk=get_integer(ignore_case_get(ret, "disk")),
+                ephemeral=get_integer(ignore_case_get(ret, "ephemeral")),
+                swap=get_integer(ignore_case_get(ret, "swap")),
                 isPublic=get_boolean(ignore_case_get(ret, "isPublic")),
                 extraspecs=ignore_case_get(ret, "extraSpecs"),
                 is_predefined=ignore_case_get(ret, "returnCode"),

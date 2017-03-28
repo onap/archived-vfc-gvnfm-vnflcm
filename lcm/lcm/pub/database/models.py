@@ -164,7 +164,7 @@ class FlavourInstModel(models.Model):
     ephemeral = models.IntegerField(db_column='EPHEMERAL', null=True)
     swap = models.IntegerField(db_column='SWAP', null=True)
     isPublic = models.IntegerField(db_column='ISPUBLIC', null=True)
-    extraspecs = models.CharField(db_column='EXTRASPECS', max_length=255)
+    extraspecs = models.TextField(db_column='EXTRASPECS', max_length=4096)
     instid = models.CharField(db_column='INSTID', max_length=255)
     create_time = models.CharField(db_column='CREATETIME', max_length=200, null=True, blank=True)
     is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)

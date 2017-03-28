@@ -31,3 +31,6 @@ def get_none(val, def_val=""):
 
 def get_boolean(val, def_val=0):
     return 1 if val else 0
+
+def get_integer(val, def_val=0):
+    return val if val else 0
