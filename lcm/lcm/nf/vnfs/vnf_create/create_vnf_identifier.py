@@ -48,8 +48,8 @@ class CreateVnf:
         try:
             self.package_info = get_packageinfo_by_vnfdid(self.vnfd_id)
             for val in self.package_info:
-                if self.vnfd_id == ignore_case_get(val, "vnfd_id"):
-                    self.package_id = ignore_case_get(val, "csar_id")
+                if self.vnfd_id == ignore_case_get(val, "vnfdId"):
+                    self.package_id = ignore_case_get(val, "csarId")
                     break
 
             raw_data = query_rawdata_from_catalog(self.package_id, self.data)

@@ -194,7 +194,7 @@ def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
     param = {
         "name": "Flavor_%s" % flavor["vdu_id"],
         "vcpu": int(flavor["nfv_compute"]["num_cpus"]),
-        "memory": int(flavor["nfv_compute"]["mem_size"].replace('MB', '').strip()),
+        "memory": int(flavor["nfv_compute"]["mem_size"].replace('GB', '').strip()),
         "isPublic": True
     }
     for local_storage_id in ignore_case_get(flavor, "local_storages"):
@@ -265,7 +265,7 @@ def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
             "fileName": inject_data["file_name"],
             "fileData": inject_data["file_data"]
         })
-    for vol_data in vm["volume_storages"]:
+    for vol_data in ignore_case_get(vm, "volume_storages"):
         vol_id = vol_data["volume_storage_id"]
         param["volumeArray"].append({
             "volumeId": get_res_id(res_cache, RES_VOLUME, vol_id)

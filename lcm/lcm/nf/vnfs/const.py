@@ -428,7 +428,7 @@ vnfd_model_dict = {
             ],
             "nfv_compute": {
                 "num_cpus": 4,
-                "mem_size": "1024MB",
+                "mem_size": "1 GB",
                 "cpu_frequency": "1GHz",
                 "flavor_extra_specs": {
                     "hw: cpu_policy": "shared",
