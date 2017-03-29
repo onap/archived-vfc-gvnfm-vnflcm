@@ -14,8 +14,10 @@
 
 import logging
 
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from .resources import ResCreateThread, ResDeleteThread
 
 logger = logging.getLogger(__name__)
 
@@ -27,3 +29,21 @@ class SampleList(APIView):
     def get(self, request, format=None):
         logger.debug("get")
         return Response({"status": "active"})
+
+class ResourceList(APIView):
+    """
+    Add resource.
+    """
+    def post(self, request):
+        logger.debug("ResourceList post: %s" % request.data)
+        ResCreateThread(request.data).start()
+        return Response(data=None, status=status.HTTP_204_NO_CONTENT)
+        
+    """
+    Delete resource.
+    """
+    def delete(self, request):
+        logger.debug("ResourceList delete: %s" % request.data)
+        ResDeleteThread(request.data).start()
+        return Response(data=None, status=status.HTTP_204_NO_CONTENT)
+        

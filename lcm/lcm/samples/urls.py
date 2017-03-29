@@ -16,4 +16,5 @@ from django.conf.urls import url
 from lcm.samples import views
 
 urlpatterns = [
+    url(r'^openoapi/vnflcm/v1/resources$', views.ResourceList.as_view()),
     url(r'^samples/$', views.SampleList.as_view()), ]
