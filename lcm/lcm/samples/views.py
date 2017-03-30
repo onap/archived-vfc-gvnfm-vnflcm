@@ -32,18 +32,12 @@ class SampleList(APIView):
 
 class ResourceList(APIView):
     """
-    Add resource.
+    Instantiate/Terminate resource.
     """
-    def post(self, request):
-        logger.debug("ResourceList post: %s" % request.data)
-        ResCreateThread(request.data).start()
+    def post(self, request, action_type):
+        logger.debug("ResourceList post(%s): %s", action_type, request.data)
+        if action_type == "inst":
+            ResCreateThread(request.data).start()
+        else:
+            ResDeleteThread(request.data).start()
         return Response(data=None, status=status.HTTP_204_NO_CONTENT)
-        
-    """
-    Delete resource.
-    """
-    def delete(self, request):
-        logger.debug("ResourceList delete: %s" % request.data)
-        ResDeleteThread(request.data).start()
-        return Response(data=None, status=status.HTTP_204_NO_CONTENT)
-        

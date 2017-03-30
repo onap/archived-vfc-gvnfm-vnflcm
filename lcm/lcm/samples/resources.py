@@ -37,7 +37,7 @@ class ResCreateThread(threading.Thread):
             logger.error(str(sys.exc_info()))
             
     def do_notify(self, res_type, ret):
-        logger.debug('ret of [%s] is %s', res_type, str(ret))
+        logger.debug('ret of [%s] is %s', res_type, ret)
 
 class ResDeleteThread(threading.Thread):
     """
