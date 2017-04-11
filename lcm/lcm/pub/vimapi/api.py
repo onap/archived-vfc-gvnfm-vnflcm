@@ -22,7 +22,7 @@ VIM_DRIVER_BASE_URL = "openoapi/multivim/v1"
 def call(vim_id, tenant_id, res, method, data=''):
     if data and not isinstance(data, (str, unicode)):
         data = json.JSONEncoder().encode(data)
-    url = "{base_url}/{vim_id}/{tenant_id}/{res}".format(
+    url = "{base_url}/{vim_id}{tenant_id}/{res}".format(
         base_url=VIM_DRIVER_BASE_URL, 
         vim_id=vim_id,
         tenant_id="/" + tenant_id if tenant_id else "",
