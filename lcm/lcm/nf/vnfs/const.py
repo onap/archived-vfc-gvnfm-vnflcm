@@ -774,7 +774,7 @@ c7_data_create_flavor ={
 c8_data_list_image = {
     "vimid": "",
     "vimname": "",
-    "imageList": [
+    "images": [
         {
             "status": "active",
             "id": "5e2757c1-f846-4727-915c-9a872553ed75",

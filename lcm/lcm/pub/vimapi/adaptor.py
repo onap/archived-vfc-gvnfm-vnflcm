@@ -183,7 +183,7 @@ def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
     set_opt_val(param, "securityGroups", "") # TODO
     vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
     tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
-    ret = api.create_subnet(vim_id, tenant_id, param)
+    ret = api.create_port(vim_id, tenant_id, param)
     ret["nodeId"] = port["cp_id"]
     do_notify(res_type, ret)
     set_res_cache(res_cache, res_type, port["cp_id"], ret["id"])
@@ -202,7 +202,7 @@ def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
             if local_storage_id != local_storage["local_storage_id"]:
                 continue
             disk_type = local_storage["properties"]["disk_type"]
-            disk_size = int(local_storage["properties"]["size"].replace('GB', '').strip())
+            disk_size = int(local_storage["properties"]["size"].replace('GB', '').strip())*1024
             if disk_type == "root":
                 param["disk"] = disk_size
             elif disk_type == "ephemeral":
@@ -243,7 +243,7 @@ def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
         if not img_name:
             raise VimException("Undefined image(%s)" % vm["image_file"], ERR_CODE)
         images = api.list_image(vim_id, tenant_id)
-        for image in images["imageList"]:
+        for image in images["images"]:
             if img_name == image["name"]:
                 param["boot"]["imageId"] = image["id"]
                 break
