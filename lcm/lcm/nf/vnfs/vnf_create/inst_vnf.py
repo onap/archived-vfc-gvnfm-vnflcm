@@ -69,16 +69,19 @@ class InstVnf(Thread):
         JobUtil.add_job_status(self.job_id, 5, 'Get packageinfo by vnfd_id')
         self.vnfd_id = vnf_insts[0].vnfdid
         package_info = get_packageinfo_by_vnfdid(self.vnfd_id)
-        for val in package_info:
-            if self.vnfd_id == ignore_case_get(val, "vnfd_id"):
-                self.package_id = ignore_case_get(val, "csar_id")
+        for val in ignore_case_get(package_info, "csars"):
+            if self.vnfd_id == ignore_case_get(val, "vnfdId"):
+                self.package_id = ignore_case_get(val, "csarId")
                 break
 
         JobUtil.add_job_status(self.job_id, 10, 'Get rawdata from catalog by csar_id')
         input_parameters = []
         inputs = ignore_case_get(self.data['additionalParams'], "inputs")
-        for key, val in inputs.items():
-            input_parameters.append({"key": key, "value": val})
+        if inputs:
+            if isinstance(inputs, (str, unicode)):
+                inputs = json.loads(inputs)
+            for key, val in inputs.items():
+                input_parameters.append({"key": key, "value": val})
         raw_data = query_rawdata_from_catalog(self.package_id, input_parameters)
         self.vnfd_info = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
         self.vnfd_info = json.JSONDecoder().decode(self.vnfd_info)
@@ -119,7 +122,8 @@ class InstVnf(Thread):
 
         logger.info('content_args=%s' % content_args)
         apply_result = apply_grant_to_nfvo(json.dumps(content_args))
-        vim_info = ignore_case_get(apply_result, "vim")
+        #vim_info = ignore_case_get(apply_result, "vim")
+        vim_info = ignore_case_get(json.JSONDecoder().decode(apply_result), "vim")
 
         for vdu in ignore_case_get(self.vnfd_info, "vdus"):
             if "location_info" in vdu["properties"]:
