@@ -279,7 +279,11 @@ def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
     
     ret = api.create_vm(vim_id, tenant_id, param)
     do_notify(res_type, ret)
-    vm_id, vm_name, return_code = ret["id"], ret["name"], ret["returnCode"]
+    #vm_id, vm_name, return_code = ret["id"], ret["name"], ret["returnCode"]
+    vm_id, return_code = ret["id"], ret["returnCode"]
+    if ignore_case_get(ret, "name"):
+        vm_name = vm["properties"]["name"]
+        logger.debug("vm_name:%s" % vm_name)
     opt_vm_status = "Timeout"
     retry_count, max_retry_count = 0, 100
     while retry_count < max_retry_count:

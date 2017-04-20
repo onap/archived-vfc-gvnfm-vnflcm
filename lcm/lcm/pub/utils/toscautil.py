@@ -55,7 +55,8 @@ def convert_metadata(src_json):
 
 
 def convert_factor_unit(value):
-    return "%s %s" % (value["factor"], value["unit"])
+    return value
+    #return "%s %s" % (value["factor"], value["unit"])
 
 
 def convert_inputs(src_json):
