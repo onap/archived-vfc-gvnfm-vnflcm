@@ -19,7 +19,7 @@ from threading import Thread
 
 from lcm.nf.vnfs.const import vnfd_model_dict
 from lcm.pub.database.models import NfInstModel, VmInstModel, NetworkInstModel, \
-    SubNetworkInstModel, PortInstModel, StorageInstModel, FlavourInstModel, VNFCInstModel
+    SubNetworkInstModel, PortInstModel, StorageInstModel, FlavourInstModel, VNFCInstModel, NfvoRegInfoModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.msapi.catalog import query_rawdata_from_catalog
 from lcm.pub.msapi.gvnfmdriver import apply_grant_to_nfvo, notify_lcm_to_nfvo, get_packageinfo_by_vnfdid
@@ -101,6 +101,7 @@ class InstVnf(Thread):
                    vendor=vendor, netype=netype, vnfd_model=vnfd_model, status='NOT_INSTANTIATED', vnfdid=self.vnfd_id,
                    localizationLanguage=ignore_case_get(self.data, 'localizationLanguage'), input_params=self.data,
                    vnfSoftwareVersion=vnfsoftwareversion, lastuptime=now_time())
+        NfvoRegInfoModel.objects.create(nfvoid=str(uuid.uuid4()), vnfminstid=ignore_case_get(self.data, "vnfmId"))
         JobUtil.add_job_status(self.job_id, 15, 'Nf instancing pre-check finish')
         logger.info("Nf instancing pre-check finish")
 
@@ -120,6 +121,8 @@ class InstVnf(Thread):
             content_args['addResource'].append(res_def)
             res_index += 1
 
+        vnfmInfo = NfvoRegInfoModel.objects.all()
+        content_args['additionalParam']['vnfmid'] = vnfmInfo[0].vnfminstid
         logger.info('content_args=%s' % content_args)
         apply_result = apply_grant_to_nfvo(json.dumps(content_args))
         vim_info = ignore_case_get(apply_result, "vim")
