@@ -86,7 +86,7 @@ class InstVnf(Thread):
         self.vnfd_info = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
         self.vnfd_info = json.JSONDecoder().decode(self.vnfd_info)
 
-        self.vnfd_info = vnfd_model_dict  # just for test
+        #self.vnfd_info = vnfd_model_dict  # just for test
         self.update_cps()
 
         self.check_parameter_exist()
@@ -122,8 +122,8 @@ class InstVnf(Thread):
 
         logger.info('content_args=%s' % content_args)
         apply_result = apply_grant_to_nfvo(json.dumps(content_args))
-        #vim_info = ignore_case_get(apply_result, "vim")
-        vim_info = ignore_case_get(json.JSONDecoder().decode(apply_result), "vim")
+        vim_info = ignore_case_get(apply_result, "vim")
+        #vim_info = ignore_case_get(json.JSONDecoder().decode(apply_result), "vim")
 
         for vdu in ignore_case_get(self.vnfd_info, "vdus"):
             if "location_info" in vdu["properties"]:
