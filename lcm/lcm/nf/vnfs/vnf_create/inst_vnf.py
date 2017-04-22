@@ -125,18 +125,18 @@ class InstVnf(Thread):
         content_args['additionalParam']['vnfmid'] = vnfmInfo[0].vnfminstid
         logger.info('content_args=%s' % content_args)
         apply_result = apply_grant_to_nfvo(json.dumps(content_args))
-        vim_info = ignore_case_get(apply_result, "vim")
+        #vim_info = ignore_case_get(apply_result, "vim")
         #vim_info = ignore_case_get(json.JSONDecoder().decode(apply_result), "vim")
 
         for vdu in ignore_case_get(self.vnfd_info, "vdus"):
             if "location_info" in vdu["properties"]:
-                vdu["properties"]["location_info"]["vimid"] = ignore_case_get(vim_info, "vimid")
-                vdu["properties"]["location_info"]["tenant"] = ignore_case_get(
-                    ignore_case_get(vim_info, "accessinfo"), "tenant")
+                vdu["properties"]["location_info"]["vimid"] = ignore_case_get(apply_result, "vimid")
+                vdu["properties"]["location_info"]["tenant"] = ignore_case_get(apply_result, "tenant")
             else:
                 vdu["properties"]["location_info"] = {
-                    "vimid": ignore_case_get(vim_info, "vimid"),
-                    "tenant": ignore_case_get(ignore_case_get(vim_info, "accessinfo"), "tenant")}
+                    "vimid": ignore_case_get(apply_result, "vimid"),
+                    "tenant": ignore_case_get(apply_result, "tenant")}
+                logger.info('vdu["properties"]["location_info"]=%s' % vdu["properties"]["location_info"])
 
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='INSTANTIATED', lastuptime=now_time())
         JobUtil.add_job_status(self.job_id, 20, 'Nf instancing apply grant finish')
