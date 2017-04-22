@@ -83,7 +83,8 @@ def delete_vim_res(data, do_notify):
     for res_type, res_del_fun in zip(res_types, res_del_funs):
         for res in ignore_case_get(data, res_type):
             try:
-                res_del_fun(res["vim_id"], res["tenant_id"], res["res_id"])
+                if 1 == res["is_predefined"]:
+                    res_del_fun(res["vim_id"], res["tenant_id"], res["res_id"])
             except VimException as e:
                 logger.error("Failed to delete %s(%s)", res_type, res["res_id"])
                 logger.error("%s:%s", e.http_code, e.message)
@@ -163,6 +164,8 @@ def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
     for vdu in ignore_case_get(data, "vdus"):
         if vdu["vdu_id"] == port_ref_vdu_id:
             location_info = vdu["properties"]["location_info"]
+            if  port["cp_id"] not in vdu["cps"]:
+                vdu["cps"].append(port["cp_id"])
             break
     if not location_info:
         err_msg = "vdu_id(%s) for cp(%s) is not defined"
@@ -174,7 +177,7 @@ def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
         subnet_id = get_res_id(res_cache, RES_SUBNET, port["vl_id"])
     param = {
         "networkId": network_id,
-        "name": port["properties"]["name"]
+        "name": port["properties"].get("name","undefined")
     }
     set_opt_val(param, "subnetId", subnet_id)
     set_opt_val(param, "macAddress", ignore_case_get(port["properties"], "mac_address"))
@@ -202,7 +205,7 @@ def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
             if local_storage_id != local_storage["local_storage_id"]:
                 continue
             disk_type = local_storage["properties"]["disk_type"]
-            disk_size = int(local_storage["properties"]["size"].replace('GB', '').strip())*1024
+            disk_size = int(local_storage["properties"]["size"].replace('GB', '').strip())
             if disk_type == "root":
                 param["disk"] = disk_size
             elif disk_type == "ephemeral":
@@ -225,7 +228,7 @@ def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
     vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
     tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
     param = {
-        "name": vm["properties"]["name"],
+        "name": vm["properties"].get("name","undefined"),
         "flavorId": get_res_id(res_cache, RES_FLAVOR, vm["vdu_id"]),
         "boot": {},
         "nicArray": [],
@@ -282,7 +285,7 @@ def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
     #vm_id, vm_name, return_code = ret["id"], ret["name"], ret["returnCode"]
     vm_id, return_code = ret["id"], ret["returnCode"]
     if ignore_case_get(ret, "name"):
-        vm_name = vm["properties"]["name"]
+        vm_name = vm["properties"].get("name","undefined")
         logger.debug("vm_name:%s" % vm_name)
     opt_vm_status = "Timeout"
     retry_count, max_retry_count = 0, 100

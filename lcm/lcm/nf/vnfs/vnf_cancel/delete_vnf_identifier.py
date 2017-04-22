@@ -32,3 +32,4 @@ class DeleteVnf:
         if sel_vnf.status != 'NOT_INSTANTIATED':
             raise NFLCMException("Don't allow to delete vnf(status:[%s])" % sel_vnf.status)
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).delete()
+        NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id).delete()

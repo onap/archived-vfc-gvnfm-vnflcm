@@ -39,6 +39,7 @@ class InstVnf(Thread):
         self.nf_inst_id = nf_inst_id
         self.job_id = job_id
         self.vnfd_id = ''
+        self.vim_id = ignore_case_get(ignore_case_get(self.data, "additionalParams"), "vimId")
         self.nfvo_inst_id = ''
         self.vnfm_inst_id = ''
         self.package_id = ''
@@ -101,7 +102,10 @@ class InstVnf(Thread):
                    vendor=vendor, netype=netype, vnfd_model=vnfd_model, status='NOT_INSTANTIATED', vnfdid=self.vnfd_id,
                    localizationLanguage=ignore_case_get(self.data, 'localizationLanguage'), input_params=self.data,
                    vnfSoftwareVersion=vnfsoftwareversion, lastuptime=now_time())
-        NfvoRegInfoModel.objects.create(nfvoid=str(uuid.uuid4()), vnfminstid=ignore_case_get(self.data, "vnfmId"))
+
+        logger.info("self.vim_id = %s" % self.vim_id)
+        NfvoRegInfoModel.objects.create(nfvoid=self.nf_inst_id,
+            vnfminstid=ignore_case_get(self.data, "vnfmId"), apiurl=self.vim_id)
         JobUtil.add_job_status(self.job_id, 15, 'Nf instancing pre-check finish')
         logger.info("Nf instancing pre-check finish")
 
@@ -121,8 +125,12 @@ class InstVnf(Thread):
             content_args['addResource'].append(res_def)
             res_index += 1
 
-        vnfmInfo = NfvoRegInfoModel.objects.all()
+        logger.debug("NfvoRegInfoModel filter nf_inst_id=%s", self.nf_inst_id)
+        vnfmInfo = NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id)
+        if len(vnfmInfo) == 0:
+            raise NFLCMException('nf_inst_id(%s) does not exist in NfvoRegInfoModel' % self.nf_inst_id)
         content_args['additionalParam']['vnfmid'] = vnfmInfo[0].vnfminstid
+        content_args['additionalParam']['vimid'] = vnfmInfo[0].apiurl
         logger.info('content_args=%s' % content_args)
         apply_result = apply_grant_to_nfvo(json.dumps(content_args))
         #vim_info = ignore_case_get(apply_result, "vim")
@@ -138,6 +146,17 @@ class InstVnf(Thread):
                     "tenant": ignore_case_get(apply_result, "tenant")}
                 logger.info('vdu["properties"]["location_info"]=%s' % vdu["properties"]["location_info"])
 
+        for vl in ignore_case_get(self.vnfd_info, "vls"):
+            if "location_info" in vl["properties"]:
+                vl["properties"]["location_info"]["vimid"] = ignore_case_get(apply_result, "vimid")
+                vl["properties"]["location_info"]["tenant"] = ignore_case_get(apply_result, "tenant")
+            else:
+                vl["properties"]["location_info"] = {
+                    "vimid": ignore_case_get(apply_result, "vimid"),
+                    "tenant": ignore_case_get(apply_result, "tenant")}
+                logger.info('vl["properties"]["location_info"]=%s' % vl["properties"]["location_info"])
+
+        logger.info('self.vnfd_info=%s' % self.vnfd_info)
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='INSTANTIATED', lastuptime=now_time())
         JobUtil.add_job_status(self.job_id, 20, 'Nf instancing apply grant finish')
         logger.info("Nf instancing apply grant finish")
@@ -321,7 +340,7 @@ class InstVnf(Thread):
                 metadata=ignore_case_get(ret, "metadata"),
                 volume_array=ignore_case_get(ret, "volumeArray"),
                 server_group=ignore_case_get(ret, "serverGroup"),
-                availability_zone=ignore_case_get(ret, "availabilityZone"),
+                availability_zone=str(ignore_case_get(ret, "availabilityZone", "undefined")),
                 flavor_id=ignore_case_get(ret, "flavorId"),
                 security_groups=ignore_case_get(ret, "securityGroups"),
                 operationalstate=ignore_case_get(ret, "status"),
