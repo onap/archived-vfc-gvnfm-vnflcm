@@ -46,7 +46,7 @@ class TestNFInstantiate(TestCase):
     def test_swagger_ok(self):
         response = self.client.get("/openoapi/vnflcm/v1/swagger.json", format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
+'''
     @mock.patch.object(restcall, 'call_req')
     def test_create_vnf_identifier(self, mock_call_req):
         r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode([{'package_id': '222',
@@ -62,7 +62,7 @@ class TestNFInstantiate(TestCase):
         self.failUnlessEqual(status.HTTP_201_CREATED, response.status_code)
         context = json.loads(response.content)
         self.assertTrue(NfInstModel.objects.filter(nfinstid=context['vnfInstanceId']).exists())
-'''
+
     @mock.patch.object(InstVnf, 'run')
     def test_instantiate_vnf(self, mock_run):
         mock_run.re.return_value = None

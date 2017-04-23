@@ -27,9 +27,10 @@ class DeleteVnf:
     def do_biz(self):
         vnf_insts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
         if not vnf_insts.exists():
-            raise NFLCMException('VnfInst(%s) does not exist' % self.nf_inst_id)
+            logger.warn('VnfInst(%s) does not exist' % self.nf_inst_id)
+            return
         sel_vnf = vnf_insts[0]
-        if sel_vnf.status != 'NOT_INSTANTIATED':
-            raise NFLCMException("Don't allow to delete vnf(status:[%s])" % sel_vnf.status)
+        #if sel_vnf.status != 'NOT_INSTANTIATED':
+        #    raise NFLCMException("Don't allow to delete vnf(status:[%s])" % sel_vnf.status)
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).delete()
         NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id).delete()

@@ -49,12 +49,12 @@ class TermVnf(Thread):
 
     def run(self):
         try:
-            self.term_pre()
-            self.grant_resource()
-            self.query_inst_resource()
-            self.query_notify_data()
-            self.delete_resource()
-            self.lcm_notify()
+            if self.term_pre():
+                self.grant_resource()
+                self.query_inst_resource()
+                self.query_notify_data()
+                self.delete_resource()
+                self.lcm_notify()
             JobUtil.add_job_status(self.job_id, 100, "Terminate Vnf success.")
         except NFLCMException as e:
             self.vnf_term_failed_handle(e.message)
@@ -64,16 +64,21 @@ class TermVnf(Thread):
     def term_pre(self):
         vnf_insts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
         if not vnf_insts.exists():
-            raise NFLCMException('VnfInst(%s) does not exist' % self.nf_inst_id)
+            logger.warn('VnfInst(%s) does not exist' % self.nf_inst_id)
+            return False
+            #raise NFLCMException('VnfInst(%s) does not exist' % self.nf_inst_id)
         sel_vnf = vnf_insts[0]
         #if sel_vnf.status != 'VNF_INSTANTIATED':
         #    raise NFLCMException("Don't allow to terminate vnf(status:[%s])" % sel_vnf.status)
         if self.terminationType == 'GRACEFUL' and not self.gracefulTerminationTimeout:
-            raise NFLCMException("Graceful termination must set timeout")
+            logger.warn("Set Graceful default termination timeout = 60")
+            self.gracefulTerminationTimeout = 60
+            #raise NFLCMException("Graceful termination must set timeout")
 
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status=VNF_STATUS.TERMINATING)
         JobUtil.add_job_status(self.job_id, 10, 'Nf terminating pre-check finish')
         logger.info("Nf terminating pre-check finish")
+        return True
 
     def grant_resource(self):
         logger.info("nf_cancel_task grant_resource begin")
