@@ -263,7 +263,7 @@ class TermVnf(Thread):
     def lcm_notify(self):
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='NOT_INSTANTIATED', lastuptime=now_time())
         logger.info('[NF termination] send notify request to nfvo end')
-        resp = notify_lcm_to_nfvo(self.notify_data)
+        resp = notify_lcm_to_nfvo(json.dumps(self.notify_data))
         logger.info('[NF termination] get lcm response %s' % resp)
         logger.info('[NF termination] send notify request to nfvo end')
 

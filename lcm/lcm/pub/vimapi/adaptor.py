@@ -164,7 +164,7 @@ def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
     for vdu in ignore_case_get(data, "vdus"):
         if vdu["vdu_id"] == port_ref_vdu_id:
             location_info = vdu["properties"]["location_info"]
-            if  port["cp_id"] not in vdu["cps"]:
+            if port["cp_id"] not in vdu["cps"]:
                 vdu["cps"].append(port["cp_id"])
             break
     if not location_info:
@@ -285,7 +285,7 @@ def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
     #vm_id, vm_name, return_code = ret["id"], ret["name"], ret["returnCode"]
     vm_id, return_code = ret["id"], ret["returnCode"]
     if ignore_case_get(ret, "name"):
-        vm_name = vm["properties"].get("name","undefined")
+        vm_name = vm["properties"].get("name", "undefined")
         logger.debug("vm_name:%s" % vm_name)
     opt_vm_status = "Timeout"
     retry_count, max_retry_count = 0, 100
