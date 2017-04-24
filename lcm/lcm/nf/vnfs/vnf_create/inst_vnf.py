@@ -214,7 +214,7 @@ class InstVnf(Thread):
                                      'resourceName': vs.name, 'resourceType': 'volume'}})
         content_args = {
             "status": 'result',
-            "nfInstanceId": self.nf_inst_id,
+            "vnfInstanceId": self.nf_inst_id,
             "operation": 'instantiate',
             "jobId": self.job_id,
             'affectedVnfc': affected_vnfc,
@@ -222,6 +222,10 @@ class InstVnf(Thread):
             'affectedVirtualStorage': affected_vs,
             'affectedCp': affected_cp
             }
+        vnfmInfo = NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id)
+        if len(vnfmInfo) == 0:
+            raise NFLCMException('nf_inst_id(%s) does not exist in NfvoRegInfoModel' % self.nf_inst_id)
+        content_args['VNFMID'] = vnfmInfo[0].vnfminstid
         logger.info('content_args=%s' % content_args)
         resp = notify_lcm_to_nfvo(json.dumps(content_args))
         logger.info('[NF instantiation] get lcm response %s' % resp)
