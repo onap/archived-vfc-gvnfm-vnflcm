@@ -13,7 +13,7 @@
 # limitations under the License.
 import logging
 
-from lcm.pub.database.models import NfInstModel
+from lcm.pub.database.models import NfInstModel, NfvoRegInfoModel
 from lcm.pub.exceptions import NFLCMException
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ class DeleteVnf:
         if not vnf_insts.exists():
             logger.warn('VnfInst(%s) does not exist' % self.nf_inst_id)
             return
-        sel_vnf = vnf_insts[0]
+        #sel_vnf = vnf_insts[0]
         #if sel_vnf.status != 'NOT_INSTANTIATED':
         #    raise NFLCMException("Don't allow to delete vnf(status:[%s])" % sel_vnf.status)
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).delete()
