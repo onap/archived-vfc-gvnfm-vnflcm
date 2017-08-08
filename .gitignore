@@ -1,3 +1,4 @@
-lcm/.idea
+.idea
+.gitignore
 lcm/logs/runtime_lcm.log
 *.pyc

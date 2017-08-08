@@ -48,5 +48,5 @@
             </includes>
         </fileSet>
     </fileSets>
-    <baseDirectory>gvnfm-vnflcm/lcm</baseDirectory>
+    <baseDirectory>vfc/gvnfm/vnflcm/lcm</baseDirectory>
 </assembly>
