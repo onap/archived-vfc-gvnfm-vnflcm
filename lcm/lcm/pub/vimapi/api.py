@@ -17,7 +17,7 @@ import json
 from lcm.pub.utils.restcall import req_by_msb
 from .exceptions import VimException
 
-VIM_DRIVER_BASE_URL = "openoapi/multivim/v1"
+VIM_DRIVER_BASE_URL = "api/multivim/v1"
 
 def call(vim_id, tenant_id, res, method, data=''):
     if data and not isinstance(data, (str, unicode)):

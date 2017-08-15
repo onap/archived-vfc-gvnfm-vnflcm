@@ -113,7 +113,7 @@ class ResourceTest(TestCase):
         vnf_inst_id = "1"
         NfInstModel(nfinstid=vnf_inst_id, nf_name='VNF1').save()
         StorageInstModel(storageid='s02', vimid='vim01', resouceid='resource01', insttype=1, instid=vnf_inst_id).save()
-        response = self.client.get("/openoapi/vnflcm/v1/vnf_instances/%s" % vnf_inst_id, format='json')
+        response = self.client.get("/api/vnflcm/v1/vnf_instances/%s" % vnf_inst_id, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self.test_data_single_vnf, response.data)
 
@@ -122,6 +122,6 @@ class ResourceTest(TestCase):
             NfInstModel(nfinstid='%s' % i, nf_name='VNF%s' % i).save()
             StorageInstModel(storageid='s0%s' % i, vimid='vim0%s' % i, resouceid='resource0%s' % i,
                              insttype=1, instid='%s' % i).save()
-        response = self.client.get("/openoapi/vnflcm/v1/vnf_instances", format='json')
+        response = self.client.get("/api/vnflcm/v1/vnf_instances", format='json')
         self.failUnlessEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(self.test_data_multi_vnf, response.data)

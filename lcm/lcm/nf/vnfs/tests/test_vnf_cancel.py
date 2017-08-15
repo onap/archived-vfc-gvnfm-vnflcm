@@ -61,13 +61,13 @@ class TestNFTerminate(TestCase):
                                    netype='', vnfd_model='', status='NOT_INSTANTIATED', nf_desc='', vnfdid='',
                                    vnfSoftwareVersion='', vnfConfigurableProperties='todo',
                                    localizationLanguage='EN_US', create_time=now_time())
-        response = self.client.delete("/openoapi/vnflcm/v1/vnf_instances/1111")
+        response = self.client.delete("/api/vnflcm/v1/vnf_instances/1111")
         self.failUnlessEqual(status.HTTP_204_NO_CONTENT, response.status_code)
         self.assertEqual(None, response.data)
 
     """
     def test_delete_vnf_identifier_when_vnf_not_exist(self):
-        response = self.client.delete("/openoapi/vnflcm/v1/vnf_instances/1111")
+        response = self.client.delete("/api/vnflcm/v1/vnf_instances/1111")
         self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
         self.assertEqual("VnfInst(1111) does not exist", response.data["error"])
 
@@ -76,7 +76,7 @@ class TestNFTerminate(TestCase):
                                    netype='', vnfd_model='', status='VNF_INSTANTIATED', nf_desc='', vnfdid='',
                                    vnfSoftwareVersion='', vnfConfigurableProperties='todo',
                                    localizationLanguage='EN_US', create_time=now_time())
-        response = self.client.delete("/openoapi/vnflcm/v1/vnf_instances/1111")
+        response = self.client.delete("/api/vnflcm/v1/vnf_instances/1111")
         self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
         self.assertEqual("Don't allow to delete vnf(status:[VNF_INSTANTIATED])", response.data["error"])
     """
@@ -84,7 +84,7 @@ class TestNFTerminate(TestCase):
     @mock.patch.object(TermVnf, 'run')
     def test_terminate_vnf(self, mock_run):
         mock_run.re.return_value = None
-        response = self.client.post("/openoapi/vnflcm/v1/vnf_instances/12/terminate", data={}, format='json')
+        response = self.client.post("/api/vnflcm/v1/vnf_instances/12/terminate", data={}, format='json')
         self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
 
     """

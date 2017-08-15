@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_packageinfo_by_vnfdid(vnfdid):
-    ret = req_by_msb("openoapi/gvnfmdriver/v1/vnfpackages", "GET")  # TODO
+    ret = req_by_msb("api/gvnfmdriver/v1/vnfpackages", "GET")  # TODO
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Failed to query package_info of vnfdid(%s) from nslcm." % vnfdid)
@@ -29,7 +29,7 @@ def get_packageinfo_by_vnfdid(vnfdid):
 
 
 def apply_grant_to_nfvo(data):
-    ret = req_by_msb("openoapi/gvnfmdriver/v1/resource/grant", "PUT", data)
+    ret = req_by_msb("api/gvnfmdriver/v1/resource/grant", "PUT", data)
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Nf instancing apply grant exception")
@@ -37,7 +37,7 @@ def apply_grant_to_nfvo(data):
 
 
 def notify_lcm_to_nfvo(data):
-    ret = req_by_msb("openoapi/gvnfmdriver/v1/vnfs/lifecyclechangesnotification", "POST", data)
+    ret = req_by_msb("api/gvnfmdriver/v1/vnfs/lifecyclechangesnotification", "POST", data)
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Nf lcm notify exception")

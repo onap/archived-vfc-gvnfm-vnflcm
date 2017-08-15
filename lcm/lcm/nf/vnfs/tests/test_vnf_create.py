@@ -44,7 +44,7 @@ class TestNFInstantiate(TestCase):
         self.assertEqual(1, len(jobs))
 
     def test_swagger_ok(self):
-        response = self.client.get("/openoapi/vnflcm/v1/swagger.json", format='json')
+        response = self.client.get("/api/vnflcm/v1/swagger.json", format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     @mock.patch.object(restcall, 'call_req')
@@ -58,7 +58,7 @@ class TestNFInstantiate(TestCase):
             "vnfdId": "111",
             "vnfInstanceName": "vFW_01",
             "vnfInstanceDescription": "vFW in Nanjing TIC Edge"}
-        response = self.client.post("/openoapi/vnflcm/v1/vnf_instances", data=data, format='json')
+        response = self.client.post("/api/vnflcm/v1/vnf_instances", data=data, format='json')
         self.failUnlessEqual(status.HTTP_201_CREATED, response.status_code)
         context = json.loads(response.content)
         self.assertTrue(NfInstModel.objects.filter(nfinstid=context['vnfInstanceId']).exists())
@@ -66,7 +66,7 @@ class TestNFInstantiate(TestCase):
     @mock.patch.object(InstVnf, 'run')
     def test_instantiate_vnf(self, mock_run):
         mock_run.re.return_value = None
-        response = self.client.post("/openoapi/vnflcm/v1/vnf_instances/12/instantiate", data={}, format='json')
+        response = self.client.post("/api/vnflcm/v1/vnf_instances/12/instantiate", data={}, format='json')
         self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
 """
     def test_instantiate_vnf_when_inst_id_not_exist(self):

@@ -17,7 +17,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from lcm.jobs.views import JobView
 
 urlpatterns = patterns('',
-                       url(r'^openoapi/vnflcm/v1/vnf_lc_ops/(?P<job_id>[0-9a-zA-Z_-]+)$', JobView.as_view()),
+                       url(r'^api/vnflcm/v1/vnf_lc_ops/(?P<job_id>[0-9a-zA-Z_-]+)$', JobView.as_view()),
                        )
 
 urlpatterns = format_suffix_patterns(urlpatterns)

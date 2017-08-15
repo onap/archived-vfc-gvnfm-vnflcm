@@ -20,8 +20,8 @@ from rest_framework import status
 
 from lcm.pub.vimapi import api
 
-inst_res_url = "/openoapi/vnflcm/v1/resources/inst"
-term_res_url = "/openoapi/vnflcm/v1/resources/term"
+inst_res_url = "/api/vnflcm/v1/resources/inst"
+term_res_url = "/api/vnflcm/v1/resources/term"
 inst_res_data = {
     "vdus": [
         {
