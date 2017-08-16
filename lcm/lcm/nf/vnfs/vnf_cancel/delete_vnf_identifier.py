@@ -13,8 +13,9 @@
 # limitations under the License.
 import logging
 
+from lcm.pub.aaiapi.aai import call_aai
+from lcm.pub.config.config import AAI_BASE_URL
 from lcm.pub.database.models import NfInstModel, NfvoRegInfoModel
-from lcm.pub.exceptions import NFLCMException
 
 logger = logging.getLogger(__name__)
 
@@ -34,3 +35,8 @@ class DeleteVnf:
         #    raise NFLCMException("Don't allow to delete vnf(status:[%s])" % sel_vnf.status)
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).delete()
         NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id).delete()
+
+    def delete_data_from_aai(self, req_data):
+        full_url = AAI_BASE_URL + "api/aai-service-design-and-creation/v1/%s" % self.nf_inst_id
+        del_result = call_aai(full_url, "DELETE", req_data)
+        pass
