@@ -179,4 +179,5 @@ class TestNFInstantiate(TestCase):
         data = inst_req_data
         InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
         self.assert_job_result(self.job_id, 100, "Instantiate Vnf success.")
+
 """
