@@ -11,6 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import logging
 
-def call_aai(full_url, method, req_data):
+logger = logging.getLogger(__name__)
+
+
+def create_ns(ns_id, data):
+    pass
+
+
+def create_vnf(vnf_id, data):
+    pass
+
+
+def create_vserver(cloud_owner, cloud_region_id, tenant_id, vserver_id, data):
     pass
