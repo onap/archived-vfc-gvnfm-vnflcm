@@ -26,7 +26,28 @@ def create_ns(ns_id, data):
 
 
 def create_vnf(vnf_id, data):
-    pass
+    resource = "/network/generic-vnfs/generic-vnf/%s" % vnf_id
+    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "PUT", data)
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Vnf instance creation exception in AAI")
+    return json.JSONDecoder().decode(ret[1])
+
+def delete_vnf(vnf_id, data):
+    resource = "/network/generic-vnfs/generic-vnf/%s" % vnf_id
+    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "DELETE", data)
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Vnf instance delete exception in AAI")
+    return json.JSONDecoder().decode(ret[1])
+
+def query_vnf(vnf_id, data):
+    resource = "/network/generic-vnfs/generic-vnf/%s" % vnf_id
+    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "GET", data)
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Vnf instance query exception in AAI")
+    return json.JSONDecoder().decode(ret[1])
 
 
 def create_vserver(cloud_owner, cloud_region_id, tenant_id, vserver_id, data):
