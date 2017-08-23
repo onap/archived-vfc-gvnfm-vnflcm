@@ -21,8 +21,35 @@ from lcm.pub.utils.restcall import call_req_aai, rest_no_auth
 logger = logging.getLogger(__name__)
 
 
-def create_ns(ns_id, data):
-    pass
+def create_ns(global_customer_id, service_type, service_instance_id, data):
+    resource = "/business/customers/customer/%s/service-subscriptions/service-subscription/" \
+               "%s/service-instances/service-instance/%s" % \
+               (global_customer_id, service_type, service_instance_id)
+    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "PUT", data)
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Ns instance creation exception in AAI")
+    return json.JSONDecoder().decode(ret[1])
+
+def delete_ns(global_customer_id, service_type, service_instance_id, data):
+    resource = "/business/customers/customer/%s/service-subscriptions/service-subscription/" \
+               "%s/service-instances/service-instance/%s" % \
+               (global_customer_id, service_type, service_instance_id)
+    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "DELETE", data)
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Ns instance delete exception in AAI")
+    return json.JSONDecoder().decode(ret[1])
+
+def query_ns(global_customer_id, service_type, service_instance_id, data):
+    resource = "/business/customers/customer/%s/service-subscriptions/service-subscription/" \
+               "%s/service-instances/service-instance/%s" % \
+               (global_customer_id, service_type, service_instance_id)
+    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "GET", data)
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Ns instance query exception in AAI")
+    return json.JSONDecoder().decode(ret[1])
 
 
 def create_vnf(vnf_id, data):
