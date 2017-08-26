@@ -68,7 +68,7 @@ class TestNFInstantiate(TestCase):
         mock_run.re.return_value = None
         response = self.client.post("/api/vnflcm/v1/vnf_instances/12/instantiate", data={}, format='json')
         self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
-    """
+
     def test_instantiate_vnf_when_inst_id_not_exist(self):
         self.nf_inst_id = str(uuid.uuid4())
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
@@ -179,4 +179,3 @@ class TestNFInstantiate(TestCase):
         data = inst_req_data
         InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
         self.assert_job_result(self.job_id, 100, "Instantiate Vnf success.")
-    """
