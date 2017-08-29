@@ -142,3 +142,23 @@ def delete_vnf_relationship(vnf_id, data):
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Delete vnf instance relationship exception in AAI")
     return json.JSONDecoder().decode(ret[1])
+
+def put_ns_relationship(global_customer_id, service_type, service_instance_id, data):
+    resource = "/business/customers/customer/%s/service-subscriptions/service-subscription/" \
+               "%s/service-instances/service-instance/%s/relationship-list/relationship" % \
+               (global_customer_id, service_type, service_instance_id)
+    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "PUT", data)
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Put or update ns instance relationship exception in AAI")
+    return json.JSONDecoder().decode(ret[1])
+
+def delete_ns_relationship(global_customer_id, service_type, service_instance_id, data):
+    resource = "/business/customers/customer/%s/service-subscriptions/service-subscription/" \
+               "%s/service-instances/service-instance/%s/relationship-list/relationship" % \
+               (global_customer_id, service_type, service_instance_id)
+    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "DELETE", data)
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Delete ns instance relationship exception in AAI")
+    return json.JSONDecoder().decode(ret[1])
