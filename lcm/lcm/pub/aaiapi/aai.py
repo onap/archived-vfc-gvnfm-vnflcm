@@ -107,6 +107,7 @@ def query_vserver(cloud_owner, cloud_region_id, tenant_id, vserver_id, data):
         raise NFLCMException("Vserver query exception in AAI")
     return json.JSONDecoder().decode(ret[1])
 
+
 def put_vserver_relationship(cloud_owner, cloud_region_id, tenant_id, vserver_id, data):
     resource = "/cloud-infrastructure/cloud-regions/cloud-region/%s/" \
                "%s/tenants/tenant/%s/vservers/vserver/%s/relationship-list/relationship" % \
@@ -127,6 +128,7 @@ def delete_vserver_relationship(cloud_owner, cloud_region_id, tenant_id, vserver
         raise NFLCMException("Delete vserver relationship exception in AAI")
     return json.JSONDecoder().decode(ret[1])
 
+
 def put_vnf_relationship(vnf_id, data):
     resource = "/network/generic-vnfs/generic-vnf/%s/relationship-list/relationship" % vnf_id
     ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "PUT", data)
@@ -142,6 +144,7 @@ def delete_vnf_relationship(vnf_id, data):
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Delete vnf instance relationship exception in AAI")
     return json.JSONDecoder().decode(ret[1])
+
 
 def put_ns_relationship(global_customer_id, service_type, service_instance_id, data):
     resource = "/business/customers/customer/%s/service-subscriptions/service-subscription/" \
