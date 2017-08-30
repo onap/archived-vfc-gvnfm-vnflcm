@@ -20,12 +20,15 @@ from lcm.pub.utils.restcall import call_req_aai, rest_no_auth
 
 logger = logging.getLogger(__name__)
 
+def call_aai(resource, method, data):
+    return call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, method, data)
 
 def create_ns(global_customer_id, service_type, service_instance_id, data):
     resource = "/business/customers/customer/%s/service-subscriptions/service-subscription/" \
                "%s/service-instances/service-instance/%s" % \
                (global_customer_id, service_type, service_instance_id)
-    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "PUT", data)
+    ret = call_aai(resource, "PUT", data)
+    # ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "PUT", data)
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Ns instance creation exception in AAI")
@@ -35,7 +38,8 @@ def delete_ns(global_customer_id, service_type, service_instance_id, data):
     resource = "/business/customers/customer/%s/service-subscriptions/service-subscription/" \
                "%s/service-instances/service-instance/%s" % \
                (global_customer_id, service_type, service_instance_id)
-    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "DELETE", data)
+    ret = call_aai(resource, "DELETE", data)
+    # ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "DELETE", data)
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Ns instance delete exception in AAI")
@@ -45,7 +49,8 @@ def query_ns(global_customer_id, service_type, service_instance_id, data):
     resource = "/business/customers/customer/%s/service-subscriptions/service-subscription/" \
                "%s/service-instances/service-instance/%s" % \
                (global_customer_id, service_type, service_instance_id)
-    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "GET", data)
+    ret = call_aai(resource, "GET", data)
+    # ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "GET", data)
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Ns instance query exception in AAI")
@@ -54,7 +59,8 @@ def query_ns(global_customer_id, service_type, service_instance_id, data):
 
 def create_vnf(vnf_id, data):
     resource = "/network/generic-vnfs/generic-vnf/%s" % vnf_id
-    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "PUT", data)
+    ret = call_aai(resource, "PUT", data)
+    # ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "PUT", data)
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Vnf instance creation exception in AAI")
@@ -62,7 +68,8 @@ def create_vnf(vnf_id, data):
 
 def delete_vnf(vnf_id, data):
     resource = "/network/generic-vnfs/generic-vnf/%s" % vnf_id
-    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "DELETE", data)
+    ret = call_aai(resource, "DELETE", data)
+    # ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "DELETE", data)
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Vnf instance delete exception in AAI")
@@ -70,7 +77,8 @@ def delete_vnf(vnf_id, data):
 
 def query_vnf(vnf_id, data):
     resource = "/network/generic-vnfs/generic-vnf/%s" % vnf_id
-    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "GET", data)
+    ret = call_aai(resource, "GET", data)
+    # ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "GET", data)
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Vnf instance query exception in AAI")
@@ -81,7 +89,8 @@ def create_vserver(cloud_owner, cloud_region_id, tenant_id, vserver_id, data):
     resource = "/cloud-infrastructure/cloud-regions/cloud-region/%s/" \
                "%s/tenants/tenant/%s/vservers/vserver/%s" % \
                (cloud_owner, cloud_region_id, tenant_id, vserver_id)
-    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "PUT", data)
+    ret = call_aai(resource, "PUT", data)
+    # ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "PUT", data)
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Vserver creation exception in AAI")
@@ -91,7 +100,8 @@ def delete_vserver(cloud_owner, cloud_region_id, tenant_id, vserver_id, data):
     resource = "/cloud-infrastructure/cloud-regions/cloud-region/%s/" \
                "%s/tenants/tenant/%s/vservers/vserver/%s" % \
                (cloud_owner, cloud_region_id, tenant_id, vserver_id)
-    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "DELETE", data)
+    ret = call_aai(resource, "DELETE", data)
+    # ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "DELETE", data)
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Vserver delete exception in AAI")
@@ -101,7 +111,8 @@ def query_vserver(cloud_owner, cloud_region_id, tenant_id, vserver_id, data):
     resource = "/cloud-infrastructure/cloud-regions/cloud-region/%s/" \
                "%s/tenants/tenant/%s/vservers/vserver/%s" % \
                (cloud_owner, cloud_region_id, tenant_id, vserver_id)
-    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "GET", data)
+    ret = call_aai(resource, "GET", data)
+    # ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "GET", data)
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Vserver query exception in AAI")
@@ -112,7 +123,8 @@ def put_vserver_relationship(cloud_owner, cloud_region_id, tenant_id, vserver_id
     resource = "/cloud-infrastructure/cloud-regions/cloud-region/%s/" \
                "%s/tenants/tenant/%s/vservers/vserver/%s/relationship-list/relationship" % \
                (cloud_owner, cloud_region_id, tenant_id, vserver_id)
-    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "PUT", data)
+    ret = call_aai(resource, "PUT", data)
+    # ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "PUT", data)
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Put or update vserver relationship exception in AAI")
@@ -122,7 +134,8 @@ def delete_vserver_relationship(cloud_owner, cloud_region_id, tenant_id, vserver
     resource = "/cloud-infrastructure/cloud-regions/cloud-region/%s/" \
                "%s/tenants/tenant/%s/vservers/vserver/%s/relationship-list/relationship" % \
                (cloud_owner, cloud_region_id, tenant_id, vserver_id)
-    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "DELETE", data)
+    ret = call_aai(resource, "DELETE", data)
+    # ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "DELETE", data)
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Delete vserver relationship exception in AAI")
@@ -131,7 +144,8 @@ def delete_vserver_relationship(cloud_owner, cloud_region_id, tenant_id, vserver
 
 def put_vnf_relationship(vnf_id, data):
     resource = "/network/generic-vnfs/generic-vnf/%s/relationship-list/relationship" % vnf_id
-    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "PUT", data)
+    ret = call_aai(resource, "PUT", data)
+    # ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "PUT", data)
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Put or update vnf instance relationship exception in AAI")
@@ -139,7 +153,8 @@ def put_vnf_relationship(vnf_id, data):
 
 def delete_vnf_relationship(vnf_id, data):
     resource = "/network/generic-vnfs/generic-vnf/%s/relationship-list/relationship" % vnf_id
-    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "DELETE", data)
+    ret = call_aai(resource, "DELETE", data)
+    # ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "DELETE", data)
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Delete vnf instance relationship exception in AAI")
@@ -150,7 +165,8 @@ def put_ns_relationship(global_customer_id, service_type, service_instance_id, d
     resource = "/business/customers/customer/%s/service-subscriptions/service-subscription/" \
                "%s/service-instances/service-instance/%s/relationship-list/relationship" % \
                (global_customer_id, service_type, service_instance_id)
-    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "PUT", data)
+    ret = call_aai(resource, "PUT", data)
+    # ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "PUT", data)
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Put or update ns instance relationship exception in AAI")
@@ -160,7 +176,8 @@ def delete_ns_relationship(global_customer_id, service_type, service_instance_id
     resource = "/business/customers/customer/%s/service-subscriptions/service-subscription/" \
                "%s/service-instances/service-instance/%s/relationship-list/relationship" % \
                (global_customer_id, service_type, service_instance_id)
-    ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "DELETE", data)
+    ret = call_aai(resource, "DELETE", data)
+    # ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "DELETE", data)
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Delete ns instance relationship exception in AAI")

@@ -104,7 +104,7 @@ def call_req_aai(base_url, user, passwd, auth_type, resource, method, content=''
     try:
         full_url = combine_url(base_url, resource)
         headers = {'content-type': 'application/json', 'accept': 'application/json',
-                   'X-FromAppId': 'AAI', 'X-TransactionId': 'get_aai_subscr'}
+                   'X-FromAppId': 'VFC-GVNFM-VNFLCM', 'X-TransactionId': str(uuid.uuid1())}
         if user:
             headers['Authorization'] = 'Basic ' + ('%s:%s' % (user, passwd)).encode("base64")
         ca_certs = None
