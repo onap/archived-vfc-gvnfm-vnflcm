@@ -13,7 +13,9 @@
 # limitations under the License.
 import logging
 
+from lcm.pub.aaiapi.aai import delete_vnf
 from lcm.pub.database.models import NfInstModel, NfvoRegInfoModel
+from lcm.pub.exceptions import NFLCMException
 
 logger = logging.getLogger(__name__)
 
@@ -24,12 +26,19 @@ class DeleteVnf:
         self.nf_inst_id = instanceid
 
     def do_biz(self):
-        vnf_insts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
-        if not vnf_insts.exists():
-            logger.warn('VnfInst(%s) does not exist' % self.nf_inst_id)
-            return
-        #sel_vnf = vnf_insts[0]
-        #if sel_vnf.status != 'NOT_INSTANTIATED':
-        #    raise NFLCMException("Don't allow to delete vnf(status:[%s])" % sel_vnf.status)
-        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).delete()
-        NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id).delete()
+        try:
+            vnf_insts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
+            if not vnf_insts.exists():
+                logger.warn('VnfInst(%s) does not exist' % self.nf_inst_id)
+                return
+            #sel_vnf = vnf_insts[0]
+            #if sel_vnf.status != 'NOT_INSTANTIATED':
+            #    raise NFLCMException("Don't allow to delete vnf(status:[%s])" % sel_vnf.status)
+            NfInstModel.objects.filter(nfinstid=self.nf_inst_id).delete()
+            NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id).delete()
+
+            delete_vnf(self.nf_inst_id)
+        except NFLCMException as e:
+            logger.debug('Delete VNF instance[%s] from AAI failed' % self.nf_inst_id)
+        except:
+            logger.debug('Delete VNF instance[%s] failed' % self.nf_inst_id)

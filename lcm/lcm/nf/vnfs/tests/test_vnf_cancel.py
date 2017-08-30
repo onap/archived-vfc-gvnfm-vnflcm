@@ -56,11 +56,14 @@ class TestNFTerminate(TestCase):
             descp=job_detail)
         self.assertEqual(1, len(jobs))
 
-    def test_delete_vnf_identifier(self):
+    @mock.patch.object(restcall, 'call_req_aai')
+    def test_delete_vnf_identifier(self, mock_call_req_aai):
         NfInstModel.objects.create(nfinstid='1111', nf_name='2222', package_id='todo', version='', vendor='',
                                    netype='', vnfd_model='', status='NOT_INSTANTIATED', nf_desc='', vnfdid='',
                                    vnfSoftwareVersion='', vnfConfigurableProperties='todo',
                                    localizationLanguage='EN_US', create_time=now_time())
+        r1_create_vnf_to_aai = [0, json.JSONEncoder().encode({}), '200']
+        mock_call_req_aai.side_effect = [r1_create_vnf_to_aai]
         response = self.client.delete("/api/vnflcm/v1/vnf_instances/1111")
         self.failUnlessEqual(status.HTTP_204_NO_CONTENT, response.status_code)
         self.assertEqual(None, response.data)

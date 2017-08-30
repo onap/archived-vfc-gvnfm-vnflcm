@@ -66,7 +66,7 @@ def create_vnf(vnf_id, data):
         raise NFLCMException("Vnf instance creation exception in AAI")
     return json.JSONDecoder().decode(ret[1])
 
-def delete_vnf(vnf_id, data):
+def delete_vnf(vnf_id, data=[]):
     resource = "/network/generic-vnfs/generic-vnf/%s" % vnf_id
     ret = call_aai(resource, "DELETE", data)
     # ret = call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, "DELETE", data)

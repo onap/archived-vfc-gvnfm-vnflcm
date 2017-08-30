@@ -15,6 +15,7 @@ import json
 import logging
 import uuid
 
+from lcm.pub.aaiapi.aai import create_vnf
 from lcm.pub.database.models import NfInstModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.msapi.catalog import query_rawdata_from_catalog
@@ -66,6 +67,16 @@ class CreateVnf:
                                        version=version, vendor=vendor, netype=netype, vnfd_model=vnfd_model,
                                        status='NOT_INSTANTIATED', nf_desc=self.description, vnfdid=self.vnfd_id,
                                        vnfSoftwareVersion=vnfsoftwareversion, create_time=now_time())
+            data = {
+                "vnf-id": nf_inst_id,
+                "vnf-name": self.vnf_instance_mame,
+                "vnf-type": "INFRA",
+                "in-maint": "true",
+                "is-closed-loop-disabled": "false"
+            }
+            create_vnf(nf_inst_id, data)
+        except NFLCMException as e:
+            logger.debug('Create VNF instance[%s] to AAI failed' % nf_inst_id)
         except:
             NfInstModel.objects.create(nfinstid=nf_inst_id, nf_name=self.vnf_instance_mame, package_id='',
                                        version='', vendor='', netype='', vnfd_model='',
