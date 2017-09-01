@@ -27,7 +27,7 @@ RUN apt-get update && \
     apt-get install -y unzip
 
 ADD . /service
-RUN cd /service
+WORKDIR /service
 
 # get binary zip from nexus
 RUN wget -q -O vfc-gvnfm-vnflcm-lcm.zip 'https://nexus.onap.org/service/local/artifact/maven/redirect?r=snapshots&g=org.onap.vfc.gvnfm.vnflcm&a=vfc-gvnfm-vnflcm-lcm&v=LATEST&e=zip' && \
@@ -44,6 +44,5 @@ RUN wget -q -O vfc-gvnfm-vnfres-res.zip 'https://nexus.onap.org/service/local/ar
 EXPOSE 8801
 EXPOSE 3306
 
-WORKDIR /service/vfc/gvnfm/vnflcm/
-
-CMD lcm/docker/instance_init.sh
+WORKDIR /service
+CMD vfc/gvnfm/vnflcm/lcm/docker/docker-entrypoint.sh
