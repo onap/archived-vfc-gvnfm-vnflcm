@@ -20,7 +20,7 @@ from lcm.pub.utils.restcall import call_req_aai, rest_no_auth
 
 logger = logging.getLogger(__name__)
 
-def call_aai(resource, method, data):
+def call_aai(resource, method, data=''):
     return call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, method, data)
 
 def create_ns(global_customer_id, service_type, service_instance_id, data):
