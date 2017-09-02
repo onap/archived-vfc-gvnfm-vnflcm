@@ -18,6 +18,7 @@ VNF_STATUS = enum(NULL='null', INSTANTIATING="instantiating", INACTIVE='inactive
                   FAILED="failed", TERMINATING="terminating", SCALING="scaling", OPERATING="operating",
                   UPDATING="updating", HEALING="healing")
 
+# inst_req_data
 inst_req_data = {
     "flavourId": "flavour_1",
     "instantiationLevelId": "instantiationLevel_1",
@@ -83,6 +84,8 @@ inst_req_data = {
                         }]}
 }
 
+
+# vnfd_rawdata
 vnfd_rawdata = {
     "rawData": {
         "instance": {
@@ -350,7 +353,7 @@ vnfd_rawdata = {
     }
 }
 
-
+# vnfd_model_dict
 vnfd_model_dict = {
     'metadata': {
         'vendor': u'zte',
@@ -660,7 +663,8 @@ vnfd_model_dict = {
     ],
 }
 
-c1_data_get_tenant_id = {  # get_tenant_id
+# get_tenant_id
+c1_data_get_tenant_id = {
     "tenants": [
         {
             "id": "1",
@@ -668,6 +672,8 @@ c1_data_get_tenant_id = {  # get_tenant_id
         }
     ]
 }
+
+# create_volume
 c2_data_create_volume = {
     "id": "4bd3e9eb-cd8b-456a-8589-910836a0ab31",
     "name": "volume1",
@@ -682,7 +688,9 @@ c2_data_create_volume = {
     "type": None,
     "size": 40
 }
-c3_data_get_volume = {  # get_volume
+
+# get_volume
+c3_data_get_volume = {
     "status": "available",
     "name": "wangsong",
     "attachments": [
@@ -699,7 +707,9 @@ c3_data_get_volume = {  # get_volume
     "id": "4bd3e9eb-cd8b-456a-8589-910836a0ab31",
     "size": 40
 }
-c4_data_create_network = {  # create_network
+
+# create_network
+c4_data_create_network = {
     "returnCode": 0,
     "vimId": "11111",
     "vimName": "11111",
@@ -715,6 +725,8 @@ c4_data_create_network = {  # create_network
     "physicalNetwork": "ctrl",
     "routerExternal": False
 }
+
+# create_subnet
 c5_data_create_subnet = {
     "returnCode": 0,
     "vimId": "11111",
@@ -738,6 +750,8 @@ c5_data_create_subnet = {
     ],
     "hostRoutes": []
 }
+
+# create_ports
 c6_data_create_port = {
     "returnCode": 0,
     "vimId": "11111",
@@ -755,6 +769,8 @@ c6_data_create_port = {
     "vnicType": "normal",
     "securityGroups": ""
 }
+
+# create_flavor
 c7_data_create_flavor ={
     "returnCode": 0,
     "vimId": "11111",
@@ -771,6 +787,7 @@ c7_data_create_flavor ={
     "extraSpecs": "testtt"
 }
 
+# list_image
 c8_data_list_image = {
     "vimid": "",
     "vimname": "",
@@ -783,6 +800,8 @@ c8_data_list_image = {
         }
     ]
 }
+
+# create_vm
 c9_data_create_vm = {
     "returnCode": 1,
     "id": "3c9eebdbbfd345658269340b9ea6fb73",
@@ -800,6 +819,8 @@ c9_data_create_vm = {
     "serverGroup": "fdvfdv",
     "status": "ACTIVE"
 }
+
+# get_vm
 c10_data_get_vm = {
     "returnCode": 1,
     "id": "3c9eebdbbfd345658269340b9ea6fb73",
