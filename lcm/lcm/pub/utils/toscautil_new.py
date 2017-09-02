@@ -1450,7 +1450,3 @@ if __name__ == '__main__':
         }
     })
     print convert_vnfd_model(src_json)
-
-
-
-
