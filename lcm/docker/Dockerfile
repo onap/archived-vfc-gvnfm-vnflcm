@@ -24,8 +24,7 @@ RUN apt-get update && \
     apt-get install -y curl && \
     apt-get install -y build-essential && \
     apt-get install -y libssl-dev && \
-    apt-get install -y libffi-dev && \
-    yes | pip install cryptography
+    apt-get install -y libffi-dev
 
 ADD . /service
 WORKDIR /service
@@ -41,6 +40,11 @@ RUN wget -q -O vfc-gvnfm-vnfres-res.zip 'https://nexus.onap.org/service/local/ar
     mv ./vfc/gvnfm/vnfres/res/assembly/bin ./bin && \
     mv ./vfc/gvnfm/vnfres/res/assembly/dbscripts ./dbscripts && \
     rm -rf vfc-gvnfm-vnfres-res.zip
+
+RUN sed -i "s|bind-address.*|# bind-address = 127.0.0.1|" /etc/mysql/my.cnf
+
+WORKDIR /service/vfc/gvnfm/vnflcm/lcm
+RUN pip install -r requirements.txt
 
 EXPOSE 8801
 EXPOSE 3306
