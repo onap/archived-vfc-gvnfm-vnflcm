@@ -19,15 +19,14 @@ if [ $HTTPS_PROXY ]; then
     BUILD_ARGS+=" --build-arg HTTPS_PROXY=${HTTPS_PROXY}"
 fi
 
-function build_vnflcm {
+function build_image {
     docker build ${BUILD_ARGS} -t ${IMAGE_NAME}:${VERSION} -t ${IMAGE_NAME}:latest .
 }
 
-function push_vnflcm {
+function push_image {
     docker push ${IMAGE_NAME}:${VERSION}
     docker push ${IMAGE_NAME}:latest
 }
 
-build_vnflcm
-push_vnflcm
-
+build_image
+push_image
