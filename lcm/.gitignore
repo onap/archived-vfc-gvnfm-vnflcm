@@ -1,4 +1,4 @@
-../.idea
+.idea
 logs/runtime_lcm.log
 *.pyc
 bash.exe.stackdump

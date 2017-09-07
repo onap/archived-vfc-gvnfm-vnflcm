@@ -16,9 +16,9 @@ import json
 import logging
 import uuid
 
-from lcm.pub.aaiapi.aai import create_vnf
 from lcm.pub.database.models import NfInstModel
 from lcm.pub.exceptions import NFLCMException
+from lcm.pub.msapi.aai import create_vnf
 from lcm.pub.msapi.catalog import query_rawdata_from_catalog
 from lcm.pub.msapi.gvnfmdriver import get_packageinfo_by_vnfdid
 from lcm.pub.utils import toscautil

@@ -14,9 +14,9 @@
 
 import logging
 
-from lcm.pub.aaiapi.aai import delete_vnf
 from lcm.pub.database.models import NfInstModel, NfvoRegInfoModel
 from lcm.pub.exceptions import NFLCMException
+from lcm.pub.msapi.aai import delete_vnf
 
 logger = logging.getLogger(__name__)
 
