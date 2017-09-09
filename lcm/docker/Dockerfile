@@ -30,12 +30,12 @@ ADD . /service
 WORKDIR /service
 
 # get binary zip from nexus
-RUN wget -q -O vfc-gvnfm-vnflcm-lcm.zip 'https://nexus.onap.org/service/local/artifact/maven/redirect?r=snapshots&g=org.onap.vfc.gvnfm.vnflcm&a=vfc-gvnfm-vnflcm-lcm&v=LATEST&e=zip' && \
+RUN wget -q -O vfc-gvnfm-vnflcm-lcm.zip 'https://nexus.onap.org/service/local/artifact/maven/redirect?r=snapshots&g=org.onap.vfc.gvnfm.vnflcm.lcm&a=vfc-gvnfm-vnflcm-lcm&v=LATEST&e=zip' && \
     unzip vfc-gvnfm-vnflcm-lcm.zip && \
     rm -rf vfc-gvnfm-vnflcm-lcm.zip
 
 # get db scripts from nexus
-RUN wget -q -O vfc-gvnfm-vnfres-res.zip 'https://nexus.onap.org/service/local/artifact/maven/redirect?r=snapshots&g=org.onap.vfc.gvnfm.vnfres&a=vfc-gvnfm-vnfres-res&v=LATEST&e=zip' && \
+RUN wget -q -O vfc-gvnfm-vnfres-res.zip 'https://nexus.onap.org/service/local/artifact/maven/redirect?r=snapshots&g=org.onap.vfc.gvnfm.vnfres.res&a=vfc-gvnfm-vnfres-res&v=LATEST&e=zip' && \
     unzip vfc-gvnfm-vnfres-res.zip vfc/gvnfm/vnfres/res/assembly/*.* && \
     mv ./vfc/gvnfm/vnfres/res/assembly/bin ./bin && \
     mv ./vfc/gvnfm/vnfres/res/assembly/dbscripts ./dbscripts && \
