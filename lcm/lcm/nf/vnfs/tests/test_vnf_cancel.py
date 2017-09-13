@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import json
 import uuid
 
@@ -44,11 +45,13 @@ class TestNFTerminate(TestCase):
                                    is_predefined=1, operationalstate=1)
         NfvoRegInfoModel.objects.create(nfvoid='1111', vnfminstid='11111', apiurl='1')
 
+
     def tearDown(self):
         VmInstModel.objects.all().delete()
         NetworkInstModel.objects.all().delete()
         SubNetworkInstModel.objects.all().delete()
         PortInstModel.objects.all().delete()
+
 
     def assert_job_result(self, job_id, job_progress, job_detail):
         jobs = JobStatusModel.objects.filter(
@@ -57,33 +60,24 @@ class TestNFTerminate(TestCase):
             descp=job_detail)
         self.assertEqual(1, len(jobs))
 
-    @mock.patch.object(restcall, 'call_req_aai')
-    def test_delete_vnf_identifier(self, mock_call_req_aai):
+
+    @mock.patch.object(restcall, 'call_req')
+    def test_delete_vnf_identifier(self, mock_call_req):
         NfInstModel.objects.create(nfinstid='1111', nf_name='2222', package_id='todo', version='', vendor='',
                                    netype='', vnfd_model='', status='NOT_INSTANTIATED', nf_desc='', vnfdid='',
                                    vnfSoftwareVersion='', vnfConfigurableProperties='todo',
                                    localizationLanguage='EN_US', create_time=now_time())
         r1_create_vnf_to_aai = [0, json.JSONEncoder().encode({}), '200']
-        mock_call_req_aai.side_effect = [r1_create_vnf_to_aai]
+        mock_call_req.side_effect = [r1_create_vnf_to_aai]
         response = self.client.delete("/api/vnflcm/v1/vnf_instances/1111")
         self.failUnlessEqual(status.HTTP_204_NO_CONTENT, response.status_code)
         self.assertEqual(None, response.data)
 
-    """
+
     def test_delete_vnf_identifier_when_vnf_not_exist(self):
         response = self.client.delete("/api/vnflcm/v1/vnf_instances/1111")
-        self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
-        self.assertEqual("VnfInst(1111) does not exist", response.data["error"])
+        self.failUnlessEqual(status.HTTP_204_NO_CONTENT, response.status_code)
 
-    def test_delete_vnf_identifier_when_status_check_failed(self):
-        NfInstModel.objects.create(nfinstid='1111', nf_name='2222', package_id='todo', version='', vendor='',
-                                   netype='', vnfd_model='', status='VNF_INSTANTIATED', nf_desc='', vnfdid='',
-                                   vnfSoftwareVersion='', vnfConfigurableProperties='todo',
-                                   localizationLanguage='EN_US', create_time=now_time())
-        response = self.client.delete("/api/vnflcm/v1/vnf_instances/1111")
-        self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
-        self.assertEqual("Don't allow to delete vnf(status:[VNF_INSTANTIATED])", response.data["error"])
-    """
 
     @mock.patch.object(TermVnf, 'run')
     def test_terminate_vnf(self, mock_run):
@@ -91,7 +85,7 @@ class TestNFTerminate(TestCase):
         response = self.client.post("/api/vnflcm/v1/vnf_instances/12/terminate", data={}, format='json')
         self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
 
-    """
+
     def test_terminate_vnf_when_inst_id_not_exist(self):
         data = {"terminationType": "GRACEFUL",
                 "gracefulTerminationTimeout": 120}
@@ -99,8 +93,8 @@ class TestNFTerminate(TestCase):
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
         JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
         TermVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        self.assert_job_result(self.job_id, 255, "VnfInst(%s) does not exist" % self.nf_inst_id)
-    """
+        self.assert_job_result(self.job_id, 100, "Terminate Vnf success.")
+
 
     @mock.patch.object(restcall, 'call_req')
     @mock.patch.object(api, 'call')

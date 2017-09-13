@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import json
 import uuid
 
@@ -49,15 +50,13 @@ class TestNFInstantiate(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     @mock.patch.object(restcall, 'call_req')
-    @mock.patch.object(restcall, 'call_req_aai')
-    def test_create_vnf_identifier(self, mock_call_req_aai, mock_call_req):
+    def test_create_vnf_identifier(self, mock_call_req):
         r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode({'csars':[{'package_id': '222',
                                                                   'csarId': '2222',
                                                                   'vnfdId': '111'}]}), '200']
         r2_get_rawdata_from_catalog = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']
         r3_create_vnf_to_aai = [0, json.JSONEncoder().encode({}), '200']
-        mock_call_req.side_effect = [r1_get_csarid_by_vnfdid, r2_get_rawdata_from_catalog]
-        mock_call_req_aai.side_effect = [r3_create_vnf_to_aai]
+        mock_call_req.side_effect = [r1_get_csarid_by_vnfdid, r2_get_rawdata_from_catalog, r3_create_vnf_to_aai]
         data = {
             "vnfdId": "111",
             "vnfInstanceName": "vFW_01",

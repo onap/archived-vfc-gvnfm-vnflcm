@@ -14,15 +14,28 @@
 
 import json
 import logging
+import uuid
 
 from lcm.pub.config.config import AAI_BASE_URL, AAI_USER, AAI_PASSWORD
 from lcm.pub.exceptions import NFLCMException
-from lcm.pub.utils.restcall import call_req_aai, rest_no_auth
+from lcm.pub.utils.restcall import rest_no_auth, call_req
 
 logger = logging.getLogger(__name__)
 
+
 def call_aai(resource, method, data=''):
-    return call_req_aai(AAI_BASE_URL, AAI_USER, AAI_PASSWORD, rest_no_auth, resource, method, data)
+    additional_headers = {
+        'X-FromAppId': 'VFC-GVNFM-VNFLCM',
+        'X-TransactionId': str(uuid.uuid1())
+    }
+    return call_req(AAI_BASE_URL,
+                    AAI_USER,
+                    AAI_PASSWORD,
+                    rest_no_auth,
+                    resource,
+                    method,
+                    data,
+                    additional_headers)
 
 
 def create_ns(global_customer_id, service_type, service_instance_id, data):
