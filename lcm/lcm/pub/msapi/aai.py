@@ -18,7 +18,7 @@ import uuid
 
 from lcm.pub.config.config import AAI_BASE_URL, AAI_USER, AAI_PASSWORD
 from lcm.pub.exceptions import NFLCMException
-from lcm.pub.utils.restcall import rest_no_auth, call_req
+from lcm.pub.utils import restcall
 
 logger = logging.getLogger(__name__)
 
@@ -28,10 +28,10 @@ def call_aai(resource, method, data=''):
         'X-FromAppId': 'VFC-GVNFM-VNFLCM',
         'X-TransactionId': str(uuid.uuid1())
     }
-    return call_req(AAI_BASE_URL,
+    return restcall.call_req(AAI_BASE_URL,
                     AAI_USER,
                     AAI_PASSWORD,
-                    rest_no_auth,
+                    restcall.rest_no_auth,
                     resource,
                     method,
                     data,
@@ -71,27 +71,27 @@ def query_ns(global_customer_id, service_type, service_instance_id, data):
     return json.JSONDecoder().decode(ret[1])
 
 
-def create_vnf(vnf_id, data):
+def create_vnf_aai(vnf_id, data):
     resource = "/network/generic-vnfs/generic-vnf/%s" % vnf_id
     ret = call_aai(resource, "PUT", data)
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Vnf instance creation exception in AAI")
-    return json.JSONDecoder().decode(ret[1])
+    return json.JSONDecoder().decode(ret[1]), ret[2]
 
-
-def delete_vnf(vnf_id):
+def delete_vnf_aai(vnf_id, resource_version=""):
     resource = "/network/generic-vnfs/generic-vnf/%s" % vnf_id
+    if resource_version:
+        resource = resource + "?resource-version=%s" % resource_version
     ret = call_aai(resource, "DELETE")
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Vnf instance delete exception in AAI")
     return json.JSONDecoder().decode(ret[1])
 
-
-def query_vnf(vnf_id, data):
-    resource = "/network/generic-vnfs/generic-vnf/%s" % vnf_id
-    ret = call_aai(resource, "GET", data)
+def query_vnf_aai(vnf_id):
+    resource = "/network/generic-vnfs/generic-vnf/%s?depth=all" % vnf_id
+    ret = call_aai(resource, "GET")
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Vnf instance query exception in AAI")
