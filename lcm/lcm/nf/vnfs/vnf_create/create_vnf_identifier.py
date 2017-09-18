@@ -40,35 +40,11 @@ class CreateVnf:
         self.csar_id = ''
 
     def do_biz(self):
-        logger.debug("CreateVnfIdentifier--CreateVnf::> %s" % self.data)
-        is_exist = NfInstModel.objects.filter(nf_name=self.vnf_instance_mame).exists()
-        logger.debug("check_inst_name_exist::is_exist=%s" % is_exist)
-        if is_exist:
-            raise NFLCMException('VNF is already exist.')
-
         self.nf_inst_id = str(uuid.uuid4())
         try:
-            self.package_info = get_packageinfo_by_vnfdid(self.vnfd_id)
-            for val in ignore_case_get(self.package_info, "csars"):
-                if self.vnfd_id == ignore_case_get(val, "vnfdId"):
-                    self.package_id = ignore_case_get(val, "csarId")
-                    break
-
-            raw_data = query_rawdata_from_catalog(self.package_id)
-            self.vnfd = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
-            self.vnfd = json.JSONDecoder().decode(self.vnfd)
-
-            metadata = ignore_case_get(self.vnfd, "metadata")
-            version = ignore_case_get(metadata, "vnfd_version")
-            vendor = ignore_case_get(metadata, "vendor")
-            netype = ignore_case_get(metadata, "vnf_type")
-            vnfsoftwareversion = ignore_case_get(metadata, "version")
-            vnfd_model = self.vnfd
-            NfInstModel.objects.create(nfinstid=self.nf_inst_id, nf_name=self.vnf_instance_mame, package_id=self.package_id,
-                                       version=version, vendor=vendor, netype=netype, vnfd_model=vnfd_model,
-                                       status='NOT_INSTANTIATED', nf_desc=self.description, vnfdid=self.vnfd_id,
-                                       vnfSoftwareVersion=vnfsoftwareversion, create_time=now_time())
-
+            self.check_vnf_name_valid()
+            self.get_vnfd_info()
+            self.save_info_to_db()
             self.create_vnf_in_aai()
         except NFLCMException as e:
             logger.debug('Create VNF instance[%s] to AAI failed' % self.nf_inst_id)
@@ -85,6 +61,37 @@ class CreateVnf:
                       vnf_inst.vnfd_model, vnf_inst.nf_desc, vnf_inst.create_time))
         return self.nf_inst_id
 
+    def check_vnf_name_valid(self):
+        logger.debug("CreateVnfIdentifier--CreateVnf::> %s" % self.data)
+        is_exist = NfInstModel.objects.filter(nf_name=self.vnf_instance_mame).exists()
+        logger.debug("check_inst_name_exist::is_exist=%s" % is_exist)
+        if is_exist:
+            raise NFLCMException('VNF is already exist.')
+
+    def get_vnfd_info(self):
+        self.nf_inst_id = str(uuid.uuid4())
+        self.package_info = get_packageinfo_by_vnfdid(self.vnfd_id)
+        for val in ignore_case_get(self.package_info, "csars"):
+            if self.vnfd_id == ignore_case_get(val, "vnfdId"):
+                self.package_id = ignore_case_get(val, "csarId")
+                break
+
+        raw_data = query_rawdata_from_catalog(self.package_id)
+        self.vnfd = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
+        self.vnfd = json.JSONDecoder().decode(self.vnfd)
+
+    def save_info_to_db(self):
+        metadata = ignore_case_get(self.vnfd, "metadata")
+        version = ignore_case_get(metadata, "vnfd_version")
+        vendor = ignore_case_get(metadata, "vendor")
+        netype = ignore_case_get(metadata, "vnf_type")
+        vnfsoftwareversion = ignore_case_get(metadata, "version")
+        vnfd_model = self.vnfd
+        NfInstModel.objects.create(nfinstid=self.nf_inst_id, nf_name=self.vnf_instance_mame, package_id=self.package_id,
+                                   version=version, vendor=vendor, netype=netype, vnfd_model=vnfd_model,
+                                   status='NOT_INSTANTIATED', nf_desc=self.description, vnfdid=self.vnfd_id,
+                                   vnfSoftwareVersion=vnfsoftwareversion, create_time=now_time())
+
     def create_vnf_in_aai(self):
         logger.debug("CreateVnf::create_vnf_in_aai::report vnf instance[%s] to aai." % self.nf_inst_id)
         data = {
@@ -99,4 +106,3 @@ class CreateVnf:
             logger.debug("Fail to create vnf instance[%s] to aai, resp_status: [%s]." % (self.nf_inst_id, resp_status))
         else:
             logger.debug("Success to create vnf instance[%s] to aai, resp_status: [%s]." % (self.nf_inst_id, resp_status))
-
