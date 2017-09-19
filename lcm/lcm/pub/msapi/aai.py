@@ -38,7 +38,54 @@ def call_aai(resource, method, data=''):
                     additional_headers)
 
 
-def create_ns(global_customer_id, service_type, service_instance_id, data):
+def create_customer_aai(global_customer_id, data):
+    resource = "/business/customers/customer/%s" % global_customer_id
+    ret = call_aai(resource, "PUT", data)
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Customer creation exception in AAI")
+    return json.JSONDecoder().decode(ret[1]), ret[2]
+
+
+def get_customer_aai(global_customer_id):
+    resource = "/business/customers/customer/%s?depth=all" % global_customer_id
+    ret = call_aai(resource, "GET")
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Get customer info exception in AAI")
+    return json.JSONDecoder().decode(ret[1])
+
+
+def delete_customer_aai(global_customer_id, resource_version=""):
+    resource = "/business/customers/customer/%s" % global_customer_id
+    if resource_version:
+        resource = resource + "?resource-version=%s" % resource_version
+    ret = call_aai(resource, "DELETE")
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Customer delete exception in AAI")
+    return json.JSONDecoder().decode(ret[1]), ret[2]
+
+
+def put_customer_relationship(global_customer_id, data):
+    resource = "/business/customers/customer/{global-customer-id}/relationship-list/relationship" % global_customer_id
+    ret = call_aai(resource, "PUT", data)
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Put or update customer relationship exception in AAI")
+    return json.JSONDecoder().decode(ret[1])
+
+
+def delete_customer_relationship(global_customer_id):
+    resource = "/business/customers/customer/{global-customer-id}/relationship-list/relationship" % global_customer_id
+    ret = call_aai(resource, "DELETE")
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Delete customer relationship exception in AAI")
+    return json.JSONDecoder().decode(ret[1])
+
+
+def create_ns_aai(global_customer_id, service_type, service_instance_id, data):
     resource = "/business/customers/customer/%s/service-subscriptions/service-subscription/" \
                "%s/service-instances/service-instance/%s" % \
                (global_customer_id, service_type, service_instance_id)
@@ -46,28 +93,52 @@ def create_ns(global_customer_id, service_type, service_instance_id, data):
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Ns instance creation exception in AAI")
+    return json.JSONDecoder().decode(ret[1]), ret[2]
+
+
+def query_ns_aai(global_customer_id, service_type, service_instance_id):
+    resource = "/business/customers/customer/%s/service-subscriptions/service-subscription/" \
+               "%s/service-instances/service-instance/%s?depth=all" % \
+               (global_customer_id, service_type, service_instance_id)
+    ret = call_aai(resource, "GET")
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Ns instance query exception in AAI")
     return json.JSONDecoder().decode(ret[1])
 
 
-def delete_ns(global_customer_id, service_type, service_instance_id):
+def delete_ns_aai(global_customer_id, service_type, service_instance_id, resource_version=""):
     resource = "/business/customers/customer/%s/service-subscriptions/service-subscription/" \
                "%s/service-instances/service-instance/%s" % \
                (global_customer_id, service_type, service_instance_id)
+    if resource_version:
+        resource = resource + "?resource-version=%s" % resource_version
     ret = call_aai(resource, "DELETE")
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Ns instance delete exception in AAI")
+    return json.JSONDecoder().decode(ret[1]), ret[2]
+
+
+def put_ns_relationship(global_customer_id, service_type, service_instance_id, data):
+    resource = "/business/customers/customer/%s/service-subscriptions/service-subscription/" \
+               "%s/service-instances/service-instance/%s/relationship-list/relationship" % \
+               (global_customer_id, service_type, service_instance_id)
+    ret = call_aai(resource, "PUT", data)
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Put or update ns instance relationship exception in AAI")
     return json.JSONDecoder().decode(ret[1])
 
 
-def query_ns(global_customer_id, service_type, service_instance_id, data):
+def delete_ns_relationship(global_customer_id, service_type, service_instance_id):
     resource = "/business/customers/customer/%s/service-subscriptions/service-subscription/" \
-               "%s/service-instances/service-instance/%s" % \
+               "%s/service-instances/service-instance/%s/relationship-list/relationship" % \
                (global_customer_id, service_type, service_instance_id)
-    ret = call_aai(resource, "GET", data)
+    ret = call_aai(resource, "DELETE")
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
-        raise NFLCMException("Ns instance query exception in AAI")
+        raise NFLCMException("Delete ns instance relationship exception in AAI")
     return json.JSONDecoder().decode(ret[1])
 
 
@@ -79,15 +150,6 @@ def create_vnf_aai(vnf_id, data):
         raise NFLCMException("Vnf instance creation exception in AAI")
     return json.JSONDecoder().decode(ret[1]), ret[2]
 
-def delete_vnf_aai(vnf_id, resource_version=""):
-    resource = "/network/generic-vnfs/generic-vnf/%s" % vnf_id
-    if resource_version:
-        resource = resource + "?resource-version=%s" % resource_version
-    ret = call_aai(resource, "DELETE")
-    if ret[0] != 0:
-        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
-        raise NFLCMException("Vnf instance delete exception in AAI")
-    return json.JSONDecoder().decode(ret[1]), ret[2]
 
 def query_vnf_aai(vnf_id):
     resource = "/network/generic-vnfs/generic-vnf/%s?depth=all" % vnf_id
@@ -98,7 +160,36 @@ def query_vnf_aai(vnf_id):
     return json.JSONDecoder().decode(ret[1])
 
 
-def create_vserver(cloud_owner, cloud_region_id, tenant_id, vserver_id, data):
+def delete_vnf_aai(vnf_id, resource_version=""):
+    resource = "/network/generic-vnfs/generic-vnf/%s" % vnf_id
+    if resource_version:
+        resource = resource + "?resource-version=%s" % resource_version
+    ret = call_aai(resource, "DELETE")
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Vnf instance delete exception in AAI")
+    return json.JSONDecoder().decode(ret[1]), ret[2]
+
+
+def put_vnf_relationship(vnf_id, data):
+    resource = "/network/generic-vnfs/generic-vnf/%s/relationship-list/relationship" % vnf_id
+    ret = call_aai(resource, "PUT", data)
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Put or update vnf instance relationship exception in AAI")
+    return json.JSONDecoder().decode(ret[1])
+
+
+def delete_vnf_relationship(vnf_id):
+    resource = "/network/generic-vnfs/generic-vnf/%s/relationship-list/relationship" % vnf_id
+    ret = call_aai(resource, "DELETE")
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Delete vnf instance relationship exception in AAI")
+    return json.JSONDecoder().decode(ret[1])
+
+
+def create_vserver_aai(cloud_owner, cloud_region_id, tenant_id, vserver_id, data):
     resource = "/cloud-infrastructure/cloud-regions/cloud-region/%s/" \
                "%s/tenants/tenant/%s/vservers/vserver/%s" % \
                (cloud_owner, cloud_region_id, tenant_id, vserver_id)
@@ -106,29 +197,31 @@ def create_vserver(cloud_owner, cloud_region_id, tenant_id, vserver_id, data):
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Vserver creation exception in AAI")
-    return json.JSONDecoder().decode(ret[1])
+    return json.JSONDecoder().decode(ret[1]), ret[2]
 
 
-def delete_vserver(cloud_owner, cloud_region_id, tenant_id, vserver_id):
+def query_vserver_aai(cloud_owner, cloud_region_id, tenant_id, vserver_id):
     resource = "/cloud-infrastructure/cloud-regions/cloud-region/%s/" \
-               "%s/tenants/tenant/%s/vservers/vserver/%s" % \
+               "%s/tenants/tenant/%s/vservers/vserver/%s?depth=all" % \
                (cloud_owner, cloud_region_id, tenant_id, vserver_id)
-    ret = call_aai(resource, "DELETE")
-    if ret[0] != 0:
-        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
-        raise NFLCMException("Vserver delete exception in AAI")
-    return json.JSONDecoder().decode(ret[1])
-
-
-def query_vserver(cloud_owner, cloud_region_id, tenant_id, vserver_id, data):
-    resource = "/cloud-infrastructure/cloud-regions/cloud-region/%s/" \
-               "%s/tenants/tenant/%s/vservers/vserver/%s" % \
-               (cloud_owner, cloud_region_id, tenant_id, vserver_id)
-    ret = call_aai(resource, "GET", data)
+    ret = call_aai(resource, "GET")
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Vserver query exception in AAI")
     return json.JSONDecoder().decode(ret[1])
+
+
+def delete_vserver_aai(cloud_owner, cloud_region_id, tenant_id, vserver_id, resource_version=""):
+    resource = "/cloud-infrastructure/cloud-regions/cloud-region/%s/" \
+               "%s/tenants/tenant/%s/vservers/vserver/%s" % \
+               (cloud_owner, cloud_region_id, tenant_id, vserver_id)
+    if resource_version:
+        resource = resource + "?resource-version=%s" % resource_version
+    ret = call_aai(resource, "DELETE")
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        raise NFLCMException("Vserver delete exception in AAI")
+    return json.JSONDecoder().decode(ret[1]), ret[2]
 
 
 def put_vserver_relationship(cloud_owner, cloud_region_id, tenant_id, vserver_id, data):
@@ -153,41 +246,7 @@ def delete_vserver_relationship(cloud_owner, cloud_region_id, tenant_id, vserver
     return json.JSONDecoder().decode(ret[1])
 
 
-def put_vnf_relationship(vnf_id, data):
-    resource = "/network/generic-vnfs/generic-vnf/%s/relationship-list/relationship" % vnf_id
-    ret = call_aai(resource, "PUT", data)
-    if ret[0] != 0:
-        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
-        raise NFLCMException("Put or update vnf instance relationship exception in AAI")
-    return json.JSONDecoder().decode(ret[1])
 
 
-def delete_vnf_relationship(vnf_id):
-    resource = "/network/generic-vnfs/generic-vnf/%s/relationship-list/relationship" % vnf_id
-    ret = call_aai(resource, "DELETE")
-    if ret[0] != 0:
-        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
-        raise NFLCMException("Delete vnf instance relationship exception in AAI")
-    return json.JSONDecoder().decode(ret[1])
 
 
-def put_ns_relationship(global_customer_id, service_type, service_instance_id, data):
-    resource = "/business/customers/customer/%s/service-subscriptions/service-subscription/" \
-               "%s/service-instances/service-instance/%s/relationship-list/relationship" % \
-               (global_customer_id, service_type, service_instance_id)
-    ret = call_aai(resource, "PUT", data)
-    if ret[0] != 0:
-        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
-        raise NFLCMException("Put or update ns instance relationship exception in AAI")
-    return json.JSONDecoder().decode(ret[1])
-
-
-def delete_ns_relationship(global_customer_id, service_type, service_instance_id):
-    resource = "/business/customers/customer/%s/service-subscriptions/service-subscription/" \
-               "%s/service-instances/service-instance/%s/relationship-list/relationship" % \
-               (global_customer_id, service_type, service_instance_id)
-    ret = call_aai(resource, "DELETE")
-    if ret[0] != 0:
-        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
-        raise NFLCMException("Delete ns instance relationship exception in AAI")
-    return json.JSONDecoder().decode(ret[1])
