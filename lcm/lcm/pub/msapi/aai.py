@@ -87,7 +87,7 @@ def delete_vnf_aai(vnf_id, resource_version=""):
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Vnf instance delete exception in AAI")
-    return json.JSONDecoder().decode(ret[1])
+    return json.JSONDecoder().decode(ret[1]), ret[2]
 
 def query_vnf_aai(vnf_id):
     resource = "/network/generic-vnfs/generic-vnf/%s?depth=all" % vnf_id

@@ -82,20 +82,17 @@ class TestNFTerminate(TestCase):
                                         vnfminstid='11111',
                                         apiurl='1')
 
-
     def tearDown(self):
         VmInstModel.objects.all().delete()
         NetworkInstModel.objects.all().delete()
         SubNetworkInstModel.objects.all().delete()
         PortInstModel.objects.all().delete()
 
-
     def assert_job_result(self, job_id, job_progress, job_detail):
         jobs = JobStatusModel.objects.filter(jobid=job_id,
                                              progress=job_progress,
                                              descp=job_detail)
         self.assertEqual(1, len(jobs))
-
 
     @mock.patch.object(restcall, 'call_req')
     def test_delete_vnf_identifier(self, mock_call_req):
@@ -113,24 +110,30 @@ class TestNFTerminate(TestCase):
                                    vnfConfigurableProperties='todo',
                                    localizationLanguage='EN_US',
                                    create_time=now_time())
-        r1_create_vnf_to_aai = [0, json.JSONEncoder().encode({}), '200']
-        mock_call_req.side_effect = [r1_create_vnf_to_aai]
+        vnf_info = {
+            "vnf-id": "vnf-id-test111",
+            "vnf-name": "vnf-name-test111",
+            "vnf-type": "vnf-type-test111",
+            "in-maint": True,
+            "is-closed-loop-disabled": False,
+            "resource-version": "1505465356262"
+        }
+        r1_query_vnf_to_aai = [0, json.JSONEncoder().encode(vnf_info), '200']
+        r1_delete_vnf_to_aai = [0, json.JSONEncoder().encode({}), '200']
+        mock_call_req.side_effect = [r1_query_vnf_to_aai, r1_delete_vnf_to_aai]
         response = self.client.delete("/api/vnflcm/v1/vnf_instances/1111")
         self.failUnlessEqual(status.HTTP_204_NO_CONTENT, response.status_code)
         self.assertEqual(None, response.data)
 
-
     def test_delete_vnf_identifier_when_vnf_not_exist(self):
         response = self.client.delete("/api/vnflcm/v1/vnf_instances/1111")
         self.failUnlessEqual(status.HTTP_204_NO_CONTENT, response.status_code)
-
 
     @mock.patch.object(TermVnf, 'run')
     def test_terminate_vnf(self, mock_run):
         mock_run.re.return_value = None
         response = self.client.post("/api/vnflcm/v1/vnf_instances/12/terminate", data={}, format='json')
         self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
-
 
     def test_terminate_vnf_when_inst_id_not_exist(self):
         data = {
@@ -142,7 +145,6 @@ class TestNFTerminate(TestCase):
         JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
         TermVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
         self.assert_job_result(self.job_id, 100, "Terminate Vnf success.")
-
 
     @mock.patch.object(restcall, 'call_req')
     @mock.patch.object(api, 'call')
