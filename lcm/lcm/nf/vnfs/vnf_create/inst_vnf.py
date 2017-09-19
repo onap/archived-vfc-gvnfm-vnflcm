@@ -18,7 +18,6 @@ import traceback
 import uuid
 from threading import Thread
 
-from lcm.nf.vnfs.const import vnfd_model_dict
 from lcm.pub.database.models import NfInstModel, VmInstModel, NetworkInstModel, \
     SubNetworkInstModel, PortInstModel, StorageInstModel, FlavourInstModel, VNFCInstModel, NfvoRegInfoModel
 from lcm.pub.exceptions import NFLCMException
@@ -99,10 +98,18 @@ class InstVnf(Thread):
         vnfsoftwareversion = ignore_case_get(metadata, "version")
         vnfd_model = self.vnfd_info
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).\
-            update(package_id=self.package_id, flavour_id=ignore_case_get(self.data, "flavourId"), version=version,
-                   vendor=vendor, netype=netype, vnfd_model=vnfd_model, status='NOT_INSTANTIATED', vnfdid=self.vnfd_id,
-                   localizationLanguage=ignore_case_get(self.data, 'localizationLanguage'), input_params=self.data,
-                   vnfSoftwareVersion=vnfsoftwareversion, lastuptime=now_time())
+            update(package_id=self.package_id,
+                   flavour_id=ignore_case_get(self.data, "flavourId"),
+                   version=version,
+                   vendor=vendor,
+                   netype=netype,
+                   vnfd_model=vnfd_model,
+                   status='NOT_INSTANTIATED',
+                   vnfdid=self.vnfd_id,
+                   localizationLanguage=ignore_case_get(self.data, 'localizationLanguage'),
+                   input_params=self.data,
+                   vnfSoftwareVersion=vnfsoftwareversion,
+                   lastuptime=now_time())
 
         logger.info("self.vim_id = %s" % self.vim_id)
         NfvoRegInfoModel.objects.create(nfvoid=self.nf_inst_id,

@@ -16,6 +16,7 @@ import json
 import logging
 import uuid
 
+from lcm.pub.config.config import REPORT_TO_AAI
 from lcm.pub.database.models import NfInstModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.msapi.aai import create_vnf_aai
@@ -45,14 +46,23 @@ class CreateVnf:
             self.check_vnf_name_valid()
             self.get_vnfd_info()
             self.save_info_to_db()
-            self.create_vnf_in_aai()
+            if REPORT_TO_AAI:
+                self.create_vnf_in_aai()
         except NFLCMException as e:
             logger.debug('Create VNF instance[%s] to AAI failed' % self.nf_inst_id)
         except:
-            NfInstModel.objects.create(nfinstid=self.nf_inst_id, nf_name=self.vnf_instance_mame, package_id='',
-                                       version='', vendor='', netype='', vnfd_model='',
-                                       status='NOT_INSTANTIATED', nf_desc=self.description, vnfdid=self.vnfd_id,
-                                       vnfSoftwareVersion='', create_time=now_time())
+            NfInstModel.objects.create(nfinstid=self.nf_inst_id,
+                                       nf_name=self.vnf_instance_mame,
+                                       package_id='',
+                                       version='',
+                                       vendor='',
+                                       netype='',
+                                       vnfd_model='',
+                                       status='NOT_INSTANTIATED',
+                                       nf_desc=self.description,
+                                       vnfdid=self.vnfd_id,
+                                       vnfSoftwareVersion='',
+                                       create_time=now_time())
 
         vnf_inst = NfInstModel.objects.get(nfinstid=self.nf_inst_id)
         logger.debug('id is [%s],name is [%s],vnfd_id is [%s],vnfd_model is [%s],'
@@ -87,10 +97,18 @@ class CreateVnf:
         netype = ignore_case_get(metadata, "vnf_type")
         vnfsoftwareversion = ignore_case_get(metadata, "version")
         vnfd_model = self.vnfd
-        NfInstModel.objects.create(nfinstid=self.nf_inst_id, nf_name=self.vnf_instance_mame, package_id=self.package_id,
-                                   version=version, vendor=vendor, netype=netype, vnfd_model=vnfd_model,
-                                   status='NOT_INSTANTIATED', nf_desc=self.description, vnfdid=self.vnfd_id,
-                                   vnfSoftwareVersion=vnfsoftwareversion, create_time=now_time())
+        NfInstModel.objects.create(nfinstid=self.nf_inst_id,
+                                   nf_name=self.vnf_instance_mame,
+                                   package_id=self.package_id,
+                                   version=version,
+                                   vendor=vendor,
+                                   netype=netype,
+                                   vnfd_model=vnfd_model,
+                                   status='NOT_INSTANTIATED',
+                                   nf_desc=self.description,
+                                   vnfdid=self.vnfd_id,
+                                   vnfSoftwareVersion=vnfsoftwareversion,
+                                   create_time=now_time())
 
     def create_vnf_in_aai(self):
         logger.debug("CreateVnf::create_vnf_in_aai::report vnf instance[%s] to aai." % self.nf_inst_id)

@@ -14,6 +14,7 @@
 
 import logging
 
+from lcm.pub.config.config import REPORT_TO_AAI
 from lcm.pub.database.models import NfInstModel, NfvoRegInfoModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.msapi.aai import query_vnf_aai, delete_vnf_aai
@@ -30,7 +31,8 @@ class DeleteVnf:
         try:
             self.check_parameter()
             self.delete_info_from_db()
-            self.delete_vnf_in_aai()
+            if REPORT_TO_AAI:
+                self.delete_vnf_in_aai()
         except NFLCMException as e:
             logger.debug('Delete VNF instance[%s] from AAI failed' % self.nf_inst_id)
         except:
