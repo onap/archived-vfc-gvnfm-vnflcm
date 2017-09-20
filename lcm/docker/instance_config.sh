@@ -24,6 +24,3 @@ sed -i "s|DB_IP.*|DB_IP = '$MYSQL_IP'|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/conf
 sed -i "s|DB_PORT.*|DB_PORT = $MYSQL_PORT|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
 
 cat vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
-
-sed -i "s|127\.0\.0\.1|$SERVICE_IP|" vfc/gvnfm/vnflcm/lcm/run.sh
-sed -i "s|127\.0\.0\.1|$SERVICE_IP|" vfc/gvnfm/vnflcm/lcm/stop.sh
