@@ -39,6 +39,7 @@ class NfInstModel(models.Model):
     vnfConfigurableProperties = models.TextField(db_column='VNFCONFIGURABLEPROPERTIES', max_length=20000, blank=True, null=True)
     localizationLanguage = models.CharField(db_column='LOCALIZATIONLANGUAGE', max_length=255, null=True)
 
+
 class JobModel(models.Model):
     class Meta:
         db_table = 'JOB'
@@ -61,6 +62,7 @@ class JobModel(models.Model):
         import json
         return json.dumps(dict([(attr, getattr(self, attr)) for attr in [f.name for f in self._meta.fields]]))
 
+
 class JobStatusModel(models.Model):
     class Meta:
         db_table = 'JOB_STATUS'
@@ -79,6 +81,7 @@ class JobStatusModel(models.Model):
         import json
         return json.dumps(dict([(attr, getattr(self, attr)) for attr in [f.name for f in self._meta.fields]]))
 
+
 class NfvoRegInfoModel(models.Model):
     class Meta:
         db_table = 'NFVOREGINFO'
@@ -92,6 +95,7 @@ class NfvoRegInfoModel(models.Model):
     clientcert = models.CharField(max_length=255, db_column='CLIENTCERT', null=True)
     servercert = models.CharField(max_length=255, db_column='SERVERCERT', null=True)
     regtime = models.CharField(max_length=255, db_column='REGTIME')
+
 
 class StorageInstModel(models.Model):
     class Meta:
@@ -116,6 +120,7 @@ class StorageInstModel(models.Model):
     create_time = models.CharField(db_column='CREATETIME', max_length=200, null=True, blank=True)
     nodeId = models.CharField(db_column='NODEID', max_length=255, null=True)
 
+
 class VmInstModel(models.Model):
     class Meta:
         db_table = 'VMINST'
@@ -139,6 +144,7 @@ class VmInstModel(models.Model):
     instid = models.CharField(db_column='INSTID', max_length=255)
     nodeId = models.CharField(db_column='NODEID', max_length=255, null=True)
 
+
 class VNFCInstModel(models.Model):
     class Meta:
         db_table = 'VNFCINST'
@@ -149,6 +155,7 @@ class VNFCInstModel(models.Model):
     instid = models.CharField(db_column='NFINSTID', max_length=255)
     vmid = models.CharField(db_column='VMID', max_length=255)
     is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
+
 
 class FlavourInstModel(models.Model):
     class Meta:
@@ -169,6 +176,7 @@ class FlavourInstModel(models.Model):
     instid = models.CharField(db_column='INSTID', max_length=255)
     create_time = models.CharField(db_column='CREATETIME', max_length=200, null=True, blank=True)
     is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
+
 
 class NetworkInstModel(models.Model):
     class Meta:
@@ -196,6 +204,7 @@ class NetworkInstModel(models.Model):
     routerExternal = models.IntegerField(db_column='ROUTEREXTERNAL', default=0, null=True)
     nodeId = models.CharField(db_column='NODEID', max_length=255, null=True)
 
+
 class SubNetworkInstModel(models.Model):
     class Meta:
         db_table = 'SUBNETWORKINST'
@@ -220,6 +229,7 @@ class SubNetworkInstModel(models.Model):
     hostRoutes = models.TextField(db_column='HOSTROUTES', max_length=1024)
     allocationPools = models.TextField(db_column='ALLOCATIONPOOLS', max_length=1024)
 
+
 class VLInstModel(models.Model):
     class Meta:
         db_table = 'VLINST'
@@ -234,6 +244,7 @@ class VLInstModel(models.Model):
     vltype = models.IntegerField(db_column='VLTYPE', default=0)
     vimid = models.CharField(db_column='VIMID', max_length=255)
     tenant = models.CharField(db_column='TENANT', max_length=50)
+
 
 class PortInstModel(models.Model):
     class Meta:
@@ -265,6 +276,7 @@ class PortInstModel(models.Model):
     securityGroups = models.CharField(db_column='SECURITYGROUPS', max_length=255)
     is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
     nodeId = models.CharField(db_column='NODEID', max_length=255, null=True)
+
 
 class CPInstModel(models.Model):
     class Meta:

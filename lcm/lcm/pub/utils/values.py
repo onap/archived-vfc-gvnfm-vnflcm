@@ -22,15 +22,19 @@ def ignore_case_get(args, key, def_val=""):
             return args[old_key]
     return def_val
 
+
 def set_opt_val(param, key, val):
     if val or val is False:
         param[key] = val
 
+
 def get_none(val, def_val=""):
     return val if val else def_val
 
+
 def get_boolean(val, def_val=0):
     return 1 if val else 0
+
 
 def get_integer(val, def_val=0):
     return val if val else 0

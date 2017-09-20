@@ -25,7 +25,7 @@ urlpatterns = patterns('',
                            DeleteVnfAndQueryVnf.as_view()),
                        url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)/terminate$',
                            TerminateVnf.as_view()),
-                       url(r'^api/vnflcm/v1/swagger.json$', SwaggerJsonView.as_view()),
+                       url(r'^api/vnflcm/v1/swagger.json$', SwaggerJsonView.as_view())
                        )
 
 urlpatterns = format_suffix_patterns(urlpatterns)

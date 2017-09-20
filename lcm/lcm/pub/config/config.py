@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-
 # [MSB]
 MSB_SERVICE_IP = '127.0.0.1'
 MSB_SERVICE_PORT = '80'
@@ -23,7 +21,6 @@ AAI_BASE_URL = "https://127.0.0.1:8443/aai/v11"
 AAI_USER = "AAI"
 AAI_PASSWORD = "AAI"
 REPORT_TO_AAI = True
-
 
 # [REDIS]
 REDIS_HOST = '127.0.0.1'
