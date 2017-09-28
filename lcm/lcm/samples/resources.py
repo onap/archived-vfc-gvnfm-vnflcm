@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import logging
 import threading
 import traceback
@@ -21,6 +20,7 @@ import sys
 from lcm.pub.vimapi import adaptor
 
 logger = logging.getLogger(__name__)
+
 
 class ResCreateThread(threading.Thread):
     """
@@ -36,9 +36,10 @@ class ResCreateThread(threading.Thread):
         except:
             logger.error(traceback.format_exc())
             logger.error(str(sys.exc_info()))
-            
+
     def do_notify(self, res_type, ret):
         logger.debug('ret of [%s] is %s', res_type, ret)
+
 
 class ResDeleteThread(threading.Thread):
     """
@@ -54,6 +55,6 @@ class ResDeleteThread(threading.Thread):
         except:
             logger.error(traceback.format_exc())
             logger.error(str(sys.exc_info()))
-            
+
     def do_notify(self, res_type, res_id):
         logger.debug('Delete %s(%s)', res_type, res_id)

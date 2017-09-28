@@ -14,11 +14,8 @@
 
 import unittest
 import json
-import mock
 from django.test import Client
 from rest_framework import status
-
-from lcm.pub.vimapi import api
 
 inst_res_url = "/api/vnflcm/v1/resources/inst"
 term_res_url = "/api/vnflcm/v1/resources/term"
@@ -243,6 +240,7 @@ term_res_data = {
     "vm": [{"vim_id": "6", "tenant_id": "7", "res_id": "8"}]
 }
 
+
 class SampleViewTest(unittest.TestCase):
     def setUp(self):
         self.client = Client()
@@ -255,7 +253,7 @@ class SampleViewTest(unittest.TestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code, response.content)
         resp_data = json.loads(response.content)
         self.assertEqual({"status": "active"}, resp_data)
-		
+
     def test_inst_res(self):
         resp = self.client.post(inst_res_url, data=json.dumps(inst_res_data), content_type='application/json')
         self.failUnlessEqual(status.HTTP_204_NO_CONTENT, resp.status_code)
@@ -263,4 +261,3 @@ class SampleViewTest(unittest.TestCase):
     def test_term_res(self):
         resp = self.client.post(term_res_url, data=json.dumps(term_res_data), content_type='application/json')
         self.failUnlessEqual(status.HTTP_204_NO_CONTENT, resp.status_code)
-        

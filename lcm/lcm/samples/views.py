@@ -30,6 +30,7 @@ class SampleList(APIView):
         logger.debug("get")
         return Response({"status": "active"})
 
+
 class ResourceList(APIView):
     """
     Instantiate/Terminate resource.
