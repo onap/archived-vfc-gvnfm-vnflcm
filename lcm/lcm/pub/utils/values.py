@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 def ignore_case_get(args, key, def_val=""):
     if not key:
         return def_val

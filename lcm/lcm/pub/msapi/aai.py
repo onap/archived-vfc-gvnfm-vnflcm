@@ -29,13 +29,13 @@ def call_aai(resource, method, data=''):
         'X-TransactionId': str(uuid.uuid1())
     }
     return restcall.call_req(AAI_BASE_URL,
-                    AAI_USER,
-                    AAI_PASSWORD,
-                    restcall.rest_no_auth,
-                    resource,
-                    method,
-                    data,
-                    additional_headers)
+                             AAI_USER,
+                             AAI_PASSWORD,
+                             restcall.rest_no_auth,
+                             resource,
+                             method,
+                             data,
+                             additional_headers)
 
 
 def create_customer_aai(global_customer_id, data):
