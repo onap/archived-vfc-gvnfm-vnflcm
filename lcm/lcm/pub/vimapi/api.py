@@ -19,14 +19,15 @@ from .exceptions import VimException
 
 VIM_DRIVER_BASE_URL = "api/multivim/v1"
 
+
 def call(vim_id, tenant_id, res, method, data=''):
     if data and not isinstance(data, (str, unicode)):
         data = json.JSONEncoder().encode(data)
-    url = "{base_url}/{vim_id}{tenant_id}/{res}".format(
-        base_url=VIM_DRIVER_BASE_URL, 
-        vim_id=vim_id,
-        tenant_id="/" + tenant_id if tenant_id else "",
-        res=res)
+    url_fmt = "{base_url}/{vim_id}{tenant_id}/{res}"
+    url = url_fmt.format(base_url=VIM_DRIVER_BASE_URL,
+                         vim_id=vim_id,
+                         tenant_id="/" + tenant_id if tenant_id else "",
+                         res=res)
     ret = req_by_msb(url, method, data)
     if ret[0] > 0:
         raise VimException(ret[1], ret[2])
@@ -34,103 +35,132 @@ def call(vim_id, tenant_id, res, method, data=''):
 
 ######################################################################
 
+
 def create_image(vim_id, tenant_id, data):
     return call(vim_id, tenant_id, "images", "POST", data)
 
+
 def delete_image(vim_id, tenant_id, image_id):
     return call(vim_id, tenant_id, "images/%s" % image_id, "DELETE")
-    
+
+
 def get_image(vim_id, tenant_id, image_id):
     return call(vim_id, tenant_id, "images/%s" % image_id, "GET")
-    
+
+
 def list_image(vim_id, tenant_id):
     return call(vim_id, tenant_id, "images", "GET")
 
 ######################################################################
 
+
 def create_network(vim_id, tenant_id, data):
     return call(vim_id, tenant_id, "networks", "POST", data)
 
+
 def delete_network(vim_id, tenant_id, network_id):
     return call(vim_id, tenant_id, "networks/%s" % network_id, "DELETE")
-    
+
+
 def get_network(vim_id, tenant_id, network_id):
     return call(vim_id, tenant_id, "networks/%s" % network_id, "GET")
-    
+
+
 def list_network(vim_id, tenant_id):
     return call(vim_id, tenant_id, "networks", "GET")
 
 ######################################################################
 
+
 def create_subnet(vim_id, tenant_id, data):
     return call(vim_id, tenant_id, "subnets", "POST", data)
 
+
 def delete_subnet(vim_id, tenant_id, subnet_id):
     return call(vim_id, tenant_id, "subnets/%s" % subnet_id, "DELETE")
-    
+
+
 def get_subnet(vim_id, tenant_id, subnet_id):
     return call(vim_id, tenant_id, "subnets/%s" % subnet_id, "GET")
-    
+
+
 def list_subnet(vim_id, tenant_id):
     return call(vim_id, tenant_id, "subnets", "GET")
 
 ######################################################################
 
+
 def create_port(vim_id, tenant_id, data):
     return call(vim_id, tenant_id, "ports", "POST", data)
 
+
 def delete_port(vim_id, tenant_id, port_id):
     return call(vim_id, tenant_id, "ports/%s" % port_id, "DELETE")
-    
+
+
 def get_port(vim_id, tenant_id, port_id):
     return call(vim_id, tenant_id, "ports/%s" % port_id, "GET")
-    
+
+
 def list_port(vim_id, tenant_id):
     return call(vim_id, tenant_id, "ports", "GET")
 
 ######################################################################
 
+
 def create_flavor(vim_id, tenant_id, data):
     return call(vim_id, tenant_id, "flavors", "POST", data)
 
+
 def delete_flavor(vim_id, tenant_id, flavor_id):
     return call(vim_id, tenant_id, "flavors/%s" % flavor_id, "DELETE")
-    
+
+
 def get_flavor(vim_id, tenant_id, flavor_id):
     return call(vim_id, tenant_id, "flavors/%s" % flavor_id, "GET")
-    
+
+
 def list_flavor(vim_id, tenant_id):
     return call(vim_id, tenant_id, "flavors", "GET")
 
 ######################################################################
 
+
 def create_vm(vim_id, tenant_id, data):
     return call(vim_id, tenant_id, "servers", "POST", data)
 
+
 def delete_vm(vim_id, tenant_id, vm_id):
     return call(vim_id, tenant_id, "servers/%s" % vm_id, "DELETE")
-    
+
+
 def get_vm(vim_id, tenant_id, vm_id):
     return call(vim_id, tenant_id, "servers/%s" % vm_id, "GET")
-    
+
+
 def list_vm(vim_id, tenant_id):
     return call(vim_id, tenant_id, "servers", "GET")
 
 ######################################################################
 
+
 def create_volume(vim_id, tenant_id, data):
     return call(vim_id, tenant_id, "volumes", "POST", data)
 
+
 def delete_volume(vim_id, tenant_id, volume_id):
     return call(vim_id, tenant_id, "volumes/%s" % volume_id, "DELETE")
-    
+
+
 def get_volume(vim_id, tenant_id, volume_id):
     return call(vim_id, tenant_id, "volumes/%s" % volume_id, "GET")
-    
+
+
 def list_volume(vim_id, tenant_id):
     return call(vim_id, tenant_id, "volumes", "GET")
 
 ######################################################################
+
 
 def list_tenant(vim_id, tenant_name=""):
     res = "tenants"
