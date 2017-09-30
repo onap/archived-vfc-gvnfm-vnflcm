@@ -67,14 +67,14 @@ class TermVnf(Thread):
         if not vnf_insts.exists():
             logger.warn('VnfInst(%s) does not exist' % self.nf_inst_id)
             return False
-            #raise NFLCMException('VnfInst(%s) does not exist' % self.nf_inst_id)
-        sel_vnf = vnf_insts[0]
-        #if sel_vnf.status != 'VNF_INSTANTIATED':
+            # raise NFLCMException('VnfInst(%s) does not exist' % self.nf_inst_id)
+        # sel_vnf = vnf_insts[0]
+        # if sel_vnf.status != 'VNF_INSTANTIATED':
         #    raise NFLCMException("Don't allow to terminate vnf(status:[%s])" % sel_vnf.status)
         if self.terminationType == 'GRACEFUL' and not self.gracefulTerminationTimeout:
             logger.warn("Set Graceful default termination timeout = 60")
             self.gracefulTerminationTimeout = 60
-            #raise NFLCMException("Graceful termination must set timeout")
+            # raise NFLCMException("Graceful termination must set timeout")
 
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status=VNF_STATUS.TERMINATING)
         JobUtil.add_job_status(self.job_id, 10, 'Nf terminating pre-check finish')
@@ -233,8 +233,8 @@ class TermVnf(Thread):
             'affectedVnfc': affected_vnfc,
             'affectedVirtualLink': affected_vl,
             'affectedVirtualStorage': affected_vs,
-            'affectedCp': affected_cp
-            }
+            'affectedCp': affected_cp}
+
         vnfmInfo = NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id)
         if len(vnfmInfo) == 0:
             raise NFLCMException('nf_inst_id(%s) does not exist in NfvoRegInfoModel' % self.nf_inst_id)

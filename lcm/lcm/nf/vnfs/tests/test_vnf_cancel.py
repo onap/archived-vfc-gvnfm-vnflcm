@@ -165,9 +165,9 @@ class TestNFTerminate(TestCase):
                                    create_time=now_time())
         t1_apply_grant_result = [0, json.JSONEncoder().encode(
             {
-                "vim":{
+                "vim": {
                     "vimid": 'vimid_1',
-                    "accessinfo":{
+                    "accessinfo": {
                         "tenant": 'tenantname_1'
                     }
                 }

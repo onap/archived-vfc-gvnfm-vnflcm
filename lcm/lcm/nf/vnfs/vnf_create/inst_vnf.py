@@ -87,7 +87,7 @@ class InstVnf(Thread):
         self.vnfd_info = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
         self.vnfd_info = json.JSONDecoder().decode(self.vnfd_info)
 
-        #self.vnfd_info = vnfd_model_dict  # just for test
+        # self.vnfd_info = vnfd_model_dict  # just for test
         self.update_cps()
 
         self.check_parameter_exist()
@@ -112,8 +112,10 @@ class InstVnf(Thread):
                    lastuptime=now_time())
 
         logger.info("self.vim_id = %s" % self.vim_id)
-        NfvoRegInfoModel.objects.create(nfvoid=self.nf_inst_id,
-            vnfminstid=ignore_case_get(self.data, "vnfmId"), apiurl=self.vim_id)
+        NfvoRegInfoModel.objects.create(
+            nfvoid=self.nf_inst_id,
+            vnfminstid=ignore_case_get(self.data, "vnfmId"),
+            apiurl=self.vim_id)
         JobUtil.add_job_status(self.job_id, 15, 'Nf instancing pre-check finish')
         logger.info("Nf instancing pre-check finish")
 
@@ -141,8 +143,8 @@ class InstVnf(Thread):
         content_args['additionalParam']['vimid'] = vnfmInfo[0].apiurl
         logger.info('content_args=%s' % content_args)
         apply_result = apply_grant_to_nfvo(json.dumps(content_args))
-        #vim_info = ignore_case_get(apply_result, "vim")
-        #vim_info = ignore_case_get(json.JSONDecoder().decode(apply_result), "vim")
+        # vim_info = ignore_case_get(apply_result, "vim")
+        # vim_info = ignore_case_get(json.JSONDecoder().decode(apply_result), "vim")
 
         for vdu in ignore_case_get(self.vnfd_info, "vdus"):
             if "location_info" in vdu["properties"]:
@@ -228,8 +230,8 @@ class InstVnf(Thread):
             'affectedVnfc': affected_vnfc,
             'affectedVirtualLink': affected_vl,
             'affectedVirtualStorage': affected_vs,
-            'affectedCp': affected_cp
-            }
+            'affectedCp': affected_cp}
+
         vnfmInfo = NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id)
         if len(vnfmInfo) == 0:
             raise NFLCMException('nf_inst_id(%s) does not exist in NfvoRegInfoModel' % self.nf_inst_id)

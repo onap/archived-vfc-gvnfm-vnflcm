@@ -778,7 +778,7 @@ c6_data_create_port = {
 }
 
 # create_flavor
-c7_data_create_flavor ={
+c7_data_create_flavor = {
     "returnCode": 0,
     "vimId": "11111",
     "vimName": "11111",

@@ -49,7 +49,7 @@ class CreateVnf:
             if REPORT_TO_AAI:
                 self.create_vnf_in_aai()
         except NFLCMException as e:
-            logger.debug('Create VNF instance[%s] to AAI failed' % self.nf_inst_id)
+            logger.debug('Create VNF instance[%s] to AAI failed: %s', self.nf_inst_id, e.message)
         except:
             NfInstModel.objects.create(nfinstid=self.nf_inst_id,
                                        nf_name=self.vnf_instance_mame,

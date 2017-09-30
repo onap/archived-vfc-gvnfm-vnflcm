@@ -34,7 +34,7 @@ class DeleteVnf:
                 self.delete_vnf_in_aai()
             self.delete_info_from_db()
         except NFLCMException as e:
-            logger.debug('Delete VNF instance[%s] from AAI failed' % self.nf_inst_id)
+            logger.debug('Delete VNF instance[%s] failed: %s', self.nf_inst_id, e.message)
         except:
             logger.debug('Delete VNF instance[%s] failed' % self.nf_inst_id)
 

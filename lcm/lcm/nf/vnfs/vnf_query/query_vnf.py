@@ -40,7 +40,7 @@ class QueryVnf:
         resp_data = []
         for vnf_inst in vnf_insts:
             resp_data.append(self.fill_resp_data(vnf_inst))
-        return  resp_data
+        return resp_data
 
     def fill_resp_data(self, vnf):
         logger.info('Get the list of vloumes')
