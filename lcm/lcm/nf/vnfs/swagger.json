@@ -283,7 +283,7 @@
                 }
             }
         },
-        "/vnf_lc_ops/{vnfLcOpId}&responseId={responseId}": {
+        "/vnf_lc_ops/{vnfLcOpId}": {
             "get": {
                 "tags": [
                     "lcm Resource"
@@ -307,7 +307,7 @@
                     },
                     {
                         "name": "responseId",
-                        "in": "path",
+                        "in": "query",
                         "description": "Response Identifier",
                         "required": true,
                         "type": "string"
