@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import logging
-import os
 import traceback
 
 from rest_framework import status
@@ -119,12 +117,3 @@ class TerminateVnf(APIView):
             return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         rsp = {"jobId": job_id}
         return Response(data=rsp, status=status.HTTP_202_ACCEPTED)
-
-
-class SwaggerJsonView(APIView):
-    def get(self, request):
-        json_file = os.path.join(os.path.dirname(__file__), 'swagger.json')
-        f = open(json_file)
-        json_data = json.JSONDecoder().decode(f.read())
-        f.close()
-        return Response(json_data)
