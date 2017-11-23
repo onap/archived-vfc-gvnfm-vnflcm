@@ -15,7 +15,7 @@
 from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from lcm.nf.vnfs.views import InstantiateVnf, TerminateVnf, SwaggerJsonView, DeleteVnfAndQueryVnf, CreateVnfAndQueryVnfs
+from lcm.nf.vnfs.views import InstantiateVnf, TerminateVnf, DeleteVnfAndQueryVnf, CreateVnfAndQueryVnfs
 
 urlpatterns = patterns('',
                        url(r'^api/vnflcm/v1/vnf_instances$', CreateVnfAndQueryVnfs.as_view()),
@@ -25,7 +25,6 @@ urlpatterns = patterns('',
                            DeleteVnfAndQueryVnf.as_view()),
                        url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)/terminate$',
                            TerminateVnf.as_view()),
-                       url(r'^api/vnflcm/v1/swagger.json$', SwaggerJsonView.as_view())
                        )
 
 urlpatterns = format_suffix_patterns(urlpatterns)

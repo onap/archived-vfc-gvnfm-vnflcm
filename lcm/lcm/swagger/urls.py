@@ -12,18 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import include, url
-from lcm.pub.config.config import REG_TO_MSB_WHEN_START, REG_TO_MSB_REG_URL, REG_TO_MSB_REG_PARAM
+from django.conf.urls import url
+from lcm.swagger import views
 
 urlpatterns = [
-    url(r'^', include('lcm.samples.urls')),
-    url(r'^', include('lcm.nf.vnfs.urls')),
-    url(r'^', include('lcm.jobs.urls')),
-    url(r'^', include('lcm.swagger.urls')),
+    url(r'^api/vnflcm/v1/swagger.json$', views.SwaggerView.as_view())
 ]
-
-# regist to MSB when startup
-if REG_TO_MSB_WHEN_START:
-    import json
-    from lcm.pub.utils.restcall import req_by_msb
-    req_by_msb(REG_TO_MSB_REG_URL, "POST", json.JSONEncoder().encode(REG_TO_MSB_REG_PARAM))
