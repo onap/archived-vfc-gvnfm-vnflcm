@@ -211,8 +211,8 @@ class InstVnf(Thread):
                 {'vsInstanceId': port.portid,
                  'cpdid': port.nodeId,
                  'changeType': 'added',
-                 'storageResource': {'vimId': port.vimid, 'resourceId': port.resouceid,
-                                     'resourceName': port.name, 'resourceType': 'port'}})
+                 'portResource': {'vimId': port.vimid, 'resourceId': port.resouceid,
+                                  'resourceName': port.name, 'resourceType': 'port'}})
         affected_vs = []
         vss = StorageInstModel.objects.filter(instid=self.nf_inst_id)
         for vs in vss:
