@@ -6,7 +6,7 @@ cd ${DOCKER_BUILD_DIR}
 
 BUILD_ARGS="--no-cache"
 ORG="onap"
-VERSION="1.0.1"
+VERSION="1.0.2"
 PROJECT="vfc"
 IMAGE="vnflcm"
 DOCKER_REPOSITORY="nexus3.onap.org:10003"
@@ -21,21 +21,21 @@ if [ $HTTPS_PROXY ]; then
 fi
 
 function build_image {
-    echo "Start build docker image: ${IMAGE_NAME}"
-    docker build ${BUILD_ARGS} -t ${IMAGE_NAME}:latest .
+    echo "Start build docker image: ${IMAGE_NAME}:${VERSION}-latest"
+    docker build ${BUILD_ARGS} -t ${IMAGE_NAME}:${VERSION}-latest .
 }
 
 function push_image_tag {
     TAG_NAME=$1
     echo "Start push ${TAG_NAME}"
-    docker tag ${IMAGE_NAME}:latest ${TAG_NAME}
+    docker tag ${IMAGE_NAME}:${VERSION}-latest ${TAG_NAME}
     docker push ${TAG_NAME}
 }
 
 function push_image {
-    echo "Start push ${IMAGE_NAME}:latest"
-    docker push ${IMAGE_NAME}:latest
-    
+    echo "Start push ${IMAGE_NAME}:${VERSION}-latest"
+    docker push ${IMAGE_NAME}:${VERSION}-latest
+
     push_image_tag ${IMAGE_NAME}:${VERSION}-SNAPSHOT-latest
     push_image_tag ${IMAGE_NAME}:${VERSION}-STAGING-latest
     push_image_tag ${IMAGE_NAME}:${VERSION}-STAGING-${TIMESTAMP}
