@@ -16,10 +16,8 @@ import json
 import logging
 import uuid
 
-from lcm.pub.config.config import REPORT_TO_AAI
 from lcm.pub.database.models import NfInstModel
 from lcm.pub.exceptions import NFLCMException
-from lcm.pub.msapi.aai import create_vnf_aai
 from lcm.pub.msapi.catalog import query_rawdata_from_catalog
 from lcm.pub.msapi.gvnfmdriver import get_packageinfo_by_vnfdid
 from lcm.pub.utils import toscautil
@@ -46,8 +44,6 @@ class CreateVnf:
             self.check_vnf_name_valid()
             self.get_vnfd_info()
             self.save_info_to_db()
-            if REPORT_TO_AAI:
-                self.create_vnf_in_aai()
         except NFLCMException as e:
             logger.debug('Create VNF instance[%s] to AAI failed: %s', self.nf_inst_id, e.message)
         except:
@@ -109,18 +105,3 @@ class CreateVnf:
                                    vnfdid=self.vnfd_id,
                                    vnfSoftwareVersion=vnfsoftwareversion,
                                    create_time=now_time())
-
-    def create_vnf_in_aai(self):
-        logger.debug("CreateVnf::create_vnf_in_aai::report vnf instance[%s] to aai." % self.nf_inst_id)
-        data = {
-            "vnf-id": self.nf_inst_id,
-            "vnf-name": self.vnf_instance_mame,
-            "vnf-type": "INFRA",
-            "in-maint": True,
-            "is-closed-loop-disabled": False
-        }
-        resp_data, resp_status = create_vnf_aai(self.nf_inst_id, data)
-        if resp_data:
-            logger.debug("Fail to create vnf instance[%s] to aai, resp_status: [%s]." % (self.nf_inst_id, resp_status))
-        else:
-            logger.debug("Success to create vnf instance[%s] to aai, resp_status: [%s]." % (self.nf_inst_id, resp_status))

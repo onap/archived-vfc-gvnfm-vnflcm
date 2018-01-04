@@ -14,10 +14,8 @@
 
 import logging
 
-from lcm.pub.config.config import REPORT_TO_AAI
 from lcm.pub.database.models import NfInstModel, NfvoRegInfoModel
 from lcm.pub.exceptions import NFLCMException
-from lcm.pub.msapi.aai import query_vnf_aai, delete_vnf_aai
 
 logger = logging.getLogger(__name__)
 
@@ -30,8 +28,6 @@ class DeleteVnf:
     def do_biz(self):
         try:
             self.check_parameter()
-            if REPORT_TO_AAI:
-                self.delete_vnf_in_aai()
             self.delete_info_from_db()
         except NFLCMException as e:
             logger.debug('Delete VNF instance[%s] failed: %s', self.nf_inst_id, e.message)
@@ -50,18 +46,3 @@ class DeleteVnf:
     def delete_info_from_db(self):
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).delete()
         NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id).delete()
-
-    def delete_vnf_in_aai(self):
-        logger.debug("DeleteVnf::delete_vnf_in_aai::delete vnf instance[%s] in aai." % self.nf_inst_id)
-
-        # query vnf instance in aai, get resource_version
-        customer_info = query_vnf_aai(self.nf_inst_id)
-        resource_version = customer_info["resource-version"]
-
-        # delete vnf instance from aai
-        resp_data, resp_status = delete_vnf_aai(self.nf_inst_id, resource_version)
-        if resp_data:
-            logger.debug("Fail to delete vnf instance[%s] from aai, resp_status: [%s]." % (self.nf_inst_id, resp_status))
-        else:
-            logger.debug(
-                "Success to delete vnf instance[%s] from aai, resp_status: [%s]." % (self.nf_inst_id, resp_status))
