@@ -21,9 +21,8 @@ from threading import Thread
 from lcm.pub.database.models import NfInstModel, VmInstModel, NetworkInstModel, \
     SubNetworkInstModel, PortInstModel, StorageInstModel, FlavourInstModel, VNFCInstModel, NfvoRegInfoModel
 from lcm.pub.exceptions import NFLCMException
-from lcm.pub.msapi.catalog import query_rawdata_from_catalog
-from lcm.pub.msapi.gvnfmdriver import apply_grant_to_nfvo, notify_lcm_to_nfvo, get_packageinfo_by_vnfdid
-from lcm.pub.utils import toscautil
+from lcm.pub.msapi.gvnfmdriver import apply_grant_to_nfvo, notify_lcm_to_nfvo
+from lcm.pub.msapi.sdc_run_catalog import query_vnfpackage_by_id
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.values import ignore_case_get, get_none, get_boolean, get_integer
@@ -43,7 +42,6 @@ class InstVnf(Thread):
         self.nfvo_inst_id = ''
         self.vnfm_inst_id = ''
         self.package_id = ''
-        # self.csar_id = ''
         self.vnfd_info = []
 
     def run(self):
@@ -69,13 +67,7 @@ class InstVnf(Thread):
 
         JobUtil.add_job_status(self.job_id, 5, 'Get packageinfo by vnfd_id')
         self.vnfd_id = vnf_insts[0].vnfdid
-        package_info = get_packageinfo_by_vnfdid(self.vnfd_id)
-        for val in ignore_case_get(package_info, "csars"):
-            if self.vnfd_id == ignore_case_get(val, "vnfdId"):
-                self.package_id = ignore_case_get(val, "csarId")
-                break
-
-        JobUtil.add_job_status(self.job_id, 10, 'Get rawdata from catalog by csar_id')
+        JobUtil.add_job_status(self.job_id, 10, 'Get vnf package info from catalog by csar_id')
         input_parameters = []
         inputs = ignore_case_get(self.data['additionalParams'], "inputs")
         if inputs:
@@ -83,27 +75,23 @@ class InstVnf(Thread):
                 inputs = json.loads(inputs)
             for key, val in inputs.items():
                 input_parameters.append({"key": key, "value": val})
-        raw_data = query_rawdata_from_catalog(self.package_id, input_parameters)
-        self.vnfd_info = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
-        self.vnfd_info = json.JSONDecoder().decode(self.vnfd_info)
-
+        self.vnfd_info = query_vnfpackage_by_id(self.vnfd_id)
         # self.vnfd_info = vnfd_model_dict  # just for test
-        self.update_cps()
 
+        self.update_cps()
         self.check_parameter_exist()
         metadata = ignore_case_get(self.vnfd_info, "metadata")
-        version = ignore_case_get(metadata, "vnfd_version")
+        version = ignore_case_get(metadata, "vnfdVersion")
         vendor = ignore_case_get(metadata, "vendor")
-        netype = ignore_case_get(metadata, "vnf_type")
+        netype = ignore_case_get(metadata, "type")
         vnfsoftwareversion = ignore_case_get(metadata, "version")
-        vnfd_model = self.vnfd_info
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).\
             update(package_id=self.package_id,
                    flavour_id=ignore_case_get(self.data, "flavourId"),
                    version=version,
                    vendor=vendor,
                    netype=netype,
-                   vnfd_model=vnfd_model,
+                   vnfd_model=self.vnfd_info,
                    status='NOT_INSTANTIATED',
                    vnfdid=self.vnfd_id,
                    localizationLanguage=ignore_case_get(self.data, 'localizationLanguage'),
@@ -121,17 +109,25 @@ class InstVnf(Thread):
 
     def apply_grant(self):
         logger.info('[NF instantiation] send resource grand request to nfvo start')
-        content_args = {'vnfInstanceId': self.nf_inst_id, 'vnfDescriptorId': '',
-                        'lifecycleOperation': 'Instantiate', 'jobId': self.job_id,
-                        'addResource': [], 'removeResource': [],
-                        'placementConstraint': [], 'additionalParam': {}}
+        content_args = {
+            'vnfInstanceId': self.nf_inst_id,
+            'vnfDescriptorId': '',
+            'lifecycleOperation': 'Instantiate',
+            'jobId': self.job_id,
+            'addResource': [],
+            'removeResource': [],
+            'placementConstraint': [],
+            'additionalParam': {}
+        }
 
         vdus = ignore_case_get(self.vnfd_info, "vdus")
         res_index = 1
         for vdu in vdus:
-            res_def = {'type': 'VDU',
-                       'resDefId': str(res_index),
-                       'resDesId': ignore_case_get(vdu, "vdu_id")}
+            res_def = {
+                'type': 'VDU',
+                'resDefId': str(res_index),
+                'resDesId': ignore_case_get(vdu, "vdu_id")
+            }
             content_args['addResource'].append(res_def)
             res_index += 1
 
@@ -230,7 +226,8 @@ class InstVnf(Thread):
             'affectedVnfc': affected_vnfc,
             'affectedVirtualLink': affected_vl,
             'affectedVirtualStorage': affected_vs,
-            'affectedCp': affected_cp}
+            'affectedCp': affected_cp
+        }
 
         vnfmInfo = NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id)
         if len(vnfmInfo) == 0:
