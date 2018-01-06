@@ -12,15 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import logging
 import uuid
 
 from lcm.pub.database.models import NfInstModel
 from lcm.pub.exceptions import NFLCMException
-from lcm.pub.msapi.catalog import query_rawdata_from_catalog
-from lcm.pub.msapi.gvnfmdriver import get_packageinfo_by_vnfdid
-from lcm.pub.utils import toscautil
+from lcm.pub.msapi.sdc_run_catalog import query_vnfpackage_by_id
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.values import ignore_case_get
 
@@ -34,18 +31,15 @@ class CreateVnf:
         self.vnf_instance_mame = ignore_case_get(self.data, "vnfInstanceName")
         self.description = ignore_case_get(self.data, "vnfInstanceDescription")
         self.vnfd = None
-        self.package_info = ''
-        self.package_id = ''
-        self.csar_id = ''
+        self.csar_id = self.vnfd_id
 
     def do_biz(self):
         self.nf_inst_id = str(uuid.uuid4())
         try:
-            self.check_vnf_name_valid()
-            self.get_vnfd_info()
-            self.save_info_to_db()
+            self.check_valid()
+            self.save_db()
         except NFLCMException as e:
-            logger.debug('Create VNF instance[%s] to AAI failed: %s', self.nf_inst_id, e.message)
+            logger.debug('Create VNF instance[%s]: %s', self.nf_inst_id, e.message)
         except:
             NfInstModel.objects.create(nfinstid=self.nf_inst_id,
                                        nf_name=self.vnf_instance_mame,
@@ -67,39 +61,27 @@ class CreateVnf:
                       vnf_inst.vnfd_model, vnf_inst.nf_desc, vnf_inst.create_time))
         return self.nf_inst_id
 
-    def check_vnf_name_valid(self):
-        logger.debug("CreateVnfIdentifier--CreateVnf::> %s" % self.data)
+    def check_valid(self):
+        logger.debug("CreateVnf--check_valid::> %s" % self.data)
         is_exist = NfInstModel.objects.filter(nf_name=self.vnf_instance_mame).exists()
-        logger.debug("check_inst_name_exist::is_exist=%s" % is_exist)
+        logger.debug("check_valid::is_exist=%s" % is_exist)
         if is_exist:
             raise NFLCMException('VNF is already exist.')
+        self.vnfdModel = query_vnfpackage_by_id(self.csar_id)
 
-    def get_vnfd_info(self):
-        self.nf_inst_id = str(uuid.uuid4())
-        self.package_info = get_packageinfo_by_vnfdid(self.vnfd_id)
-        for val in ignore_case_get(self.package_info, "csars"):
-            if self.vnfd_id == ignore_case_get(val, "vnfdId"):
-                self.package_id = ignore_case_get(val, "csarId")
-                break
-
-        raw_data = query_rawdata_from_catalog(self.package_id)
-        self.vnfd = toscautil.convert_vnfd_model(raw_data["rawData"])  # convert to inner json
-        self.vnfd = json.JSONDecoder().decode(self.vnfd)
-
-    def save_info_to_db(self):
-        metadata = ignore_case_get(self.vnfd, "metadata")
-        version = ignore_case_get(metadata, "vnfd_version")
+    def save_db(self):
+        metadata = ignore_case_get(self.vnfdModel, "metadata")
+        version = ignore_case_get(metadata, "vnfdVersion")
         vendor = ignore_case_get(metadata, "vendor")
-        netype = ignore_case_get(metadata, "vnf_type")
+        netype = ignore_case_get(metadata, "type")
         vnfsoftwareversion = ignore_case_get(metadata, "version")
-        vnfd_model = self.vnfd
         NfInstModel.objects.create(nfinstid=self.nf_inst_id,
                                    nf_name=self.vnf_instance_mame,
-                                   package_id=self.package_id,
+                                   package_id=self.csar_id,
                                    version=version,
                                    vendor=vendor,
                                    netype=netype,
-                                   vnfd_model=vnfd_model,
+                                   vnfd_model=self.vnfdModel,
                                    status='NOT_INSTANTIATED',
                                    nf_desc=self.description,
                                    vnfdid=self.vnfd_id,
