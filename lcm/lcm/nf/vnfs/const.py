@@ -837,3 +837,89 @@ c10_data_get_vm = {
     "tenantId": "tenant1",
     "status": "ACTIVE"
 }
+
+vnfpackage_info = {
+    "volume_storages": [],
+    "inputs": {
+        "pe1_id": {
+            "type": "string",
+            "description": "pe1_idofunderlayvpn"
+        },
+        "pe2_id": {
+            "type": "string",
+            "description": "pe2_idofunderlayvpn"
+        },
+        "serviceType": {
+            "type": "string",
+            "description": "serviceTypeofunderlayvpn"
+        },
+        "description": {
+            "type": "string",
+            "description": "descriptionofunderlayvpn"
+        },
+        "ac2_route": {
+            "type": "string",
+            "description": "ac2_routeofunderlayvpn"
+        },
+        "ac1_route": {
+            "type": "string",
+            "description": "ac1_routeofunderlayvpn"
+        },
+        "ac1_svlan": {
+            "type": "integer",
+            "description": "ac1_svlanofunderlayvpn"
+        },
+        "ac2_ip": {
+            "type": "string",
+            "description": "ac2_ipofunderlayvpn"
+        },
+        "ac1_ip": {
+            "type": "string",
+            "description": "ac1_ipofunderlayvpn"
+        },
+        "ac2_port": {
+            "type": "string",
+            "description": "ac2_portofunderlayvpn"
+        },
+        "topology": {
+            "type": "string",
+            "description": "topologyofunderlayvpn"
+        },
+        "technology": {
+            "type": "string",
+            "description": "technologyofunderlayvpn"
+        },
+        "ac1_port": {
+            "type": "string",
+            "description": "ac1_portofunderlayvpn"
+        },
+        "ac2_svlan": {
+            "type": "integer",
+            "description": "ac2_svlanofunderlayvpn"
+        },
+        "name": {
+            "type": "string",
+            "description": "Nameofunderlayervpn"
+        }
+    },
+    "vdus": [],
+    "image_files": [],
+    "routers": [],
+    "local_storages": [],
+    "vnf_exposed": {
+        "external_cps": [],
+        "forward_cps": []
+    },
+    "vls": [],
+    "cps": [],
+    "metadata": {
+        "designer": "sdno",
+        "name": "underlayervpn",
+        "csarVersion": "1.0",
+        "csarType": "SSAR",
+        "csarProvider": "huawei",
+        "version": "1.0",
+        "type": "SSAR",
+        "id": "ns_underlayervpn_1_0"
+    }
+}
