@@ -21,7 +21,7 @@ from rest_framework import status
 
 from lcm.nf.vnfs.const import vnfd_rawdata, c1_data_get_tenant_id, c4_data_create_network, c2_data_create_volume, \
     c5_data_create_subnet, c3_data_get_volume, c6_data_create_port, c7_data_create_flavor, c8_data_list_image, \
-    c9_data_create_vm, c10_data_get_vm, inst_req_data
+    c9_data_create_vm, c10_data_get_vm, inst_req_data, vnfpackage_info
 from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
 from lcm.pub.database.models import NfInstModel, JobStatusModel
 from lcm.pub.utils import restcall
@@ -87,37 +87,6 @@ class TestNFInstantiate(TestCase):
         self.assert_job_result(self.job_id, 255, "VNF nf_inst_id is not exist.")
 
     @mock.patch.object(restcall, 'call_req')
-    def test_instantiate_vnf_when_get_package_info_by_vnfdid_failed(self, mock_call_req):
-        NfInstModel.objects.create(nfinstid='1111',
-                                   nf_name='vFW_01',
-                                   package_id='222',
-                                   version='',
-                                   vendor='',
-                                   netype='',
-                                   vnfd_model='',
-                                   status='NOT_INSTANTIATED',
-                                   nf_desc='vFW in Nanjing TIC Edge',
-                                   vnfdid='111',
-                                   create_time=now_time())
-        r1_get_csarid_by_vnfdid = [1, json.JSONEncoder().encode(
-            {
-                'csars': [
-                    {
-                        'package_id': '222',
-                        'csarId': '2222',
-                        'vnfdId': '111'
-                    }
-                ]
-            }), '200']
-        mock_call_req.side_effect = [r1_get_csarid_by_vnfdid]
-        self.nf_inst_id = '1111'
-        self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
-        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
-        data = inst_req_data
-        InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        self.assert_job_result(self.job_id, 255, "Failed to query package_info of vnfdid(111) from nslcm.")
-
-    @mock.patch.object(restcall, 'call_req')
     def test_instantiate_vnf_when_get_rawdata_by_csarid_failed(self, mock_call_req):
         NfInstModel.objects.create(nfinstid='1111',
                                    nf_name='vFW_01',
@@ -130,24 +99,14 @@ class TestNFInstantiate(TestCase):
                                    nf_desc='vFW in Nanjing TIC Edge',
                                    vnfdid='111',
                                    create_time=now_time())
-        r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode(
-            {
-                'csars': [
-                    {
-                        'package_id': '222',
-                        'csarId': '2222',
-                        'vnfdId': '111'
-                    }
-                ]
-            }), '200']
-        r2_get_rawdata_from_catalog = [1, json.JSONEncoder().encode(vnfd_rawdata), '200']
-        mock_call_req.side_effect = [r1_get_csarid_by_vnfdid, r2_get_rawdata_from_catalog]
+        r1_get_vnfpackage_by_vnfdid = [1, json.JSONEncoder().encode(vnfpackage_info), '200']
+        mock_call_req.side_effect = [r1_get_vnfpackage_by_vnfdid]
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
         JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
         data = inst_req_data
         InstVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        self.assert_job_result(self.job_id, 255, "Failed to query rawdata of CSAR(2222) from catalog.")
+        self.assert_job_result(self.job_id, 255, "Failed to query vnf CSAR(111) from catalog.")
 
     @mock.patch.object(restcall, 'call_req')
     def test_instantiate_vnf_when_applay_grant_failed(self, mock_call_req):
@@ -162,17 +121,7 @@ class TestNFInstantiate(TestCase):
                                    nf_desc='vFW in Nanjing TIC Edge',
                                    vnfdid='111',
                                    create_time=now_time())
-        r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode(
-            {
-                'csars': [
-                    {
-                        'package_id': '222',
-                        'csarId': '2222',
-                        'vnfdId': '111'
-                    }
-                ]
-            }), '200']
-        r2_get_rawdata_from_catalog = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']
+        r1_get_vnfpackage_by_vnfdid = [0, json.JSONEncoder().encode(vnfpackage_info), '200']
         r3_apply_grant_result = [1, json.JSONEncoder().encode(
             {
                 "vim": {
@@ -182,7 +131,7 @@ class TestNFInstantiate(TestCase):
                     }
                 }
             }), '200']
-        mock_call_req.side_effect = [r1_get_csarid_by_vnfdid, r2_get_rawdata_from_catalog, r3_apply_grant_result]
+        mock_call_req.side_effect = [r1_get_vnfpackage_by_vnfdid, r3_apply_grant_result]
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
         JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
@@ -204,17 +153,7 @@ class TestNFInstantiate(TestCase):
                                    nf_desc='vFW in Nanjing TIC Edge',
                                    vnfdid='111',
                                    create_time=now_time())
-        r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode(
-            {
-                'csars': [
-                    {
-                        'package_id': '222',
-                        'csarId': '2222',
-                        'vnfdId': '111'
-                    }
-                ]
-            }), '200']
-        r2_get_rawdata_from_catalog = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']
+        r1_get_vnfpackage_by_vnfdid = [0, json.JSONEncoder().encode(vnfpackage_info), '200']
         r3_apply_grant_result = [0, json.JSONEncoder().encode(
             {
                 "vim": {
@@ -224,7 +163,7 @@ class TestNFInstantiate(TestCase):
                     }
                 }
             }), '200']
-        mock_call_req.side_effect = [r1_get_csarid_by_vnfdid, r2_get_rawdata_from_catalog, r3_apply_grant_result]
+        mock_call_req.side_effect = [r1_get_vnfpackage_by_vnfdid, r3_apply_grant_result]
         mock_call.side_effect = [c1_data_get_tenant_id, c2_data_create_volume, c3_data_get_volume]
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
@@ -247,17 +186,7 @@ class TestNFInstantiate(TestCase):
                                    nf_desc='vFW in Nanjing TIC Edge',
                                    vnfdid='111',
                                    create_time=now_time())
-        r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode(
-            {
-                'csars': [
-                    {
-                        'package_id': '222',
-                        'csarId': '2222',
-                        'vnfdId': '111'
-                    }
-                ]
-            }), '200']
-        r2_get_rawdata_from_catalog = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']
+        r1_get_vnfpackage_by_vnfdid = [0, json.JSONEncoder().encode(vnfpackage_info), '200']
         r3_apply_grant_result = [0, json.JSONEncoder().encode(
             {
                 "vim": {
@@ -268,8 +197,7 @@ class TestNFInstantiate(TestCase):
                 }
             }), '200']
         r4_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
-        mock_call_req.side_effect = [r1_get_csarid_by_vnfdid, r2_get_rawdata_from_catalog,
-                                     r3_apply_grant_result, r4_lcm_notify_result]
+        mock_call_req.side_effect = [r1_get_vnfpackage_by_vnfdid, r3_apply_grant_result, r4_lcm_notify_result]
         mock_call.side_effect = [c1_data_get_tenant_id, c2_data_create_volume, c3_data_get_volume,
                                  c4_data_create_network, c5_data_create_subnet, c6_data_create_port,
                                  c7_data_create_flavor, c8_data_list_image, c9_data_create_vm, c10_data_get_vm]
