@@ -19,7 +19,7 @@ import mock
 from django.test import TestCase, Client
 from rest_framework import status
 
-from lcm.nf.vnfs.const import vnfd_rawdata, c1_data_get_tenant_id, c4_data_create_network, c2_data_create_volume, \
+from lcm.nf.vnfs.const import c1_data_get_tenant_id, c4_data_create_network, c2_data_create_volume, \
     c5_data_create_subnet, c3_data_get_volume, c6_data_create_port, c7_data_create_flavor, c8_data_list_image, \
     c9_data_create_vm, c10_data_get_vm, inst_req_data, vnfpackage_info
 from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
@@ -45,19 +45,8 @@ class TestNFInstantiate(TestCase):
 
     @mock.patch.object(restcall, 'call_req')
     def test_create_vnf_identifier(self, mock_call_req):
-        r1_get_csarid_by_vnfdid = [0, json.JSONEncoder().encode(
-            {
-                'csars': [
-                    {
-                        'package_id': '222',
-                        'csarId': '2222',
-                        'vnfdId': '111'
-                    }
-                ]
-            }), '200']
-        r2_get_rawdata_from_catalog = [0, json.JSONEncoder().encode(vnfd_rawdata), '200']
-        r3_create_vnf_to_aai = [0, json.JSONEncoder().encode({}), '200']
-        mock_call_req.side_effect = [r1_get_csarid_by_vnfdid, r2_get_rawdata_from_catalog, r3_create_vnf_to_aai]
+        r2_get_vnfpackage_from_catalog = [0, json.JSONEncoder().encode(vnfpackage_info), '200']
+        mock_call_req.side_effect = [r2_get_vnfpackage_from_catalog]
         data = {
             "vnfdId": "111",
             "vnfInstanceName": "vFW_01",

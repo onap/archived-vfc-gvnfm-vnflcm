@@ -91,275 +91,6 @@ inst_req_data = {
     }
 }
 
-
-# vnfd_rawdata
-vnfd_rawdata = {
-    "rawData": {
-        "instance": {
-            "metadata": {
-                "designer": "sdno",
-                "name": "underlayervpn",
-                "csarVersion": "1.0",
-                "csarType": "SSAR",
-                "csarProvider": "huawei",
-                "version": "1.0",
-                "type": "SSAR",
-                "id": "ns_underlayervpn_1_0"
-            },
-            "nodes": [
-                {
-                    "id": "ac2_fdhrbk3dvan8hl5wifm9lp1e9",
-                    "type_name": "tosca.nodes.sdn.l3ac",
-                    "template_name": "ac2",
-                    "properties": {
-                        "ip": {
-                            "type_name": "string"
-                        },
-                        "route": {
-                            "type_name": "string"
-                        },
-                        "port": {
-                            "type_name": "string"
-                        },
-                        "svlan": {
-                            "type_name": "string"
-                        }
-                    },
-                    "interfaces": [
-                        {
-                            "name": "Standard",
-                            "type_name": "tosca.interfaces.node.lifecycle.Standard"
-                        }
-                    ],
-                    "capabilities": [
-                        {
-                            "name": "feature",
-                            "type_name": "tosca.capabilities.Node"
-                        },
-                        {
-                            "name": "ac",
-                            "type_name": "tosca.capabilities.sdn.ac"
-                        }
-                    ],
-                    "relationships": [
-                        {
-                            "target_node_id": "pe2_go3vo1ctxr1vlbl0ij8stbtj6",
-                            "target_capability_name": "feature"
-                        },
-                        {
-                            "target_node_id": "ac2_fdhrbk3dvan8hl5wifm9lp1e9",
-                            "target_capability_name": "feature"
-                        }
-                    ]
-                },
-                {
-                    "id": "ac1_jqows1ai0j0cmwk9jdvuknt97",
-                    "type_name": "tosca.nodes.sdn.l3ac",
-                    "template_name": "ac1",
-                    "properties": {
-                        "ip": {
-                            "type_name": "string"
-                        },
-                        "route": {
-                            "type_name": "string"
-                        },
-                        "port": {
-                            "type_name": "string"
-                        },
-                        "svlan": {
-                            "type_name": "string"
-                        }
-                    },
-                    "interfaces": [
-                        {
-                            "name": "Standard",
-                            "type_name": "tosca.interfaces.node.lifecycle.Standard"
-                        }
-                    ],
-                    "capabilities": [
-                        {
-                            "name": "feature",
-                            "type_name": "tosca.capabilities.Node"
-                        },
-                        {
-                            "name": "ac",
-                            "type_name": "tosca.capabilities.sdn.ac"
-                        }
-                    ],
-                    "relationships": [
-                        {
-                            "target_node_id": "pe1_e58ekps6m45g6w9egs9lue2j7",
-                            "target_capability_name": "feature"
-                        },
-                        {
-                            "target_node_id": "ac2_fdhrbk3dvan8hl5wifm9lp1e9",
-                            "target_capability_name": "feature"
-                        }
-                    ]
-                },
-                {
-                    "id": "vpn_ie0xim076f7cje67fvrrq9tg1",
-                    "type_name": "tosca.nodes.sdn.underlayVPN",
-                    "template_name": "vpn",
-                    "properties": {
-                        "serviceType": {
-                            "type_name": "string"
-                        },
-                        "description": {
-                            "type_name": "string"
-                        },
-                        "name": {
-                            "type_name": "string"
-                        },
-                        "topology": {
-                            "type_name": "string"
-                        }
-                    },
-                    "interfaces": [
-                        {
-                            "name": "Standard",
-                            "type_name": "tosca.interfaces.node.lifecycle.Standard"
-                        }
-                    ],
-                    "capabilities": [
-                        {
-                            "name": "feature",
-                            "type_name": "tosca.capabilities.Node"
-                        }
-                    ],
-                    "relationships": [
-                        {
-                            "target_node_id": "ac1_jqows1ai0j0cmwk9jdvuknt97",
-                            "target_capability_name": "feature"
-                        },
-                        {
-                            "target_node_id": "ac2_fdhrbk3dvan8hl5wifm9lp1e9",
-                            "target_capability_name": "feature"
-                        }
-                    ]
-                },
-                {
-                    "id": "pe1_e58ekps6m45g6w9egs9lue2j7",
-                    "type_name": "tosca.nodes.sdn.l3pe",
-                    "template_name": "pe1",
-                    "properties": {
-                        "id": {
-                            "type_name": "string"
-                        }
-                    },
-                    "interfaces": [
-                        {
-                            "name": "Standard",
-                            "type_name": "tosca.interfaces.node.lifecycle.Standard"
-                        }
-                    ],
-                    "capabilities": [
-                        {
-                            "name": "feature",
-                            "type_name": "tosca.capabilities.Node"
-                        },
-                        {
-                            "name": "pe",
-                            "type_name": "tosca.capabilities.sdn.pe"
-                        }
-                    ]
-                },
-                {
-                    "id": "pe2_go3vo1ctxr1vlbl0ij8stbtj6",
-                    "type_name": "tosca.nodes.sdn.l3pe",
-                    "template_name": "pe2",
-                    "properties": {
-                        "id": {
-                            "type_name": "string"
-                        }
-                    },
-                    "interfaces": [
-                        {
-                            "name": "Standard",
-                            "type_name": "tosca.interfaces.node.lifecycle.Standard"
-                        }
-                    ],
-                    "capabilities": [
-                        {
-                            "name": "feature",
-                            "type_name": "tosca.capabilities.Node"
-                        },
-                        {
-                            "name": "pe",
-                            "type_name": "tosca.capabilities.sdn.pe"
-                        }
-                    ]
-                }
-            ],
-            "substitution": {
-                "node_type_name": "tosca.nodes.sdn.ext.NS.ns_underlayervpn"
-            },
-            "inputs": {
-                "ac2_ip": {
-                    "type_name": "string",
-                    "description": "ac2_ipofunderlayvpn"
-                },
-                "ac2_route": {
-                    "type_name": "string",
-                    "description": "ac2_routeofunderlayvpn"
-                },
-                "serviceType": {
-                    "type_name": "string",
-                    "description": "serviceTypeofunderlayvpn"
-                },
-                "description": {
-                    "type_name": "string",
-                    "description": "descriptionofunderlayvpn"
-                },
-                "pe2_id": {
-                    "type_name": "string",
-                    "description": "pe2_idofunderlayvpn"
-                },
-                "ac1_route": {
-                    "type_name": "string",
-                    "description": "ac1_routeofunderlayvpn"
-                },
-                "ac1_svlan": {
-                    "type_name": "integer",
-                    "description": "ac1_svlanofunderlayvpn"
-                },
-                "name": {
-                    "type_name": "string",
-                    "description": "Nameofunderlayervpn"
-                },
-                "ac1_ip": {
-                    "type_name": "string",
-                    "description": "ac1_ipofunderlayvpn"
-                },
-                "ac2_port": {
-                    "type_name": "string",
-                    "description": "ac2_portofunderlayvpn"
-                },
-                "pe1_id": {
-                    "type_name": "string",
-                    "description": "pe1_idofunderlayvpn"
-                },
-                "technology": {
-                    "type_name": "string",
-                    "description": "technologyofunderlayvpn"
-                },
-                "ac1_port": {
-                    "type_name": "string",
-                    "description": "ac1_portofunderlayvpn"
-                },
-                "ac2_svlan": {
-                    "type_name": "integer",
-                    "description": "ac2_svlanofunderlayvpn"
-                },
-                "topology": {
-                    "type_name": "string",
-                    "description": "topologyofunderlayvpn"
-                }
-            }
-        }
-    }
-}
-
 # vnfd_model_dict
 vnfd_model_dict = {
     'metadata': {
@@ -923,3 +654,271 @@ vnfpackage_info = {
         "id": "ns_underlayervpn_1_0"
     }
 }
+
+# # vnfd_rawdata
+# vnfd_rawdata = {
+#     "rawData": {
+#         "instance": {
+#             "metadata": {
+#                 "designer": "sdno",
+#                 "name": "underlayervpn",
+#                 "csarVersion": "1.0",
+#                 "csarType": "SSAR",
+#                 "csarProvider": "huawei",
+#                 "version": "1.0",
+#                 "type": "SSAR",
+#                 "id": "ns_underlayervpn_1_0"
+#             },
+#             "nodes": [
+#                 {
+#                     "id": "ac2_fdhrbk3dvan8hl5wifm9lp1e9",
+#                     "type_name": "tosca.nodes.sdn.l3ac",
+#                     "template_name": "ac2",
+#                     "properties": {
+#                         "ip": {
+#                             "type_name": "string"
+#                         },
+#                         "route": {
+#                             "type_name": "string"
+#                         },
+#                         "port": {
+#                             "type_name": "string"
+#                         },
+#                         "svlan": {
+#                             "type_name": "string"
+#                         }
+#                     },
+#                     "interfaces": [
+#                         {
+#                             "name": "Standard",
+#                             "type_name": "tosca.interfaces.node.lifecycle.Standard"
+#                         }
+#                     ],
+#                     "capabilities": [
+#                         {
+#                             "name": "feature",
+#                             "type_name": "tosca.capabilities.Node"
+#                         },
+#                         {
+#                             "name": "ac",
+#                             "type_name": "tosca.capabilities.sdn.ac"
+#                         }
+#                     ],
+#                     "relationships": [
+#                         {
+#                             "target_node_id": "pe2_go3vo1ctxr1vlbl0ij8stbtj6",
+#                             "target_capability_name": "feature"
+#                         },
+#                         {
+#                             "target_node_id": "ac2_fdhrbk3dvan8hl5wifm9lp1e9",
+#                             "target_capability_name": "feature"
+#                         }
+#                     ]
+#                 },
+#                 {
+#                     "id": "ac1_jqows1ai0j0cmwk9jdvuknt97",
+#                     "type_name": "tosca.nodes.sdn.l3ac",
+#                     "template_name": "ac1",
+#                     "properties": {
+#                         "ip": {
+#                             "type_name": "string"
+#                         },
+#                         "route": {
+#                             "type_name": "string"
+#                         },
+#                         "port": {
+#                             "type_name": "string"
+#                         },
+#                         "svlan": {
+#                             "type_name": "string"
+#                         }
+#                     },
+#                     "interfaces": [
+#                         {
+#                             "name": "Standard",
+#                             "type_name": "tosca.interfaces.node.lifecycle.Standard"
+#                         }
+#                     ],
+#                     "capabilities": [
+#                         {
+#                             "name": "feature",
+#                             "type_name": "tosca.capabilities.Node"
+#                         },
+#                         {
+#                             "name": "ac",
+#                             "type_name": "tosca.capabilities.sdn.ac"
+#                         }
+#                     ],
+#                     "relationships": [
+#                         {
+#                             "target_node_id": "pe1_e58ekps6m45g6w9egs9lue2j7",
+#                             "target_capability_name": "feature"
+#                         },
+#                         {
+#                             "target_node_id": "ac2_fdhrbk3dvan8hl5wifm9lp1e9",
+#                             "target_capability_name": "feature"
+#                         }
+#                     ]
+#                 },
+#                 {
+#                     "id": "vpn_ie0xim076f7cje67fvrrq9tg1",
+#                     "type_name": "tosca.nodes.sdn.underlayVPN",
+#                     "template_name": "vpn",
+#                     "properties": {
+#                         "serviceType": {
+#                             "type_name": "string"
+#                         },
+#                         "description": {
+#                             "type_name": "string"
+#                         },
+#                         "name": {
+#                             "type_name": "string"
+#                         },
+#                         "topology": {
+#                             "type_name": "string"
+#                         }
+#                     },
+#                     "interfaces": [
+#                         {
+#                             "name": "Standard",
+#                             "type_name": "tosca.interfaces.node.lifecycle.Standard"
+#                         }
+#                     ],
+#                     "capabilities": [
+#                         {
+#                             "name": "feature",
+#                             "type_name": "tosca.capabilities.Node"
+#                         }
+#                     ],
+#                     "relationships": [
+#                         {
+#                             "target_node_id": "ac1_jqows1ai0j0cmwk9jdvuknt97",
+#                             "target_capability_name": "feature"
+#                         },
+#                         {
+#                             "target_node_id": "ac2_fdhrbk3dvan8hl5wifm9lp1e9",
+#                             "target_capability_name": "feature"
+#                         }
+#                     ]
+#                 },
+#                 {
+#                     "id": "pe1_e58ekps6m45g6w9egs9lue2j7",
+#                     "type_name": "tosca.nodes.sdn.l3pe",
+#                     "template_name": "pe1",
+#                     "properties": {
+#                         "id": {
+#                             "type_name": "string"
+#                         }
+#                     },
+#                     "interfaces": [
+#                         {
+#                             "name": "Standard",
+#                             "type_name": "tosca.interfaces.node.lifecycle.Standard"
+#                         }
+#                     ],
+#                     "capabilities": [
+#                         {
+#                             "name": "feature",
+#                             "type_name": "tosca.capabilities.Node"
+#                         },
+#                         {
+#                             "name": "pe",
+#                             "type_name": "tosca.capabilities.sdn.pe"
+#                         }
+#                     ]
+#                 },
+#                 {
+#                     "id": "pe2_go3vo1ctxr1vlbl0ij8stbtj6",
+#                     "type_name": "tosca.nodes.sdn.l3pe",
+#                     "template_name": "pe2",
+#                     "properties": {
+#                         "id": {
+#                             "type_name": "string"
+#                         }
+#                     },
+#                     "interfaces": [
+#                         {
+#                             "name": "Standard",
+#                             "type_name": "tosca.interfaces.node.lifecycle.Standard"
+#                         }
+#                     ],
+#                     "capabilities": [
+#                         {
+#                             "name": "feature",
+#                             "type_name": "tosca.capabilities.Node"
+#                         },
+#                         {
+#                             "name": "pe",
+#                             "type_name": "tosca.capabilities.sdn.pe"
+#                         }
+#                     ]
+#                 }
+#             ],
+#             "substitution": {
+#                 "node_type_name": "tosca.nodes.sdn.ext.NS.ns_underlayervpn"
+#             },
+#             "inputs": {
+#                 "ac2_ip": {
+#                     "type_name": "string",
+#                     "description": "ac2_ipofunderlayvpn"
+#                 },
+#                 "ac2_route": {
+#                     "type_name": "string",
+#                     "description": "ac2_routeofunderlayvpn"
+#                 },
+#                 "serviceType": {
+#                     "type_name": "string",
+#                     "description": "serviceTypeofunderlayvpn"
+#                 },
+#                 "description": {
+#                     "type_name": "string",
+#                     "description": "descriptionofunderlayvpn"
+#                 },
+#                 "pe2_id": {
+#                     "type_name": "string",
+#                     "description": "pe2_idofunderlayvpn"
+#                 },
+#                 "ac1_route": {
+#                     "type_name": "string",
+#                     "description": "ac1_routeofunderlayvpn"
+#                 },
+#                 "ac1_svlan": {
+#                     "type_name": "integer",
+#                     "description": "ac1_svlanofunderlayvpn"
+#                 },
+#                 "name": {
+#                     "type_name": "string",
+#                     "description": "Nameofunderlayervpn"
+#                 },
+#                 "ac1_ip": {
+#                     "type_name": "string",
+#                     "description": "ac1_ipofunderlayvpn"
+#                 },
+#                 "ac2_port": {
+#                     "type_name": "string",
+#                     "description": "ac2_portofunderlayvpn"
+#                 },
+#                 "pe1_id": {
+#                     "type_name": "string",
+#                     "description": "pe1_idofunderlayvpn"
+#                 },
+#                 "technology": {
+#                     "type_name": "string",
+#                     "description": "technologyofunderlayvpn"
+#                 },
+#                 "ac1_port": {
+#                     "type_name": "string",
+#                     "description": "ac1_portofunderlayvpn"
+#                 },
+#                 "ac2_svlan": {
+#                     "type_name": "integer",
+#                     "description": "ac2_svlanofunderlayvpn"
+#                 },
+#                 "topology": {
+#                     "type_name": "string",
+#                     "description": "topologyofunderlayvpn"
+#                 }
+#             }
+#         }
+#     }
+# }

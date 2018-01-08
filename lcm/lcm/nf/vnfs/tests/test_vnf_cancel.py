@@ -94,8 +94,7 @@ class TestNFTerminate(TestCase):
                                              descp=job_detail)
         self.assertEqual(1, len(jobs))
 
-    @mock.patch.object(restcall, 'call_req')
-    def test_delete_vnf_identifier(self, mock_call_req):
+    def test_delete_vnf_identifier(self):
         NfInstModel.objects.create(nfinstid='1111',
                                    nf_name='2222',
                                    package_id='todo',
@@ -110,17 +109,6 @@ class TestNFTerminate(TestCase):
                                    vnfConfigurableProperties='todo',
                                    localizationLanguage='EN_US',
                                    create_time=now_time())
-        vnf_info = {
-            "vnf-id": "vnf-id-test111",
-            "vnf-name": "vnf-name-test111",
-            "vnf-type": "vnf-type-test111",
-            "in-maint": True,
-            "is-closed-loop-disabled": False,
-            "resource-version": "1505465356262"
-        }
-        r1_query_vnf_to_aai = [0, json.JSONEncoder().encode(vnf_info), '200']
-        r1_delete_vnf_to_aai = [0, json.JSONEncoder().encode({}), '200']
-        mock_call_req.side_effect = [r1_query_vnf_to_aai, r1_delete_vnf_to_aai]
         response = self.client.delete("/api/vnflcm/v1/vnf_instances/1111")
         self.failUnlessEqual(status.HTTP_204_NO_CONTENT, response.status_code)
         self.assertEqual(None, response.data)
