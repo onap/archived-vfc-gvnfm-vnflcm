@@ -40,13 +40,14 @@ class TermVnf(Thread):
         self.gracefulTerminationTimeout = ignore_case_get(self.data, "gracefulTerminationTimeout")
         self.apply_result = None
         self.notify_data = None
-        self.inst_resource = {'volumn': [],
-                              'network': [],
-                              'subnet': [],
-                              'port': [],
-                              'flavor': [],
-                              'vm': [],
-                              }
+        self.inst_resource = {
+            'volumn': [],
+            'network': [],
+            'subnet': [],
+            'port': [],
+            'flavor': [],
+            'vm': [],
+        }
 
     def run(self):
         try:

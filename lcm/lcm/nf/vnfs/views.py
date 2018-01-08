@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 class CreateVnfAndQueryVnfs(APIView):
     def get(self, request):
-        logger.debug("QuerySingleVnf--get::> %s" % request.data)
+        logger.debug("QueryMultiVnf--get::> %s" % request.data)
         try:
             resp_data = QueryVnf(request.data).query_multi_vnf()
         except NFLCMException as e:
@@ -54,7 +54,9 @@ class CreateVnfAndQueryVnfs(APIView):
         except Exception:
             logger.error(traceback.format_exc())
             return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        rsp = {"vnfInstanceId": nf_inst_id}
+        rsp = {
+            "vnfInstanceId": nf_inst_id
+        }
         return Response(data=rsp, status=status.HTTP_201_CREATED)
 
 
@@ -71,7 +73,9 @@ class InstantiateVnf(APIView):
         except Exception:
             logger.error(traceback.format_exc())
             return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        rsp = {"jobId": job_id}
+        rsp = {
+            "jobId": job_id
+        }
         return Response(data=rsp, status=status.HTTP_202_ACCEPTED)
 
 
@@ -115,5 +119,7 @@ class TerminateVnf(APIView):
         except Exception:
             logger.error(traceback.format_exc())
             return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        rsp = {"jobId": job_id}
+        rsp = {
+            "jobId": job_id
+        }
         return Response(data=rsp, status=status.HTTP_202_ACCEPTED)

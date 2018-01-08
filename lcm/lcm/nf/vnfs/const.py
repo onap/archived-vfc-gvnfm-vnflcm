@@ -18,7 +18,6 @@ VNF_STATUS = enum(NULL='null', INSTANTIATING="instantiating", INACTIVE='inactive
                   FAILED="failed", TERMINATING="terminating", SCALING="scaling", OPERATING="operating",
                   UPDATING="updating", HEALING="healing")
 
-# inst_req_data
 inst_req_data = {
     "flavourId": "flavour_1",
     "instantiationLevelId": "instantiationLevel_1",
@@ -91,7 +90,6 @@ inst_req_data = {
     }
 }
 
-# vnfd_model_dict
 vnfd_model_dict = {
     'metadata': {
         'vendor': u'zte',

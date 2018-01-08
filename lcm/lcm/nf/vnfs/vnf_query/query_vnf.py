@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import logging
 
 from lcm.pub.database.models import NfInstModel, StorageInstModel, VLInstModel, NetworkInstModel, VNFCInstModel, \
@@ -24,7 +25,6 @@ class QueryVnf:
     def __init__(self, data, instanceid=''):
         self.vnf_inst_id = instanceid
         self.data = data
-        pass
 
     def query_single_vnf(self):
         vnf_inst = NfInstModel.objects.filter(nfinstid=self.vnf_inst_id)
@@ -120,15 +120,9 @@ class QueryVnf:
         resp_data = {
             "vnfInstanceId": vnf.nfinstid,
             "vnfInstanceName": vnf.nf_name,
-            # "vnfInstanceDescription": vnf.nf_desc,
             "onboardedVnfPkgInfoId": vnf.package_id,
-            # "vnfdId": vnf.vnfdid,
             "vnfdVersion": vnf.version,
-            # "vnfSoftwareVersion": vnf.vnfSoftwareVersion,
             "vnfProvider": vnf.vendor,
-            # "vnfProductName": vnf.producttype,
-            # "vnfConfigurableProperties": {vnf.vnfConfigurableProperties},
-            # "instantiationState": vnf.status,
             "instantiatedVnfInfo": {
                 "flavourId": vnf.flavour_id,
                 "vnfState": vnf.status,
@@ -136,13 +130,10 @@ class QueryVnf:
                 "extCpInfo": [],
                 "extVirtualLink": [],
                 "monitoringParameters": {},
-                # "localizationLanguage": vnf.localizationLanguage,
                 "vimInfo": vm_arr,
                 "vnfcResourceInfo": vnfc_arr,
                 "virtualLinkResourceInfo": vl_arr,
                 "virtualStorageResourceInfo": arr
-            },
-            # "metadata": vnf.input_params,
-            # "extensions": vnf.extension
+            }
         }
         return resp_data

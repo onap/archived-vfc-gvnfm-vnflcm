@@ -33,6 +33,14 @@ from lcm.pub.vimapi import api
 class TestNFInstantiate(TestCase):
     def setUp(self):
         self.client = Client()
+        self.grant_result = {
+            "vim": {
+                "vimid": 'vimid_1',
+                "accessinfo": {
+                    "tenant": 'tenantname_1'
+                }
+            }
+        }
 
     def tearDown(self):
         pass
@@ -111,16 +119,8 @@ class TestNFInstantiate(TestCase):
                                    vnfdid='111',
                                    create_time=now_time())
         r1_get_vnfpackage_by_vnfdid = [0, json.JSONEncoder().encode(vnfpackage_info), '200']
-        r3_apply_grant_result = [1, json.JSONEncoder().encode(
-            {
-                "vim": {
-                    "vimid": 'vimid_1',
-                    "accessinfo": {
-                        "tenant": 'tenantname_1'
-                    }
-                }
-            }), '200']
-        mock_call_req.side_effect = [r1_get_vnfpackage_by_vnfdid, r3_apply_grant_result]
+        r2_apply_grant_result = [1, json.JSONEncoder().encode(self.grant_result), '200']
+        mock_call_req.side_effect = [r1_get_vnfpackage_by_vnfdid, r2_apply_grant_result]
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
         JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
@@ -143,16 +143,8 @@ class TestNFInstantiate(TestCase):
                                    vnfdid='111',
                                    create_time=now_time())
         r1_get_vnfpackage_by_vnfdid = [0, json.JSONEncoder().encode(vnfpackage_info), '200']
-        r3_apply_grant_result = [0, json.JSONEncoder().encode(
-            {
-                "vim": {
-                    "vimid": 'vimid_1',
-                    "accessinfo": {
-                        "tenant": 'tenantname_1'
-                    }
-                }
-            }), '200']
-        mock_call_req.side_effect = [r1_get_vnfpackage_by_vnfdid, r3_apply_grant_result]
+        r2_apply_grant_result = [0, json.JSONEncoder().encode(self.grant_result), '200']
+        mock_call_req.side_effect = [r1_get_vnfpackage_by_vnfdid, r2_apply_grant_result]
         mock_call.side_effect = [c1_data_get_tenant_id, c2_data_create_volume, c3_data_get_volume]
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
@@ -176,17 +168,9 @@ class TestNFInstantiate(TestCase):
                                    vnfdid='111',
                                    create_time=now_time())
         r1_get_vnfpackage_by_vnfdid = [0, json.JSONEncoder().encode(vnfpackage_info), '200']
-        r3_apply_grant_result = [0, json.JSONEncoder().encode(
-            {
-                "vim": {
-                    "vimid": 'vimid_1',
-                    "accessinfo": {
-                        "tenant": 'tenantname_1'
-                    }
-                }
-            }), '200']
-        r4_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
-        mock_call_req.side_effect = [r1_get_vnfpackage_by_vnfdid, r3_apply_grant_result, r4_lcm_notify_result]
+        r2_apply_grant_result = [0, json.JSONEncoder().encode(self.grant_result), '200']
+        r3_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
+        mock_call_req.side_effect = [r1_get_vnfpackage_by_vnfdid, r2_apply_grant_result, r3_lcm_notify_result]
         mock_call.side_effect = [c1_data_get_tenant_id, c2_data_create_volume, c3_data_get_volume,
                                  c4_data_create_network, c5_data_create_subnet, c6_data_create_port,
                                  c7_data_create_flavor, c8_data_list_image, c9_data_create_vm, c10_data_get_vm]
