@@ -51,6 +51,28 @@ class TestNFInstantiate(TestCase):
                                              descp=job_detail)
         self.assertEqual(1, len(jobs))
 
+    def test_create_vnf_identifier_when_vnf_is_exist(self):
+        NfInstModel.objects.create(nfinstid='1111',
+                                   nf_name='vFW_01',
+                                   package_id='222',
+                                   version='',
+                                   vendor='',
+                                   netype='',
+                                   vnfd_model='',
+                                   status='NOT_INSTANTIATED',
+                                   nf_desc='vFW in Nanjing TIC Edge',
+                                   vnfdid='111',
+                                   create_time=now_time())
+        data = {
+            "vnfdId": "111",
+            "vnfInstanceName": "vFW_01",
+            "vnfInstanceDescription": "vFW in Nanjing TIC Edge"
+        }
+        response = self.client.post("/api/vnflcm/v1/vnf_instances", data=data, format='json')
+        self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
+        context = json.loads(response.content)
+        self.assertEqual({'error': 'VNF is already exist.'}, context)
+
     @mock.patch.object(restcall, 'call_req')
     def test_create_vnf_identifier(self, mock_call_req):
         r2_get_vnfpackage_from_catalog = [0, json.JSONEncoder().encode(vnfpackage_info), '200']

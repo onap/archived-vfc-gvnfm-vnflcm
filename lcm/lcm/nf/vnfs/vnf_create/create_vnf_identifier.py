@@ -40,6 +40,7 @@ class CreateVnf:
             self.save_db()
         except NFLCMException as e:
             logger.debug('Create VNF instance[%s]: %s', self.nf_inst_id, e.message)
+            raise NFLCMException(e.message)
         except:
             NfInstModel.objects.create(nfinstid=self.nf_inst_id,
                                        nf_name=self.vnf_instance_mame,
