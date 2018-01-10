@@ -60,7 +60,8 @@ class TermVnf(Thread):
             JobUtil.add_job_status(self.job_id, 100, "Terminate Vnf success.")
         except NFLCMException as e:
             self.vnf_term_failed_handle(e.message)
-        except:
+        except Exception as e:
+            logger.error(e.message)
             self.vnf_term_failed_handle(traceback.format_exc())
 
     def term_pre(self):

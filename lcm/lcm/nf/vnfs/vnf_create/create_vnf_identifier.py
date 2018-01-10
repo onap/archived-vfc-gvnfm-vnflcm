@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+import traceback
 import uuid
 
 from lcm.pub.database.models import NfInstModel
@@ -41,7 +42,9 @@ class CreateVnf:
         except NFLCMException as e:
             logger.debug('Create VNF instance[%s]: %s', self.nf_inst_id, e.message)
             raise NFLCMException(e.message)
-        except:
+        except Exception as e:
+            logger.error(e.message)
+            logger.error(traceback.format_exc())
             NfInstModel.objects.create(nfinstid=self.nf_inst_id,
                                        nf_name=self.vnf_instance_mame,
                                        package_id='',

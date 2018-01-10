@@ -38,7 +38,8 @@ class CreateVnfAndQueryVnfs(APIView):
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except:
+        except Exception as e:
+            logger.error(e.message)
             logger.error(traceback.format_exc())
             return Response(data={'error': 'Failed to get Vnfs'},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -51,7 +52,8 @@ class CreateVnfAndQueryVnfs(APIView):
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except Exception:
+        except Exception as e:
+            logger.error(e.message)
             logger.error(traceback.format_exc())
             return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         rsp = {
@@ -70,7 +72,8 @@ class InstantiateVnf(APIView):
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except Exception:
+        except Exception as e:
+            logger.error(e.message)
             logger.error(traceback.format_exc())
             return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         rsp = {
@@ -87,7 +90,8 @@ class DeleteVnfAndQueryVnf(APIView):
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except:
+        except Exception as e:
+            logger.eror(e.message)
             logger.error(traceback.format_exc())
             return Response(data={'error': 'Failed to get Vnf(%s)' % instanceid},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -100,7 +104,8 @@ class DeleteVnfAndQueryVnf(APIView):
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except Exception:
+        except Exception as e:
+            logger.error(e.message)
             logger.error(traceback.format_exc())
             return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(data=None, status=status.HTTP_204_NO_CONTENT)
@@ -116,7 +121,8 @@ class TerminateVnf(APIView):
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except Exception:
+        except Exception as e:
+            logger.error(e.message)
             logger.error(traceback.format_exc())
             return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         rsp = {

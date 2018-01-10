@@ -53,7 +53,8 @@ class InstVnf(Thread):
             JobUtil.add_job_status(self.job_id, 100, "Instantiate Vnf success.")
         except NFLCMException as e:
             self.vnf_inst_failed_handle(e.message)
-        except:
+        except Exception as e:
+            logger.error(e.message)
             logger.error(traceback.format_exc())
             self.vnf_inst_failed_handle('unexpected exception')
 

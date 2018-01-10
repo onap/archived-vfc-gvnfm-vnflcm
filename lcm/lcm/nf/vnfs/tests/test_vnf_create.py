@@ -106,7 +106,7 @@ class TestNFInstantiate(TestCase):
         self.assert_job_result(self.job_id, 255, "VNF nf_inst_id is not exist.")
 
     @mock.patch.object(restcall, 'call_req')
-    def test_instantiate_vnf_when_get_rawdata_by_csarid_failed(self, mock_call_req):
+    def test_instantiate_vnf_when_get_packageinfo_by_csarid_failed(self, mock_call_req):
         NfInstModel.objects.create(nfinstid='1111',
                                    nf_name='vFW_01',
                                    package_id='222',
