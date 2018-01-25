@@ -24,9 +24,9 @@ swagger_info = openapi.Info(
     default_version='v1',
     description="""
 
-The `swagger-ui` view can be found [here](/cached/swagger).
-The `ReDoc` view can be found [here](/cached/redoc).
-The swagger YAML document can be found [here](/cached/swagger.yaml)."""
+The `swagger-ui` view can be found [here](/api/vnflcm/v1/cached/swagger).
+The `ReDoc` view can be found [here](/api/vnflcm/v1/cached/redoc).
+The swagger YAML document can be found [here](/api/vnflcm/v1/cached/swagger.yaml)."""
 )
 
 SchemaView = get_schema_view(
@@ -36,11 +36,11 @@ SchemaView = get_schema_view(
 )
 
 urlpatterns = [
-    url(r'^api/vnflcm/v1/swagger.json$', views.SwaggerView.as_view()),
-    url(r'^swagger(?P<format>.json|.yaml)$', SchemaView.without_ui(cache_timeout=0), name='schema-json'),
-    url(r'^swagger/$', SchemaView.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    url(r'^redoc/$', SchemaView.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    url(r'^cached/swagger(?P<format>.json|.yaml)$', SchemaView.without_ui(cache_timeout=None), name='cschema-json'),
-    url(r'^cached/swagger/$', SchemaView.with_ui('swagger', cache_timeout=None), name='cschema-swagger-ui'),
-    url(r'^cached/redoc/$', SchemaView.with_ui('redoc', cache_timeout=None), name='cschema-redoc'),
+    # url(r'^api/vnflcm/v1/swagger.json$', views.SwaggerView.as_view()),
+    url(r'^api/vnflcm/v1/swagger(?P<format>.json|.yaml)$', SchemaView.without_ui(cache_timeout=0), name='schema-json'),
+    url(r'^api/vnflcm/v1/swagger/$', SchemaView.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    url(r'^api/vnflcm/v1/redoc/$', SchemaView.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    url(r'^api/vnflcm/v1/cached/swagger(?P<format>.json|.yaml)$', SchemaView.without_ui(cache_timeout=None), name='cschema-json'),
+    url(r'^api/vnflcm/v1/cached/swagger/$', SchemaView.with_ui('swagger', cache_timeout=None), name='cschema-swagger-ui'),
+    url(r'^api/vnflcm/v1/cached/redoc/$', SchemaView.with_ui('redoc', cache_timeout=None), name='cschema-redoc'),
 ]
