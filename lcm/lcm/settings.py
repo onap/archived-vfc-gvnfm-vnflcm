@@ -94,6 +94,13 @@ TEMPLATES = [
     },
 ]
 
+SWAGGER_SETTINGS = {
+    'LOGIN_URL': '/admin/login',
+    'LOGOUT_URL': '/admin/logout',
+
+    'DEFAULT_INFO': 'lcm.swagger.urls.swagger_info'
+}
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
