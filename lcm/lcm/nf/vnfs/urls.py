@@ -12,19 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import patterns, url
-from rest_framework.urlpatterns import format_suffix_patterns
+from django.conf.urls import url
 
 from lcm.nf.vnfs.views import InstantiateVnf, TerminateVnf, DeleteVnfAndQueryVnf, CreateVnfAndQueryVnfs
 
-urlpatterns = patterns('',
-                       url(r'^api/vnflcm/v1/vnf_instances$', CreateVnfAndQueryVnfs.as_view()),
-                       url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)/instantiate$',
-                           InstantiateVnf.as_view()),
-                       url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)$',
-                           DeleteVnfAndQueryVnf.as_view()),
-                       url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)/terminate$',
-                           TerminateVnf.as_view()),
-                       )
-
-urlpatterns = format_suffix_patterns(urlpatterns)
+urlpatterns = [
+    url(r'^api/vnflcm/v1/vnf_instances$', CreateVnfAndQueryVnfs.as_view()),
+    url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)/instantiate$',
+        InstantiateVnf.as_view()),
+    url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)$',
+        DeleteVnfAndQueryVnf.as_view()),
+    url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)/terminate$',
+        TerminateVnf.as_view()),
+]

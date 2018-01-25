@@ -16,5 +16,5 @@ from django.conf.urls import url
 from lcm.swagger import views
 
 urlpatterns = [
-    url(r'^api/vnflcm/v1/swagger.json$', views.SwaggerView.as_view())
+    url(r'^api/vnflcm/v1/swagger.json$', views.SwaggerView.as_view()),
 ]
