@@ -35,14 +35,3 @@ class JobDescriptorSerializer(serializers.Serializer):
 class JobQueryRespSerializer(serializers.Serializer):
     jobId = serializers.CharField(help_text="UUID of job", required=True)
     responseDescriptor = JobDescriptorSerializer(help_text="Descriptor of job", required=False)
-
-
-class JobUpdReqSerializer(serializers.Serializer):
-    progress = serializers.CharField(help_text="Progress of job", required=True)
-    desc = serializers.CharField(help_text="Desc of job", required=False)
-    errcode = serializers.CharField(help_text="Error code of job", required=False)
-
-
-class JobUpdRespSerializer(serializers.Serializer):
-    result = serializers.CharField(help_text="Result of job update", required=True)
-    msg = serializers.CharField(help_text="Detail of job update", required=False)
