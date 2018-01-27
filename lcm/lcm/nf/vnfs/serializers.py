@@ -37,16 +37,45 @@ class vnfcResourceInfoSerializer(serializers.Serializer):
     pass
 
 
+class accessInfoSerializer(serializers.Serializer):
+    tenant = serializers.CharField(help_text="tenant", required=True)
+    username = serializers.CharField(help_text="username", required=True)
+    password = serializers.CharField(help_text="password", required=True)
+
+
+class InterfaceInfoSerializer(serializers.Serializer):
+    vimType = serializers.CharField(help_text="vimType", required=True)
+    apiVersion = serializers.CharField(help_text="apiVersion", required=True)
+    protocolType = serializers.ChoiceField(help_text="protocolType", choices=['http', 'https'], required=True)
+
+
 class vimInfoSerializer(serializers.Serializer):
-    pass
+    vimInfoId = serializers.CharField(help_text="vimInfoId", required=True)
+    vimId = serializers.CharField(help_text="vimId", required=True)
+    interfaceEndpoint = serializers.CharField(help_text="interfaceEndpoint", required=True)
+    interfaceInfo = InterfaceInfoSerializer(help_text="vimInfoId", required=True)
+    accessInfo = accessInfoSerializer(help_text="accessInfo", required=True)
 
 
 class monitoringParametersSerializer(serializers.Serializer):
     pass
 
 
+class linkPortsSerializer(serializers.Serializer):
+    resourceId = serializers.CharField(help_text="resourceId", required=True)
+    vimId = serializers.CharField(help_text="vimId", required=False)
+
+
+class resourceHandleSerializer(serializers.Serializer):
+    resourceId = serializers.CharField(help_text="resourceId", required=True)
+    vimId = serializers.CharField(help_text="vimId", required=False)
+    resourceProviderId = serializers.CharField(help_text="resourceProviderId", required=False)
+
+
 class ExtVirtualLinkInfoSerializer(serializers.Serializer):
-    pass
+    extVirtualLinkId = serializers.CharField(help_text="extVirtualLinkId", required=True)
+    resourceHandle = resourceHandleSerializer(help_text="iPAddress", required=True)
+    linkPorts = linkPortsSerializer(help_text="iPAddress", many=True, allow_null=True)
 
 
 class l3AddressDataSerializer(serializers.Serializer):
