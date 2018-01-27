@@ -49,12 +49,26 @@ class ExtVirtualLinkInfoSerializer(serializers.Serializer):
     pass
 
 
+class l3AddressDataSerializer(serializers.Serializer):
+    iPAddressType = serializers.ChoiceField(help_text="iPAddressType", choices=['IPv4', 'IPv6'], required=True)
+    iPAddress = serializers.CharField(help_text="iPAddress", required=True)
+
+
+class NetworkAddressSerializer(serializers.Serializer):
+    addressType = serializers.ChoiceField(help_text="addressType", choices=['MAC', 'IP'], required=True)
+    l2AddressData = serializers.CharField(help_text="l2AddressData", required=False)
+    l3AddressData = l3AddressDataSerializer(help_text="addresses", required=False)
+
+
 class extCpInfoSerializer(serializers.Serializer):
-    pass
+    cpInstanceId = serializers.CharField(help_text="cpInstanceId", required=True)
+    cpdId = serializers.IntegerField(help_text="cpdId", required=True)
+    addresses = NetworkAddressSerializer(help_text="addresses", many=True, allow_null=True)
 
 
 class ScaleInfoSerializer(serializers.Serializer):
-    pass
+    aspectId = serializers.CharField(help_text="aspectId", required=True)
+    scaleLevel = serializers.IntegerField(help_text="scaleLevel", required=True)
 
 
 class instantiatedVnfInfoSerializer(serializers.Serializer):
