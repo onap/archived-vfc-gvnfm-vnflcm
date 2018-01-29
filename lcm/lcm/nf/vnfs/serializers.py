@@ -25,8 +25,14 @@ class CreateVnfRespSerializer(serializers.Serializer):
     vnfInstanceId = serializers.CharField(help_text="vnf Instance Id", required=True)
 
 
+class StorageResourceSerializer(serializers.Serializer):
+    resourceId = serializers.CharField(help_text="resourceId", required=True)
+    vimId = serializers.CharField(help_text="vimId", required=True)
+
+
 class virtualStorageResourceInfoSerializer(serializers.Serializer):
-    pass
+    virtualStorageInstanceId = serializers.CharField(help_text="virtualStorageInstanceId", required=True)
+    storageResource = StorageResourceSerializer(help_text="storageResource", required=True)
 
 
 class virtualLinkResourceInfoSerializer(serializers.Serializer):
@@ -101,12 +107,12 @@ class ScaleInfoSerializer(serializers.Serializer):
 
 
 class instantiatedVnfInfoSerializer(serializers.Serializer):
-    flavourId = serializers.CharField(help_text="flavour Id", required=True)
-    vnfState = serializers.ChoiceField(help_text="vnf State", choices=['STARTED', 'STOPPED'], required=True)
+    flavourId = serializers.CharField(help_text="flavour Id", required=True, allow_null=True)
+    vnfState = serializers.ChoiceField(help_text="vnf State", choices=['STARTED', 'STOPPED'], required=True, allow_null=True)
     scaleStatus = ScaleInfoSerializer(help_text="scaleStatus", many=True)
     extCpInfo = extCpInfoSerializer(help_text="extCpInfo", many=True)
     extVirtualLink = ExtVirtualLinkInfoSerializer(help_text="extVirtualLink", many=True)
-    monitoringParameters = monitoringParametersSerializer(help_text="monitoringParameters", many=True, allow_null=True)
+    monitoringParameters = monitoringParametersSerializer(help_text="monitoringParameters", allow_null=True)
     vimInfo = vimInfoSerializer(help_text="vimInfo", many=True)
     vnfcResourceInfo = vnfcResourceInfoSerializer(help_text="vnfcResourceInfo", many=True)
     virtualLinkResourceInfo = virtualLinkResourceInfoSerializer(help_text="virtualLinkResourceInfo", many=True)
@@ -114,7 +120,7 @@ class instantiatedVnfInfoSerializer(serializers.Serializer):
     pass
 
 
-class VnfsInfoSerializer(serializers.ListSerializer):
+class VnfInfoSerializer(serializers.Serializer):
     vnfInstanceId = serializers.CharField(help_text="vnf Instance Id", required=True)
     vnfInstanceName = serializers.CharField(help_text="vnf Instance Name", required=True)
     onboardedVnfPkgInfoId = serializers.CharField(help_text="onboarded Vnf Pkg Info Id", required=False,
@@ -122,3 +128,7 @@ class VnfsInfoSerializer(serializers.ListSerializer):
     vnfdVersion = serializers.CharField(help_text="vnfd Version", required=False, allow_null=True)
     vnfProvider = serializers.CharField(help_text="vnf Provider", required=False, allow_null=True)
     instantiatedVnfInfo = instantiatedVnfInfoSerializer(help_text="instantiatedVnfInfo", required=True)
+
+
+class VnfsInfoSerializer(serializers.ListSerializer):
+    child = VnfInfoSerializer()

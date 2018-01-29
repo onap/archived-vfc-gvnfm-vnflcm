@@ -20,7 +20,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from lcm.nf.vnfs.serializers import CreateVnfReqSerializer, CreateVnfRespSerializer
+from lcm.nf.vnfs.serializers import CreateVnfReqSerializer, CreateVnfRespSerializer, VnfsInfoSerializer
 from lcm.nf.vnfs.vnf_cancel.delete_vnf_identifier import DeleteVnf
 from lcm.nf.vnfs.vnf_cancel.term_vnf import TermVnf
 from lcm.nf.vnfs.vnf_create.create_vnf_identifier import CreateVnf
@@ -33,19 +33,31 @@ logger = logging.getLogger(__name__)
 
 
 class CreateVnfAndQueryVnfs(APIView):
+    @swagger_auto_schema(
+        request_body=None,
+        responses={
+            status.HTTP_200_OK: VnfsInfoSerializer(),
+            status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal error"
+        }
+    )
     def get(self, request):
         logger.debug("QueryMultiVnf--get::> %s" % request.data)
         try:
             resp_data = QueryVnf(request.data).query_multi_vnf()
+
+            vnfsInfoSerializer = VnfsInfoSerializer(data=resp_data)
+            resp_isValid = vnfsInfoSerializer.is_valid()
+            if not resp_isValid:
+                raise NFLCMException(vnfsInfoSerializer.errors)
+
+            return Response(data=vnfsInfoSerializer.data, status=status.HTTP_200_OK)
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             logger.error(e.message)
             logger.error(traceback.format_exc())
-            return Response(data={'error': 'Failed to get Vnfs'},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        return Response(data=resp_data, status=status.HTTP_200_OK)
+            return Response(data={'error': 'Failed to get Vnfs'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @swagger_auto_schema(
         request_body=CreateVnfReqSerializer(),
@@ -63,10 +75,8 @@ class CreateVnfAndQueryVnfs(APIView):
                 raise NFLCMException(req_serializer.errors)
 
             nf_inst_id = CreateVnf(req_serializer.data).do_biz()
-            rsp = {
-                "vnfInstanceId": nf_inst_id
-            }
-            resp_serializer = CreateVnfRespSerializer(data=rsp)
+
+            resp_serializer = CreateVnfRespSerializer(data={"vnfInstanceId": nf_inst_id})
             resp_isValid = resp_serializer.is_valid()
             if not resp_isValid:
                 raise NFLCMException(resp_serializer.errors)
