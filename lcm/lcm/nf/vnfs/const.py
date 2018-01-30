@@ -66,7 +66,7 @@ inst_req_data = {
             "resourceSubnetId": '55_subnet',
             "cpdId": 'cpId1',
             "vim": {
-                "vimid": '55_vimid'
+                "vimId": '55_vimid'
             }
         }
     ],
@@ -83,12 +83,13 @@ inst_req_data = {
                 "resourceSubnetId": '55_subnet',
                 "cpdId": 'cpId1',
                 "vim": {
-                    "vimid": '55_vimid'
+                    "vimId": '55_vimid'
                 }
             }
         ]
     }
 }
+
 
 vnfd_model_dict = {
     'metadata': {

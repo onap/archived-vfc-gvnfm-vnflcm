@@ -20,7 +20,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from lcm.nf.vnfs.serializers import CreateVnfReqSerializer, CreateVnfRespSerializer, VnfsInfoSerializer
+from lcm.nf.vnfs.serializers import CreateVnfReqSerializer, CreateVnfRespSerializer, VnfsInfoSerializer, \
+    InstantiateVnfResponseSerializer, InstantiateVnfRequestSerializer
 from lcm.nf.vnfs.vnf_cancel.delete_vnf_identifier import DeleteVnf
 from lcm.nf.vnfs.vnf_cancel.term_vnf import TermVnf
 from lcm.nf.vnfs.vnf_create.create_vnf_identifier import CreateVnf
@@ -91,12 +92,31 @@ class CreateVnfAndQueryVnfs(APIView):
 
 
 class InstantiateVnf(APIView):
+    @swagger_auto_schema(
+        request_body=InstantiateVnfRequestSerializer(),
+        responses={
+            status.HTTP_202_ACCEPTED: InstantiateVnfResponseSerializer(),
+            status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal error"
+        }
+    )
     def post(self, request, instanceid):
         logger.debug("InstantiateVnf--post::> %s" % request.data)
+        instantiateVnfRequestSerializer = InstantiateVnfRequestSerializer(data=request.data)
+        req_isValid = instantiateVnfRequestSerializer.is_valid()
         try:
+            if not req_isValid:
+                raise NFLCMException(instantiateVnfRequestSerializer.errors)
+
             job_id = JobUtil.create_job('NF', 'INSTANTIATE', instanceid)
             JobUtil.add_job_status(job_id, 0, "INST_VNF_READY")
-            InstVnf(request.data, instanceid, job_id).start()
+            InstVnf(instantiateVnfRequestSerializer.data, instanceid, job_id).start()
+
+            instantiateVnfResponseSerializer = InstantiateVnfResponseSerializer(data={"jobId": job_id})
+            resp_isValid = instantiateVnfResponseSerializer.is_valid()
+            if not resp_isValid:
+                raise NFLCMException(instantiateVnfResponseSerializer.errors)
+
+            return Response(data=instantiateVnfResponseSerializer.data, status=status.HTTP_202_ACCEPTED)
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -104,10 +124,6 @@ class InstantiateVnf(APIView):
             logger.error(e.message)
             logger.error(traceback.format_exc())
             return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        rsp = {
-            "jobId": job_id
-        }
-        return Response(data=rsp, status=status.HTTP_202_ACCEPTED)
 
 
 class DeleteVnfAndQueryVnf(APIView):

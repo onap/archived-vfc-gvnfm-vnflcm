@@ -56,11 +56,11 @@ class InterfaceInfoSerializer(serializers.Serializer):
 
 
 class vimInfoSerializer(serializers.Serializer):
-    vimInfoId = serializers.CharField(help_text="vimInfoId", required=True)
-    vimId = serializers.CharField(help_text="vimId", required=True)
-    interfaceEndpoint = serializers.CharField(help_text="interfaceEndpoint", required=True)
-    interfaceInfo = InterfaceInfoSerializer(help_text="vimInfoId", required=True)
-    accessInfo = accessInfoSerializer(help_text="accessInfo", required=True)
+    vimInfoId = serializers.CharField(help_text="vimInfoId", required=False, allow_null=True)
+    vimId = serializers.CharField(help_text="vimId", required=False, allow_null=True)
+    interfaceEndpoint = serializers.CharField(help_text="interfaceEndpoint", required=False, allow_null=True)
+    interfaceInfo = InterfaceInfoSerializer(help_text="vimInfoId", required=False, allow_null=True)
+    accessInfo = accessInfoSerializer(help_text="accessInfo", required=False, allow_null=True)
 
 
 class monitoringParametersSerializer(serializers.Serializer):
@@ -96,7 +96,7 @@ class NetworkAddressSerializer(serializers.Serializer):
 
 
 class extCpInfoSerializer(serializers.Serializer):
-    cpInstanceId = serializers.CharField(help_text="cpInstanceId", required=True)
+    cpInstanceId = serializers.CharField(help_text="cpInstanceId", required=False, allow_null=True)
     cpdId = serializers.IntegerField(help_text="cpdId", required=True)
     numDynamicAddresses = serializers.IntegerField(help_text="numDynamicAddresses", required=False, allow_null=True)
     addresses = NetworkAddressSerializer(help_text="addresses", many=True, allow_null=True)
@@ -135,25 +135,36 @@ class VnfsInfoSerializer(serializers.ListSerializer):
     child = VnfInfoSerializer()
 
 
-class emptySerializer(serializers.Serializer):
-    pass
+class extVirtualLinkSerizlizer(serializers.Serializer):
+    vlInstanceId = serializers.CharField(help_text="vlInstanceId", required=False, allow_null=True)
+    resourceSubnetId = serializers.CharField(help_text="resourceSubnetId", required=False, allow_null=True)
+    cpdId = serializers.CharField(help_text="cpdId", required=False, allow_null=True)
+    resourceId = serializers.CharField(help_text="resourceId", required=False, allow_null=True)
+    vim = vimInfoSerializer(help_text="vim", required=False, allow_null=True)
+    extCps = extCpInfoSerializer(help_text="extCps", many=True, required=False, allow_null=True)
 
 
-class extVirtualLinksSerializer(serializers.Serializer):
-    vlInstanceId = serializers.CharField(help_text="vlInstanceId", required=True)
-    resourceId = serializers.CharField(help_text="resourceId", required=True)
-    vim = vimInfoSerializer(help_text="vim", required=True)
-    extCps = extCpInfoSerializer(help_text="extCps", many=True)
+class extVirtualLinksSerializer(serializers.ListSerializer):
+    child = extVirtualLinkSerizlizer(help_text="extVirtualLink", required=False, allow_null=True)
 
 
 class additionalParamsSerializer(serializers.Serializer):
-    inputs = emptySerializer(help_text="inputs", required=True)
-    extVirtualLinks = extVirtualLinksSerializer(help_text="extVirtualLinks", many=True, allow_null=True)
+    inputs = serializers.DictField(
+        help_text="inputs",
+        child=serializers.CharField(help_text="but i needed to test these 2 fields somehow", allow_blank=True),
+        required=False,
+        allow_null=True
+    )
+    extVirtualLinks = extVirtualLinksSerializer(help_text="extVirtualLinks", required=False, allow_null=True)
 
 
 class InstantiateVnfRequestSerializer(serializers.Serializer):
     flavourId = serializers.CharField(help_text="flavourId", required=True)
     instantiationLevelId = serializers.CharField(help_text="instantiationLevelId", required=True, allow_null=True)
     localizationLanguage = serializers.CharField(help_text="localizationLanguage", required=True, allow_null=True)
-    extVirtualLinks = extVirtualLinksSerializer(help_text="extVirtualLinks", many=True, allow_null=True)
-    additionalParams = additionalParamsSerializer(help_text="additionalParams", required=True, allow_null=True)
+    extVirtualLinks = extVirtualLinksSerializer(help_text="extVirtualLinks", required=False, allow_null=True)
+    additionalParams = additionalParamsSerializer(help_text="additionalParams", required=False, allow_null=True)
+
+
+class InstantiateVnfResponseSerializer(serializers.Serializer):
+    jobId = serializers.CharField(help_text="jobId", required=True)

@@ -16,8 +16,9 @@ import json
 import uuid
 
 import mock
-from django.test import TestCase, Client
+from django.test import TestCase
 from rest_framework import status
+from rest_framework.test import APIClient
 
 from lcm.nf.vnfs.const import c1_data_get_tenant_id, c4_data_create_network, c2_data_create_volume, \
     c5_data_create_subnet, c3_data_get_volume, c6_data_create_port, c7_data_create_flavor, c8_data_list_image, \
@@ -32,7 +33,7 @@ from lcm.pub.vimapi import api
 
 class TestNFInstantiate(TestCase):
     def setUp(self):
-        self.client = Client()
+        self.client = APIClient()
         self.grant_result = {
             "vim": {
                 "vimid": 'vimid_1',
@@ -90,7 +91,7 @@ class TestNFInstantiate(TestCase):
     @mock.patch.object(InstVnf, 'run')
     def test_instantiate_vnf(self, mock_run):
         mock_run.re.return_value = None
-        response = self.client.post("/api/vnflcm/v1/vnf_instances/12/instantiate", data={}, format='json')
+        response = self.client.post("/api/vnflcm/v1/vnf_instances/12/instantiate", data=inst_req_data, format='json')
         self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
 
     def test_instantiate_vnf_when_inst_id_not_exist(self):
