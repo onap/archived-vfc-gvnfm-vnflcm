@@ -264,5 +264,12 @@ class InstantiateVnfRequestSerializer(serializers.Serializer):
         help_text="additionalParams", required=False, allow_null=True)
 
 
-class InstantiateVnfResponseSerializer(serializers.Serializer):
+class InstOrTeriVnfResponseSerializer(serializers.Serializer):
     jobId = serializers.CharField(help_text="jobId", required=True)
+
+
+class TerminateVnfRequestSerializer(serializers.Serializer):
+    terminationType = serializers.CharField(
+        help_text="terminationType", required=True)
+    gracefulTerminationTimeout = serializers.IntegerField(
+        help_text="gracefulTerminationTimeout", default=120, required=False)
