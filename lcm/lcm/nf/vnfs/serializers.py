@@ -244,7 +244,7 @@ class AdditionalParamsSerializer(serializers.Serializer):
     inputs = serializers.DictField(
         help_text="inputs",
         child=serializers.CharField(
-            help_text="but i needed to test these 2 fields somehow",
+            help_text="custom key-value",
             allow_blank=True),
         required=False,
         allow_null=True)

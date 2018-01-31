@@ -21,7 +21,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from lcm.nf.vnfs.serializers import CreateVnfReqSerializer, CreateVnfRespSerializer, VnfsInfoSerializer, \
-    InstantiateVnfResponseSerializer, InstantiateVnfRequestSerializer
+    InstantiateVnfResponseSerializer, InstantiateVnfRequestSerializer, VnfInfoSerializer
 from lcm.nf.vnfs.vnf_cancel.delete_vnf_identifier import DeleteVnf
 from lcm.nf.vnfs.vnf_cancel.term_vnf import TermVnf
 from lcm.nf.vnfs.vnf_create.create_vnf_identifier import CreateVnf
@@ -35,7 +35,6 @@ logger = logging.getLogger(__name__)
 
 class CreateVnfAndQueryVnfs(APIView):
     @swagger_auto_schema(
-        request_body=None,
         responses={
             status.HTTP_200_OK: VnfsInfoSerializer(),
             status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal error"
@@ -127,10 +126,23 @@ class InstantiateVnf(APIView):
 
 
 class DeleteVnfAndQueryVnf(APIView):
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: VnfInfoSerializer(),
+            status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal error"
+        }
+    )
     def get(self, request, instanceid):
         logger.debug("QuerySingleVnf--get::> %s" % request.data)
         try:
             resp_data = QueryVnf(request.data, instanceid).query_single_vnf()
+
+            vnfInfoSerializer = VnfInfoSerializer(data=resp_data)
+            resp_isValid = vnfInfoSerializer.is_valid()
+            if not resp_isValid:
+                raise NFLCMException(vnfInfoSerializer.errors)
+
+            return Response(data=vnfInfoSerializer.data, status=status.HTTP_200_OK)
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -139,7 +151,6 @@ class DeleteVnfAndQueryVnf(APIView):
             logger.error(traceback.format_exc())
             return Response(data={'error': 'Failed to get Vnf(%s)' % instanceid},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        return Response(data=resp_data, status=status.HTTP_200_OK)
 
     def delete(self, request, instanceid):
         logger.debug("DeleteVnfIdentifier--delete::> %s" % request.data)
