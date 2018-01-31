@@ -152,10 +152,18 @@ class DeleteVnfAndQueryVnf(APIView):
             return Response(data={'error': 'Failed to get Vnf(%s)' % instanceid},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_204_NO_CONTENT: "Successfully",
+            status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal error"
+        }
+    )
     def delete(self, request, instanceid):
         logger.debug("DeleteVnfIdentifier--delete::> %s" % request.data)
         try:
             DeleteVnf(request.data, instanceid).do_biz()
+
+            return Response(data=None, status=status.HTTP_204_NO_CONTENT)
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -163,7 +171,6 @@ class DeleteVnfAndQueryVnf(APIView):
             logger.error(e.message)
             logger.error(traceback.format_exc())
             return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        return Response(data=None, status=status.HTTP_204_NO_CONTENT)
 
 
 class TerminateVnf(APIView):
