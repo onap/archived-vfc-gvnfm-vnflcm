@@ -24,7 +24,8 @@ swagger_info = openapi.Info(
 
 The `swagger-ui` view can be found [here](/api/vnflcm/v1/cached/swagger).
 The `ReDoc` view can be found [here](/api/vnflcm/v1/cached/redoc).
-The swagger YAML document can be found [here](/api/vnflcm/v1/cached/swagger.yaml)."""
+The swagger YAML document can be found [here](/api/vnflcm/v1/cached/swagger.yaml).
+The swagger JSON document can be found [here](/api/vnflcm/v1/cached/swagger.json)."""
 )
 
 SchemaView = get_schema_view(

@@ -45,12 +45,12 @@ class CreateVnfAndQueryVnfs(APIView):
         try:
             resp_data = QueryVnf(request.data).query_multi_vnf()
 
-            vnfsInfoSerializer = VnfsInfoSerializer(data=resp_data)
-            resp_isValid = vnfsInfoSerializer.is_valid()
-            if not resp_isValid:
-                raise NFLCMException(vnfsInfoSerializer.errors)
+            vnfs_info_serializer = VnfsInfoSerializer(data=resp_data)
+            resp_isvalid = vnfs_info_serializer.is_valid()
+            if not resp_isvalid:
+                raise NFLCMException(vnfs_info_serializer.errors)
 
-            return Response(data=vnfsInfoSerializer.data, status=status.HTTP_200_OK)
+            return Response(data=vnfs_info_serializer.data, status=status.HTTP_200_OK)
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -69,18 +69,18 @@ class CreateVnfAndQueryVnfs(APIView):
     def post(self, request):
         logger.debug("CreateVnfIdentifier--post::> %s" % request.data)
         req_serializer = CreateVnfReqSerializer(data=request.data)
-        req_isValid = req_serializer.is_valid()
+        req_isvalid = req_serializer.is_valid()
         try:
-            if not req_isValid:
+            if not req_isvalid:
                 raise NFLCMException(req_serializer.errors)
 
             nf_inst_id = CreateVnf(req_serializer.data).do_biz()
 
-            resp_serializer = CreateVnfRespSerializer(data={"vnfInstanceId": nf_inst_id})
-            resp_isValid = resp_serializer.is_valid()
-            if not resp_isValid:
-                raise NFLCMException(resp_serializer.errors)
-            return Response(data=resp_serializer.data, status=status.HTTP_201_CREATED)
+            create_vnf_resp_serializer = CreateVnfRespSerializer(data={"vnfInstanceId": nf_inst_id})
+            resp_isvalid = create_vnf_resp_serializer.is_valid()
+            if not resp_isvalid:
+                raise NFLCMException(create_vnf_resp_serializer.errors)
+            return Response(data=create_vnf_resp_serializer.data, status=status.HTTP_201_CREATED)
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -100,22 +100,22 @@ class InstantiateVnf(APIView):
     )
     def post(self, request, instanceid):
         logger.debug("InstantiateVnf--post::> %s" % request.data)
-        instantiateVnfRequestSerializer = InstantiateVnfRequestSerializer(data=request.data)
-        req_isValid = instantiateVnfRequestSerializer.is_valid()
+        instantiate_vnf_request_serializer = InstantiateVnfRequestSerializer(data=request.data)
+        req_isvalid = instantiate_vnf_request_serializer.is_valid()
         try:
-            if not req_isValid:
-                raise NFLCMException(instantiateVnfRequestSerializer.errors)
+            if not req_isvalid:
+                raise NFLCMException(instantiate_vnf_request_serializer.errors)
 
             job_id = JobUtil.create_job('NF', 'INSTANTIATE', instanceid)
             JobUtil.add_job_status(job_id, 0, "INST_VNF_READY")
-            InstVnf(instantiateVnfRequestSerializer.data, instanceid, job_id).start()
+            InstVnf(instantiate_vnf_request_serializer.data, instanceid, job_id).start()
 
-            instantiateVnfResponseSerializer = InstOrTeriVnfResponseSerializer(data={"jobId": job_id})
-            resp_isValid = instantiateVnfResponseSerializer.is_valid()
-            if not resp_isValid:
-                raise NFLCMException(instantiateVnfResponseSerializer.errors)
+            instantiate_vnf_response_serializer = InstOrTeriVnfResponseSerializer(data={"jobId": job_id})
+            resp_isvalid = instantiate_vnf_response_serializer.is_valid()
+            if not resp_isvalid:
+                raise NFLCMException(instantiate_vnf_response_serializer.errors)
 
-            return Response(data=instantiateVnfResponseSerializer.data, status=status.HTTP_202_ACCEPTED)
+            return Response(data=instantiate_vnf_response_serializer.data, status=status.HTTP_202_ACCEPTED)
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -137,12 +137,12 @@ class DeleteVnfAndQueryVnf(APIView):
         try:
             resp_data = QueryVnf(request.data, instanceid).query_single_vnf()
 
-            vnfInfoSerializer = VnfInfoSerializer(data=resp_data)
-            resp_isValid = vnfInfoSerializer.is_valid()
-            if not resp_isValid:
-                raise NFLCMException(vnfInfoSerializer.errors)
+            vnf_info_serializer = VnfInfoSerializer(data=resp_data)
+            resp_isvalid = vnf_info_serializer.is_valid()
+            if not resp_isvalid:
+                raise NFLCMException(vnf_info_serializer.errors)
 
-            return Response(data=vnfInfoSerializer.data, status=status.HTTP_200_OK)
+            return Response(data=vnf_info_serializer.data, status=status.HTTP_200_OK)
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -188,12 +188,12 @@ class TerminateVnf(APIView):
             JobUtil.add_job_status(job_id, 0, "TERM_VNF_READY")
             TermVnf(request.data, instanceid, job_id).start()
 
-            terminateVnfResponseSerializer = InstOrTeriVnfResponseSerializer(data={"jobId": job_id})
-            resp_isValid = terminateVnfResponseSerializer.is_valid()
-            if not resp_isValid:
-                raise NFLCMException(terminateVnfResponseSerializer.errors)
+            terminate_vnf_response_serializer = InstOrTeriVnfResponseSerializer(data={"jobId": job_id})
+            resp_isvalid = terminate_vnf_response_serializer.is_valid()
+            if not resp_isvalid:
+                raise NFLCMException(terminate_vnf_response_serializer.errors)
 
-            return Response(data=terminateVnfResponseSerializer.data, status=status.HTTP_202_ACCEPTED)
+            return Response(data=terminate_vnf_response_serializer.data, status=status.HTTP_202_ACCEPTED)
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
