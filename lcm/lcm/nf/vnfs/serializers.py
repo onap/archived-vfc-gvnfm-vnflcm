@@ -16,28 +16,55 @@ from rest_framework import serializers
 
 
 class CreateVnfReqSerializer(serializers.Serializer):
-    vnfdId = serializers.CharField(help_text="vnfd Id", required=True)
+    vnfdId = serializers.CharField(
+        help_text="vnfd Id",
+        max_length=255,
+        required=True,
+        allow_null=True)
     vnfInstanceName = serializers.CharField(
-        help_text="vnf Instance Name", required=True)
+        help_text="vnf Instance Name",
+        max_length=255,
+        required=True,
+        allow_null=False)
     vnfInstanceDescription = serializers.CharField(
-        help_text="vnf Instance Description", required=False, allow_null=True)
+        help_text="vnf Instance Description",
+        max_length=255,
+        required=False,
+        allow_null=True)
 
 
 class CreateVnfRespSerializer(serializers.Serializer):
     vnfInstanceId = serializers.CharField(
-        help_text="vnf Instance Id", required=True)
+        help_text="vnf Instance Id",
+        required=True,
+        max_length=255,
+        allow_null=True)
 
 
 class ResourceSerializer(serializers.Serializer):
-    resourceId = serializers.CharField(help_text="resourceId", required=True)
-    vimId = serializers.CharField(help_text="vimId", required=True)
+    resourceId = serializers.CharField(
+        help_text="resourceId",
+        required=True,
+        max_length=255,
+        allow_null=True)
+    vimId = serializers.CharField(
+        help_text="vimId",
+        required=True,
+        max_length=255,
+        allow_null=True)
 
 
 class VirtualStorageResourceInfoSerializer(serializers.Serializer):
     virtualStorageInstanceId = serializers.CharField(
-        help_text="virtualStorageInstanceId", required=False, allow_null=True)
+        help_text="virtualStorageInstanceId",
+        required=False,
+        allow_null=True,
+        max_length=255)
     virtualStorageDescId = serializers.CharField(
-        help_text="virtualStorageDescId", required=False, allow_null=True)
+        help_text="virtualStorageDescId",
+        required=False,
+        max_length=255,
+        allow_null=True)
     storageResource = ResourceSerializer(
         help_text="storageResource",
         required=False,
@@ -45,10 +72,16 @@ class VirtualStorageResourceInfoSerializer(serializers.Serializer):
 
 
 class VirtualLinkResourceInfoSerializer(serializers.Serializer):
-    virtualLinkInstanceId = serializers.IntegerField(
-        help_text="virtualLinkInstanceId", required=False, allow_null=True)
-    virtualLinkDescId = serializers.IntegerField(
-        help_text="virtualLinkDescId", required=False, allow_null=True)
+    virtualLinkInstanceId = serializers.CharField(
+        help_text="virtualLinkInstanceId",
+        required=False,
+        max_length=255,
+        allow_null=True)
+    virtualLinkDescId = serializers.CharField(
+        help_text="virtualLinkDescId",
+        required=False,
+        max_length=255,
+        allow_null=True)
     networkResource = ResourceSerializer(
         help_text="networkResource",
         required=False,
@@ -56,14 +89,19 @@ class VirtualLinkResourceInfoSerializer(serializers.Serializer):
 
 
 class VnfcResourceInfoSerializer(serializers.Serializer):
-    vnfcInstanceId = serializers.IntegerField(
-        help_text="vnfcInstanceId", required=False, allow_null=True)
-    vduId = serializers.IntegerField(
-        help_text="vduId",
+    vnfcInstanceId = serializers.CharField(
+        help_text="vnfcInstanceId",
         required=False,
+        max_length=255,
         allow_null=True)
-    storageResourceIds = serializers.IntegerField(
-        help_text="storageResourceIds", required=False, allow_null=True)
+    vduId = serializers.CharField(
+        help_text="vduId",
+        required=False, max_length=255, allow_null=True)
+    storageResourceIds = serializers.CharField(
+        help_text="storageResourceIds",
+        required=False,
+        max_length=255,
+        allow_null=True)
     computeResource = ResourceSerializer(
         help_text="computeResource",
         required=False,
@@ -71,14 +109,34 @@ class VnfcResourceInfoSerializer(serializers.Serializer):
 
 
 class AccessInfoSerializer(serializers.Serializer):
-    tenant = serializers.CharField(help_text="tenant", required=True)
-    username = serializers.CharField(help_text="username", required=True)
-    password = serializers.CharField(help_text="password", required=True)
+    tenant = serializers.CharField(
+        help_text="tenant",
+        required=True,
+        max_length=255,
+        allow_null=True)
+    username = serializers.CharField(
+        help_text="username",
+        required=True,
+        max_length=255,
+        allow_null=True)
+    password = serializers.CharField(
+        help_text="password",
+        required=True,
+        max_length=255,
+        allow_null=True)
 
 
 class InterfaceInfoSerializer(serializers.Serializer):
-    vimType = serializers.CharField(help_text="vimType", required=True)
-    apiVersion = serializers.CharField(help_text="apiVersion", required=True)
+    vimType = serializers.CharField(
+        help_text="vimType",
+        required=True,
+        max_length=255,
+        allow_null=True)
+    apiVersion = serializers.CharField(
+        help_text="apiVersion",
+        required=True,
+        max_length=255,
+        allow_null=True)
     protocolType = serializers.ChoiceField(
         help_text="protocolType", choices=[
             'http', 'https'], required=True)
@@ -87,14 +145,15 @@ class InterfaceInfoSerializer(serializers.Serializer):
 class VimInfoSerializer(serializers.Serializer):
     vimInfoId = serializers.CharField(
         help_text="vimInfoId",
-        required=False,
-        allow_null=True)
+        required=False, max_length=255, allow_null=True)
     vimId = serializers.CharField(
         help_text="vimId",
-        required=False,
-        allow_null=True)
+        required=False, max_length=255, allow_null=True)
     interfaceEndpoint = serializers.CharField(
-        help_text="interfaceEndpoint", required=False, allow_null=True)
+        help_text="interfaceEndpoint",
+        required=False,
+        max_length=255,
+        allow_null=True)
     interfaceInfo = InterfaceInfoSerializer(
         help_text="vimInfoId", required=False, allow_null=True)
     accessInfo = AccessInfoSerializer(
@@ -104,20 +163,42 @@ class VimInfoSerializer(serializers.Serializer):
 
 
 class LinkPortsSerializer(serializers.Serializer):
-    resourceId = serializers.CharField(help_text="resourceId", required=True)
-    vimId = serializers.CharField(help_text="vimId", required=False)
+    resourceId = serializers.CharField(
+        help_text="resourceId",
+        required=True,
+        max_length=255,
+        allow_null=True)
+    vimId = serializers.CharField(
+        help_text="vimId",
+        required=False,
+        max_length=255,
+        allow_null=True)
 
 
 class ResourceHandleSerializer(serializers.Serializer):
-    resourceId = serializers.CharField(help_text="resourceId", required=True)
-    vimId = serializers.CharField(help_text="vimId", required=False)
+    resourceId = serializers.CharField(
+        help_text="resourceId",
+        required=True,
+        max_length=255,
+        allow_null=True)
+    vimId = serializers.CharField(
+        help_text="vimId",
+        required=False,
+        max_length=255,
+        allow_null=True)
     resourceProviderId = serializers.CharField(
-        help_text="resourceProviderId", required=False)
+        help_text="resourceProviderId",
+        required=False,
+        max_length=255,
+        allow_null=True)
 
 
 class ExtVirtualLinkInfoSerializer(serializers.Serializer):
     extVirtualLinkId = serializers.CharField(
-        help_text="extVirtualLinkId", required=True)
+        help_text="extVirtualLinkId",
+        required=True,
+        max_length=255,
+        allow_null=True)
     resourceHandle = ResourceHandleSerializer(
         help_text="iPAddress", required=True)
     linkPorts = LinkPortsSerializer(
@@ -128,7 +209,11 @@ class L3AddressDataSerializer(serializers.Serializer):
     iPAddressType = serializers.ChoiceField(
         help_text="iPAddressType", choices=[
             'IPv4', 'IPv6'], required=True)
-    iPAddress = serializers.CharField(help_text="iPAddress", required=True)
+    iPAddress = serializers.CharField(
+        help_text="iPAddress",
+        required=True,
+        max_length=255,
+        allow_null=True)
 
 
 class NetworkAddressSerializer(serializers.Serializer):
@@ -136,7 +221,10 @@ class NetworkAddressSerializer(serializers.Serializer):
         help_text="addressType", choices=[
             'MAC', 'IP'], required=True)
     l2AddressData = serializers.CharField(
-        help_text="l2AddressData", required=False)
+        help_text="l2AddressData",
+        required=False,
+        max_length=255,
+        allow_null=True)
     l3AddressData = L3AddressDataSerializer(
         help_text="addresses", required=False)
 
@@ -144,17 +232,27 @@ class NetworkAddressSerializer(serializers.Serializer):
 class ExtCpInfoSerializer(serializers.Serializer):
     cpInstanceId = serializers.CharField(
         help_text="cpInstanceId",
-        required=False,
+        required=False, max_length=255, allow_null=True)
+    cpdId = serializers.CharField(
+        help_text="cpdId",
+        required=True,
+        max_length=255,
         allow_null=True)
-    cpdId = serializers.IntegerField(help_text="cpdId", required=True)
-    numDynamicAddresses = serializers.IntegerField(
-        help_text="numDynamicAddresses", required=False, allow_null=True)
+    numDynamicAddresses = serializers.CharField(
+        help_text="numDynamicAddresses",
+        required=False,
+        max_length=255,
+        allow_null=True)
     addresses = NetworkAddressSerializer(
         help_text="addresses", many=True, allow_null=True)
 
 
 class ScaleInfoSerializer(serializers.Serializer):
-    aspectId = serializers.CharField(help_text="aspectId", required=True)
+    aspectId = serializers.CharField(
+        help_text="aspectId",
+        required=True,
+        max_length=255,
+        allow_null=True)
     scaleLevel = serializers.IntegerField(
         help_text="scaleLevel", required=True)
 
@@ -162,8 +260,7 @@ class ScaleInfoSerializer(serializers.Serializer):
 class instantiatedVnfInfoSerializer(serializers.Serializer):
     flavourId = serializers.CharField(
         help_text="flavour Id",
-        required=True,
-        allow_null=True)
+        required=True, max_length=255, allow_null=True)
     vnfState = serializers.ChoiceField(
         help_text="vnf State",
         choices=[
@@ -189,19 +286,26 @@ class instantiatedVnfInfoSerializer(serializers.Serializer):
 
 class VnfInfoSerializer(serializers.Serializer):
     vnfInstanceId = serializers.CharField(
-        help_text="vnf Instance Id", required=True)
+        help_text="vnf Instance Id",
+        required=True,
+        max_length=255,
+        allow_null=True)
     vnfInstanceName = serializers.CharField(
-        help_text="vnf Instance Name", required=True)
+        help_text="vnf Instance Name",
+        required=True,
+        max_length=255,
+        allow_null=True)
     onboardedVnfPkgInfoId = serializers.CharField(
-        help_text="onboarded Vnf Pkg Info Id", required=False, allow_null=True)
+        help_text="onboarded Vnf Pkg Info Id",
+        required=False,
+        max_length=255,
+        allow_null=True)
     vnfdVersion = serializers.CharField(
         help_text="vnfd Version",
-        required=False,
-        allow_null=True)
+        required=False, max_length=255, allow_null=True)
     vnfProvider = serializers.CharField(
         help_text="vnf Provider",
-        required=False,
-        allow_null=True)
+        required=False, max_length=255, allow_null=True)
     instantiatedVnfInfo = instantiatedVnfInfoSerializer(
         help_text="instantiatedVnfInfo", required=True)
 
@@ -213,18 +317,18 @@ class VnfsInfoSerializer(serializers.ListSerializer):
 class ExtVirtualLinkSerizlizer(serializers.Serializer):
     vlInstanceId = serializers.CharField(
         help_text="vlInstanceId",
-        required=False,
-        allow_null=True)
+        required=False, max_length=255, allow_null=True)
     resourceSubnetId = serializers.CharField(
-        help_text="resourceSubnetId", required=False, allow_null=True)
+        help_text="resourceSubnetId",
+        required=False,
+        max_length=255,
+        allow_null=True)
     cpdId = serializers.CharField(
         help_text="cpdId",
-        required=False,
-        allow_null=True)
+        required=False, max_length=255, allow_null=True)
     resourceId = serializers.CharField(
         help_text="resourceId",
-        required=False,
-        allow_null=True)
+        required=False, max_length=255, allow_null=True)
     vim = VimInfoSerializer(help_text="vim", required=False, allow_null=True)
     extCps = ExtCpInfoSerializer(
         help_text="extCps",
@@ -253,11 +357,21 @@ class AdditionalParamsSerializer(serializers.Serializer):
 
 
 class InstantiateVnfRequestSerializer(serializers.Serializer):
-    flavourId = serializers.CharField(help_text="flavourId", required=True)
+    flavourId = serializers.CharField(
+        help_text="flavourId",
+        required=True,
+        max_length=255,
+        allow_null=True)
     instantiationLevelId = serializers.CharField(
-        help_text="instantiationLevelId", required=True, allow_null=True)
+        help_text="instantiationLevelId",
+        required=True,
+        max_length=255,
+        allow_null=True)
     localizationLanguage = serializers.CharField(
-        help_text="localizationLanguage", required=True, allow_null=True)
+        help_text="localizationLanguage",
+        required=True,
+        max_length=255,
+        allow_null=True)
     extVirtualLinks = ExtVirtualLinksSerializer(
         help_text="extVirtualLinks", required=False, allow_null=True)
     additionalParams = AdditionalParamsSerializer(
@@ -265,11 +379,18 @@ class InstantiateVnfRequestSerializer(serializers.Serializer):
 
 
 class InstOrTeriVnfResponseSerializer(serializers.Serializer):
-    jobId = serializers.CharField(help_text="jobId", required=True)
+    jobId = serializers.CharField(
+        help_text="jobId",
+        required=True,
+        max_length=255,
+        allow_null=True)
 
 
 class TerminateVnfRequestSerializer(serializers.Serializer):
     terminationType = serializers.CharField(
-        help_text="terminationType", required=True)
+        help_text="terminationType",
+        required=True,
+        max_length=255,
+        allow_null=True)
     gracefulTerminationTimeout = serializers.IntegerField(
         help_text="gracefulTerminationTimeout", default=120, required=False)
