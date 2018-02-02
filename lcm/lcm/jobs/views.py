@@ -30,7 +30,6 @@ logger = logging.getLogger(__name__)
 
 class JobView(APIView):
     @swagger_auto_schema(
-        request_body=None,
         responses={
             status.HTTP_200_OK: JobQueryRespSerializer(),
             status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal error"
