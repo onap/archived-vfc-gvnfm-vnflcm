@@ -46,8 +46,7 @@ class CreateVnfAndQueryVnfs(APIView):
             resp_data = QueryVnf(request.data).query_multi_vnf()
 
             vnfs_info_serializer = VnfsInfoSerializer(data=resp_data)
-            resp_isvalid = vnfs_info_serializer.is_valid()
-            if not resp_isvalid:
+            if not vnfs_info_serializer.is_valid():
                 raise NFLCMException(vnfs_info_serializer.errors)
 
             return Response(data=vnfs_info_serializer.data, status=status.HTTP_200_OK)
@@ -68,17 +67,15 @@ class CreateVnfAndQueryVnfs(APIView):
     )
     def post(self, request):
         logger.debug("CreateVnfIdentifier--post::> %s" % request.data)
-        req_serializer = CreateVnfReqSerializer(data=request.data)
-        req_isvalid = req_serializer.is_valid()
         try:
-            if not req_isvalid:
+            req_serializer = CreateVnfReqSerializer(data=request.data)
+            if not req_serializer.is_valid():
                 raise NFLCMException(req_serializer.errors)
 
             nf_inst_id = CreateVnf(req_serializer.data).do_biz()
 
             create_vnf_resp_serializer = CreateVnfRespSerializer(data={"vnfInstanceId": nf_inst_id})
-            resp_isvalid = create_vnf_resp_serializer.is_valid()
-            if not resp_isvalid:
+            if not create_vnf_resp_serializer.is_valid():
                 raise NFLCMException(create_vnf_resp_serializer.errors)
             return Response(data=create_vnf_resp_serializer.data, status=status.HTTP_201_CREATED)
         except NFLCMException as e:
@@ -100,10 +97,9 @@ class InstantiateVnf(APIView):
     )
     def post(self, request, instanceid):
         logger.debug("InstantiateVnf--post::> %s" % request.data)
-        instantiate_vnf_request_serializer = InstantiateVnfRequestSerializer(data=request.data)
-        req_isvalid = instantiate_vnf_request_serializer.is_valid()
         try:
-            if not req_isvalid:
+            instantiate_vnf_request_serializer = InstantiateVnfRequestSerializer(data=request.data)
+            if not instantiate_vnf_request_serializer.is_valid():
                 raise NFLCMException(instantiate_vnf_request_serializer.errors)
 
             job_id = JobUtil.create_job('NF', 'INSTANTIATE', instanceid)
@@ -138,8 +134,7 @@ class DeleteVnfAndQueryVnf(APIView):
             resp_data = QueryVnf(request.data, instanceid).query_single_vnf()
 
             vnf_info_serializer = VnfInfoSerializer(data=resp_data)
-            resp_isvalid = vnf_info_serializer.is_valid()
-            if not resp_isvalid:
+            if not vnf_info_serializer.is_valid():
                 raise NFLCMException(vnf_info_serializer.errors)
 
             return Response(data=vnf_info_serializer.data, status=status.HTTP_200_OK)
