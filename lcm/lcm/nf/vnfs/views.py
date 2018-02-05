@@ -179,13 +179,16 @@ class TerminateVnf(APIView):
     def post(self, request, instanceid):
         logger.debug("TerminateVnf--post::> %s" % request.data)
         try:
+            terminate_vnf_request_serializer = TerminateVnfRequestSerializer(data=request.data)
+            if not terminate_vnf_request_serializer.is_valid():
+                raise NFLCMException(terminate_vnf_request_serializer.errors)
+
             job_id = JobUtil.create_job('NF', 'TERMINATE', instanceid)
             JobUtil.add_job_status(job_id, 0, "TERM_VNF_READY")
-            TermVnf(request.data, instanceid, job_id).start()
+            TermVnf(terminate_vnf_request_serializer.data, instanceid, job_id).start()
 
             terminate_vnf_response_serializer = InstOrTeriVnfResponseSerializer(data={"jobId": job_id})
-            resp_isvalid = terminate_vnf_response_serializer.is_valid()
-            if not resp_isvalid:
+            if not terminate_vnf_response_serializer.is_valid():
                 raise NFLCMException(terminate_vnf_response_serializer.errors)
 
             return Response(data=terminate_vnf_response_serializer.data, status=status.HTTP_202_ACCEPTED)

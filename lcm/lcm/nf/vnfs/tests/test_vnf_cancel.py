@@ -119,8 +119,12 @@ class TestNFTerminate(TestCase):
 
     @mock.patch.object(TermVnf, 'run')
     def test_terminate_vnf(self, mock_run):
+        req_data = {
+            "terminationType": "GRACEFUL",
+            "gracefulTerminationTimeout": 120
+        }
         mock_run.re.return_value = None
-        response = self.client.post("/api/vnflcm/v1/vnf_instances/12/terminate", data={}, format='json')
+        response = self.client.post("/api/vnflcm/v1/vnf_instances/12/terminate", data=req_data, format='json')
         self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
 
     def test_terminate_vnf_when_inst_id_not_exist(self):
