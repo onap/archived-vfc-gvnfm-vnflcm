@@ -17,17 +17,17 @@ from rest_framework import serializers
 
 class CreateVnfReqSerializer(serializers.Serializer):
     vnfdId = serializers.CharField(
-        help_text="vnfd Id",
+        help_text="vnfdId",
         max_length=255,
         required=True,
         allow_null=True)
     vnfInstanceName = serializers.CharField(
-        help_text="vnf Instance Name",
+        help_text="vnfInstanceName",
         max_length=255,
         required=True,
         allow_null=False)
     vnfInstanceDescription = serializers.CharField(
-        help_text="vnf Instance Description",
+        help_text="vnfInstanceDescription",
         max_length=255,
         required=False,
         allow_null=True)
@@ -35,7 +35,7 @@ class CreateVnfReqSerializer(serializers.Serializer):
 
 class CreateVnfRespSerializer(serializers.Serializer):
     vnfInstanceId = serializers.CharField(
-        help_text="vnf Instance Id",
+        help_text="vnfInstanceId",
         required=True,
         max_length=255,
         allow_null=True)
@@ -259,10 +259,10 @@ class ScaleInfoSerializer(serializers.Serializer):
 
 class instantiatedVnfInfoSerializer(serializers.Serializer):
     flavourId = serializers.CharField(
-        help_text="flavour Id",
+        help_text="flavourId",
         required=True, max_length=255, allow_null=True)
     vnfState = serializers.ChoiceField(
-        help_text="vnf State",
+        help_text="vnfState",
         choices=[
             'STARTED',
             'STOPPED'],
@@ -286,25 +286,25 @@ class instantiatedVnfInfoSerializer(serializers.Serializer):
 
 class VnfInfoSerializer(serializers.Serializer):
     vnfInstanceId = serializers.CharField(
-        help_text="vnf Instance Id",
+        help_text="vnfInstanceId",
         required=True,
         max_length=255,
         allow_null=True)
     vnfInstanceName = serializers.CharField(
-        help_text="vnf Instance Name",
+        help_text="vnfInstanceName",
         required=True,
         max_length=255,
         allow_null=True)
     onboardedVnfPkgInfoId = serializers.CharField(
-        help_text="onboarded Vnf Pkg Info Id",
+        help_text="onboardedVnfPkgInfoId",
         required=False,
         max_length=255,
         allow_null=True)
     vnfdVersion = serializers.CharField(
-        help_text="vnfd Version",
+        help_text="vnfdVersion",
         required=False, max_length=255, allow_null=True)
     vnfProvider = serializers.CharField(
-        help_text="vnf Provider",
+        help_text="vnfProvider",
         required=False, max_length=255, allow_null=True)
     instantiatedVnfInfo = instantiatedVnfInfoSerializer(
         help_text="instantiatedVnfInfo", required=True)
