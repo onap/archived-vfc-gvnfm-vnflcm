@@ -18,10 +18,7 @@ from lcm.nf.vnfs.views import InstantiateVnf, TerminateVnf, DeleteVnfAndQueryVnf
 
 urlpatterns = [
     url(r'^api/vnflcm/v1/vnf_instances$', CreateVnfAndQueryVnfs.as_view()),
-    url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)/instantiate$',
-        InstantiateVnf.as_view()),
-    url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)$',
-        DeleteVnfAndQueryVnf.as_view()),
-    url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)/terminate$',
-        TerminateVnf.as_view()),
+    url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)/instantiate$', InstantiateVnf.as_view()),
+    url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)$', DeleteVnfAndQueryVnf.as_view()),
+    url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)/terminate$', TerminateVnf.as_view()),
 ]
