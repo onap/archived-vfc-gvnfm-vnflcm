@@ -337,13 +337,6 @@ class ExtVirtualLinkSerizlizer(serializers.Serializer):
         allow_null=True)
 
 
-class ExtVirtualLinksSerializer(serializers.ListSerializer):
-    child = ExtVirtualLinkSerizlizer(
-        help_text="extVirtualLink",
-        required=False,
-        allow_null=True)
-
-
 class AdditionalParamsSerializer(serializers.Serializer):
     inputs = serializers.DictField(
         help_text="inputs",
@@ -352,8 +345,11 @@ class AdditionalParamsSerializer(serializers.Serializer):
             allow_blank=True),
         required=False,
         allow_null=True)
-    extVirtualLinks = ExtVirtualLinksSerializer(
-        help_text="extVirtualLinks", required=False, allow_null=True)
+    extVirtualLinks = serializers.ListSerializer(
+        help_text="extVirtualLinks",
+        child=ExtVirtualLinkSerizlizer(help_text="extVirtualLinks", required=False, allow_null=True),
+        required=False,
+        allow_null=True)
 
 
 class InstantiateVnfRequestSerializer(serializers.Serializer):
@@ -372,8 +368,11 @@ class InstantiateVnfRequestSerializer(serializers.Serializer):
         required=True,
         max_length=255,
         allow_null=True)
-    extVirtualLinks = ExtVirtualLinksSerializer(
-        help_text="extVirtualLinks", required=False, allow_null=True)
+    extVirtualLinks = serializers.ListSerializer(
+        help_text="extVirtualLinks",
+        child=ExtVirtualLinkSerizlizer(help_text="extVirtualLinks", required=False, allow_null=True),
+        required=False,
+        allow_null=True)
     additionalParams = AdditionalParamsSerializer(
         help_text="additionalParams", required=False, allow_null=True)
 
