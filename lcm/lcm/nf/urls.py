@@ -14,7 +14,7 @@
 
 from django.conf.urls import url
 
-from lcm.nf.vnfs.views import InstantiateVnf, TerminateVnf, DeleteVnfAndQueryVnf, CreateVnfAndQueryVnfs
+from lcm.nf.views import InstantiateVnf, TerminateVnf, DeleteVnfAndQueryVnf, CreateVnfAndQueryVnfs
 
 urlpatterns = [
     url(r'^api/vnflcm/v1/vnf_instances$', CreateVnfAndQueryVnfs.as_view()),

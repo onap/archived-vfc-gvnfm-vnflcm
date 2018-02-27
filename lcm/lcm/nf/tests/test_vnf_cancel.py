@@ -20,7 +20,7 @@ import mock
 from django.test import TestCase, Client
 from rest_framework import status
 
-from lcm.nf.vnfs.vnf_cancel.term_vnf import TermVnf
+from lcm.nf.vnf_cancel.term_vnf import TermVnf
 from lcm.pub.database.models import NfInstModel, JobStatusModel, VmInstModel, NetworkInstModel, SubNetworkInstModel, \
     PortInstModel, FlavourInstModel, StorageInstModel, NfvoRegInfoModel
 from lcm.pub.utils import restcall

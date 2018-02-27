@@ -17,7 +17,7 @@ import logging
 import traceback
 from threading import Thread
 
-from lcm.nf.vnfs.const import VNF_STATUS
+from lcm.nf.const import VNF_STATUS
 from lcm.pub.database.models import NfInstModel, VmInstModel, NetworkInstModel, StorageInstModel, \
     FlavourInstModel, PortInstModel, SubNetworkInstModel, VNFCInstModel, NfvoRegInfoModel
 from lcm.pub.exceptions import NFLCMException

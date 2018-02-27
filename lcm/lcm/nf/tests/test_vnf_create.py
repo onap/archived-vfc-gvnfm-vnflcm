@@ -20,10 +20,10 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from lcm.nf.vnfs.const import c1_data_get_tenant_id, c4_data_create_network, c2_data_create_volume, \
+from lcm.nf.const import c1_data_get_tenant_id, c4_data_create_network, c2_data_create_volume, \
     c5_data_create_subnet, c3_data_get_volume, c6_data_create_port, c7_data_create_flavor, c8_data_list_image, \
     c9_data_create_vm, c10_data_get_vm, inst_req_data, vnfpackage_info
-from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
+from lcm.nf.vnf_create.inst_vnf import InstVnf
 from lcm.pub.database.models import NfInstModel, JobStatusModel
 from lcm.pub.utils import restcall
 from lcm.pub.utils.jobutil import JobUtil

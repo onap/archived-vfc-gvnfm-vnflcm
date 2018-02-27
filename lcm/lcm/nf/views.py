@@ -20,13 +20,13 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from lcm.nf.vnfs.serializers import CreateVnfReqSerializer, CreateVnfRespSerializer, VnfsInfoSerializer, \
+from lcm.nf.serializers import CreateVnfReqSerializer, CreateVnfRespSerializer, VnfsInfoSerializer, \
     InstOrTeriVnfResponseSerializer, InstantiateVnfRequestSerializer, VnfInfoSerializer, TerminateVnfRequestSerializer
-from lcm.nf.vnfs.vnf_cancel.delete_vnf_identifier import DeleteVnf
-from lcm.nf.vnfs.vnf_cancel.term_vnf import TermVnf
-from lcm.nf.vnfs.vnf_create.create_vnf_identifier import CreateVnf
-from lcm.nf.vnfs.vnf_create.inst_vnf import InstVnf
-from lcm.nf.vnfs.vnf_query.query_vnf import QueryVnf
+from lcm.nf.vnf_cancel.delete_vnf_identifier import DeleteVnf
+from lcm.nf.vnf_cancel.term_vnf import TermVnf
+from lcm.nf.vnf_create.create_vnf_identifier import CreateVnf
+from lcm.nf.vnf_create.inst_vnf import InstVnf
+from lcm.nf.vnf_query.query_vnf import QueryVnf
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.utils.jobutil import JobUtil
 
