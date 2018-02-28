@@ -1,4 +1,4 @@
-# Copyright 2017 ZTE Corporation.
+# Copyright 2018 ZTE Corporation.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -80,4 +80,5 @@ class TestNFInstantiate(TestCase):
         response = self.client.post("/api/vnflcm/v2/vnf_instances", data=data, format='json')
         self.failUnlessEqual(status.HTTP_201_CREATED, response.status_code)
         context = json.loads(response.content)
+        self.assertEqual(context['vnfInstanceName'], "vFW_01")
         self.assertTrue(NfInstModel.objects.filter(nfinstid=context['id']).exists())
