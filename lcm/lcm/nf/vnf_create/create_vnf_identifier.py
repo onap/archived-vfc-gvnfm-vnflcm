@@ -73,7 +73,7 @@ class CreateVnf:
             'vnfSoftwareVersion': vnf_inst.vnfSoftwareVersion,
             'vnfdVersion': vnf_inst.version,
             'vnfPkgId': vnf_inst.package_id,
-            'vnfConfigurableProperties': []
+            'vnfConfigurableProperties': {}
         }
         return resp
 
