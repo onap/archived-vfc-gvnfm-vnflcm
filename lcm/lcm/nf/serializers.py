@@ -17,17 +17,17 @@ from rest_framework import serializers
 
 class CreateVnfReqSerializer(serializers.Serializer):
     vnfdId = serializers.CharField(
-        help_text="vnfdId",
+        help_text="Identifier that identifies the VNFD which defines the VNF instance to be created.",
         max_length=255,
         required=True,
         allow_null=True)
     vnfInstanceName = serializers.CharField(
-        help_text="vnfInstanceName",
+        help_text="Human-readable name of the VNF instance to be created.",
         max_length=255,
         required=True,
         allow_null=False)
     vnfInstanceDescription = serializers.CharField(
-        help_text="vnfInstanceDescription",
+        help_text="Human-readable description of the VNF instance to be created.",
         max_length=255,
         required=False,
         allow_null=True)
@@ -35,7 +35,7 @@ class CreateVnfReqSerializer(serializers.Serializer):
 
 class CreateVnfRespSerializer(serializers.Serializer):
     vnfInstanceId = serializers.CharField(
-        help_text="vnfInstanceId",
+        help_text="Identifier of the VNF instance",
         required=True,
         max_length=255,
         allow_null=True)
