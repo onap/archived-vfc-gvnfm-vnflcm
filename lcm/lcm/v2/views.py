@@ -20,7 +20,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from lcm.nf.serializers import CreateVnfReqSerializer, CreateVnfRespSerializer
+from lcm.nf.serializers import CreateVnfReqSerializer
 from lcm.nf.vnf_create.create_vnf_identifier import CreateVnf
 from lcm.pub.exceptions import NFLCMException
 from lcm.v2.serializers import VnfInstanceSerializer
@@ -43,12 +43,12 @@ class CreateVnfAndQueryVnfs(APIView):
             if not req_serializer.is_valid():
                 raise NFLCMException(req_serializer.errors)
 
-            nf_inst_id = CreateVnf(req_serializer.data).do_biz()
+            resp = CreateVnf(req_serializer.data).do_biz()
 
-            create_vnf_resp_serializer = CreateVnfRespSerializer(data={"vnfInstanceId": nf_inst_id})
-            if not create_vnf_resp_serializer.is_valid():
-                raise NFLCMException(create_vnf_resp_serializer.errors)
-            return Response(data=create_vnf_resp_serializer.data, status=status.HTTP_201_CREATED)
+            vnfInstanceSerializer = VnfInstanceSerializer(data=resp)
+            if not vnfInstanceSerializer.is_valid():
+                raise NFLCMException(vnfInstanceSerializer.errors)
+            return Response(data=vnfInstanceSerializer.data, status=status.HTTP_201_CREATED)
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -63,7 +63,19 @@ class CreateVnf:
                      'description is [%s],create_time is [%s]' %
                      (vnf_inst.nfinstid, vnf_inst.nf_name, vnf_inst.vnfdid,
                       vnf_inst.vnfd_model, vnf_inst.nf_desc, vnf_inst.create_time))
-        return self.nf_inst_id
+        resp = {
+            'id': vnf_inst.nfinstid,
+            'vnfInstanceName': vnf_inst.nf_name,
+            'vnfInstanceDescription': 'Human-readable description of the VNF instance.',
+            'vnfdId': vnf_inst.vnfdid,
+            'vnfProvider': vnf_inst.vendor,
+            'vnfProductName': vnf_inst.nf_name,
+            'vnfSoftwareVersion': vnf_inst.vnfSoftwareVersion,
+            'vnfdVersion': vnf_inst.version,
+            'vnfPkgId': vnf_inst.package_id,
+            'vnfConfigurableProperties': []
+        }
+        return resp
 
     def check_valid(self):
         logger.debug("CreateVnf--check_valid::> %s" % self.data)
