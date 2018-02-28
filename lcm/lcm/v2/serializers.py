@@ -47,6 +47,34 @@ class VimInfoSerializer(serializers.Serializer):
         allow_null=True)
 
 
+class ScaleInfoSerializer(serializers.Serializer):
+    aspectId = serializers.CharField(
+        help_text="Identifier of the scaling aspect.",
+        required=True,
+        max_length=255,
+        allow_null=True)
+    scaleLevel = serializers.IntegerField(
+        help_text="Indicates the scale level.",
+        required=True)
+
+
+class instantiatedVnfInfoSerializer(serializers.Serializer):
+    flavourId = serializers.CharField(
+        help_text="Identifier of the VNF deployment flavour applied to this VNF instance.",
+        required=True,
+        max_length=255,
+        allow_null=True)
+    vnfState = serializers.ChoiceField(
+        help_text="State of the VNF instance.",
+        choices=["STARTED", "STOPPED"],
+        required=True,
+        allow_null=True)
+    scaleStatus = ScaleInfoSerializer(
+        help_text="Scale status of the VNF, one entry per aspect.",
+        required=False,
+        many=True)
+
+
 class VnfInstanceSerializer(serializers.Serializer):
     id = serializers.CharField(
         help_text="Identifier of the VNF instance",
@@ -97,7 +125,7 @@ class VnfInstanceSerializer(serializers.Serializer):
         required=False,
         allow_null=True)
     vimConnectionInfo = VimInfoSerializer(
-        help_text="vim",
+        help_text="Information about VIM connections to be used for managing the resources for the VNF instance.",
         required=False,
         allow_null=True)
     instantiationState = serializers.ChoiceField(
@@ -105,3 +133,6 @@ class VnfInstanceSerializer(serializers.Serializer):
         choices=["NOT_INSTANTIATED", "INSTANTIATED"],
         required=False,
         allow_null=True)
+    instantiatedVnfInfo = instantiatedVnfInfoSerializer(
+        help_text="Information specific to an instantiated VNF instance.",
+        required=False)
