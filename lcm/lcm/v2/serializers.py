@@ -14,6 +14,40 @@
 from rest_framework import serializers
 
 
+class AccessInfoSerializer(serializers.Serializer):
+    pass
+
+
+class InterfaceInfoSerializer(serializers.Serializer):
+    pass
+
+
+class VimInfoSerializer(serializers.Serializer):
+    id = serializers.CharField(
+        help_text="The identifier of the VIM Connection. This identifier is managed by the NFVO.",
+        required=False,
+        max_length=255,
+        allow_null=True)
+    vimId = serializers.CharField(
+        help_text="The identifier of the VIM instance. This identifier is managed by the NFVO.",
+        required=False,
+        max_length=255,
+        allow_null=True)
+    vimType = serializers.CharField(
+        help_text="Discriminator for the different types of the VIM information.",
+        required=False,
+        max_length=255,
+        allow_null=True)
+    interfaceInfo = InterfaceInfoSerializer(
+        help_text="vimInfoId",
+        required=False,
+        allow_null=True)
+    accessInfo = AccessInfoSerializer(
+        help_text="accessInfo",
+        required=False,
+        allow_null=True)
+
+
 class VnfInstanceSerializer(serializers.Serializer):
     id = serializers.CharField(
         help_text="Identifier of the VNF instance",
@@ -61,5 +95,9 @@ class VnfInstanceSerializer(serializers.Serializer):
     vnfConfigurableProperties = serializers.DictField(
         help_text="Current values of the configurable properties of the VNF instance.",
         child=serializers.CharField(help_text="Vnf Configurable Properties", allow_blank=True),
+        required=False,
+        allow_null=True)
+    vimConnectionInfo = VimInfoSerializer(
+        help_text="vim",
         required=False,
         allow_null=True)
