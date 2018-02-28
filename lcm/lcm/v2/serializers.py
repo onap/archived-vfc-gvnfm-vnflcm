@@ -58,6 +58,41 @@ class ScaleInfoSerializer(serializers.Serializer):
         required=True)
 
 
+class CpProtocolInfoSerializer(serializers.Serializer):
+    layerProtocol = serializers.ChoiceField(
+        help_text="The identifier of layer(s) and protocol(s) associated to the network address information.",
+        choices=["IP_OVER_ETHERNET"],
+        required=False,
+        allow_null=True)
+    ipOverEthernet = serializers.DictField(
+        help_text="IP addresses over Ethernet to assign to the extCP instance.",
+        child=serializers.CharField(allow_blank=True),
+        required=False,
+        allow_null=True)
+
+
+class ExtCpInfoSerializer(serializers.Serializer):
+    id = serializers.CharField(
+        help_text="Identifier of the external CP instance and the related information instance.",
+        required=False,
+        max_length=255,
+        allow_null=True)
+    cpdId = serializers.CharField(
+        help_text="Identifier of the external CPD, VnfExtCpd, in the VNFD.",
+        required=True,
+        max_length=255,
+        allow_null=True)
+    cpProtocolInfo = CpProtocolInfoSerializer(
+        help_text="Network protocol information for this CP.",
+        required=False,
+        allow_null=True)
+    extLinkPortId = serializers.CharField(
+        help_text="Identifier of the 'extLinkPortInfo' structure inside the 'extVirtualLinkInfo' structure.",
+        required=False,
+        max_length=255,
+        allow_null=True)
+
+
 class instantiatedVnfInfoSerializer(serializers.Serializer):
     flavourId = serializers.CharField(
         help_text="Identifier of the VNF deployment flavour applied to this VNF instance.",
@@ -71,6 +106,10 @@ class instantiatedVnfInfoSerializer(serializers.Serializer):
         allow_null=True)
     scaleStatus = ScaleInfoSerializer(
         help_text="Scale status of the VNF, one entry per aspect.",
+        required=False,
+        many=True)
+    extCpInfo = ExtCpInfoSerializer(
+        help_text="Information about the external CPs exposed by the VNF instance.",
         required=False,
         many=True)
 
