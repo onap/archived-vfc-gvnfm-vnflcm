@@ -14,14 +14,6 @@
 from rest_framework import serializers
 
 
-class AccessInfoSerializer(serializers.Serializer):
-    pass
-
-
-class InterfaceInfoSerializer(serializers.Serializer):
-    pass
-
-
 class VimInfoSerializer(serializers.Serializer):
     id = serializers.CharField(
         help_text="The identifier of the VIM Connection. This identifier is managed by the NFVO.",
@@ -38,12 +30,19 @@ class VimInfoSerializer(serializers.Serializer):
         required=False,
         max_length=255,
         allow_null=True)
-    interfaceInfo = InterfaceInfoSerializer(
-        help_text="vimInfoId",
+    interfaceInfo = serializers.DictField(
+        help_text="Information about the interface or interfaces to the VIM",
+        child=serializers.CharField(allow_blank=True),
         required=False,
         allow_null=True)
-    accessInfo = AccessInfoSerializer(
-        help_text="accessInfo",
+    accessInfo = serializers.DictField(
+        help_text="Authentication credentials for accessing the VIM, and other access-related information",
+        child=serializers.CharField(allow_blank=True),
+        required=False,
+        allow_null=True)
+    extra = serializers.DictField(
+        help_text="VIM type specific additional information.",
+        child=serializers.CharField(allow_blank=True),
         required=False,
         allow_null=True)
 
@@ -94,10 +93,15 @@ class VnfInstanceSerializer(serializers.Serializer):
         allow_blank=True)
     vnfConfigurableProperties = serializers.DictField(
         help_text="Current values of the configurable properties of the VNF instance.",
-        child=serializers.CharField(help_text="Vnf Configurable Properties", allow_blank=True),
+        child=serializers.CharField(allow_blank=True),
         required=False,
         allow_null=True)
     vimConnectionInfo = VimInfoSerializer(
         help_text="vim",
+        required=False,
+        allow_null=True)
+    instantiationState = serializers.ChoiceField(
+        help_text="The instantiation state of the VNF.",
+        choices=["NOT_INSTANTIATED", "INSTANTIATED"],
         required=False,
         allow_null=True)

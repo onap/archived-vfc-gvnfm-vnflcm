@@ -139,7 +139,7 @@ class InterfaceInfoSerializer(serializers.Serializer):
         allow_null=True)
     protocolType = serializers.ChoiceField(
         help_text="protocolType",
-        choices=['http', 'https'],
+        choices=["http", "https"],
         required=True)
 
 
@@ -218,7 +218,7 @@ class ExtVirtualLinkInfoSerializer(serializers.Serializer):
 class L3AddressDataSerializer(serializers.Serializer):
     iPAddressType = serializers.ChoiceField(
         help_text="iPAddressType",
-        choices=['IPv4', 'IPv6'],
+        choices=["IPv4", "IPv6"],
         required=True)
     iPAddress = serializers.CharField(
         help_text="iPAddress",
@@ -230,7 +230,7 @@ class L3AddressDataSerializer(serializers.Serializer):
 class NetworkAddressSerializer(serializers.Serializer):
     addressType = serializers.ChoiceField(
         help_text="addressType",
-        choices=['MAC', 'IP'],
+        choices=["MAC", "IP"],
         required=True)
     l2AddressData = serializers.CharField(
         help_text="l2AddressData",
@@ -283,7 +283,7 @@ class instantiatedVnfInfoSerializer(serializers.Serializer):
         allow_null=True)
     vnfState = serializers.ChoiceField(
         help_text="vnfState",
-        choices=['STARTED', 'STOPPED'],
+        choices=["STARTED", "STOPPED"],
         required=True,
         allow_null=True)
     scaleStatus = ScaleInfoSerializer(
