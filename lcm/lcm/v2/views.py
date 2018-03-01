@@ -24,11 +24,41 @@ from lcm.nf.serializers import CreateVnfReqSerializer
 from lcm.nf.vnf_create.create_vnf_identifier import CreateVnf
 from lcm.pub.exceptions import NFLCMException
 from lcm.v2.serializers import VnfInstanceSerializer
+from lcm.v2.vnf_query.query_vnf import QueryVnf
 
 logger = logging.getLogger(__name__)
 
 
 class CreateVnfAndQueryVnfs(APIView):
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: VnfInstanceSerializer(),
+            status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal error"
+        }
+    )
+    def get(self, request):
+        logger.debug("QueryMultiVnf--get::> %s" % request.data)
+        try:
+            resp_data = QueryVnf(request.data).query_multi_vnf()
+
+            # vnfs_info_serializer = VnfsInfoSerializer(data=resp_data)
+            # if not vnfs_info_serializer.is_valid():
+            #     raise NFLCMException(vnfs_info_serializer.errors)
+            #
+            # return Response(data=vnfs_info_serializer.data, status=status.HTTP_200_OK)
+
+            vnfInstanceSerializer = VnfInstanceSerializer(data=resp_data)
+            if not vnfInstanceSerializer.is_valid():
+                raise NFLCMException(vnfInstanceSerializer.errors)
+            return Response(data=vnfInstanceSerializer.data, status=status.HTTP_200_OK)
+        except NFLCMException as e:
+            logger.error(e.message)
+            return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            logger.error(e.message)
+            logger.error(traceback.format_exc())
+            return Response(data={'error': 'Failed to get Vnfs'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     @swagger_auto_schema(
         request_body=CreateVnfReqSerializer(),
         responses={
