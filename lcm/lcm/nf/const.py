@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
 
 from lcm.pub.utils.jobutil import enum
 
@@ -21,6 +22,7 @@ VNF_STATUS = enum(NULL='null', INSTANTIATING="instantiating", INACTIVE='inactive
 inst_req_data = {
     "flavourId": "flavour_1",
     "instantiationLevelId": "instantiationLevel_1",
+    "vnfmId": "vnfm_1",
     "extVirtualLinks": [
         {
             "vlInstanceId": "1",
@@ -72,6 +74,7 @@ inst_req_data = {
     ],
     "localizationLanguage": "en_US",
     "additionalParams": {
+        "vimId": "vim_1",
         "inputs": {
             "key1": "test1",
             "key2": "test2"
@@ -568,7 +571,7 @@ c10_data_get_vm = {
     "status": "ACTIVE"
 }
 
-vnfpackage_info = {
+vnfdModel = {
     "volume_storages": [],
     "inputs": {
         "pe1_id": {
@@ -651,6 +654,21 @@ vnfpackage_info = {
         "version": "1.0",
         "type": "SSAR",
         "id": "ns_underlayervpn_1_0"
+    }
+}
+
+vnfpackage_info = {
+    "imageInfo": [],
+    "csarId": "vOpenNAT",
+    "packageInfo": {
+        "csarName": "vOpenNAT.csar",
+        "vnfdModel": json.dumps(vnfdModel),
+        "vnfdProvider": "Intel",
+        "vnfdId": "openNAT_1.0",
+        "downloadUrl": "http://10.96.33.39:8806/static/catalog/vOpenNAT/vOpenNAT.csar",
+        "vnfVersion": "v1.0",
+        "vnfdVersion": "v1.0",
+        "vnfPackageId": "vOpenNAT"
     }
 }
 
