@@ -283,7 +283,7 @@ class instantiatedVnfInfoSerializer(serializers.Serializer):
         allow_null=True)
     vnfState = serializers.ChoiceField(
         help_text="vnfState",
-        choices=["STARTED", "STOPPED"],
+        choices=["STARTED", "STOPPED", "NOT_INSTANTIATED", "INSTANTIATED"],
         required=True,
         allow_null=True)
     scaleStatus = ScaleInfoSerializer(
@@ -334,12 +334,14 @@ class VnfInfoSerializer(serializers.Serializer):
         help_text="vnfdVersion",
         required=False,
         max_length=255,
-        allow_null=True)
+        allow_null=True,
+        allow_blank=True)
     vnfProvider = serializers.CharField(
         help_text="vnfProvider",
         required=False,
         max_length=255,
-        allow_null=True)
+        allow_null=True,
+        allow_blank=True)
     instantiatedVnfInfo = instantiatedVnfInfoSerializer(
         help_text="instantiatedVnfInfo",
         required=True)
@@ -382,6 +384,11 @@ class ExtVirtualLinkSerizlizer(serializers.Serializer):
 
 
 class AdditionalParamsSerializer(serializers.Serializer):
+    vimId = serializers.CharField(
+        help_text="vimId",
+        required=False,
+        max_length=255,
+        allow_null=True)
     inputs = serializers.DictField(
         help_text="inputs",
         child=serializers.CharField(help_text="custom key-value", allow_blank=True),
@@ -408,6 +415,11 @@ class InstantiateVnfRequestSerializer(serializers.Serializer):
     localizationLanguage = serializers.CharField(
         help_text="localizationLanguage",
         required=True,
+        max_length=255,
+        allow_null=True)
+    vnfmId = serializers.CharField(
+        help_text="vnfmId",
+        required=False,
         max_length=255,
         allow_null=True)
     extVirtualLinks = serializers.ListSerializer(
