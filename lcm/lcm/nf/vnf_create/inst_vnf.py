@@ -170,7 +170,9 @@ class InstVnf(Thread):
 
     def create_res(self):
         logger.info("[NF instantiation] create resource start")
-        adaptor.create_vim_res(self.vnfd_info, self.do_notify)
+        self.vnfdModel = json.loads(ignore_case_get(ignore_case_get(self.vnfd_info, "packageInfo"), "vnfdModel"))
+        logger.debug("self.vnfdModel = %s", self.vnfdModel)
+        adaptor.create_vim_res(self.vnfdModel, self.do_notify)
 
         JobUtil.add_job_status(self.job_id, 70, '[NF instantiation] create resource finish')
         logger.info("[NF instantiation] create resource finish")
