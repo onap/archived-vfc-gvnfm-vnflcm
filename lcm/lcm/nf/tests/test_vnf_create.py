@@ -35,12 +35,8 @@ class TestNFInstantiate(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.grant_result = {
-            "vim": {
-                "vimid": 'vimid_1',
-                "accessinfo": {
-                    "tenant": 'tenantname_1'
-                }
-            }
+            "vimid": 'vimid_1',
+            "tenant": 'tenantname_1'
         }
 
     def tearDown(self):

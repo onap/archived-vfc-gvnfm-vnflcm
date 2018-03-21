@@ -101,10 +101,12 @@ class InstVnf(Thread):
                    lastuptime=now_time())
 
         logger.info("self.vim_id = %s" % self.vim_id)
-        NfvoRegInfoModel.objects.create(
-            nfvoid=self.nf_inst_id,
-            vnfminstid=ignore_case_get(self.data, "vnfmId"),
-            apiurl=self.vim_id)
+        is_exist = NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id).exists()
+        if not is_exist:
+            NfvoRegInfoModel.objects.create(
+                nfvoid=self.nf_inst_id,
+                vnfminstid=ignore_case_get(self.data, "vnfmId"),
+                apiurl=self.vim_id)
         JobUtil.add_job_status(self.job_id, 15, 'Nf instancing pre-check finish')
         logger.info("Nf instancing pre-check finish")
 
@@ -243,7 +245,7 @@ class InstVnf(Thread):
 
     def vnf_inst_failed_handle(self, error_msg):
         logger.error('VNF instantiation failed, detail message: %s' % error_msg)
-        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='failed', lastuptime=now_time())
+        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='FAILED', lastuptime=now_time())
         JobUtil.add_job_status(self.job_id, 255, error_msg)
 
     def do_notify(self, res_type, ret):

@@ -283,7 +283,7 @@ class instantiatedVnfInfoSerializer(serializers.Serializer):
         allow_null=True)
     vnfState = serializers.ChoiceField(
         help_text="vnfState",
-        choices=["STARTED", "STOPPED", "NOT_INSTANTIATED", "INSTANTIATED"],
+        choices=["STARTED", "STOPPED", "NOT_INSTANTIATED", "INSTANTIATED", "FAILED"],
         required=True,
         allow_null=True)
     scaleStatus = ScaleInfoSerializer(
