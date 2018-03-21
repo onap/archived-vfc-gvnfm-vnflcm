@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import json
 import logging
 import traceback
 import uuid
@@ -83,10 +83,11 @@ class CreateVnf:
         logger.debug("check_valid::is_exist=%s" % is_exist)
         if is_exist:
             raise NFLCMException('VNF is already exist.')
-        self.vnfdModel = query_vnfpackage_by_id(self.csar_id)
+        vnf_package_info = query_vnfpackage_by_id(self.csar_id)
+        self.vnfd_info = json.loads(ignore_case_get(ignore_case_get(vnf_package_info, "packageInfo"), "vnfdModel"))
 
     def save_db(self):
-        metadata = ignore_case_get(self.vnfdModel, "metadata")
+        metadata = ignore_case_get(self.vnfd_info, "metadata")
         version = ignore_case_get(metadata, "vnfdVersion")
         vendor = ignore_case_get(metadata, "vendor")
         netype = ignore_case_get(metadata, "type")
@@ -97,7 +98,7 @@ class CreateVnf:
                                    version=version,
                                    vendor=vendor,
                                    netype=netype,
-                                   vnfd_model=self.vnfdModel,
+                                   vnfd_model=self.vnfd_info,
                                    status='NOT_INSTANTIATED',
                                    nf_desc=self.description,
                                    vnfdid=self.vnfd_id,

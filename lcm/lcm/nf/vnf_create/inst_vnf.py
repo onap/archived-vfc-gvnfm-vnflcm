@@ -76,7 +76,8 @@ class InstVnf(Thread):
                 inputs = json.loads(inputs)
             for key, val in inputs.items():
                 input_parameters.append({"key": key, "value": val})
-        self.vnfd_info = query_vnfpackage_by_id(self.vnfd_id)
+        vnf_package_info = query_vnfpackage_by_id(self.vnfd_id)
+        self.vnfd_info = json.loads(ignore_case_get(ignore_case_get(vnf_package_info, "packageInfo"), "vnfdModel"))
         # self.vnfd_info = vnfd_model_dict  # just for test
 
         self.update_cps()
@@ -172,10 +173,8 @@ class InstVnf(Thread):
 
     def create_res(self):
         logger.info("[NF instantiation] create resource start")
-        self.vnfdModel = json.loads(ignore_case_get(ignore_case_get(self.vnfd_info, "packageInfo"), "vnfdModel"))
-        logger.debug("self.vnfdModel = %s", self.vnfdModel)
-        adaptor.create_vim_res(self.vnfdModel, self.do_notify)
-
+        logger.debug("self.vnfdModel = %s", self.vnfd_info)
+        adaptor.create_vim_res(self.vnfd_info, self.do_notify)
         JobUtil.add_job_status(self.job_id, 70, '[NF instantiation] create resource finish')
         logger.info("[NF instantiation] create resource finish")
 
