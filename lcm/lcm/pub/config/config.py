@@ -28,6 +28,11 @@ DB_NAME = "gvnfm"
 DB_USER = "gvnfm"
 DB_PASSWD = "gvnfm"
 
+# [MDC]
+SERVICE_NAME = "vnflcm"
+FORWARDED_FOR_FIELDS = ["HTTP_X_FORWARDED_FOR", "HTTP_X_FORWARDED_HOST",
+                        "HTTP_X_FORWARDED_SERVER"]
+
 # [register]
 REG_TO_MSB_WHEN_START = True
 REG_TO_MSB_REG_URL = "/api/microservices/v1/services"
