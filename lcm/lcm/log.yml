@@ -24,7 +24,7 @@ handlers:
         level: "DEBUG"
         class:
             "logging.handlers.RotatingFileHandler"
-        filename: "/var/log/onap/vfc-gvnfm-vnflcm/runtime_lcm.log"
+        filename: "/var/log/onap/vfc/gvnfm-vnflcm/runtime_lcm.log"
         formatter:
             "mdcFormat"
         maxBytes: 52428800
