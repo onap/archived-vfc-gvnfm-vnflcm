@@ -14,8 +14,10 @@
 
 import logging
 import time
+import json
 
 from lcm.pub.utils.values import ignore_case_get, set_opt_val
+from lcm.pub.msapi.extsys import call_aai, split_vim_to_owner_region
 from . import api
 from .exceptions import VimException
 
@@ -207,26 +209,49 @@ def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
         "memory": int(flavor["nfv_compute"]["mem_size"].replace('GB', '').strip()),
         "isPublic": True
     }
-    for local_storage_id in ignore_case_get(flavor, "local_storages"):
-        for local_storage in local_storages:
-            if local_storage_id != local_storage["local_storage_id"]:
-                continue
-            disk_type = local_storage["properties"]["disk_type"]
-            disk_size = int(local_storage["properties"]["size"].replace('GB', '').strip())
-            if disk_type == "root":
-                param["disk"] = disk_size
-            elif disk_type == "ephemeral":
-                param["ephemeral"] = disk_size
-            elif disk_type == "swap":
-                param["swap"] = disk_size
     flavor_extra_specs = ignore_case_get(flavor["nfv_compute"], "flavor_extra_specs")
-    extra_specs = []
-    for es in flavor_extra_specs:
-        extra_specs.append({"keyName": es, "value": flavor_extra_specs[es]})
-    set_opt_val(param, "extraSpecs", extra_specs)
     vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
-    tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
-    ret = api.create_flavor(vim_id, tenant_id, param)
+
+    # search aai flavor
+    find = False
+    cloud_owner, cloud_region = split_vim_to_owner_region(vim_id)
+    flavors = call_aai("/cloud-infrastructure/cloud-regions/cloud-region/%s/%s/flavors?depth=all"
+                       % (cloud_owner, cloud_region), "GET")
+    aai_flavors = json.loads(flavors)
+    aai_flavor = aai_flavors["flavors"]["flavor"]
+    for i in range(len(aai_flavor)):
+        for fes in flavor_extra_specs:
+            if (str(aai_flavor[i].find(fes)) != -1):
+                find = True
+                break
+        if find:
+            break
+
+    # add aai flavor
+    if find:
+        ret = aai_flavor[i]
+    else:
+        extra_specs = []
+        for local_storage_id in ignore_case_get(flavor, "local_storages"):
+            for local_storage in local_storages:
+                if local_storage_id != local_storage["local_storage_id"]:
+                    continue
+                disk_type = local_storage["properties"]["disk_type"]
+                disk_size = int(local_storage["properties"]["size"].replace('GB', '').strip())
+                if disk_type == "root":
+                    param["disk"] = disk_size
+                elif disk_type == "ephemeral":
+                    param["ephemeral"] = disk_size
+                elif disk_type == "swap":
+                    param["swap"] = disk_size
+
+        for es in flavor_extra_specs:
+            extra_specs.append({"keyName": es, "value": flavor_extra_specs[es]})
+
+        set_opt_val(param, "extraSpecs", extra_specs)
+        tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
+        ret = api.create_flavor(vim_id, tenant_id, param)
+
     do_notify(res_type, ret)
     set_res_cache(res_cache, res_type, flavor["vdu_id"], ret["id"])
 
