@@ -48,3 +48,9 @@ REG_TO_MSB_REG_PARAM = {
         "ttl": 0
     }]
 }
+
+# [aai config]
+AAI_BASE_URL = "http://127.0.0.1:80/aai/v11"
+AAI_USER = "AAI"
+AAI_PASSWD = "AAI"
+REPORT_TO_AAI = True
