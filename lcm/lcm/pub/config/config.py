@@ -33,6 +33,11 @@ SERVICE_NAME = "vnflcm"
 FORWARDED_FOR_FIELDS = ["HTTP_X_FORWARDED_FOR", "HTTP_X_FORWARDED_HOST",
                         "HTTP_X_FORWARDED_SERVER"]
 
+# [aai config]
+AAI_BASE_URL = "http://127.0.0.1:80/aai/v13"
+AAI_USER = "AAI"
+AAI_PASSWD = "AAI"
+
 # [register]
 REG_TO_MSB_WHEN_START = True
 REG_TO_MSB_REG_URL = "/api/microservices/v1/services"
