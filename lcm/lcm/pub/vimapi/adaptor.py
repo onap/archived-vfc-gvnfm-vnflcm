@@ -204,11 +204,11 @@ def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
     local_storages = ignore_case_get(data, "local_storages")
     param = {
         "name": "Flavor_%s" % flavor["vdu_id"],
-        "vcpu": int(flavor["nfv_compute"]["num_cpus"]),
-        "memory": int(flavor["nfv_compute"]["mem_size"].replace('GB', '').strip()),
+        "vcpu": int(flavor["virtual_compute"]["virtual_cpu"]["num_virtual_cpu"]),
+        "memory": int(flavor["virtual_compute"]["virtual_memory"]["virtual_mem_size"].replace('MB', '').strip()),
         "isPublic": True
     }
-    flavor_extra_specs = ignore_case_get(flavor["nfv_compute"], "flavor_extra_specs")
+    flavor_extra_specs = ignore_case_get(flavor["virtual_compute"], "flavor_extra_specs")
     vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
 
     # search aai flavor
