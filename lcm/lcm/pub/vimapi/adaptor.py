@@ -73,10 +73,16 @@ def create_vim_res(data, do_notify):
         create_subnet(vim_cache, res_cache, subnet, do_notify, RES_SUBNET)
     for port in ignore_case_get(data, "cps"):
         create_port(vim_cache, res_cache, data, port, do_notify, RES_PORT)
-    for flavor in ignore_case_get(data, "vdus"):
-        create_flavor(vim_cache, res_cache, data, flavor, do_notify, RES_FLAVOR)
-    for vm in ignore_case_get(data, "vdus"):
-        create_vm(vim_cache, res_cache, data, vm, do_notify, RES_VM)
+
+    vdu_requirements = {}
+    for vdu in ignore_case_get(data, "vdus"):
+        if vdu["type"] != "tosca.nodes.nfv.Vdu.Compute":
+            vdu_requirements.update(vdu)
+
+    for vdu in ignore_case_get(data, "vdus"):
+        if vdu["type"] == "tosca.nodes.nfv.Vdu.Compute":
+            create_flavor(vim_cache, res_cache, data, vdu, do_notify, RES_FLAVOR, vdu_requirements)
+            create_vm(vim_cache, res_cache, data, vdu, do_notify, RES_VM)
 
 
 def delete_vim_res(data, do_notify):
@@ -199,17 +205,23 @@ def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
     set_res_cache(res_cache, res_type, port["cp_id"], ret["id"])
 
 
-def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
+def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type, flavor_requirements):
     location_info = flavor["properties"]["location_info"]
-    local_storages = ignore_case_get(data, "local_storages")
+    vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
+
     param = {
         "name": "Flavor_%s" % flavor["vdu_id"],
-        "vcpu": int(flavor["nfv_compute"]["num_cpus"]),
-        "memory": int(flavor["nfv_compute"]["mem_size"].replace('GB', '').strip()),
+        "vcpu": int(flavor["virtual_compute"]["virtual_cpu"]["num_virtual_cpu"]),
+        "memory": int(flavor["virtual_compute"]["virtual_memory"]["virtual_mem_size"].replace('MB', '').strip()),
         "isPublic": True
     }
-    flavor_extra_specs = ignore_case_get(flavor["nfv_compute"], "flavor_extra_specs")
-    vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
+
+    # just do memory huge page
+    flavor_extra_specs = []
+    if int(param["memory"]) == 2:
+        flavor_extra_specs += "hw:mem_page_size=2MB"
+    elif int(param["memory"]) == 4:
+        flavor_extra_specs += "hw:mem_page_size=4MB"
 
     # search aai flavor
     find = False
@@ -228,12 +240,10 @@ def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
         ret = aai_flavor[i]
     else:
         extra_specs = []
-        for local_storage_id in ignore_case_get(flavor, "local_storages"):
-            for local_storage in local_storages:
-                if local_storage_id != local_storage["local_storage_id"]:
-                    continue
-                disk_type = local_storage["properties"]["disk_type"]
-                disk_size = int(local_storage["properties"]["size"].replace('GB', '').strip())
+        for fkey, fvalue in flavor_requirements.items():
+            if fkey == "tosca.nodes.nfv.Vdu.VirtualStorage":
+                disk_type = fvalue["properties"]["type_of_storage"]
+                disk_size = int(fvalue["properties"]["size_of_storage"].replace('MB', '').strip())
                 if disk_type == "root":
                     param["disk"] = disk_size
                 elif disk_type == "ephemeral":
