@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a93c517_f9831bca",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-04-03T06:30:42Z",
+      "side": 1,
+      "message": "You should use append to add an element to a list.",
+      "range": {
+        "startLine": 222,
+        "startChar": 7,
+        "endLine": 222,
+        "endChar": 52
+      },
+      "revId": "df6c8597aaa2c07028d2891b7dea1448712dd18d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a93c517_b96d9334",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-04-03T06:30:42Z",
+      "side": 1,
+      "message": "You should use append to add an element to a list.",
+      "range": {
+        "startLine": 224,
+        "startChar": 7,
+        "endLine": 224,
+        "endChar": 52
+      },
+      "revId": "df6c8597aaa2c07028d2891b7dea1448712dd18d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a93c517_59648f48",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-04-03T06:30:42Z",
+      "side": 1,
+      "message": "I cannot understand this statement, you use a str to compare with an int.",
+      "range": {
+        "startLine": 232,
+        "startChar": 11,
+        "endLine": 232,
+        "endChar": 52
+      },
+      "revId": "df6c8597aaa2c07028d2891b7dea1448712dd18d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
