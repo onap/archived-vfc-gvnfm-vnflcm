@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5a93c517_bf72537a",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2018-04-04T02:25:30Z",
+      "side": 1,
+      "message": "ok",
+      "parentUuid": "5a93c517_f9831bca",
+      "range": {
+        "startLine": 222,
+        "startChar": 7,
+        "endLine": 222,
+        "endChar": 52
+      },
+      "revId": "df6c8597aaa2c07028d2891b7dea1448712dd18d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a93c517_b96d9334",
         "filename": "lcm/lcm/pub/vimapi/adaptor.py",
         "patchSetId": 4
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "5a93c517_df6ddf9a",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2018-04-04T02:25:30Z",
+      "side": 1,
+      "message": "ok",
+      "parentUuid": "5a93c517_b96d9334",
+      "range": {
+        "startLine": 224,
+        "startChar": 7,
+        "endLine": 224,
+        "endChar": 52
+      },
+      "revId": "df6c8597aaa2c07028d2891b7dea1448712dd18d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a93c517_59648f48",
         "filename": "lcm/lcm/pub/vimapi/adaptor.py",
         "patchSetId": 4
@@ -59,6 +107,30 @@
       "writtenOn": "2018-04-03T06:30:42Z",
       "side": 1,
       "message": "I cannot understand this statement, you use a str to compare with an int.",
+      "range": {
+        "startLine": 232,
+        "startChar": 11,
+        "endLine": 232,
+        "endChar": 52
+      },
+      "revId": "df6c8597aaa2c07028d2891b7dea1448712dd18d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a93c517_7f55abc4",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2018-04-04T02:25:30Z",
+      "side": 1,
+      "message": "write error.\nif(aai_flavor[i].find(fes) !\u003d -1):",
+      "parentUuid": "5a93c517_59648f48",
       "range": {
         "startLine": 232,
         "startChar": 11,
