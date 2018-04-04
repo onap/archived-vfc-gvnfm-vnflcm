@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5a93c517_33867c14",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2018-04-04T02:25:30Z",
+      "side": 1,
+      "message": "ok, you are right.",
+      "parentUuid": "5a93c517_d372b87b",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 85,
+        "endChar": 73
+      },
+      "revId": "cfd983f0ef421cc99d0105a2b569828d48ae2682",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a93c517_f36d749a",
         "filename": "lcm/lcm/pub/vimapi/adaptor.py",
         "patchSetId": 5
@@ -36,6 +60,30 @@
       "writtenOn": "2018-04-04T01:28:09Z",
       "side": 1,
       "message": "I cannot understand the search logic, I think we should use all the values such as disk, memory and so on to check if the flavor exists.",
+      "range": {
+        "startLine": 227,
+        "startChar": 1,
+        "endLine": 236,
+        "endChar": 17
+      },
+      "revId": "cfd983f0ef421cc99d0105a2b569828d48ae2682",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a93c517_139a6063",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2018-04-04T02:25:30Z",
+      "side": 1,
+      "message": "What we discussed at the time was that if we were to make an extremely complicated project and then finally scrap it, the significance was not great. So, for those without HPA, Flavor was created in the same way. With HPA, transitional plan are used to look for flavors through the HPA feature.",
+      "parentUuid": "5a93c517_f36d749a",
       "range": {
         "startLine": 227,
         "startChar": 1,
