@@ -18,7 +18,8 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .resources import ResCreateThread, ResDeleteThread
+#from .resources import ResCreateThread, ResDeleteThread
+from lcm.pub.vimapi import adaptor
 
 logger = logging.getLogger(__name__)
 
@@ -36,10 +37,15 @@ class ResourceList(APIView):
     @swagger_auto_schema(
         responses={
             status.HTTP_204_NO_CONTENT: 'Successfully'})
+    def do_notify(delf, res_type, ret):
+        logger.debug('ret of [%s] is %s', res_type, ret)
+
     def post(self, request, action_type):
         logger.debug("ResourceList post(%s): %s", action_type, request.data)
         if action_type == "inst":
-            ResCreateThread(request.data).start()
+#            ResCreateThread(request.data).start()
+            adaptor.create_vim_res(request.data, self.do_notify)
         else:
-            ResDeleteThread(request.data).start()
+#            ResDeleteThread(request.data).start()
+            adaptor.delete_vim_res(request.data, self.do_notify)
         return Response(data=None, status=status.HTTP_204_NO_CONTENT)

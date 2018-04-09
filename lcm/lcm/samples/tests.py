@@ -12,18 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import mock
 import unittest
 import json
-from django.test import Client
+from rest_framework.test import APIClient
 from rest_framework import status
+from lcm.pub.utils import restcall
 
 inst_res_url = "/api/vnflcm/v1/resources/inst"
 term_res_url = "/api/vnflcm/v1/resources/term"
 inst_res_data = {
     "vdus": [
         {
-            "description": "",
-            "vdu_id": "vdu_vNat",
+            "type": "tosca.nodes.nfv.Vdu.Compute",
+            "description": "vbng",
+            "vdu_id": "VDU_vbng_0",
+            "virtual_compute": {
+                "virtual_memory": {
+                    "virtual_mem_size": "4096 MB",
+                    "vdu_memory_requirements": {
+                        "memoryPageSize": "2 MB",
+                        "numberOfPages": "1024"
+                    }
+                },
+                "virtual_cpu": {
+                    "num_virtual_cpu": "2",
+                    "cpu_architecture": "generic"
+                },
+                "virtual_storage": {
+                    "type_of_storage": "root",
+                    "size_of_storage": "40 GB"
+                },
+            },
             "artifacts": [
                 {
                     "artifact_name": "cirros.img",
@@ -43,12 +63,6 @@ inst_res_data = {
                     "file": "/swimages/xenial-snat.qcow2"
                 }
             ],
-            "nfv_compute": {
-                "flavor_extra_specs": {
-                },
-                "mem_size": "2 GB",
-                "num_cpus": 2
-            },
             "image_file": "cirros.img",
             "local_storages": [
                 "intel_local_storages_1"
@@ -208,7 +222,7 @@ inst_res_data = {
             "vl_id": "vl_vNat",
             "description": "",
             "cp_id": "cp_vNat",
-            "vdu_id": "vdu_vNat"
+            "vdu_id": "VDU_vbng_0"
         }
     ],
     "metadata": {
@@ -241,9 +255,88 @@ term_res_data = {
 }
 
 
+c0_data_get_tenant_id = {
+    "tenants": [
+        {
+            "id": "1",
+            "name": "vnfm",
+        }
+    ]
+}
+
+c1_data_create_volume = {
+    "vimId": "f1e33529-4a88-4155-9d7a-893cf2c80527",
+    "nodeId": "",
+    "id": "234",
+    "name": "volume1"
+}
+
+c1_data_get_volume = {
+    "vimId": "f1e33529-4a88-4155-9d7a-893cf2c80527",
+    "status": "AVAILABLE"
+}
+
+c2_data_create_network = {
+    "vimId": "f1e33529-4a88-4155-9d7a-893cf2c80527",
+    "nodeId": "",
+    "id": "234"
+}
+
+c3_data_create_subnet = {
+    "vimId": "f1e33529-4a88-4155-9d7a-893cf2c80527",
+    "id": "345"
+}
+
+c4_data_create_port = {
+    "vimId": "f1e33529-4a88-4155-9d7a-893cf2c80527",
+    "nodeId": "",
+    "id": "456"
+}
+
+c5_data_get_flavor = [{
+    "flavors":{
+        "flavor": [
+            {
+                "flavor-id":"111111",
+                "hpa-capabilities": [
+                    {
+                        "hpa-capability-id":"1243",
+                        "hpa-feature-attributes": [
+                            {
+                                "hpa-attribute-key":"memoryPageSize",
+                                "hpa-attribute-value":{"value":2, "unit":"MB"}
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}]
+
+c6_data_list_image = {
+    "images": [
+        {
+            "name": "cirros.img",
+            "id": "678"
+        }
+    ]
+}
+
+c6_data_create_vm = {
+    "id": "789",
+    "name": "vm"
+}
+
+c6_data_get_vm = {
+    "id": "789",
+    "status":"Active",
+    "name": "vm"
+}
+
 class SampleViewTest(unittest.TestCase):
     def setUp(self):
-        self.client = Client()
+        self.client = APIClient()
 
     def tearDown(self):
         pass
@@ -254,10 +347,29 @@ class SampleViewTest(unittest.TestCase):
         resp_data = json.loads(response.content)
         self.assertEqual({"status": "active"}, resp_data)
 
-    def test_inst_res(self):
+    @mock.patch.object(restcall, 'call_req')
+    def test_inst_res(self, mock_call_req):
+        r0_data_get_tenant_id = [0, json.JSONEncoder().encode(c0_data_get_tenant_id), '200']
+        r1_data_create_volume = [0, json.JSONEncoder().encode(c1_data_create_volume), '200']
+        r1_data_get_volume = [0, json.JSONEncoder().encode(c1_data_get_volume), '200']
+        r2_data_create_network = [0, json.JSONEncoder().encode(c2_data_create_network), '200']
+        r3_data_create_subnet = [0, json.JSONEncoder().encode(c3_data_create_subnet), '200']
+        r4_data_create_port = [0, json.JSONEncoder().encode(c4_data_create_port), '200']
+        r5_data_get_flavor = [0, json.JSONEncoder().encode(c5_data_get_flavor), '200']
+        r6_data_list_image = [0, json.JSONEncoder().encode(c6_data_list_image), '200']
+        r6_data_create_vm = [0, json.JSONEncoder().encode(c6_data_create_vm), '200']
+        r6_data_get_vm = [0, json.JSONEncoder().encode(c6_data_get_vm), '200']
+
+        mock_call_req.side_effect = [r0_data_get_tenant_id,
+                                     r1_data_create_volume, r1_data_get_volume,
+                                     r2_data_create_network,
+                                     r3_data_create_subnet,
+                                     r4_data_create_port,
+                                     r5_data_get_flavor,
+                                     r6_data_list_image, r6_data_create_vm, r6_data_get_vm]
         resp = self.client.post(inst_res_url, data=json.dumps(inst_res_data), content_type='application/json')
         self.failUnlessEqual(status.HTTP_204_NO_CONTENT, resp.status_code)
-
-    def test_term_res(self):
-        resp = self.client.post(term_res_url, data=json.dumps(term_res_data), content_type='application/json')
-        self.failUnlessEqual(status.HTTP_204_NO_CONTENT, resp.status_code)
+#
+#    def test_term_res(self):
+#        resp = self.client.post(term_res_url, data=json.dumps(term_res_data), content_type='application/json')
+#        self.failUnlessEqual(status.HTTP_204_NO_CONTENT, resp.status_code)
