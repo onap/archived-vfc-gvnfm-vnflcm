@@ -14,6 +14,7 @@
 
 import json
 
+from lcm.pub.msapi.aai import delete_aai_flavor
 from lcm.pub.utils.restcall import req_by_msb
 from .exceptions import VimException
 
@@ -113,7 +114,10 @@ def create_flavor(vim_id, tenant_id, data):
 
 
 def delete_flavor(vim_id, tenant_id, flavor_id):
-    return call(vim_id, tenant_id, "flavors/%s" % flavor_id, "DELETE")
+    # first delete aai register info
+    ret = delete_aai_flavor(vim_id, tenant_id, flavor_id)
+    if ret:
+        return call(vim_id, tenant_id, "flavors/%s" % flavor_id, "DELETE")
 
 
 def get_flavor(vim_id, tenant_id, flavor_id):
