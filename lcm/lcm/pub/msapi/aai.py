@@ -51,5 +51,19 @@ def get_flavor_info(vim_id):
     ret = call_aai(resource, "GET")
     if ret[0] != 0:
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        return None
+
+    return json.JSONDecoder().decode(ret[1]) if ret[1] else ret[1]
+
+
+def delete_aai_flavor(vim_id, tenant_id, flavor_id):
+    cloud_owner, cloud_region = split_vim_to_owner_region(vim_id)
+    resource = "/cloud-infrastructure/cloud-regions/cloud-region/%s/%s/flavors/flavor/%s" % \
+               (cloud_owner, cloud_region, flavor_id)
+
+    ret = call_aai(resource, "DELETE")
+    if ret[0] != 0:
+        logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
+        return None
 
     return json.JSONDecoder().decode(ret[1]) if ret[1] else ret[1]
