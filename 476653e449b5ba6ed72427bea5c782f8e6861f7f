@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5a93c517_30209ff6",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2018-04-09T13:43:04Z",
+      "side": 1,
+      "message": "I know, first I do this, then I will modify catalog. If first modify catalog, then vnflcm will have some attribute is not consistent with catalog.",
+      "parentUuid": "5a93c517_9090934f",
+      "range": {
+        "startLine": 77,
+        "startChar": 16,
+        "endLine": 77,
+        "endChar": 20
+      },
+      "revId": "476653e449b5ba6ed72427bea5c782f8e6861f7f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a93c517_309f3f61",
         "filename": "lcm/lcm/pub/vimapi/adaptor.py",
         "patchSetId": 4
@@ -36,6 +60,30 @@
       "writtenOn": "2018-04-09T12:14:08Z",
       "side": 1,
       "message": "You should deal the case when get flavor from aai failed.",
+      "range": {
+        "startLine": 205,
+        "startChar": 2,
+        "endLine": 207,
+        "endChar": 52
+      },
+      "revId": "476653e449b5ba6ed72427bea5c782f8e6861f7f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a93c517_30fc1f3e",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2018-04-09T13:43:04Z",
+      "side": 1,
+      "message": "ok",
+      "parentUuid": "5a93c517_309f3f61",
       "range": {
         "startLine": 205,
         "startChar": 2,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "5a93c517_70db87ed",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2018-04-09T13:43:04Z",
+      "side": 1,
+      "message": "ok",
+      "parentUuid": "5a93c517_9077333b",
+      "range": {
+        "startLine": 208,
+        "startChar": 2,
+        "endLine": 208,
+        "endChar": 36
+      },
+      "revId": "476653e449b5ba6ed72427bea5c782f8e6861f7f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a93c517_10932350",
         "filename": "lcm/lcm/pub/vimapi/adaptor.py",
         "patchSetId": 4
@@ -94,6 +166,30 @@
     },
     {
       "key": {
+        "uuid": "5a93c517_50f76b59",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2018-04-09T13:43:04Z",
+      "side": 1,
+      "message": "yes, should deal with",
+      "parentUuid": "5a93c517_10932350",
+      "range": {
+        "startLine": 231,
+        "startChar": 3,
+        "endLine": 231,
+        "endChar": 132
+      },
+      "revId": "476653e449b5ba6ed72427bea5c782f8e6861f7f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a93c517_5071ab42",
         "filename": "lcm/lcm/pub/vimapi/adaptor.py",
         "patchSetId": 4
@@ -105,6 +201,30 @@
       "writtenOn": "2018-04-09T12:14:08Z",
       "side": 1,
       "message": "You can use %s to format the string",
+      "range": {
+        "startLine": 232,
+        "startChar": 25,
+        "endLine": 232,
+        "endChar": 75
+      },
+      "revId": "476653e449b5ba6ed72427bea5c782f8e6861f7f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a93c517_304e5fc2",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2018-04-09T13:43:04Z",
+      "side": 1,
+      "message": "\u003e\u003e\u003e m\u003d2\n\u003e\u003e\u003e fl \u003d \"hw:\" + str(m) + \"MB\"\n\u003e\u003e\u003e print fl\nhw:2MB\n\u003e\u003e\u003e\nIt is work to use \"+\". why use %s to format the string.",
+      "parentUuid": "5a93c517_5071ab42",
       "range": {
         "startLine": 232,
         "startChar": 25,
