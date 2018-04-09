@@ -73,10 +73,12 @@ def create_vim_res(data, do_notify):
         create_subnet(vim_cache, res_cache, subnet, do_notify, RES_SUBNET)
     for port in ignore_case_get(data, "cps"):
         create_port(vim_cache, res_cache, data, port, do_notify, RES_PORT)
-    for flavor in ignore_case_get(data, "vdus"):
-        create_flavor(vim_cache, res_cache, data, flavor, do_notify, RES_FLAVOR)
-    for vm in ignore_case_get(data, "vdus"):
-        create_vm(vim_cache, res_cache, data, vm, do_notify, RES_VM)
+    for vdu in ignore_case_get(data, "vdus"):
+        if vdu["type"] == "tosca.nodes.nfv.Vdu.Compute":
+            create_flavor(vim_cache, res_cache, data, vdu, do_notify, RES_FLAVOR)
+    for vdu in ignore_case_get(data, "vdus"):
+        if vdu["type"] == "tosca.nodes.nfv.Vdu.Compute":
+            create_vm(vim_cache, res_cache, data, vdu, do_notify, RES_VM)
 
 
 def delete_vim_res(data, do_notify):
@@ -199,57 +201,65 @@ def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
     set_res_cache(res_cache, res_type, port["cp_id"], ret["id"])
 
 
+def search_flavor_aai(vim_id, memory_page_size):
+    aai_flavors = get_flavor_info(vim_id)
+    logger.debug("aai_flavors:%s" % aai_flavors)
+    aai_flavor = aai_flavors[0]["flavors"]["flavor"]
+    for i in range(len(aai_flavor)):
+        hpa_capabilities = aai_flavor[i]["hpa-capabilities"]
+        for j in range(len(hpa_capabilities)):
+            hpa_feature_attr = hpa_capabilities[j]["hpa-feature-attributes"]
+            for k in range(len(hpa_feature_attr)):
+                hpa_key = hpa_feature_attr[k]["hpa-attribute-key"]
+                hpa_value = hpa_feature_attr[k]["hpa-attribute-value"]["value"]
+                if hpa_key == "memoryPageSize" and int(hpa_value) == memory_page_size:
+                    return aai_flavor[i]
+
+
 def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
     location_info = flavor["properties"]["location_info"]
-    local_storages = ignore_case_get(data, "local_storages")
+    vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
+    virtual_compute = flavor["virtual_compute"]
     param = {
         "name": "Flavor_%s" % flavor["vdu_id"],
-        "vcpu": int(flavor["nfv_compute"]["num_cpus"]),
-        "memory": int(flavor["nfv_compute"]["mem_size"].replace('GB', '').strip()),
+        "vcpu": int(virtual_compute["virtual_cpu"]["num_virtual_cpu"]),
+        "memory": int(virtual_compute["virtual_memory"]["virtual_mem_size"].replace('MB', '').strip()),
         "isPublic": True
     }
-    flavor_extra_specs = ignore_case_get(flavor["nfv_compute"], "flavor_extra_specs")
-    vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
+
+    # just do memory huge page
+    memory_page_size = int(virtual_compute["virtual_memory"]["vdu_memory_requirements"]["memoryPageSize"].replace('MB', '').strip())
+    flavor_extra_specs = "hw:mem_page_size="+ str(memory_page_size) + "MB"
+    logger.debug("flavor_extra_specs:%s" % flavor_extra_specs)
 
     # search aai flavor
-    find = False
-    aai_flavors = get_flavor_info(vim_id)
-    aai_flavor = aai_flavors["flavors"]["flavor"]
-    for i in range(len(aai_flavor)):
-        for fes in flavor_extra_specs:
-            if (str(aai_flavor[i].find(fes)) != -1):
-                find = True
-                break
-        if find:
-            break
+    aai_flavor = search_flavor_aai(vim_id, memory_page_size)
 
     # add aai flavor
-    if find:
-        ret = aai_flavor[i]
+    if aai_flavor:
+        ret = aai_flavor
+        do_notify(res_type, ret)
+        set_res_cache(res_cache, res_type, flavor["vdu_id"], ret["flavor-id"])
     else:
         extra_specs = []
-        for local_storage_id in ignore_case_get(flavor, "local_storages"):
-            for local_storage in local_storages:
-                if local_storage_id != local_storage["local_storage_id"]:
-                    continue
-                disk_type = local_storage["properties"]["disk_type"]
-                disk_size = int(local_storage["properties"]["size"].replace('GB', '').strip())
-                if disk_type == "root":
-                    param["disk"] = disk_size
-                elif disk_type == "ephemeral":
-                    param["ephemeral"] = disk_size
-                elif disk_type == "swap":
-                    param["swap"] = disk_size
+        disk_type = virtual_compute["virtual_storage"]["type_of_storage"]
+        disk_size = int(fvalue["virtual_storage"]["size_of_storage"].replace('GB', '').strip())
+        if disk_type == "root":
+            param["disk"] = disk_size
+        elif disk_type == "ephemeral":
+            param["ephemeral"] = disk_size
+        elif disk_type == "swap":
+            param["swap"] = disk_size
 
         for es in flavor_extra_specs:
             extra_specs.append({"keyName": es, "value": flavor_extra_specs[es]})
 
         set_opt_val(param, "extraSpecs", extra_specs)
         tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
+        logger.debug("param:%s" % param)
         ret = api.create_flavor(vim_id, tenant_id, param)
-
-    do_notify(res_type, ret)
-    set_res_cache(res_cache, res_type, flavor["vdu_id"], ret["id"])
+        do_notify(res_type, ret)
+        set_res_cache(res_cache, res_type, flavor["vdu_id"], ret["id"])
 
 
 def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
@@ -328,3 +338,5 @@ def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
         time.sleep(2)
         retry_count = retry_count + 1
     raise VimException("Failed to create Vm(%s): %s." % (vm_name, opt_vm_status), ERR_CODE)
+
+
