@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5a93c517_e49b55c7",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2018-04-10T06:20:13Z",
+      "side": 1,
+      "message": "I don\u0027t change this line.",
+      "parentUuid": "5a93c517_0403e10d",
+      "range": {
+        "startLine": 91,
+        "startChar": 15,
+        "endLine": 91,
+        "endChar": 45
+      },
+      "revId": "6e0fe1c3adaf4fbccd57f459e4aee20a06770199",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a93c517_c915124a",
         "filename": "lcm/lcm/pub/vimapi/adaptor.py",
         "patchSetId": 5
@@ -71,6 +95,30 @@
     },
     {
       "key": {
+        "uuid": "5a93c517_64af45e4",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2018-04-10T06:20:13Z",
+      "side": 1,
+      "message": "ok",
+      "parentUuid": "5a93c517_690cfe42",
+      "range": {
+        "startLine": 219,
+        "startChar": 4,
+        "endLine": 219,
+        "endChar": 15
+      },
+      "revId": "6e0fe1c3adaf4fbccd57f459e4aee20a06770199",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a93c517_89070a1d",
         "filename": "lcm/lcm/pub/vimapi/adaptor.py",
         "patchSetId": 5
@@ -94,6 +142,30 @@
     },
     {
       "key": {
+        "uuid": "5a93c517_c47f3965",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2018-04-10T06:20:13Z",
+      "side": 1,
+      "message": "ok, is like below:\nvdu_memory_requirements \u003d virtual_compute[\"virtual_memory\"][\"vdu_memory_requirements\"]\n    if \"memoryPageSize\" in vdu_memory_requirements:\n        memory_page_size \u003d int(vdu_memory_requirements[\"memoryPageSize\"].replace(\u0027MB\u0027, \u0027\u0027).strip())",
+      "parentUuid": "5a93c517_89070a1d",
+      "range": {
+        "startLine": 235,
+        "startChar": 3,
+        "endLine": 235,
+        "endChar": 105
+      },
+      "revId": "6e0fe1c3adaf4fbccd57f459e4aee20a06770199",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a93c517_49010205",
         "filename": "lcm/lcm/pub/vimapi/adaptor.py",
         "patchSetId": 5
@@ -105,6 +177,30 @@
       "writtenOn": "2018-04-10T01:19:08Z",
       "side": 1,
       "message": "I know this will work, but for the readability, I prefer \"hw:mem_page_size\u003d%sMB\" % memory_page_size, it is not a bug, so you need not fix it.",
+      "range": {
+        "startLine": 238,
+        "startChar": 29,
+        "endLine": 238,
+        "endChar": 79
+      },
+      "revId": "6e0fe1c3adaf4fbccd57f459e4aee20a06770199",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a93c517_c4a899dd",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2018-04-10T06:20:13Z",
+      "side": 1,
+      "message": "ok",
+      "parentUuid": "5a93c517_49010205",
       "range": {
         "startLine": 238,
         "startChar": 29,
