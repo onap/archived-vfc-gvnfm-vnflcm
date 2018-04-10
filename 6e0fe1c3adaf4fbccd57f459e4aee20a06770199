@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a93c517_0403e10d",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-04-10T01:19:08Z",
+      "side": 1,
+      "message": "Here 1 is a magic number, you can use a meaningful constant to define it.",
+      "range": {
+        "startLine": 91,
+        "startChar": 15,
+        "endLine": 91,
+        "endChar": 45
+      },
+      "revId": "6e0fe1c3adaf4fbccd57f459e4aee20a06770199",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a93c517_c915124a",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-04-10T01:19:08Z",
+      "side": 1,
+      "message": "I found the logic of function get_flavor_info also not deal with the failure case(only output an error log)",
+      "range": {
+        "startLine": 205,
+        "startChar": 4,
+        "endLine": 205,
+        "endChar": 41
+      },
+      "revId": "6e0fe1c3adaf4fbccd57f459e4aee20a06770199",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a93c517_690cfe42",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-04-10T01:19:08Z",
+      "side": 1,
+      "message": "This line can be deleted, because the default return value of python function is None",
+      "range": {
+        "startLine": 219,
+        "startChar": 4,
+        "endLine": 219,
+        "endChar": 15
+      },
+      "revId": "6e0fe1c3adaf4fbccd57f459e4aee20a06770199",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a93c517_89070a1d",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-04-10T01:19:08Z",
+      "side": 1,
+      "message": "You should deal with the case that \"memoryPageSize\" does not exist. you can use \"memoryPageSize\" in xx to confirm it.",
+      "range": {
+        "startLine": 235,
+        "startChar": 3,
+        "endLine": 235,
+        "endChar": 105
+      },
+      "revId": "6e0fe1c3adaf4fbccd57f459e4aee20a06770199",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a93c517_49010205",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-04-10T01:19:08Z",
+      "side": 1,
+      "message": "I know this will work, but for the readability, I prefer \"hw:mem_page_size\u003d%sMB\" % memory_page_size, it is not a bug, so you need not fix it.",
+      "range": {
+        "startLine": 238,
+        "startChar": 29,
+        "endLine": 238,
+        "endChar": 79
+      },
+      "revId": "6e0fe1c3adaf4fbccd57f459e4aee20a06770199",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
