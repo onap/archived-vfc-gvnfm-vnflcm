@@ -127,13 +127,13 @@ def create_volume(vim_cache, res_cache, vol, do_notify, res_type):
 def create_network(vim_cache, res_cache, network, do_notify, res_type):
     location_info = network["properties"]["location_info"]
     param = {
-        "name": network["properties"]["network_name"],
+        "name": network["properties"]["networkName"],
         "shared": False,
-        "networkType": network["properties"]["network_type"],
-        "physicalNetwork": ignore_case_get(network["properties"], "physical_network")
+        "networkType": network["properties"]["networkType"],
+        "physicalNetwork": ignore_case_get(network["properties"], "physicalNetwork")
     }
-    set_opt_val(param, "vlanTransparent", ignore_case_get(network["properties"], "vlan_transparent"))
-    set_opt_val(param, "segmentationId", int(ignore_case_get(network["properties"], "segmentation_id", "0")))
+    set_opt_val(param, "vlanTransparent", ignore_case_get(network["properties"], "vlanTransparent"))
+    set_opt_val(param, "segmentationId", int(ignore_case_get(network["properties"], "segmentationId", "0")))
     set_opt_val(param, "routerExternal", ignore_case_get(network, "route_external"))
     vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
     tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
@@ -148,16 +148,16 @@ def create_subnet(vim_cache, res_cache, subnet, do_notify, res_type):
     network_id = get_res_id(res_cache, RES_NETWORK, subnet["vl_id"])
     param = {
         "networkId": network_id,
-        "name": subnet["properties"]["name"],
+        "name": subnet["properties"]["networkName"] + "_subnet",
         "cidr": ignore_case_get(subnet["properties"], "cidr"),
         "ipVersion": ignore_case_get(subnet["properties"], "ip_version", IP_V4)
     }
-    set_opt_val(param, "enableDhcp", ignore_case_get(subnet["properties"], "dhcp_enabled"))
-    set_opt_val(param, "gatewayIp", ignore_case_get(subnet["properties"], "gateway_ip"))
+    set_opt_val(param, "enableDhcp", ignore_case_get(subnet["properties"], "dhcpEnabled"))
+    set_opt_val(param, "gatewayIp", ignore_case_get(subnet["properties"], "gatewayIp"))
     set_opt_val(param, "dnsNameservers", ignore_case_get(subnet["properties"], "dns_nameservers"))
     allocation_pool = {}
-    set_opt_val(allocation_pool, "start", ignore_case_get(subnet["properties"], "start_ip"))
-    set_opt_val(allocation_pool, "end", ignore_case_get(subnet["properties"], "end_ip"))
+    set_opt_val(allocation_pool, "start", ignore_case_get(subnet["properties"], "startIp"))
+    set_opt_val(allocation_pool, "end", ignore_case_get(subnet["properties"], "endIp"))
     if allocation_pool:
         param["allocationPools"] = [allocation_pool]
     set_opt_val(param, "hostRoutes", ignore_case_get(subnet["properties"], "host_routes"))
