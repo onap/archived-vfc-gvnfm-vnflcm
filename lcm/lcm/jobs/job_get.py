@@ -12,11 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-
 from lcm.pub.utils.jobutil import JobUtil
-
-logger = logging.getLogger(__name__)
 
 
 class GetJobInfoService(object):

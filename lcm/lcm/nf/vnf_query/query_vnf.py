@@ -43,7 +43,7 @@ class QueryVnf:
         return resp_data
 
     def fill_resp_data(self, vnf):
-        logger.info('Get the list of vloumes')
+        logger.info('Get storages')
         storage_inst = StorageInstModel.objects.filter(instid=vnf.nfinstid)
         arr = []
         for s in storage_inst:
@@ -55,7 +55,7 @@ class QueryVnf:
                 }
             }
             arr.append(storage)
-        logger.info('Get the VLInstModel of list.')
+        logger.info('Get networks')
         vl_inst = VLInstModel.objects.filter(ownerid=vnf.nfinstid)
         vl_arr = []
         for v in vl_inst:
@@ -71,7 +71,7 @@ class QueryVnf:
                 }
             }
             vl_arr.append(v_dic)
-        logger.info('Get VNFCInstModel of list.')
+        logger.info('Get vnfcs')
         vnfc_insts = VNFCInstModel.objects.filter(instid=vnf.nfinstid)
         vnfc_arr = []
         for vnfc in vnfc_insts:
@@ -91,7 +91,7 @@ class QueryVnf:
                 "storageResourceIds": [s.storageid for s in storage]
             }
             vnfc_arr.append(vnfc_dic)
-        logger.info('Get the VimInstModel of list.')
+        logger.info('Get vms')
         vms = VmInstModel.objects.filter(instid=vnf.nfinstid)
         vm_arr = []
         for vm in vms:
