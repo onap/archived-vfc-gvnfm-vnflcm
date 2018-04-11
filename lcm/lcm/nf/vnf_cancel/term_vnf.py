@@ -85,10 +85,16 @@ class TermVnf(Thread):
 
     def grant_resource(self):
         logger.info("nf_cancel_task grant_resource begin")
-        content_args = {'vnfInstanceId': self.nf_inst_id, 'vnfDescriptorId': '',
-                        'lifecycleOperation': 'Terminate', 'jobId': self.job_id,
-                        'addResource': [], 'removeResource': [],
-                        'placementConstraint': [], 'additionalParam': {}}
+        content_args = {
+            'vnfInstanceId': self.nf_inst_id,
+            'vnfDescriptorId': '',
+            'lifecycleOperation': 'Terminate',
+            'jobId': self.job_id,
+            'addResource': [],
+            'removeResource': [],
+            'placementConstraint': [],
+            'additionalParam': {}
+        }
 
         vdus = VmInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
         res_index = 1
@@ -113,75 +119,53 @@ class TermVnf(Thread):
         logger.info('[query_resource begin]:inst_id=%s' % self.nf_inst_id)
         vol_list = StorageInstModel.objects.filter(instid=self.nf_inst_id)
         for vol in vol_list:
-            vol_info = {}
             if not vol.resouceid:
                 continue
-            vol_info["vim_id"] = vol.vimid
-            vol_info["tenant_id"] = vol.tenant
-            vol_info["res_id"] = vol.resouceid
-            vol_info["is_predefined"] = vol.is_predefined
-            self.inst_resource['volumn'].append(vol_info)
+            self.inst_resource['volumn'].append(self.get_resource(vol))
         logger.info('[query_volumn_resource]:ret_volumns=%s' % self.inst_resource['volumn'])
 
         network_list = NetworkInstModel.objects.filter(instid=self.nf_inst_id)
         for network in network_list:
-            network_info = {}
             if not network.resouceid:
                 continue
-            network_info["vim_id"] = network.vimid
-            network_info["tenant_id"] = network.tenant
-            network_info["res_id"] = network.resouceid
-            network_info["is_predefined"] = network.is_predefined
-            self.inst_resource['network'].append(network_info)
+            self.inst_resource['network'].append(self.get_resource(network))
         logger.info('[query_network_resource]:ret_networks=%s' % self.inst_resource['network'])
 
         subnetwork_list = SubNetworkInstModel.objects.filter(instid=self.nf_inst_id)
         for subnetwork in subnetwork_list:
-            subnetwork_info = {}
             if not subnetwork.resouceid:
                 continue
-            subnetwork_info["vim_id"] = subnetwork.vimid
-            subnetwork_info["tenant_id"] = subnetwork.tenant
-            subnetwork_info["res_id"] = subnetwork.resouceid
-            subnetwork_info["is_predefined"] = subnetwork.is_predefined
-            self.inst_resource['subnet'].append(subnetwork_info)
+            self.inst_resource['subnet'].append(self.get_resource(subnetwork))
         logger.info('[query_subnetwork_resource]:ret_networks=%s' % self.inst_resource['subnet'])
 
         port_list = PortInstModel.objects.filter(instid=self.nf_inst_id)
         for port in port_list:
-            port_info = {}
             if not port.resouceid:
                 continue
-            port_info["vim_id"] = port.vimid
-            port_info["tenant_id"] = port.tenant
-            port_info["res_id"] = port.resouceid
-            port_info["is_predefined"] = port.is_predefined
-            self.inst_resource['port'].append(port_info)
+            self.inst_resource['port'].append(self.get_resource(port))
         logger.info('[query_port_resource]:ret_networks=%s' % self.inst_resource['port'])
 
         flavor_list = FlavourInstModel.objects.filter(instid=self.nf_inst_id)
         for flavor in flavor_list:
-            flavor_info = {}
             if not flavor.resouceid:
                 continue
-            flavor_info["vim_id"] = flavor.vimid
-            flavor_info["tenant_id"] = flavor.tenant
-            flavor_info["res_id"] = flavor.resouceid
-            flavor_info["is_predefined"] = flavor.is_predefined
-            self.inst_resource['flavor'].append(flavor_info)
+            self.inst_resource['flavor'].append(self.get_resource(flavor))
         logger.info('[query_flavor_resource]:ret_networks=%s' % self.inst_resource['flavor'])
 
         vm_list = VmInstModel.objects.filter(instid=self.nf_inst_id)
         for vm in vm_list:
-            vm_info = {}
             if not vm.resouceid:
                 continue
-            vm_info["vim_id"] = vm.vimid
-            vm_info["tenant_id"] = vm.tenant
-            vm_info["res_id"] = vm.resouceid
-            vm_info["is_predefined"] = vm.is_predefined
-            self.inst_resource['vm'].append(vm_info)
+            self.inst_resource['vm'].append(self.get_resource(vm))
         logger.info('[query_vm_resource]:ret_vms=%s' % self.inst_resource['vm'])
+
+    def get_resource(self, resource):
+        return {
+            "vim_id": resource.vimid,
+            "tenant_id": resource.tenant,
+            "res_id": resource.resouceid,
+            "is_predefined": resource.is_predefined
+        }
 
     def query_notify_data(self):
         logger.info('[NF terminate] send notify request to nfvo start')
@@ -202,8 +186,11 @@ class TermVnf(Thread):
         affected_vl = []
         networks = NetworkInstModel.objects.filter(instid=self.nf_inst_id)
         for network in networks:
-            network_resource = {'vimId': network.vimid, 'resourceId': network.resouceid,
-                                'resourceName': network.name, 'resourceType': 'network'}
+            network_resource = {
+                'vimId': network.vimid,
+                'resourceId': network.resouceid,
+                'resourceName': network.name,
+                'resourceType': 'network'}
             affected_vl.append(
                 {'vlInstanceId': network.networkid,
                  'vldid': network.nodeId,

@@ -30,6 +30,7 @@ class DeleteVnf:
         try:
             self.check_parameter()
             self.delete_info_from_db()
+            logger.debug('VnfInst(%s) is deleted.' % self.nf_inst_id)
         except NFLCMException as e:
             logger.debug('Delete VNF instance[%s] failed: %s', self.nf_inst_id, e.message)
         except Exception as e:
@@ -41,7 +42,6 @@ class DeleteVnf:
         vnf_insts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
         if not vnf_insts.exists():
             logger.warn('VnfInst(%s) does not exist' % self.nf_inst_id)
-            return
             # sel_vnf = vnf_insts[0]
             # if sel_vnf.status != 'NOT_INSTANTIATED':
             #    raise NFLCMException("Don't allow to delete vnf(status:[%s])" % sel_vnf.status)
