@@ -78,10 +78,8 @@ class InstVnf(Thread):
                 input_parameters.append({"key": key, "value": val})
         vnf_package_info = query_vnfpackage_by_id(self.vnfd_id)
         self.vnfd_info = json.loads(ignore_case_get(ignore_case_get(vnf_package_info, "packageInfo"), "vnfdModel"))
-        # self.vnfd_info = vnfd_model_dict  # just for test
 
         self.update_cps()
-        self.check_parameter_exist()
         metadata = ignore_case_get(self.vnfd_info, "metadata")
         version = ignore_case_get(metadata, "vnfdVersion")
         vendor = ignore_case_get(metadata, "vendor")
@@ -101,7 +99,7 @@ class InstVnf(Thread):
                    vnfSoftwareVersion=vnfsoftwareversion,
                    lastuptime=now_time())
 
-        logger.info("self.vim_id = %s" % self.vim_id)
+        logger.info("VimId = %s" % self.vim_id)
         is_exist = NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id).exists()
         if not is_exist:
             NfvoRegInfoModel.objects.create(
@@ -112,7 +110,7 @@ class InstVnf(Thread):
         logger.info("Nf instancing pre-check finish")
 
     def apply_grant(self):
-        logger.info('[NF instantiation] send resource grand request to nfvo start')
+        logger.info('Send resource grand request to nfvo')
         content_args = {
             'vnfInstanceId': self.nf_inst_id,
             'vnfDescriptorId': '',
@@ -135,16 +133,14 @@ class InstVnf(Thread):
             content_args['addResource'].append(res_def)
             res_index += 1
 
-        logger.debug("NfvoRegInfoModel filter nf_inst_id=%s", self.nf_inst_id)
+        logger.debug("VnfInst = %s", self.nf_inst_id)
         vnfmInfo = NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id)
         if len(vnfmInfo) == 0:
-            raise NFLCMException('nf_inst_id(%s) does not exist in NfvoRegInfoModel' % self.nf_inst_id)
+            raise NFLCMException('VnfInst(%s) does not exist' % self.nf_inst_id)
         content_args['additionalParam']['vnfmid'] = vnfmInfo[0].vnfminstid
         content_args['additionalParam']['vimid'] = vnfmInfo[0].apiurl
-        logger.info('content_args=%s' % content_args)
+        logger.info('Grant request data = %s', content_args)
         apply_result = apply_grant_to_nfvo(json.dumps(content_args))
-        # vim_info = ignore_case_get(apply_result, "vim")
-        # vim_info = ignore_case_get(json.JSONDecoder().decode(apply_result), "vim")
 
         for vdu in ignore_case_get(self.vnfd_info, "vdus"):
             if "location_info" in vdu["properties"]:
@@ -154,7 +150,6 @@ class InstVnf(Thread):
                 vdu["properties"]["location_info"] = {
                     "vimid": ignore_case_get(apply_result, "vimid"),
                     "tenant": ignore_case_get(apply_result, "tenant")}
-                logger.info('vdu["properties"]["location_info"]=%s' % vdu["properties"]["location_info"])
 
         for vl in ignore_case_get(self.vnfd_info, "vls"):
             if "location_info" in vl["properties"]:
@@ -164,22 +159,20 @@ class InstVnf(Thread):
                 vl["properties"]["location_info"] = {
                     "vimid": ignore_case_get(apply_result, "vimid"),
                     "tenant": ignore_case_get(apply_result, "tenant")}
-                logger.info('vl["properties"]["location_info"]=%s' % vl["properties"]["location_info"])
 
-        logger.info('self.vnfd_info=%s' % self.vnfd_info)
+        logger.info('VnfdInfo = %s' % self.vnfd_info)
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='INSTANTIATED', lastuptime=now_time())
         JobUtil.add_job_status(self.job_id, 20, 'Nf instancing apply grant finish')
         logger.info("Nf instancing apply grant finish")
 
     def create_res(self):
-        logger.info("[NF instantiation] create resource start")
-        logger.debug("self.vnfdModel = %s", self.vnfd_info)
+        logger.info("Create resource start")
         adaptor.create_vim_res(self.vnfd_info, self.do_notify)
         JobUtil.add_job_status(self.job_id, 70, '[NF instantiation] create resource finish')
-        logger.info("[NF instantiation] create resource finish")
+        logger.info("Create resource finish")
 
     def lcm_notify(self):
-        logger.info('[NF instantiation] send notify request to nfvo start')
+        logger.info('Send notify request to nfvo')
         affected_vnfc = []
         vnfcs = VNFCInstModel.objects.filter(instid=self.nf_inst_id)
         for vnfc in vnfcs:
@@ -237,10 +230,9 @@ class InstVnf(Thread):
         if len(vnfmInfo) == 0:
             raise NFLCMException('nf_inst_id(%s) does not exist in NfvoRegInfoModel' % self.nf_inst_id)
         content_args['VNFMID'] = vnfmInfo[0].vnfminstid
-        logger.info('content_args=%s' % content_args)
+        logger.info('Notify request data = %s' % content_args)
         resp = notify_lcm_to_nfvo(json.dumps(content_args))
-        logger.info('[NF instantiation] get lcm response %s' % resp)
-        logger.info('[NF instantiation] send notify request to nfvo end')
+        logger.info('Lcm notify end, response %s' % resp)
 
     def vnf_inst_failed_handle(self, error_msg):
         logger.error('VNF instantiation failed, detail message: %s' % error_msg)
@@ -248,9 +240,9 @@ class InstVnf(Thread):
         JobUtil.add_job_status(self.job_id, 255, error_msg)
 
     def do_notify(self, res_type, ret):
-        logger.info('creating [%s] resource' % res_type)
+        logger.info('Creating [%s] resource' % res_type)
         if res_type == adaptor.RES_VOLUME:
-            logger.info('Create vloumns!')
+            logger.info('Create vloumns')
             JobUtil.add_job_status(self.job_id, 25, 'Create vloumns!')
             StorageInstModel.objects.create(
                 storageid=str(uuid.uuid4()),
@@ -266,7 +258,7 @@ class InstVnf(Thread):
                 nodeId=ignore_case_get(ret, "nodeId"),
                 instid=self.nf_inst_id)
         elif res_type == adaptor.RES_NETWORK:
-            logger.info('Create networks!')
+            logger.info('Create networks')
             JobUtil.add_job_status(self.job_id, 35, 'Create networks!')
             NetworkInstModel.objects.create(
                 networkid=str(uuid.uuid4()),
@@ -285,7 +277,7 @@ class InstVnf(Thread):
                 nodeId=ignore_case_get(ret, "nodeId"),
                 instid=self.nf_inst_id)
         elif res_type == adaptor.RES_SUBNET:
-            logger.info('Create subnets!')
+            logger.info('Create subnets')
             JobUtil.add_job_status(self.job_id, 40, 'Create subnets!')
             SubNetworkInstModel.objects.create(
                 subnetworkid=str(uuid.uuid4()),
@@ -305,7 +297,7 @@ class InstVnf(Thread):
                 is_predefined=ignore_case_get(ret, "returnCode"),
                 instid=self.nf_inst_id)
         elif res_type == adaptor.RES_PORT:
-            logger.info('Create ports!')
+            logger.info('Create ports')
             JobUtil.add_job_status(self.job_id, 50, 'Create ports!')
             PortInstModel.objects.create(
                 portid=str(uuid.uuid4()),
@@ -324,7 +316,7 @@ class InstVnf(Thread):
                 nodeId=ignore_case_get(ret, "nodeId"),
                 instid=self.nf_inst_id)
         elif res_type == adaptor.RES_FLAVOR:
-            logger.info('Create flavors!')
+            logger.info('Create flavors')
             JobUtil.add_job_status(self.job_id, 60, 'Create flavors!')
             FlavourInstModel.objects.create(
                 flavourid=str(uuid.uuid4()),
@@ -342,7 +334,7 @@ class InstVnf(Thread):
                 is_predefined=ignore_case_get(ret, "returnCode"),
                 instid=self.nf_inst_id)
         elif res_type == adaptor.RES_VM:
-            logger.info('Create vms!')
+            logger.info('Create vms')
             JobUtil.add_job_status(self.job_id, 70, 'Create vms!')
             vm_id = str(uuid.uuid4())
             VmInstModel.objects.create(
@@ -377,6 +369,3 @@ class InstVnf(Thread):
                     cp["networkId"] = ignore_case_get(extlink, "resourceId")
                     cp["subnetId"] = ignore_case_get(extlink, "resourceSubnetId")
                     break
-
-    def check_parameter_exist(self):
-        pass
