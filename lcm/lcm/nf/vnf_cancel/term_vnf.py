@@ -64,22 +64,16 @@ class TermVnf(Thread):
         if not vnf_insts.exists():
             logger.warn('VnfInst(%s) does not exist' % self.nf_inst_id)
             return False
-            # raise NFLCMException('VnfInst(%s) does not exist' % self.nf_inst_id)
-        # sel_vnf = vnf_insts[0]
-        # if sel_vnf.status != 'VNF_INSTANTIATED':
-        #    raise NFLCMException("Don't allow to terminate vnf(status:[%s])" % sel_vnf.status)
         if self.terminationType == 'GRACEFUL' and not self.gracefulTerminationTimeout:
             logger.warn("Set Graceful default termination timeout = 60")
             self.gracefulTerminationTimeout = 60
-            # raise NFLCMException("Graceful termination must set timeout")
-
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status=VNF_STATUS.TERMINATING)
         JobUtil.add_job_status(self.job_id, 10, 'Nf terminating pre-check finish')
         logger.info("Nf terminating pre-check finish")
         return True
 
     def grant_resource(self):
-        logger.info("nf_cancel_task grant_resource begin")
+        logger.info("Grant resource begin")
         content_args = {
             'vnfInstanceId': self.nf_inst_id,
             'vnfDescriptorId': '',
@@ -103,16 +97,16 @@ class TermVnf(Thread):
 
         vnfmInfo = NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id)
         if len(vnfmInfo) == 0:
-            raise NFLCMException('nf_inst_id(%s) does not exist in NfvoRegInfoModel' % self.nf_inst_id)
+            raise NFLCMException('VnfId(%s) does not exist' % self.nf_inst_id)
         content_args['additionalParam']['vnfmid'] = vnfmInfo[0].vnfminstid
         content_args['additionalParam']['vimid'] = vnfmInfo[0].apiurl
-        logger.info('content_args=%s' % content_args)
+        logger.info('Grant request data=%s' % content_args)
         self.apply_result = apply_grant_to_nfvo(json.dumps(content_args))
-        logger.info("nf_cancel_task grant_resource end")
+        logger.info("Grant resource end, response: %s" % self.apply_result)
         JobUtil.add_job_status(self.job_id, 20, 'Nf terminating grant_resource finish')
 
     def query_inst_resource(self):
-        logger.info('[query_resource begin]:inst_id=%s' % self.nf_inst_id)
+        logger.info('Query resource begin')
         for resource_type in self.resource_map.keys():
             resource_table = globals().get(resource_type + 'InstModel')
             resource_insts = resource_table.objects.filter(instid=self.nf_inst_id)
@@ -120,7 +114,7 @@ class TermVnf(Thread):
                 if not resource_inst.resouceid:
                     continue
                 self.inst_resource[self.resource_map.get(resource_type)].append(self.get_resource(resource_inst))
-        logger.info('[query_resource]:ret_resource=%s' % self.inst_resource)
+        logger.info('Query resource end, resource=%s' % self.inst_resource)
 
     def get_resource(self, resource):
         return {
@@ -131,7 +125,7 @@ class TermVnf(Thread):
         }
 
     def query_notify_data(self):
-        logger.info('[NF terminate] send notify request to nfvo start')
+        logger.info('Send notify request to nfvo')
         affected_vnfc = []
         vnfcs = VNFCInstModel.objects.filter(instid=self.nf_inst_id)
         for vnfc in vnfcs:
@@ -191,27 +185,26 @@ class TermVnf(Thread):
 
         vnfmInfo = NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id)
         if len(vnfmInfo) == 0:
-            raise NFLCMException('nf_inst_id(%s) does not exist in NfvoRegInfoModel' % self.nf_inst_id)
+            raise NFLCMException('VnfId(%s) does not exist' % self.nf_inst_id)
         self.notify_data['VNFMID'] = vnfmInfo[0].vnfminstid
-        logger.info('content_args=%s' % self.notify_data)
+        logger.info('Notify request data=%s' % self.notify_data)
 
     def delete_resource(self):
-        logger.info('rollback resource begin')
+        logger.info('Rollback resource begin')
         adaptor.delete_vim_res(self.inst_resource, self.do_notify_delete)
-        logger.info('rollback resource complete')
+        logger.info('Rollback resource complete')
 
     def do_notify_delete(self, res_type, res_id):
-        logger.error('Deleting [%s] resource:resourceid [%s]' % (res_type, res_id))
+        logger.error('Deleting [%s] resource, resourceid [%s]' % (res_type, res_id))
         resource_type = self.resource_map.keys()[self.resource_map.values().index(res_type)]
         resource_table = globals().get(resource_type + 'InstModel')
         resource_table.objects.filter(instid=self.nf_inst_id, resouceid=res_id).delete()
 
     def lcm_notify(self):
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='NOT_INSTANTIATED', lastuptime=now_time())
-        logger.info('[NF termination] send notify request to nfvo end')
+        logger.info('Send notify request to nfvo')
         resp = notify_lcm_to_nfvo(json.dumps(self.notify_data))
-        logger.info('[NF termination] get lcm response %s' % resp)
-        logger.info('[NF termination] send notify request to nfvo end')
+        logger.info('Lcm notify end, response: %s' % resp)
 
     def vnf_term_failed_handle(self, error_msg):
         logger.error('VNF termination failed, detail message: %s' % error_msg)
