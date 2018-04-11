@@ -126,14 +126,15 @@ def create_volume(vim_cache, res_cache, vol, do_notify, res_type):
 
 def create_network(vim_cache, res_cache, network, do_notify, res_type):
     location_info = network["properties"]["location_info"]
+    vl_profile = network["properties"]["vl_profile"]
     param = {
-        "name": network["properties"]["network_name"],
+        "name": vl_profile["networkName"],
         "shared": False,
-        "networkType": network["properties"]["network_type"],
-        "physicalNetwork": ignore_case_get(network["properties"], "physical_network")
+        "networkType": vl_profile["networkType"],
+        "physicalNetwork": ignore_case_get(vl_profile, "physicalNetwork")
     }
-    set_opt_val(param, "vlanTransparent", ignore_case_get(network["properties"], "vlan_transparent"))
-    set_opt_val(param, "segmentationId", int(ignore_case_get(network["properties"], "segmentation_id", "0")))
+    set_opt_val(param, "vlanTransparent", ignore_case_get(vl_profile, "vlanTransparent"))
+    set_opt_val(param, "segmentationId", int(ignore_case_get(vl_profile, "segmentationId", "0")))
     set_opt_val(param, "routerExternal", ignore_case_get(network, "route_external"))
     vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
     tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
@@ -146,18 +147,20 @@ def create_network(vim_cache, res_cache, network, do_notify, res_type):
 def create_subnet(vim_cache, res_cache, subnet, do_notify, res_type):
     location_info = subnet["properties"]["location_info"]
     network_id = get_res_id(res_cache, RES_NETWORK, subnet["vl_id"])
+    vl_profile = subnet["properties"]["vl_profile"]
+    layer_protocol = ignore_case_get(subnet["properties"]["connectivity_type"], "layer_protocol")
     param = {
         "networkId": network_id,
-        "name": subnet["properties"]["name"],
-        "cidr": ignore_case_get(subnet["properties"], "cidr"),
-        "ipVersion": ignore_case_get(subnet["properties"], "ip_version", IP_V4)
+        "name": vl_profile["networkName"] + "_subnet",
+        "cidr": ignore_case_get(vl_profile, "cidr"),
+        "ipVersion": IP_V4 if(layer_protocol == 'ipv4') else (IP_V6 if(layer_protocol == 'ipv6') else None)
     }
-    set_opt_val(param, "enableDhcp", ignore_case_get(subnet["properties"], "dhcp_enabled"))
-    set_opt_val(param, "gatewayIp", ignore_case_get(subnet["properties"], "gateway_ip"))
+    set_opt_val(param, "enableDhcp", ignore_case_get(vl_profile, "dhcpEnabled"))
+    set_opt_val(param, "gatewayIp", ignore_case_get(vl_profile, "gatewayIp"))
     set_opt_val(param, "dnsNameservers", ignore_case_get(subnet["properties"], "dns_nameservers"))
     allocation_pool = {}
-    set_opt_val(allocation_pool, "start", ignore_case_get(subnet["properties"], "start_ip"))
-    set_opt_val(allocation_pool, "end", ignore_case_get(subnet["properties"], "end_ip"))
+    set_opt_val(allocation_pool, "start", ignore_case_get(vl_profile, "startIp"))
+    set_opt_val(allocation_pool, "end", ignore_case_get(vl_profile, "endIp"))
     if allocation_pool:
         param["allocationPools"] = [allocation_pool]
     set_opt_val(param, "hostRoutes", ignore_case_get(subnet["properties"], "host_routes"))
