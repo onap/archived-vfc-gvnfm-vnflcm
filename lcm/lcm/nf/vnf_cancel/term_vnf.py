@@ -19,7 +19,7 @@ from threading import Thread
 
 from lcm.nf.const import VNF_STATUS
 from lcm.pub.database.models import NfInstModel, VmInstModel, NetworkInstModel, StorageInstModel, \
-    FlavourInstModel, PortInstModel, SubNetworkInstModel, VNFCInstModel, NfvoRegInfoModel
+    PortInstModel, VNFCInstModel, NfvoRegInfoModel, FlavourInstModel, SubNetworkInstModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.msapi.gvnfmdriver import apply_grant_to_nfvo, notify_lcm_to_nfvo
 from lcm.pub.utils.jobutil import JobUtil
@@ -41,6 +41,8 @@ class TermVnf(Thread):
         self.apply_result = None
         self.notify_data = None
         self.inst_resource = {'volumn': [], 'network': [], 'subnet': [], 'port': [], 'flavor': [], 'vm': []}
+        self.resource_map = {'Storage': 'volumn', 'Network': 'network', 'SubNetwork': 'subnet', 'Port': 'port',
+                             'Flavour': 'flavor', 'Vm': 'vm'}
 
     def run(self):
         try:
@@ -111,21 +113,13 @@ class TermVnf(Thread):
 
     def query_inst_resource(self):
         logger.info('[query_resource begin]:inst_id=%s' % self.nf_inst_id)
-        resoure_map = {
-            'Storage': 'volumn',
-            'Network': 'network',
-            'SubNetwork': 'subnet',
-            'Port': 'port',
-            'Flavour': 'flavor',
-            'Vm': 'vm'
-        }
-        for resoure_type in resoure_map.keys():
-            resoure_table = globals().get(resoure_type + 'InstModel')
-            resoure_insts = resoure_table.objects.filter(instid=self.nf_inst_id)
-            for resoure_inst in resoure_insts:
-                if not resoure_inst.resouceid:
+        for resource_type in self.resource_map.keys():
+            resource_table = globals().get(resource_type + 'InstModel')
+            resource_insts = resource_table.objects.filter(instid=self.nf_inst_id)
+            for resource_inst in resource_insts:
+                if not resource_inst.resouceid:
                     continue
-                self.inst_resource[resoure_map.get(resoure_type)].append(self.get_resource(resoure_inst))
+                self.inst_resource[self.resource_map.get(resource_type)].append(self.get_resource(resource_inst))
         logger.info('[query_resource]:ret_resource=%s' % self.inst_resource)
 
     def get_resource(self, resource):
@@ -183,6 +177,8 @@ class TermVnf(Thread):
                  'changeType': 'removed',
                  'storageResource': {'vimId': vs.vimid, 'resourceId': vs.resouceid,
                                      'resourceName': vs.name, 'resourceType': 'volume'}})
+        FlavourInstModel.objects.filter(instid=self.nf_inst_id)
+        SubNetworkInstModel.objects.filter(instid=self.nf_inst_id)
         self.notify_data = {
             "status": 'result',
             "vnfInstanceId": self.nf_inst_id,
@@ -206,18 +202,9 @@ class TermVnf(Thread):
 
     def do_notify_delete(self, res_type, res_id):
         logger.error('Deleting [%s] resource:resourceid [%s]' % (res_type, res_id))
-        if res_type == adaptor.RES_VM:
-            VmInstModel.objects.filter(instid=self.nf_inst_id, resouceid=res_id).delete()
-        elif res_type == adaptor.RES_FLAVOR:
-            FlavourInstModel.objects.filter(instid=self.nf_inst_id, resouceid=res_id).delete()
-        elif res_type == adaptor.RES_PORT:
-            PortInstModel.objects.filter(instid=self.nf_inst_id, resouceid=res_id).delete()
-        elif res_type == adaptor.RES_SUBNET:
-            SubNetworkInstModel.objects.filter(instid=self.nf_inst_id, resouceid=res_id).delete()
-        elif res_type == adaptor.RES_NETWORK:
-            NetworkInstModel.objects.filter(instid=self.nf_inst_id, resouceid=res_id).delete()
-        elif res_type == adaptor.RES_VOLUME:
-            StorageInstModel.objects.filter(instid=self.nf_inst_id, resouceid=res_id).delete()
+        resource_type = self.resource_map.keys()[self.resource_map.values().index(res_type)]
+        resource_table = globals().get(resource_type + 'InstModel')
+        resource_table.objects.filter(instid=self.nf_inst_id, resouceid=res_id).delete()
 
     def lcm_notify(self):
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='NOT_INSTANTIATED', lastuptime=now_time())
