@@ -42,9 +42,6 @@ class DeleteVnf:
         vnf_insts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
         if not vnf_insts.exists():
             logger.warn('VnfInst(%s) does not exist' % self.nf_inst_id)
-            # sel_vnf = vnf_insts[0]
-            # if sel_vnf.status != 'NOT_INSTANTIATED':
-            #    raise NFLCMException("Don't allow to delete vnf(status:[%s])" % sel_vnf.status)
 
     def delete_info_from_db(self):
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).delete()

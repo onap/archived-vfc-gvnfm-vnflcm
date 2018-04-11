@@ -57,12 +57,7 @@ class CreateVnf:
                                        vnfdid=self.vnfd_id,
                                        vnfSoftwareVersion='',
                                        create_time=now_time())
-
         vnf_inst = NfInstModel.objects.get(nfinstid=self.nf_inst_id)
-        logger.debug('id is [%s],name is [%s],vnfd_id is [%s],vnfd_model is [%s],'
-                     'description is [%s],create_time is [%s]' %
-                     (vnf_inst.nfinstid, vnf_inst.nf_name, vnf_inst.vnfdid,
-                      vnf_inst.vnfd_model, vnf_inst.nf_desc, vnf_inst.create_time))
         resp = {
             'id': vnf_inst.nfinstid,
             'vnfInstanceName': vnf_inst.nf_name,
@@ -78,9 +73,7 @@ class CreateVnf:
         return resp
 
     def check_valid(self):
-        logger.debug("CreateVnf--check_valid::> %s" % self.data)
         is_exist = NfInstModel.objects.filter(nf_name=self.vnf_instance_mame).exists()
-        logger.debug("check_valid::is_exist=%s" % is_exist)
         if is_exist:
             raise NFLCMException('VNF is already exist.')
         vnf_package_info = query_vnfpackage_by_id(self.csar_id)
