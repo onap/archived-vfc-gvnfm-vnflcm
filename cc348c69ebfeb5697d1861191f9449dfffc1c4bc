@@ -22,6 +22,30 @@
       "revId": "cc348c69ebfeb5697d1861191f9449dfffc1c4bc",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a93c517_01d74a4c",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 3641
+      },
+      "writtenOn": "2018-04-11T08:55:21Z",
+      "side": 1,
+      "message": "According to the new DM. This field is a sub-field inside VL \"properties\". Tosca parser should have already parsed all \"properties\" pairs via buildNode function including replacing with inputs, right?",
+      "parentUuid": "5a93c517_56f99a7e",
+      "range": {
+        "startLine": 129,
+        "startChar": 40,
+        "endLine": 129,
+        "endChar": 50
+      },
+      "revId": "cc348c69ebfeb5697d1861191f9449dfffc1c4bc",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
