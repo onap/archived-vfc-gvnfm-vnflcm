@@ -201,9 +201,16 @@ inst_res_data = {
     ],
     "cps": [
         {
+
             "properties": {
                 "name": "vNat_big_subnet_port",
-                "ip_address": "10.43.38.253",
+                "protocol_data": {
+                    "address_data": {
+                        "l3_address_data": {
+                            "fixed_ip_address": "10.43.38.253"
+                        },
+                    },
+                },
                 "vnic_type": "normal",
                 "role": "root",
                 "virtual_network_interface_requirements": [
