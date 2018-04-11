@@ -40,14 +40,7 @@ class TermVnf(Thread):
         self.gracefulTerminationTimeout = ignore_case_get(self.data, "gracefulTerminationTimeout")
         self.apply_result = None
         self.notify_data = None
-        self.inst_resource = {
-            'volumn': [],
-            'network': [],
-            'subnet': [],
-            'port': [],
-            'flavor': [],
-            'vm': [],
-        }
+        self.inst_resource = {'volumn': [], 'network': [], 'subnet': [], 'port': [], 'flavor': [], 'vm': []}
 
     def run(self):
         try:
@@ -99,9 +92,10 @@ class TermVnf(Thread):
         vdus = VmInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
         res_index = 1
         for vdu in vdus:
-            res_def = {'type': 'VDU',
-                       'resDefId': str(res_index),
-                       'resDesId': vdu.resouceid}
+            res_def = {
+                'type': 'VDU',
+                'resDefId': str(res_index),
+                'resDesId': vdu.resouceid}
             content_args['removeResource'].append(res_def)
             res_index += 1
 
@@ -117,47 +111,22 @@ class TermVnf(Thread):
 
     def query_inst_resource(self):
         logger.info('[query_resource begin]:inst_id=%s' % self.nf_inst_id)
-        vol_list = StorageInstModel.objects.filter(instid=self.nf_inst_id)
-        for vol in vol_list:
-            if not vol.resouceid:
-                continue
-            self.inst_resource['volumn'].append(self.get_resource(vol))
-        logger.info('[query_volumn_resource]:ret_volumns=%s' % self.inst_resource['volumn'])
-
-        network_list = NetworkInstModel.objects.filter(instid=self.nf_inst_id)
-        for network in network_list:
-            if not network.resouceid:
-                continue
-            self.inst_resource['network'].append(self.get_resource(network))
-        logger.info('[query_network_resource]:ret_networks=%s' % self.inst_resource['network'])
-
-        subnetwork_list = SubNetworkInstModel.objects.filter(instid=self.nf_inst_id)
-        for subnetwork in subnetwork_list:
-            if not subnetwork.resouceid:
-                continue
-            self.inst_resource['subnet'].append(self.get_resource(subnetwork))
-        logger.info('[query_subnetwork_resource]:ret_networks=%s' % self.inst_resource['subnet'])
-
-        port_list = PortInstModel.objects.filter(instid=self.nf_inst_id)
-        for port in port_list:
-            if not port.resouceid:
-                continue
-            self.inst_resource['port'].append(self.get_resource(port))
-        logger.info('[query_port_resource]:ret_networks=%s' % self.inst_resource['port'])
-
-        flavor_list = FlavourInstModel.objects.filter(instid=self.nf_inst_id)
-        for flavor in flavor_list:
-            if not flavor.resouceid:
-                continue
-            self.inst_resource['flavor'].append(self.get_resource(flavor))
-        logger.info('[query_flavor_resource]:ret_networks=%s' % self.inst_resource['flavor'])
-
-        vm_list = VmInstModel.objects.filter(instid=self.nf_inst_id)
-        for vm in vm_list:
-            if not vm.resouceid:
-                continue
-            self.inst_resource['vm'].append(self.get_resource(vm))
-        logger.info('[query_vm_resource]:ret_vms=%s' % self.inst_resource['vm'])
+        resoure_map = {
+            'Storage': 'volumn',
+            'Network': 'network',
+            'SubNetwork': 'subnet',
+            'Port': 'port',
+            'Flavour': 'flavor',
+            'Vm': 'vm'
+        }
+        for resoure_type in resoure_map.keys():
+            resoure_table = globals().get(resoure_type + 'InstModel')
+            resoure_insts = resoure_table.objects.filter(instid=self.nf_inst_id)
+            for resoure_inst in resoure_insts:
+                if not resoure_inst.resouceid:
+                    continue
+                self.inst_resource[resoure_map.get(resoure_type)].append(self.get_resource(resoure_inst))
+        logger.info('[query_resource]:ret_resource=%s' % self.inst_resource)
 
     def get_resource(self, resource):
         return {
