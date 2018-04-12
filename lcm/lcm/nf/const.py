@@ -19,6 +19,9 @@ VNF_STATUS = enum(NULL='null', INSTANTIATING="instantiating", INACTIVE='inactive
                   FAILED="failed", TERMINATING="terminating", SCALING="scaling", OPERATING="operating",
                   UPDATING="updating", HEALING="healing")
 
+RESOURCE_MAP = {'Storage': 'volumn', 'Network': 'network', 'SubNetwork': 'subnet', 'Port': 'port',
+                'Flavour': 'flavor', 'Vm': 'vm'}
+
 inst_req_data = {
     "flavourId": "flavour_1",
     "instantiationLevelId": "instantiationLevel_1",

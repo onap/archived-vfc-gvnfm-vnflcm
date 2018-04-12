@@ -17,7 +17,7 @@ import logging
 import traceback
 from threading import Thread
 
-from lcm.nf.const import VNF_STATUS
+from lcm.nf.const import VNF_STATUS, RESOURCE_MAP
 from lcm.pub.database.models import NfInstModel, VmInstModel, NetworkInstModel, StorageInstModel, \
     PortInstModel, VNFCInstModel, NfvoRegInfoModel, FlavourInstModel, SubNetworkInstModel
 from lcm.pub.exceptions import NFLCMException
@@ -41,8 +41,6 @@ class TermVnf(Thread):
         self.apply_result = None
         self.notify_data = None
         self.inst_resource = {'volumn': [], 'network': [], 'subnet': [], 'port': [], 'flavor': [], 'vm': []}
-        self.resource_map = {'Storage': 'volumn', 'Network': 'network', 'SubNetwork': 'subnet', 'Port': 'port',
-                             'Flavour': 'flavor', 'Vm': 'vm'}
 
     def run(self):
         try:
@@ -107,13 +105,13 @@ class TermVnf(Thread):
 
     def query_inst_resource(self):
         logger.info('Query resource begin')
-        for resource_type in self.resource_map.keys():
+        for resource_type in RESOURCE_MAP.keys():
             resource_table = globals().get(resource_type + 'InstModel')
             resource_insts = resource_table.objects.filter(instid=self.nf_inst_id)
             for resource_inst in resource_insts:
                 if not resource_inst.resouceid:
                     continue
-                self.inst_resource[self.resource_map.get(resource_type)].append(self.get_resource(resource_inst))
+                self.inst_resource[RESOURCE_MAP.get(resource_type)].append(self.get_resource(resource_inst))
         logger.info('Query resource end, resource=%s' % self.inst_resource)
 
     def get_resource(self, resource):
@@ -196,7 +194,7 @@ class TermVnf(Thread):
 
     def do_notify_delete(self, res_type, res_id):
         logger.error('Deleting [%s] resource, resourceid [%s]' % (res_type, res_id))
-        resource_type = self.resource_map.keys()[self.resource_map.values().index(res_type)]
+        resource_type = RESOURCE_MAP.keys()[RESOURCE_MAP.values().index(res_type)]
         resource_table = globals().get(resource_type + 'InstModel')
         resource_table.objects.filter(instid=self.nf_inst_id, resouceid=res_id).delete()
 
