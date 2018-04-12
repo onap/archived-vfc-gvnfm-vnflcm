@@ -140,25 +140,9 @@ class InstVnf(Thread):
         content_args['additionalParam']['vnfmid'] = vnfmInfo[0].vnfminstid
         content_args['additionalParam']['vimid'] = vnfmInfo[0].apiurl
         logger.info('Grant request data = %s', content_args)
+
         apply_result = apply_grant_to_nfvo(json.dumps(content_args))
-
-        for vdu in ignore_case_get(self.vnfd_info, "vdus"):
-            if "location_info" in vdu["properties"]:
-                vdu["properties"]["location_info"]["vimid"] = ignore_case_get(apply_result, "vimid")
-                vdu["properties"]["location_info"]["tenant"] = ignore_case_get(apply_result, "tenant")
-            else:
-                vdu["properties"]["location_info"] = {
-                    "vimid": ignore_case_get(apply_result, "vimid"),
-                    "tenant": ignore_case_get(apply_result, "tenant")}
-
-        for vl in ignore_case_get(self.vnfd_info, "vls"):
-            if "location_info" in vl["properties"]:
-                vl["properties"]["location_info"]["vimid"] = ignore_case_get(apply_result, "vimid")
-                vl["properties"]["location_info"]["tenant"] = ignore_case_get(apply_result, "tenant")
-            else:
-                vl["properties"]["location_info"] = {
-                    "vimid": ignore_case_get(apply_result, "vimid"),
-                    "tenant": ignore_case_get(apply_result, "tenant")}
+        self.set_location(apply_result)
 
         logger.info('VnfdInfo = %s' % self.vnfd_info)
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='INSTANTIATED', lastuptime=now_time())
@@ -369,3 +353,14 @@ class InstVnf(Thread):
                     cp["networkId"] = ignore_case_get(extlink, "resourceId")
                     cp["subnetId"] = ignore_case_get(extlink, "resourceSubnetId")
                     break
+
+    def set_location(self, apply_result):
+        for resource_type in ['vdus', 'vls']:
+            for resource in ignore_case_get(self.vnfd_info, resource_type):
+                if "location_info" in resource["properties"]:
+                    resource["properties"]["location_info"]["vimid"] = ignore_case_get(apply_result, "vimid")
+                    resource["properties"]["location_info"]["tenant"] = ignore_case_get(apply_result, "tenant")
+                else:
+                    resource["properties"]["location_info"] = {
+                        "vimid": ignore_case_get(apply_result, "vimid"),
+                        "tenant": ignore_case_get(apply_result, "tenant")}
