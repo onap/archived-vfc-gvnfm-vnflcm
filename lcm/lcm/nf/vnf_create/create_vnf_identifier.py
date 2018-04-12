@@ -28,11 +28,9 @@ logger = logging.getLogger(__name__)
 class CreateVnf:
     def __init__(self, data):
         self.data = data
-        self.vnfd_id = ignore_case_get(self.data, "vnfdId")
+        self.csar_id = ignore_case_get(self.data, "vnfdId")
         self.vnf_instance_mame = ignore_case_get(self.data, "vnfInstanceName")
         self.description = ignore_case_get(self.data, "vnfInstanceDescription")
-        self.vnfd = None
-        self.csar_id = self.vnfd_id
 
     def do_biz(self):
         self.nf_inst_id = str(uuid.uuid4())
@@ -54,7 +52,7 @@ class CreateVnf:
                                        vnfd_model='',
                                        status='NOT_INSTANTIATED',
                                        nf_desc=self.description,
-                                       vnfdid=self.vnfd_id,
+                                       vnfdid=self.csar_id,
                                        vnfSoftwareVersion='',
                                        create_time=now_time())
         vnf_inst = NfInstModel.objects.get(nfinstid=self.nf_inst_id)
@@ -94,6 +92,7 @@ class CreateVnf:
                                    vnfd_model=self.vnfd_info,
                                    status='NOT_INSTANTIATED',
                                    nf_desc=self.description,
-                                   vnfdid=self.vnfd_id,
+                                   vnfdid=self.csar_id,
                                    vnfSoftwareVersion=vnfsoftwareversion,
                                    create_time=now_time())
+        logger.debug('Create VNF instance[%s] success', self.nf_inst_id)
