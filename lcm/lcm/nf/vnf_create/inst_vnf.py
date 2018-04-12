@@ -37,12 +37,7 @@ class InstVnf(Thread):
         self.data = data
         self.nf_inst_id = nf_inst_id
         self.job_id = job_id
-        self.vnfd_id = ''
         self.vim_id = ignore_case_get(ignore_case_get(self.data, "additionalParams"), "vimId")
-        self.nfvo_inst_id = ''
-        self.vnfm_inst_id = ''
-        self.package_id = ''
-        self.vnfd_info = []
 
     def run(self):
         try:
@@ -81,12 +76,13 @@ class InstVnf(Thread):
 
         self.update_cps()
         metadata = ignore_case_get(self.vnfd_info, "metadata")
+        csar_id = ignore_case_get(metadata, "id")
         version = ignore_case_get(metadata, "vnfdVersion")
         vendor = ignore_case_get(metadata, "vendor")
         netype = ignore_case_get(metadata, "type")
         vnfsoftwareversion = ignore_case_get(metadata, "version")
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).\
-            update(package_id=self.package_id,
+            update(package_id=csar_id,
                    flavour_id=ignore_case_get(self.data, "flavourId"),
                    version=version,
                    vendor=vendor,
