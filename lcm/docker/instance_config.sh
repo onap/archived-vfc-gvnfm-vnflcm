@@ -3,11 +3,18 @@
 MSB_IP=`echo $MSB_ADDR | cut -d: -f 1`
 MSB_PORT=`echo $MSB_ADDR | cut -d: -f 2`
 
-sed -i "s|MSB_SERVICE_IP.*|MSB_SERVICE_IP = '$MSB_IP'|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
-sed -i "s|MSB_SERVICE_PORT.*|MSB_SERVICE_PORT = '$MSB_PORT'|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
+if [ $MSB_IP ]; then
+    sed -i "s|MSB_SERVICE_IP.*|MSB_SERVICE_IP = '$MSB_IP'|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
+fi
+
+if [ $MSB_PORT ]; then
+    sed -i "s|MSB_SERVICE_PORT.*|MSB_SERVICE_PORT = '$MSB_PORT'|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
+fi
+
 sed -i "s|DB_NAME.*|DB_NAME = 'gvnfm'|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
 sed -i "s|DB_USER.*|DB_USER = 'gvnfm'|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
 sed -i "s|DB_PASSWD.*|DB_PASSWD = 'gvnfm'|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
+
 if [ $SERVICE_IP ]; then
     sed -i "s|\"ip\": \".*\"|\"ip\": \"$SERVICE_IP\"|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
 fi
