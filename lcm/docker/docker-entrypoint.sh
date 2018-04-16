@@ -5,6 +5,11 @@ if [ -z "$SERVICE_IP" ]; then
 fi
 echo "SERVICE_IP=$SERVICE_IP"
 
+if [ -z "$REG_TO_MSB" ]; then
+    export REG_TO_MSB=True
+fi
+echo "REG_TO_MSB=$REG_TO_MSB"
+
 if [ -z "$MYSQL_ROOT_PASSWORD" ]; then
     export MYSQL_ROOT_PASSWORD="root"
 fi

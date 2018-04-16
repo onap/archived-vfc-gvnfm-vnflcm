@@ -11,6 +11,10 @@ if [ $MSB_PORT ]; then
     sed -i "s|MSB_SERVICE_PORT.*|MSB_SERVICE_PORT = '$MSB_PORT'|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
 fi
 
+if [ $REG_TO_MSB ]; then
+    sed -i "s|REG_TO_MSB_WHEN_START.*|REG_TO_MSB_WHEN_START = '$REG_TO_MSB'|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
+fi
+
 sed -i "s|DB_NAME.*|DB_NAME = 'gvnfm'|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
 sed -i "s|DB_USER.*|DB_USER = 'gvnfm'|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
 sed -i "s|DB_PASSWD.*|DB_PASSWD = 'gvnfm'|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
