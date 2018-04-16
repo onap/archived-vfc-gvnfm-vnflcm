@@ -194,8 +194,12 @@ def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
     }
     set_opt_val(param, "subnetId", subnet_id)
     set_opt_val(param, "macAddress", ignore_case_get(port["properties"], "mac_address"))
-    l3_address_data = port["properties"]["protocol_data"]["address_data"]["l3_address_data"]
-    set_opt_val(param, "ip", ignore_case_get(l3_address_data, "fixed_ip_address"))
+    ip_address = []
+    for one_protocol_data in port["properties"]["protocol_data"]:
+        l3_address_data = one_protocol_data["address_data"]["l3_address_data"]
+        fixed_ip_address = ignore_case_get(l3_address_data, "fixed_ip_address")
+        ip_address.extend(fixed_ip_address)
+    set_opt_val(param, "ip", ip_address)
     set_opt_val(param, "vnicType", ignore_case_get(port["properties"], "vnic_type"))
     set_opt_val(param, "securityGroups", "")   # TODO
     vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
