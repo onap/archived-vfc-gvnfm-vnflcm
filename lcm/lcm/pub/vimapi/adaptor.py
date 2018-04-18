@@ -289,22 +289,23 @@ def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
         "volumeArray": []
     }
     # set boot param
-    if "image_file" in vm and vm["image_file"]:
+    if "artifacts" in vm and vm["artifacts"]:
         param["boot"]["type"] = BOOT_FROM_IMAGE
         img_name = ""
-        for img in ignore_case_get(data, "image_files"):
-            if vm["image_file"] == img["image_file_id"]:
-                img_name = img["properties"]["name"]
+        for artifact in vm["artifacts"]:
+            if artifact["artifact_name"] == "sw_image":
+                # TODO: after DM define
+                img_name = artifact["file"]
                 break
         if not img_name:
-            raise VimException("Undefined image(%s)" % vm["image_file"], ERR_CODE)
+            raise VimException("Undefined image(%s)" % vm["artifacts"], ERR_CODE)
         images = api.list_image(vim_id, tenant_id)
         for image in images["images"]:
             if img_name == image["name"]:
                 param["boot"]["imageId"] = image["id"]
                 break
         if "imageId" not in param["boot"]:
-            raise VimException("Image(%s) not found in Vim(%s)" % (img_name, vim_id), ERR_CODE)
+            raise VimException("Undefined artifacts image(%s)" % vm["artifacts"], ERR_CODE)
     elif vm["volume_storages"]:
         param["boot"]["type"] = BOOT_FROM_VOLUME
         vol_id = vm["volume_storages"][0]["volume_storage_id"]
@@ -316,11 +317,13 @@ def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
         param["nicArray"].append({
             "portId": get_res_id(res_cache, RES_PORT, cp_id)
         })
-    for inject_data in ignore_case_get(vm["properties"], "inject_data_list"):
-        param["contextArray"].append({
-            "fileName": inject_data["file_name"],
-            "fileData": inject_data["file_data"]
-        })
+    # TODO: use config drive
+    for inject_data in ignore_case_get(vm["properties"], "inject_files"):
+        for key, value in inject_data.items():
+            param["contextArray"].append({
+                "fileName": key,
+                "fileData": value
+            })
     for vol_data in ignore_case_get(vm, "volume_storages"):
         vol_id = vol_data["volume_storage_id"]
         param["volumeArray"].append({
@@ -328,8 +331,8 @@ def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
         })
 
     set_opt_val(param, "availabilityZone", ignore_case_get(location_info, "availability_zone"))
-    set_opt_val(param, "userdata", "")         # TODO Configuration information or scripts to use upon launch
-    set_opt_val(param, "metadata", "")         # TODO [{"keyName": "foo", "value": "foo value"}]
+    set_opt_val(param, "userdata", ignore_case_get(vm["properties"], "user_data"))
+    set_opt_val(param, "metadata", ignore_case_get(vm["properties"], "meta_data"))
     set_opt_val(param, "securityGroups", "")   # TODO List of names of security group
     set_opt_val(param, "serverGroup", "")      # TODO the ServerGroup for anti-affinity and affinity
 

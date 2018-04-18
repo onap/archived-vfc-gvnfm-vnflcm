@@ -46,21 +46,17 @@ inst_res_data = {
             },
             "artifacts": [
                 {
-                    "artifact_name": "cirros.img",
+                    "artifact_name": "sw_image",
+                    "deploy_path": "",
                     "type": "tosca.artifacts.nfv.SwImage",
-                    "properties": {
-                        "operating_system": "unbant",
-                        "sw_image": "/swimages/xenial-snat.qcow2",
-                        "name": "cirros.img",
-                        "checksum": "5000",
-                        "min_ram": "1 GB",
-                        "disk_format": "qcow2",
-                        "version": "1.0",
-                        "container_format": "bare",
-                        "min_disk": "10 GB",
-                        "size": "10 GB"
-                    },
-                    "file": "/swimages/xenial-snat.qcow2"
+                    "repository": "",
+                    "file": "ubuntu_16.04"
+                },
+            ],
+            "inject_files": [
+                {
+                    "source_path": "artifacts/keys/authorized_keys",
+                    "dest_path": "/home/ubuntu/.ssh/authorized_keys"
                 }
             ],
             "image_file": "cirros.img",
@@ -76,6 +72,8 @@ inst_res_data = {
                 "cp_vNat"
             ],
             "properties": {
+                "user_data": "just test user data",
+                "meta_data": "just test meta data",
                 "configurable_properties": {
                     "test": {
                         "additional_vnfc_configurable_properties": {
@@ -330,7 +328,7 @@ c5_data_get_flavor = [{
 c6_data_list_image = {
     "images": [
         {
-            "name": "cirros.img",
+            "name": "ubuntu_16.04",
             "id": "678"
         }
     ]
