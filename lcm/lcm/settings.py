@@ -14,13 +14,14 @@
 
 import os
 import sys
+from logging import config
 
 import redisco
-
-from lcm.pub.config.config import REDIS_HOST, REDIS_PORT, REDIS_PASSWD
-from lcm.pub.config.config import DB_NAME, DB_IP, DB_USER, DB_PASSWD, DB_PORT
-from logging import config
 from onaplogging import monkey
+
+from lcm.pub.config.config import DB_NAME, DB_IP, DB_USER, DB_PASSWD, DB_PORT
+from lcm.pub.config.config import REDIS_HOST, REDIS_PORT, REDIS_PASSWD
+
 monkey.patch_all()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -122,41 +123,41 @@ TIME_ZONE = 'UTC'
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
-#
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': True,
-#     'formatters': {
-#         'standard': {
-#             'format': '%(asctime)s:[%(name)s]:[%(filename)s]-[%(lineno)d] [%(levelname)s]:%(message)s',
-#         },
-#     },
-#     'filters': {
-#     },
-#     'handlers': {
-#         'lcm_handler': {
-#             'level': 'DEBUG',
-#             'class': 'logging.handlers.RotatingFileHandler',
-#             'filename': os.path.join(BASE_DIR, 'logs/runtime_lcm.log'),
-#             'formatter': 'standard',
-#             'maxBytes': 1024 * 1024 * 50,
-#             'backupCount': 5,
-#         },
-#     },
-#
-#     'loggers': {
-#         'lcm': {
-#             'handlers': ['lcm_handler'],
-#             'level': 'DEBUG',
-#             'propagate': False
-#         },
-#     }
-# }
-LOGGING_CONFIG = None
-# yaml configuration of logging
-LOGGING_FILE = os.path.join(BASE_DIR, 'lcm/log.yml')
-config.yamlConfig(filepath=LOGGING_FILE, watchDog=True)
 
+if sys.platform == 'win32':
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': True,
+        'formatters': {
+            'standard': {
+                'format': '%(asctime)s:[%(name)s]:[%(filename)s]-[%(lineno)d] [%(levelname)s]:%(message)s',
+            },
+        },
+        'filters': {
+        },
+        'handlers': {
+            'lcm_handler': {
+                'level': 'DEBUG',
+                'class': 'logging.handlers.RotatingFileHandler',
+                'filename': os.path.join(BASE_DIR, 'logs/runtime_lcm.log'),
+                'formatter': 'standard',
+                'maxBytes': 1024 * 1024 * 50,
+                'backupCount': 5,
+            },
+        },
+
+        'loggers': {
+            'lcm': {
+                'handlers': ['lcm_handler'],
+                'level': 'DEBUG',
+                'propagate': False
+            },
+        }
+    }
+else:
+    LOGGING_CONFIG = None
+    LOGGING_FILE = os.path.join(BASE_DIR, 'lcm/log.yml')
+    config.yamlConfig(filepath=LOGGING_FILE, watchDog=True)
 
 if 'test' in sys.argv:
     from lcm.pub.config import config
