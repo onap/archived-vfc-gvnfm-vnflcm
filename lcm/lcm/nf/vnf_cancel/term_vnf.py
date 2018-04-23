@@ -172,7 +172,7 @@ class TermVnf(Thread):
         self.notify_data = {
             "status": 'result',
             "vnfInstanceId": self.nf_inst_id,
-            "operation": 'Terminal',
+            "operation": 'terminate',
             "jobId": self.job_id,
             'affectedVnfc': affected_vnfc,
             'affectedVirtualLink': affected_vl,
