@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a93c517_7101fbad",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 3641
+      },
+      "writtenOn": "2018-05-01T13:10:12Z",
+      "side": 1,
+      "message": "multivim currently uses \u0027--personality\u0027 to inject files via Nova api. However, this parameter seems to have been deprecated from Queens release, nova microversion 2.57.\nPlease kindly double check:\n1. How do we handle file injections in this context?\n2. Align the fields required/provided in multivim/lcm.",
+      "range": {
+        "startLine": 320,
+        "startChar": 4,
+        "endLine": 320,
+        "endChar": 77
+      },
+      "revId": "c4a3c5f929209f032f7a47c2f96e903d97bb0cfe",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
