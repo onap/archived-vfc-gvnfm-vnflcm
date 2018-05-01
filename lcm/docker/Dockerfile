@@ -43,6 +43,8 @@ RUN wget -q -O vfc-gvnfm-vnfres-res.zip 'https://nexus.onap.org/service/local/ar
 
 RUN sed -i "s|bind-address.*|# bind-address = 127.0.0.1|" /etc/mysql/my.cnf
 
+VOLUME /var/lib/mysql
+
 WORKDIR /service/vfc/gvnfm/vnflcm/lcm
 RUN pip install -r requirements.txt
 
