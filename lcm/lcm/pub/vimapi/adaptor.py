@@ -317,13 +317,8 @@ def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
         param["nicArray"].append({
             "portId": get_res_id(res_cache, RES_PORT, cp_id)
         })
-    # TODO: use config drive
-    for inject_data in ignore_case_get(vm["properties"], "inject_files"):
-        for key, value in inject_data.items():
-            param["contextArray"].append({
-                "fileName": key,
-                "fileData": value
-            })
+    param["contextArray"] = ignore_case_get(vm["properties"], "inject_files")
+    logger.debug("contextArray:%s", param["contextArray"])
     for vol_data in ignore_case_get(vm, "volume_storages"):
         vol_id = vol_data["volume_storage_id"]
         param["volumeArray"].append({

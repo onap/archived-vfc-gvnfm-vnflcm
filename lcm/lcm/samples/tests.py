@@ -53,12 +53,6 @@ inst_res_data = {
                     "file": "ubuntu_16.04"
                 },
             ],
-            "inject_files": [
-                {
-                    "source_path": "artifacts/keys/authorized_keys",
-                    "dest_path": "/home/ubuntu/.ssh/authorized_keys"
-                }
-            ],
             "image_file": "cirros.img",
             "local_storages": [
                 "intel_local_storages_1"
@@ -74,6 +68,13 @@ inst_res_data = {
             "properties": {
                 "user_data": "just test user data",
                 "meta_data": "just test meta data",
+                "inject_files": [
+                    {
+                        "source_path": "artifacts/keys/authorized_keys",
+                        "source_data_base64": "c3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBREFRQUJBQUFCQVFER3g2U0tyQXVDejFWOEtHZXZa\ndWVrc0xkV29QV0pQNnozcjI5WjdUbVBWRU9qTSs3UElQZVNzMkJWUngzcm5IWkJBbGFzTXJaK2ZK\nQlMyNXRzOXZmQytJdGV6UWFoL2hyOXZya213eENSNTRMYjg0cG9XK3NUb1BlRjZpNWVaWTdXK2pX\nSmZMYUZTRng5ZDJ2cDR6ZXMvZk9sVDNOdllDWGJuLzNRZHJ5UW9HbDdWRkk4b2VtWnlwVmNpa1pY\nRWxKZWVLZ0FWZFN3bnJ6dXF0Ty90bWJYY0FlU2JZdlZqa2k4eXdZY3NXTVZNWVdVV2hoKzFCQUI2\na1huVHNJV3F6cnEwUGZ2eSs4MVdEd3RpcXNxbWQ5M0hZOGhFMHNjQnJYRkJaelFTL0FZZklGQmxF\ndUZOZExjemNobnRqYlowbjdkbURYazh6SHRDWllOazdrd2I4ay8gbHVsaWFuaGFvQGxsdS1udWMx\nCg==\n",
+                        "dest_path": "/home/ubuntu/.ssh/authorized_keys"
+                    }
+                ],
                 "configurable_properties": {
                     "test": {
                         "additional_vnfc_configurable_properties": {
