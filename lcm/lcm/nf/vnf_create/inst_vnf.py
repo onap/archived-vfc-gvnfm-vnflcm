@@ -338,7 +338,7 @@ def flavor_save(job_id, nf_inst_id, ret):
         swap=get_integer(ignore_case_get(ret, "swap")),
         isPublic=get_boolean(ignore_case_get(ret, "isPublic")),
         extraspecs=ignore_case_get(ret, "extraSpecs"),
-        is_predefined=ignore_case_get(ret, "returnCode"),
+        is_predefined=ret.get("returnCode", int(0)),
         instid=nf_inst_id)
 
 
