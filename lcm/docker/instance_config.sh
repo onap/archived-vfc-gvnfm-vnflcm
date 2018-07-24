@@ -19,6 +19,8 @@ if [ $SERVICE_IP ]; then
     sed -i "s|\"ip\": \".*\"|\"ip\": \"$SERVICE_IP\"|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
 fi
 
+sed -i "s/AAI_IP:AAI_PORT/$MSB_IP:$MSB_PORT/" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
+
 # Configure MYSQL
 if [ -z "$MYSQL_ADDR" ]; then
     export MYSQL_IP=`hostname -i`
