@@ -14,6 +14,7 @@
 
 import logging
 import time
+import ast
 
 from lcm.pub.utils.values import ignore_case_get, set_opt_val
 from lcm.pub.msapi.aai import get_flavor_info
@@ -210,20 +211,39 @@ def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
     set_res_cache(res_cache, res_type, port["cp_id"], ret["id"])
 
 
-def search_flavor_aai(vim_id, memory_page_size):
+def parse_unit(val, base_unit):
+    recognized_units = ["B", "kB", "KiB", "MB", "MiB", "GB", "GiB", "TB", "TiB"]
+    units_rate = [1, 1000, 1024, 1000000, 1048576, 1000000000, 1073741824, 1000000000000, 1099511627776]
+    unit_rate_map = {unit.upper(): rate for unit, rate in zip(recognized_units, units_rate)}
+    num_unit = val.strip().split(" ")
+    if len(num_unit) !=2:
+        return  val.strip
+    num, unit = num_unit[0], num_unit[1]
+    return int(num) * unit_rate_map[unit.upper()]/ unit_rate_map[base_unit.upper()]
+
+
+def search_flavor_aai(vim_id, memory_page_size, memory_page_unit):
     aai_flavors = get_flavor_info(vim_id)
     if not aai_flavors:
         return None
     logger.debug("aai_flavors:%s" % aai_flavors)
-    aai_flavor = aai_flavors[0]["flavors"]["flavor"]
+    aai_flavor = aai_flavors["flavor"]
     for one_aai_flavor in aai_flavor:
-        hpa_capabilities = one_aai_flavor["hpa-capabilities"]
+        if one_aai_flavor["flavor-name"].find("onap.") == -1:
+            continue
+        hpa_capabilities = one_aai_flavor["hpa-capabilities"]["hpa-capability"]
+        logger.debug("hpa_capabilities=%s", hpa_capabilities)
         for one_hpa_capa in hpa_capabilities:
+            logger.debug("one_hpa_capa=%s", one_hpa_capa)
             hpa_feature_attr = one_hpa_capa["hpa-feature-attributes"]
             for one_hpa_attr in hpa_feature_attr:
                 hpa_key = one_hpa_attr["hpa-attribute-key"]
-                hpa_value = one_hpa_attr["hpa-attribute-value"]["value"]
-                if hpa_key == "memoryPageSize" and int(hpa_value) == memory_page_size:
+                hpa_attr_value = ast.literal_eval(one_hpa_attr["hpa-attribute-value"])
+                mem_size = ignore_case_get(hpa_attr_value, 'value')
+                mem_unit = ignore_case_get(hpa_attr_value, 'unit')
+                value = mem_size + " " + mem_unit
+                hpa_mem_size = parse_unit(value, memory_page_unit)
+                if hpa_key == "memoryPageSize" and hpa_mem_size == memory_page_size:
                     return one_aai_flavor
 
 
@@ -231,23 +251,26 @@ def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
     location_info = flavor["properties"]["location_info"]
     vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
     virtual_compute = flavor["virtual_compute"]
+    virtual_storage = flavor["virtual_storage"]
+    virtual_cpu = ignore_case_get(virtual_compute, "virtual_cpu")
+    virtual_memory = ignore_case_get(virtual_compute, "virtual_memory")
     param = {
         "name": "Flavor_%s" % flavor["vdu_id"],
-        "vcpu": int(virtual_compute["virtual_cpu"]["num_virtual_cpu"]),
-        "memory": int(virtual_compute["virtual_memory"]["virtual_mem_size"].replace('MB', '').strip()),
+        "vcpu": int(ignore_case_get(virtual_cpu, "num_virtual_cpu")),
+        "memory": int(ignore_case_get(virtual_memory, "virtual_mem_size").replace('MB', '').strip()),
         "isPublic": True
     }
 
     # just do memory huge page
     flavor_extra_specs = ""
-    vdu_memory_requirements = virtual_compute["virtual_memory"]["vdu_memory_requirements"]
+    vdu_memory_requirements = ignore_case_get(virtual_memory,"vdu_memory_requirements")
     if "memoryPageSize" in vdu_memory_requirements:
         memory_page_size = int(vdu_memory_requirements["memoryPageSize"].replace('MB', '').strip())
         flavor_extra_specs = ("hw:mem_page_size=%sMB" % memory_page_size)
         logger.debug("flavor_extra_specs:%s" % flavor_extra_specs)
 
-    # search aai flavor
-    aai_flavor = search_flavor_aai(vim_id, memory_page_size)
+    # FIXME: search aai flavor
+    aai_flavor = search_flavor_aai(vim_id, memory_page_size, "MB")
 
     # add aai flavor
     if aai_flavor:
@@ -256,8 +279,8 @@ def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
         set_res_cache(res_cache, res_type, flavor["vdu_id"], ret["flavor-id"])
     else:
         extra_specs = []
-        disk_type = virtual_compute["virtual_storage"]["type_of_storage"]
-        disk_size = int(virtual_compute["virtual_storage"]["size_of_storage"].replace('GB', '').strip())
+        disk_type = ignore_case_get(virtual_storage, "type_of_storage")
+        disk_size = int(ignore_case_get(virtual_storage, "size_of_storage").replace('GB', '').strip())
         if disk_type == "root":
             param["disk"] = disk_size
         elif disk_type == "ephemeral":
