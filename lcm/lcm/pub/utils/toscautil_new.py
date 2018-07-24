@@ -55,7 +55,7 @@ def convert_metadata(src_json):
 
 
 def convert_factor_unit(value):
-    if isinstance(value, (str, unicode)):
+    if isinstance(value, str):
         return value
     return "%s %s" % (value["factor"], value["unit"])
 
@@ -301,7 +301,7 @@ def merge_imagefile_node(img_nodes, vdu_nodes):
 
 
 def convert_common(src_json, target_json):
-    if isinstance(src_json, (unicode, str)):
+    if isinstance(src_json, str):
         src_json_dict = json.loads(src_json)
     else:
         src_json_dict = src_json
@@ -1457,4 +1457,4 @@ if __name__ == '__main__':
             }
         }
     })
-    print convert_vnfd_model(src_json)
+    print(convert_vnfd_model(src_json))

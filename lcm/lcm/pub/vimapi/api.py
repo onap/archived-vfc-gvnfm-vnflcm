@@ -22,7 +22,7 @@ VIM_DRIVER_BASE_URL = "api/multicloud/v0"
 
 
 def call(vim_id, tenant_id, res, method, data=''):
-    if data and not isinstance(data, (str, unicode)):
+    if data and not isinstance(data, str):
         data = json.JSONEncoder().encode(data)
     url_fmt = "{base_url}/{vim_id}{tenant_id}/{res}"
     url = url_fmt.format(base_url=VIM_DRIVER_BASE_URL,

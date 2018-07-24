@@ -67,7 +67,7 @@ class InstVnf(Thread):
         input_parameters = []
         inputs = ignore_case_get(self.data['additionalParams'], "inputs")
         if inputs:
-            if isinstance(inputs, (str, unicode)):
+            if isinstance(inputs, str):
                 inputs = json.loads(inputs)
             for key, val in inputs.items():
                 input_parameters.append({"key": key, "value": val})
