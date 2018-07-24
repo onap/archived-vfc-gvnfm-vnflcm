@@ -288,7 +288,7 @@ def convert_vnffgs(src_json_inst, src_nodes):
 
 
 def convert_common(src_json, target_json):
-    if isinstance(src_json, (unicode, str)):
+    if isinstance(src_json, str):
         src_json_dict = json.loads(src_json)
     else:
         src_json_dict = src_json
@@ -2676,4 +2676,4 @@ if __name__ == '__main__':
             }
         }
     )
-    print convert_nsd_model(src_json)
+    print(convert_nsd_model(src_json))

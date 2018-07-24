@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 def make_dirs(path):
     if not os.path.exists(path):
-        os.makedirs(path, 0777)
+        os.makedirs(path, 777)
 
 
 def delete_dirs(path):

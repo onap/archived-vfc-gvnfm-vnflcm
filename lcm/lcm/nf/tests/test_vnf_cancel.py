@@ -170,6 +170,7 @@ class TestNFTerminate(TestCase):
         }
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
+        print(self.job_id)
         JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
         TermVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
         self.assert_job_result(self.job_id, 100, "Terminate Vnf success.")
