@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a6a9dd7_da122158",
+        "filename": "lcm/lcm/nf/tests/test_vnf_cancel.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-07-30T08:25:51Z",
+      "side": 1,
+      "message": "remove this line?this is python3 grammer, python2.7 does not support.",
+      "range": {
+        "startLine": 173,
+        "startChar": 6,
+        "endLine": 173,
+        "endChar": 26
+      },
+      "revId": "379883dc942fb95d6fba492757cc277b6587aa35",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a6a9dd7_fa0fe52c",
+        "filename": "lcm/lcm/nf/vnf_create/inst_vnf.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-07-30T08:25:51Z",
+      "side": 1,
+      "message": "Why delete unicode?",
+      "range": {
+        "startLine": 70,
+        "startChar": 10,
+        "endLine": 70,
+        "endChar": 39
+      },
+      "revId": "379883dc942fb95d6fba492757cc277b6587aa35",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a6a9dd7_ba196d7b",
+        "filename": "lcm/lcm/pub/utils/jobutil.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-07-30T08:25:51Z",
+      "side": 1,
+      "message": "Why import reduce, no reference is found in this file",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 28
+      },
+      "revId": "379883dc942fb95d6fba492757cc277b6587aa35",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a6a9dd7_5a2611bc",
+        "filename": "lcm/lcm/pub/utils/toscautil.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-07-30T08:25:51Z",
+      "side": 1,
+      "message": "Why delete unicode?",
+      "range": {
+        "startLine": 291,
+        "startChar": 27,
+        "endLine": 291,
+        "endChar": 33
+      },
+      "revId": "379883dc942fb95d6fba492757cc277b6587aa35",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a6a9dd7_7a2bd582",
+        "filename": "lcm/lcm/pub/utils/toscautil_new.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-07-30T08:25:51Z",
+      "side": 1,
+      "message": "Why delete unicode?",
+      "range": {
+        "startLine": 58,
+        "startChar": 24,
+        "endLine": 58,
+        "endChar": 30
+      },
+      "revId": "379883dc942fb95d6fba492757cc277b6587aa35",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a6a9dd7_1a20999a",
+        "filename": "lcm/lcm/pub/vimapi/api.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-07-30T08:25:51Z",
+      "side": 1,
+      "message": "Why delete unicode?",
+      "range": {
+        "startLine": 25,
+        "startChar": 37,
+        "endLine": 25,
+        "endChar": 41
+      },
+      "revId": "379883dc942fb95d6fba492757cc277b6587aa35",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
