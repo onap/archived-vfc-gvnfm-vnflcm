@@ -39,10 +39,10 @@ inst_res_data = {
                     "num_virtual_cpu": "2",
                     "cpu_architecture": "generic"
                 },
-                "virtual_storage": {
-                    "type_of_storage": "root",
-                    "size_of_storage": "40 GB"
-                },
+            },
+            "virtual_storage": {
+                "type_of_storage": "root",
+                "size_of_storage": "40 GB"
             },
             "artifacts": [
                 {
@@ -305,26 +305,30 @@ c4_data_create_port = {
     "id": "456"
 }
 
-c5_data_get_flavor = [{
-    "flavors": {
-        "flavor": [
+c5_data_get_flavor = {
+    "flavor": [
+        {
+            "flavor-id": "111111",
+            "flavor-name": "onap.large",
+            "hpa-capabilities":
             {
-                "flavor-id": "111111",
-                "hpa-capabilities": [
+                "hpa-capability":
+                [
                     {
                         "hpa-capability-id": "1243",
-                        "hpa-feature-attributes": [
+                        "hpa-feature-attributes":
+                        [
                             {
                                 "hpa-attribute-key": "memoryPageSize",
-                                "hpa-attribute-value": {"value": 2, "unit": "MB"}
+                                "hpa-attribute-value": '{"value": "2", "unit": "MB"}'
                             }
                         ]
                     }
                 ]
             }
-        ]
-    }
-}]
+        }
+    ]
+}
 
 c6_data_list_image = {
     "images": [
