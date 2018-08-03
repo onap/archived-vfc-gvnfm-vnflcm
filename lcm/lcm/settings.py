@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'lcm.pub.database',
     'lcm.samples',
+    'lcm.swagger',
     'drf_yasg',
 ]
 
