@@ -155,10 +155,14 @@ STATIC_URL = '/static/'
 LOGGING_CONFIG = None
 # yaml configuration of logging
 LOGGING_FILE = os.path.join(BASE_DIR, 'lcm/log.yml')
+if 'test' in sys.argv:
+    os.system('sed -i "s|/var/log/onap/vfc/gvnfm-vnflcm|/tmp|" %s' % LOGGING_FILE)
 config.yamlConfig(filepath=LOGGING_FILE, watchDog=True)
 
 
 if 'test' in sys.argv:
+    os.system('sed -i "s|/tmp|/var/log/onap/vfc/gvnfm-vnflcm|" %s' % LOGGING_FILE)
+
     from lcm.pub.config import config
     config.REG_TO_MSB_WHEN_START = False
 
