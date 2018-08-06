@@ -30,9 +30,9 @@ from lcm.pub.vimapi import adaptor
 logger = logging.getLogger(__name__)
 
 
-class TermVnf(Thread):
+class TerminateVnf(Thread):
     def __init__(self, data, nf_inst_id, job_id):
-        super(TermVnf, self).__init__()
+        super(TerminateVnf, self).__init__()
         self.data = data
         self.nf_inst_id = nf_inst_id
         self.job_id = job_id

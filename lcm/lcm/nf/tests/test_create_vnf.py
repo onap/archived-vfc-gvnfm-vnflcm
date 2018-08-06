@@ -1,4 +1,4 @@
-# Copyright 2018 ZTE Corporation.
+# Copyright 2017 ZTE Corporation.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ import mock
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
-
 from lcm.nf.const import vnfpackage_info
 from lcm.pub.database.models import NfInstModel, JobStatusModel
 from lcm.pub.utils import restcall
@@ -29,12 +28,8 @@ class TestNFInstantiate(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.grant_result = {
-            "vim": {
-                "vimid": 'vimid_1',
-                "accessinfo": {
-                    "tenant": 'tenantname_1'
-                }
-            }
+            "vimid": 'vimid_1',
+            "tenant": 'tenantname_1'
         }
 
     def tearDown(self):
@@ -63,7 +58,7 @@ class TestNFInstantiate(TestCase):
             "vnfInstanceName": "vFW_01",
             "vnfInstanceDescription": "vFW in Nanjing TIC Edge"
         }
-        response = self.client.post("/api/vnflcm/v2/vnf_instances", data=data, format='json')
+        response = self.client.post("/api/vnflcm/v1/vnf_instances", data=data, format='json')
         self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
         context = json.loads(response.content)
         self.assertEqual({'error': 'VNF is already exist.'}, context)
@@ -77,8 +72,8 @@ class TestNFInstantiate(TestCase):
             "vnfInstanceName": "vFW_01",
             "vnfInstanceDescription": "vFW in Nanjing TIC Edge"
         }
-        response = self.client.post("/api/vnflcm/v2/vnf_instances", data=data, format='json')
+        response = self.client.post("/api/vnflcm/v1/vnf_instances", data=data, format='json')
         self.failUnlessEqual(status.HTTP_201_CREATED, response.status_code)
         context = json.loads(response.content)
-        self.assertEqual(context['vnfInstanceName'], "vFW_01")
-        self.assertTrue(NfInstModel.objects.filter(nfinstid=context['id']).exists())
+        self.assertTrue(NfInstModel.objects.filter(nfinstid=context['vnfInstanceId']).exists())
+
