@@ -14,6 +14,7 @@
 
 import os
 import sys
+import platform
 
 import redisco
 
@@ -123,47 +124,44 @@ TIME_ZONE = 'UTC'
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
-#
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': True,
-#     'formatters': {
-#         'standard': {
-#             'format': '%(asctime)s:[%(name)s]:[%(filename)s]-[%(lineno)d] [%(levelname)s]:%(message)s',
-#         },
-#     },
-#     'filters': {
-#     },
-#     'handlers': {
-#         'lcm_handler': {
-#             'level': 'DEBUG',
-#             'class': 'logging.handlers.RotatingFileHandler',
-#             'filename': os.path.join(BASE_DIR, 'logs/runtime_lcm.log'),
-#             'formatter': 'standard',
-#             'maxBytes': 1024 * 1024 * 50,
-#             'backupCount': 5,
-#         },
-#     },
-#
-#     'loggers': {
-#         'lcm': {
-#             'handlers': ['lcm_handler'],
-#             'level': 'DEBUG',
-#             'propagate': False
-#         },
-#     }
-# }
-LOGGING_CONFIG = None
-# yaml configuration of logging
-LOGGING_FILE = os.path.join(BASE_DIR, 'lcm/log.yml')
-if 'test' in sys.argv:
-    os.system('sed -i "s|/var/log/onap/vfc/gvnfm-vnflcm|/tmp|" %s' % LOGGING_FILE)
-config.yamlConfig(filepath=LOGGING_FILE, watchDog=True)
+
+if platform.system() == 'Windows' or 'test' in sys.argv:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': True,
+        'formatters': {
+            'standard': {
+                'format': '%(asctime)s:[%(name)s]:[%(filename)s]-[%(lineno)d] [%(levelname)s]:%(message)s',
+            },
+        },
+        'filters': {
+        },
+        'handlers': {
+            'lcm_handler': {
+                'level': 'DEBUG',
+                'class': 'logging.handlers.RotatingFileHandler',
+                'filename': os.path.join(BASE_DIR, 'logs/runtime_lcm.log'),
+                'formatter': 'standard',
+                'maxBytes': 1024 * 1024 * 50,
+                'backupCount': 5,
+            },
+        },
+
+        'loggers': {
+            'lcm': {
+                'handlers': ['lcm_handler'],
+                'level': 'DEBUG',
+                'propagate': False
+            },
+        }
+    }
+else:
+    LOGGING_CONFIG = None
+    LOGGING_FILE = os.path.join(BASE_DIR, 'lcm/log.yml')
+    config.yamlConfig(filepath=LOGGING_FILE, watchDog=True)
 
 
 if 'test' in sys.argv:
-    os.system('sed -i "s|/tmp|/var/log/onap/vfc/gvnfm-vnflcm|" %s' % LOGGING_FILE)
-
     from lcm.pub.config import config
     config.REG_TO_MSB_WHEN_START = False
 
