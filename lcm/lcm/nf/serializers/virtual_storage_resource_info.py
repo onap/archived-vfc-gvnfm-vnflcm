@@ -27,9 +27,9 @@ class VirtualStorageResourceInfoSerializer(serializers.Serializer):
     virtualStorageDescId = serializers.CharField(
         help_text="Identifier of the VirtualStorageDesc in the VNFD.",
         max_length=255,
-        required=True,
-        allow_null=False,
-        allow_blank=False)
+        required=False,
+        allow_null=True,
+        allow_blank=True)
     storageResource = ResourceHandleSerializer(
         help_text="Reference to the VirtualStorage resource.",
         required=True,
