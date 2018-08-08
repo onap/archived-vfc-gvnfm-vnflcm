@@ -38,23 +38,12 @@ class CreateVnf:
             self.check_valid()
             self.save_db()
         except NFLCMException as e:
-            logger.debug('Create VNF instance[%s]: %s', self.nf_inst_id, e.message)
+            logger.debug('Create VNF instance[%s] failed: %s', self.nf_inst_id, e.message)
             raise NFLCMException(e.message)
         except Exception as e:
             logger.error(e.message)
             logger.error(traceback.format_exc())
-            NfInstModel.objects.create(nfinstid=self.nf_inst_id,
-                                       nf_name=self.vnf_instance_mame,
-                                       package_id='',
-                                       version='',
-                                       vendor='',
-                                       netype='',
-                                       vnfd_model='',
-                                       status='NOT_INSTANTIATED',
-                                       nf_desc=self.description,
-                                       vnfdid=self.csar_id,
-                                       vnfSoftwareVersion='',
-                                       create_time=now_time())
+            logger.debug('Create VNF instance[%s] failed' % self.nf_inst_id)
         vnf_inst = NfInstModel.objects.get(nfinstid=self.nf_inst_id)
         resp = {
             'id': vnf_inst.nfinstid,
