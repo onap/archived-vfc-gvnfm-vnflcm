@@ -1,6 +1,3 @@
-# Copyright 2018 ZTE Corporation.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
@@ -15,16 +12,9 @@
 from rest_framework import serializers
 
 
-class ScaleInfoSerializer(serializers.Serializer):
-    aspectId = serializers.CharField(
-        help_text="Identifier of the scaling aspect.",
-        max_length=255,
-        required=True,
-        allow_null=False,
-        allow_blank=False)
-    scaleLevel = serializers.IntegerField(
-        help_text="Indicates the scale level. \
-        The minimum value shall be 0 and the maximum value shall be <= maxScaleLevel as described in the VNFD.",
+class LinkSerializer(serializers.Serializer):
+    href = serializers.CharField(
+        help_text="URI of the referenced resource.",
         required=True,
         allow_null=False,
         allow_blank=False)
