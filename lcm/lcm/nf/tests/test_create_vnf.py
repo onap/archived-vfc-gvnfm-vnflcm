@@ -75,4 +75,16 @@ class TestNFInstantiate(TestCase):
         response = self.client.post("/api/vnflcm/v1/vnf_instances", data=data, format='json')
         self.failUnlessEqual(status.HTTP_201_CREATED, response.status_code)
         context = json.loads(response.content)
-        self.assertTrue(NfInstModel.objects.filter(nfinstid=context['vnfInstanceId']).exists())
+        self.assertTrue(NfInstModel.objects.filter(nfinstid=context['id']).exists())
+
+    @mock.patch.object(restcall, 'call_req')
+    def test_create_vnf_successfully(self, mock_call_req):
+        r2_get_vnfpackage_from_catalog = [0, json.JSONEncoder().encode(vnfpackage_info), '200']
+        mock_call_req.side_effect = [r2_get_vnfpackage_from_catalog]
+        data = {
+            "vnfdId": "111",
+            "vnfInstanceName": "vFW_01",
+            "vnfInstanceDescription": "vFW in Nanjing TIC Edge"
+        }
+        response = self.client.post("/api/vnflcm/v1/vnf_instances", data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
