@@ -26,5 +26,4 @@ class ScaleInfoSerializer(serializers.Serializer):
         help_text="Indicates the scale level. \
         The minimum value shall be 0 and the maximum value shall be <= maxScaleLevel as described in the VNFD.",
         required=True,
-        allow_null=False,
-        allow_blank=False)
+        allow_null=False)

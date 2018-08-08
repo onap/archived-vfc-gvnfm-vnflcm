@@ -43,43 +43,43 @@ class VnfInstanceSerializer(serializers.Serializer):
     vnfdId = serializers.CharField(
         help_text="Identifier of the VNFD on which the VNF instance is based.",
         max_length=255,
-        required=True,
-        allow_null=False,
-        allow_blank=False)
+        required=False,
+        allow_null=True,
+        allow_blank=True)
     vnfProvider = serializers.CharField(
         help_text="Provider of the VNF and the VNFD. \
         The value is copied from the VNFD. ",
         max_length=255,
         required=True,
-        allow_null=False,
+        allow_null=True,
         allow_blank=False)
     vnfProductName = serializers.CharField(
         help_text="Name to identify the VNF Product. \
         The value is copied from the VNFD.",
         max_length=255,
-        required=True,
-        allow_null=False,
-        allow_blank=False)
+        required=False,
+        allow_null=True,
+        allow_blank=True)
     vnfSoftwareVersion = serializers.CharField(
         help_text="Software version of the VNF. \
         The value is copied from the VNFD.",
         max_length=255,
-        required=True,
-        allow_null=False,
-        allow_blank=False)
+        required=False,
+        allow_null=True,
+        allow_blank=True)
     vnfdVersion = serializers.CharField(
         help_text="Identifies the version of the VNFD. \
         The value is copied from the VNFD.",
         max_length=255,
         required=True,
-        allow_null=False,
+        allow_null=True,
         allow_blank=False)
     vnfPkgId = serializers.CharField(
         help_text="Identifier of information held by the NFVO about the specific VNF package on which the VNF is based. \
         This attribute can be modified with the PATCH method.",
         max_length=255,
         required=True,
-        allow_null=False,
+        allow_null=True,
         allow_blank=False)
     vnfConfigurableProperties = serializers.DictField(
         help_text="Current values of the configurable properties of the VNF instance. \
@@ -95,9 +95,9 @@ class VnfInstanceSerializer(serializers.Serializer):
     instantiationState = serializers.ChoiceField(
         help_text="The instantiation state of the VNF.",
         choices=["NOT_INSTANTIATED", "INSTANTIATED"],
-        required=True,
-        allow_null=False,
-        allow_blank=False)
+        required=False,
+        allow_null=True,
+        allow_blank=True)
     instantiatedVnfInfo = InstantiatedVnfInfoSerializer(
         help_text="Information specific to an instantiated VNF instance. \
         This attribute shall be present if the instantiateState attribute value is INSTANTIATED",
@@ -117,5 +117,5 @@ class VnfInstanceSerializer(serializers.Serializer):
         allow_null=True)
     _links = _LinksSerializer(
         help_text="Links to resources related to this resource.",
-        required=True,
+        required=False,
         allow_null=False)

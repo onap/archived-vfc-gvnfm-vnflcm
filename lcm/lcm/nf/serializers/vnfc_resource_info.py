@@ -33,14 +33,12 @@ class VnfcResourceInfoSerializer(serializers.Serializer):
         help_text="Reference to the VirtualCompute resource.",
         required=True,
         allow_null=False)
-    storageResourceIds = serializers.CharField(
+    storageResourceIds = serializers.ListSerializer(
         help_text="References to the VirtualStorage resources. \
         The value refers to a VirtualStorageResourceInfo item in the VnfInstance.",
-        max_length=255,
-        many=True,
+        child=serializers.CharField(help_text="Identifier In Vnf", allow_blank=True),
         required=False,
-        allow_null=True,
-        allow_blank=True)
+        allow_null=True)
     reservationId = serializers.CharField(
         help_text="The reservation identifier applicable to the resource.",
         max_length=255,
