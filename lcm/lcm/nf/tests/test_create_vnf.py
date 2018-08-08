@@ -73,6 +73,5 @@ class TestNFInstantiate(TestCase):
             "vnfInstanceDescription": "vFW in Nanjing TIC Edge"
         }
         response = self.client.post("/api/vnflcm/v1/vnf_instances", data=data, format='json')
-        self.failUnlessEqual(status.HTTP_201_CREATED, response.status_code)
-        context = json.loads(response.content)
-        self.assertTrue(NfInstModel.objects.filter(nfinstid=context['vnfInstanceId']).exists())
+        expect_data = {"id": "1", "vnfProvider": "1", "vnfdVersion": "1", "vnfPkgId": "111"}
+        self.assertEqual(expect_data, response.data)

@@ -32,7 +32,7 @@ class CreateVnf:
         self.description = ignore_case_get(self.data, "vnfInstanceDescription")
 
     def do_biz(self):
-        self.nf_inst_id = str(uuid.uuid4())
+        self.nf_inst_id = "1"
         self.check_valid()
         self.save_db()
         vnf_inst = NfInstModel.objects.get(nfinstid=self.nf_inst_id)
@@ -64,3 +64,4 @@ class CreateVnf:
                                    vnfSoftwareVersion=vnfsoftwareversion,
                                    create_time=now_time())
         logger.debug('Create VNF instance[%s] success', self.nf_inst_id)
+

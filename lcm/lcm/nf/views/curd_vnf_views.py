@@ -23,7 +23,7 @@ from rest_framework.views import APIView
 
 from lcm.nf.biz.create_vnf import CreateVnf
 from lcm.nf.biz.query_vnf import QueryVnf
-from lcm.nf.serializers.serializers import CreateVnfReqSerializer, CreateVnfRespSerializer
+from lcm.nf.serializers.create_vnf_req import CreateVnfReqSerializer
 from lcm.nf.serializers.vnf_instance import VnfInstanceSerializer
 from lcm.nf.serializers.vnf_instances import VnfInstancesSerializer
 from lcm.pub.exceptions import NFLCMException
@@ -59,7 +59,7 @@ class CreateVnfAndQueryVnfs(APIView):
     @swagger_auto_schema(
         request_body=CreateVnfReqSerializer(),
         responses={
-            status.HTTP_201_CREATED: CreateVnfRespSerializer(),
+            status.HTTP_201_CREATED: VnfInstanceSerializer(),
             status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal error"
         }
     )
@@ -70,8 +70,11 @@ class CreateVnfAndQueryVnfs(APIView):
             if not req_serializer.is_valid():
                 raise NFLCMException(req_serializer.errors)
 
-            nf_inst_id = CreateVnf(req_serializer.data).do_biz().nfinstid
-            create_vnf_resp_serializer = CreateVnfRespSerializer(data={"vnfInstanceId": nf_inst_id})
+            nf_inst = CreateVnf(req_serializer.data).do_biz()
+            create_vnf_resp_serializer = VnfInstanceSerializer(data={"id": nf_inst.nfinstid,
+                                                                     "vnfProvider": nf_inst.vendor,
+                                                                     "vnfdVersion": nf_inst.version,
+                                                                     "vnfPkgId": nf_inst.package_id})
             if not create_vnf_resp_serializer.is_valid():
                 raise NFLCMException(create_vnf_resp_serializer.errors)
             return Response(data=create_vnf_resp_serializer.data, status=status.HTTP_201_CREATED)

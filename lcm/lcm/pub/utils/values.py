@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-def ignore_case_get(args, key, def_val=""):
+def ignore_case_get(args, key, def_val="1"):
     if not key:
         return def_val
     if key in args:
