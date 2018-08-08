@@ -34,41 +34,10 @@ class CreateVnf:
 
     def do_biz(self):
         self.nf_inst_id = str(uuid.uuid4())
-        try:
-            self.check_valid()
-            self.save_db()
-        except NFLCMException as e:
-            logger.debug('Create VNF instance[%s]: %s', self.nf_inst_id, e.message)
-            raise NFLCMException(e.message)
-        except Exception as e:
-            logger.error(e.message)
-            logger.error(traceback.format_exc())
-            NfInstModel.objects.create(nfinstid=self.nf_inst_id,
-                                       nf_name=self.vnf_instance_mame,
-                                       package_id='',
-                                       version='',
-                                       vendor='',
-                                       netype='',
-                                       vnfd_model='',
-                                       status='NOT_INSTANTIATED',
-                                       nf_desc=self.description,
-                                       vnfdid=self.csar_id,
-                                       vnfSoftwareVersion='',
-                                       create_time=now_time())
+        self.check_valid()
+        self.save_db()
         vnf_inst = NfInstModel.objects.get(nfinstid=self.nf_inst_id)
-        resp = {
-            'id': vnf_inst.nfinstid,
-            'vnfInstanceName': vnf_inst.nf_name,
-            'vnfInstanceDescription': 'Human-readable description of the VNF instance.',
-            'vnfdId': vnf_inst.vnfdid,
-            'vnfProvider': vnf_inst.vendor,
-            'vnfProductName': vnf_inst.nf_name,
-            'vnfSoftwareVersion': vnf_inst.vnfSoftwareVersion,
-            'vnfdVersion': vnf_inst.version,
-            'vnfPkgId': vnf_inst.package_id,
-            'vnfConfigurableProperties': {}
-        }
-        return resp
+        return vnf_inst
 
     def check_valid(self):
         is_exist = NfInstModel.objects.filter(nf_name=self.vnf_instance_mame).exists()
