@@ -124,8 +124,10 @@ class DeleteVnfAndQueryVnf(APIView):
             return Response(data=None, status=status.HTTP_204_NO_CONTENT)
         except NFLCMException as e:
             logger.error(e.message)
+            logger.debug('Delete VNF instance[%s] failed' % instanceid)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             logger.error(e.message)
             logger.error(traceback.format_exc())
+            logger.debug('Delete VNF instance[%s] failed' % instanceid)
             return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

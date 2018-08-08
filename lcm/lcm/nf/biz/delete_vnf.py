@@ -13,10 +13,8 @@
 # limitations under the License.
 
 import logging
-import traceback
 
 from lcm.pub.database.models import NfInstModel, NfvoRegInfoModel
-from lcm.pub.exceptions import NFLCMException
 
 logger = logging.getLogger(__name__)
 
@@ -27,16 +25,9 @@ class DeleteVnf:
         self.nf_inst_id = instanceid
 
     def do_biz(self):
-        try:
             self.check_parameter()
             self.delete_info_from_db()
             logger.debug('VnfInst(%s) is deleted.' % self.nf_inst_id)
-        except NFLCMException as e:
-            logger.debug('Delete VNF instance[%s] failed: %s', self.nf_inst_id, e.message)
-        except Exception as e:
-            logger.error(e.message)
-            logger.error(traceback.format_exc())
-            logger.debug('Delete VNF instance[%s] failed' % self.nf_inst_id)
 
     def check_parameter(self):
         vnf_insts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
