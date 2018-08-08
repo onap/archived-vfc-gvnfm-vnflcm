@@ -36,17 +36,17 @@ class VimConnectionInfoSerializer(serializers.Serializer):
         allow_blank=False)
     interfaceInfo = serializers.DictField(
         help_text="Information about the interface or interfaces to the VIM",
-        child=serializers.CharField(allow_blank=True),
+        child=serializers.CharField(help_text="KeyValue Pairs", allow_blank=True),
         required=False,
         allow_null=True)
     accessInfo = serializers.DictField(
         help_text="Authentication credentials for accessing the VIM, and other access-related information",
-        child=serializers.CharField(allow_blank=True),
+        child=serializers.CharField(help_text="KeyValue Pairs", allow_blank=True),
         required=False,
         allow_null=True)
     extra = serializers.DictField(
         help_text="VIM type specific additional information. \
         The applicable structure, and whether or not this attribute is available, is dependent on the content of vimType.",
-        child=serializers.CharField(allow_blank=True),
+        child=serializers.CharField(help_text="KeyValue Pairs", allow_blank=True),
         required=False,
         allow_null=True)

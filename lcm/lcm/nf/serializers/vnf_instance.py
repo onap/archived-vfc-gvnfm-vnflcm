@@ -84,7 +84,7 @@ class VnfInstanceSerializer(serializers.Serializer):
     vnfConfigurableProperties = serializers.DictField(
         help_text="Current values of the configurable properties of the VNF instance. \
         Configurable properties referred in this attribute are declared in the VNFD",
-        child=serializers.CharField(allow_blank=True),
+        child=serializers.CharField(help_text="KeyValue Pairs", allow_blank=True),
         required=False,
         allow_null=True,)
     vimConnectionInfo = VimConnectionInfoSerializer(
@@ -106,13 +106,13 @@ class VnfInstanceSerializer(serializers.Serializer):
     metadata = serializers.DictField(
         help_text="Additional VNF-specific metadata describing the VNF instance.\
         This attribute can be modified with the PATCH method.",
-        child=serializers.CharField(allow_blank=True),
+        child=serializers.CharField(help_text="KeyValue Pairs", allow_blank=True),
         required=False,
         allow_null=True)
     extensions = serializers.DictField(
         help_text="VNF-specific attributes that affect the lifecycle management of this VNF instance by the VNFM, or the lifecycle management scripts. \
         This attribute can be modified with the PATCH method.",
-        child=serializers.CharField(allow_blank=True),
+        child=serializers.CharField(help_text="KeyValue Pairs", allow_blank=True),
         required=False,
         allow_null=True)
     _links = _LinksSerializer(

@@ -32,7 +32,7 @@ class InstantiatedVnfInfoSerializer(serializers.Serializer):
         allow_blank=False)
     vnfState = serializers.ChoiceField(
         help_text="State of the VNF instance.",
-        choices=["STARTED", "STOPPED", "NOT_INSTANTIATED", "INSTANTIATED", "FAILED"],
+        choices=["STARTED", "STOPPED"],
         required=True,
         allow_null=False,
         allow_blank=False)
@@ -59,7 +59,7 @@ class InstantiatedVnfInfoSerializer(serializers.Serializer):
         allow_null=True)
     monitoringParameters = serializers.DictField(
         help_text="Active monitoring parameters.",
-        child=serializers.CharField(allow_blank=True),
+        child=serializers.CharField(help_text="KeyValue Pairs", allow_blank=True),
         required=False,
         allow_null=True)
     localizationLanguage = serializers.CharField(

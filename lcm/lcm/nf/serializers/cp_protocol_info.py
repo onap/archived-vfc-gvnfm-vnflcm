@@ -24,6 +24,6 @@ class CpProtocolInfoSerializer(serializers.Serializer):
         allow_blank=False)
     ipOverEthernet = serializers.DictField(
         help_text="IP addresses over Ethernet to assign to the extCP instance.",
-        child=serializers.CharField(allow_blank=True),
+        child=serializers.CharField(help_text="KeyValue Pairs", allow_blank=True),
         required=False,
         allow_null=True,)
