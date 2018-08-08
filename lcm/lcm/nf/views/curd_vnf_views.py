@@ -23,8 +23,9 @@ from rest_framework.views import APIView
 
 from lcm.nf.biz.create_vnf import CreateVnf
 from lcm.nf.biz.query_vnf import QueryVnf
-from lcm.nf.serializers.serializers import CreateVnfReqSerializer, CreateVnfRespSerializer, VnfsInfoSerializer, \
+from lcm.nf.serializers.serializers import CreateVnfRespSerializer, VnfsInfoSerializer, \
     VnfInfoSerializer
+from lcm.nf.serializers.create_vnf_req import CreateVnfReqSerializer
 from lcm.pub.exceptions import NFLCMException
 
 logger = logging.getLogger(__name__)
@@ -69,9 +70,7 @@ class CreateVnfAndQueryVnfs(APIView):
             if not req_serializer.is_valid():
                 raise NFLCMException(req_serializer.errors)
 
-            resp = CreateVnf(req_serializer.data).do_biz()
-            nf_inst_id = resp.get('id', 'undefined')
-
+            nf_inst_id = CreateVnf(req_serializer.data).do_biz().nfinstid
             create_vnf_resp_serializer = CreateVnfRespSerializer(data={"vnfInstanceId": nf_inst_id})
             if not create_vnf_resp_serializer.is_valid():
                 raise NFLCMException(create_vnf_resp_serializer.errors)
