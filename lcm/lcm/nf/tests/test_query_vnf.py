@@ -24,7 +24,7 @@ class ResourceTest(TestCase):
         self.nf_inst_id = "01"
         NfInstModel.objects.all().delete()
         self.test_data_single_vnf = {
-            "vnfInstanceId": "1",
+            "id": "1",
             "vnfInstanceName": "VNF1",
             "vnfProvider": None,
             "instantiatedVnfInfo": {
@@ -32,27 +32,26 @@ class ResourceTest(TestCase):
                 "extCpInfo": [],
                 "virtualStorageResourceInfo": [
                     {
-                        "virtualStorageInstanceId": "s02",
+                        "id": "s02",
                         "storageResource": {
                             "resourceId": "resource01",
-                            "vimId": "vim01"
+                            "vimConnectionId": "vim01"
                         }
                     }
                 ],
-                "extVirtualLink": [],
+                "extVirtualLinkInfo": [],
                 "vnfcResourceInfo": [],
                 "monitoringParameters": {},
-                "vimInfo": [],
                 "flavourId": None,
-                "virtualLinkResourceInfo": [],
+                "vnfVirtualLinkResourceInfo": [],
                 "scaleStatus": []
             },
             "vnfdVersion": None,
-            "onboardedVnfPkgInfoId": None
+            "vnfPkgId": None
         }
         self.test_data_multi_vnf = [
             {
-                "vnfInstanceId": "1",
+                "id": "1",
                 "vnfInstanceName": "VNF1",
                 "vnfProvider": None,
                 "instantiatedVnfInfo": {
@@ -60,26 +59,25 @@ class ResourceTest(TestCase):
                     "extCpInfo": [],
                     "virtualStorageResourceInfo": [
                         {
-                            "virtualStorageInstanceId": "s01",
+                            "id": "s01",
                             "storageResource": {
                                 "resourceId": "resource01",
-                                "vimId": "vim01"
+                                "vimConnectionId": "vim01"
                             }
                         }
                     ],
-                    "extVirtualLink": [],
+                    "extVirtualLinkInfo": [],
                     "vnfcResourceInfo": [],
                     "monitoringParameters": {},
-                    "vimInfo": [],
                     "flavourId": None,
-                    "virtualLinkResourceInfo": [],
+                    "vnfVirtualLinkResourceInfo": [],
                     "scaleStatus": []
                 },
                 "vnfdVersion": None,
-                "onboardedVnfPkgInfoId": None
+                "vnfPkgId": None
             },
             {
-                "vnfInstanceId": "2",
+                "id": "2",
                 "vnfInstanceName": "VNF2",
                 "vnfProvider": None,
                 "instantiatedVnfInfo": {
@@ -87,23 +85,22 @@ class ResourceTest(TestCase):
                     "extCpInfo": [],
                     "virtualStorageResourceInfo": [
                         {
-                            "virtualStorageInstanceId": "s02",
+                            "id": "s02",
                             "storageResource": {
                                 "resourceId": "resource02",
-                                "vimId": "vim02"
+                                "vimConnectionId": "vim02"
                             }
                         }
                     ],
-                    "extVirtualLink": [],
+                    "extVirtualLinkInfo": [],
                     "vnfcResourceInfo": [],
                     "monitoringParameters": {},
-                    "vimInfo": [],
                     "flavourId": None,
-                    "virtualLinkResourceInfo": [],
+                    "vnfVirtualLinkResourceInfo": [],
                     "scaleStatus": []
                 },
                 "vnfdVersion": None,
-                "onboardedVnfPkgInfoId": None
+                "vnfPkgId": None
             }
         ]
 

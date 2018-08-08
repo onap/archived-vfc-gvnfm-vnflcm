@@ -48,9 +48,9 @@ class QueryVnf:
         arr = []
         for s in storage_inst:
             storage = {
-                "virtualStorageInstanceId": s.storageid,
+                "id": s.storageid,
                 "storageResource": {
-                    "vimId": s.vimid,
+                    "vimConnectionId": s.vimid,
                     "resourceId": s.resouceid
                 }
             }
@@ -63,10 +63,10 @@ class QueryVnf:
             if not net:
                 raise NFLCMException('NetworkInst(%s) does not exist.' % v.relatednetworkid)
             v_dic = {
-                "virtualLinkInstanceId": v.vlinstanceid,
+                "id": v.vlinstanceid,
                 "virtualLinkDescId": v.vldid,
                 "networkResource": {
-                    "vimId": net[0].vimid,
+                    "vimConnectionId": net[0].vimid,
                     "resourceId": net[0].resouceid
                 }
             }
@@ -82,45 +82,21 @@ class QueryVnf:
             if not storage:
                 raise NFLCMException('StorageInst(%s) does not exist.' % vm[0].vmid)
             vnfc_dic = {
-                "vnfcInstanceId": vnfc.vnfcinstanceid,
+                "id": vnfc.vnfcinstanceid,
                 "vduId": vnfc.vduid,
                 "computeResource": {
-                    "vimId": vm[0].vimid,
+                    "vimConnectionId": vm[0].vimid,
                     "resourceId": vm[0].resouceid
                 },
                 "storageResourceIds": [s.storageid for s in storage]
             }
             vnfc_arr.append(vnfc_dic)
         logger.info('Get vms')
-        vms = VmInstModel.objects.filter(instid=vnf.nfinstid)
-        vm_arr = []
-        for vm in vms:
-            vm_dic = {
-                "vmid": vm.vmid,
-                "vimid": vm.vimid,
-                "tenant": vm.tenant,
-                "resouceid": vm.resouceid,
-                "vmname": vm.vmname,
-                "nic_array": vm.nic_array,
-                "metadata": vm.metadata,
-                "volume_array": vm.volume_array,
-                "server_group": vm.server_group,
-                "availability_zone": vm.availability_zone,
-                "flavor_id": vm.flavor_id,
-                "security_groups": vm.security_groups,
-                "operationalstate": vm.operationalstate,
-                "insttype": vm.insttype,
-                "is_predefined": vm.is_predefined,
-                "create_time": vm.create_time,
-                "instid": vm.instid,
-                "nodeId": vm.nodeId
-            }
-            vm_arr.append(vm_dic)
 
         resp_data = {
-            "vnfInstanceId": vnf.nfinstid,
+            "id": vnf.nfinstid,
             "vnfInstanceName": vnf.nf_name,
-            "onboardedVnfPkgInfoId": vnf.package_id,
+            "vnfPkgId": vnf.package_id,
             "vnfdVersion": vnf.version,
             "vnfProvider": vnf.vendor,
             "instantiatedVnfInfo": {
@@ -128,11 +104,10 @@ class QueryVnf:
                 "vnfState": vnf.status,
                 "scaleStatus": [],
                 "extCpInfo": [],
-                "extVirtualLink": [],
+                "extVirtualLinkInfo": [],
                 "monitoringParameters": {},
-                "vimInfo": vm_arr,
                 "vnfcResourceInfo": vnfc_arr,
-                "virtualLinkResourceInfo": vl_arr,
+                "vnfVirtualLinkResourceInfo": vl_arr,
                 "virtualStorageResourceInfo": arr
             }
         }

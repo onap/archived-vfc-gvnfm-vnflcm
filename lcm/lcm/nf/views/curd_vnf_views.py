@@ -23,9 +23,9 @@ from rest_framework.views import APIView
 
 from lcm.nf.biz.create_vnf import CreateVnf
 from lcm.nf.biz.query_vnf import QueryVnf
-from lcm.nf.serializers.serializers import CreateVnfRespSerializer, VnfsInfoSerializer, \
-    VnfInfoSerializer
-from lcm.nf.serializers.create_vnf_req import CreateVnfReqSerializer
+from lcm.nf.serializers.serializers import CreateVnfReqSerializer, CreateVnfRespSerializer
+from lcm.nf.serializers.vnf_instance import VnfInstanceSerializer
+from lcm.nf.serializers.vnf_instances import VnfInstancesSerializer
 from lcm.pub.exceptions import NFLCMException
 
 logger = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 class CreateVnfAndQueryVnfs(APIView):
     @swagger_auto_schema(
         responses={
-            status.HTTP_200_OK: VnfsInfoSerializer(),
+            status.HTTP_200_OK: VnfInstancesSerializer(),
             status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal error"
         }
     )
@@ -43,11 +43,11 @@ class CreateVnfAndQueryVnfs(APIView):
         try:
             resp_data = QueryVnf(request.data).query_multi_vnf()
 
-            vnfs_info_serializer = VnfsInfoSerializer(data=resp_data)
-            if not vnfs_info_serializer.is_valid():
-                raise NFLCMException(vnfs_info_serializer.errors)
+            vnf_instances_serializer = VnfInstancesSerializer(data=resp_data)
+            if not vnf_instances_serializer.is_valid():
+                raise NFLCMException(vnf_instances_serializer.errors)
 
-            return Response(data=vnfs_info_serializer.data, status=status.HTTP_200_OK)
+            return Response(data=vnf_instances_serializer.data, status=status.HTTP_200_OK)
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -87,7 +87,7 @@ class CreateVnfAndQueryVnfs(APIView):
 class DeleteVnfAndQueryVnf(APIView):
     @swagger_auto_schema(
         responses={
-            status.HTTP_200_OK: VnfInfoSerializer(),
+            status.HTTP_200_OK: VnfInstanceSerializer(),
             status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal error"
         }
     )
@@ -96,11 +96,11 @@ class DeleteVnfAndQueryVnf(APIView):
         try:
             resp_data = QueryVnf(request.data, instanceid).query_single_vnf()
 
-            vnf_info_serializer = VnfInfoSerializer(data=resp_data)
-            if not vnf_info_serializer.is_valid():
-                raise NFLCMException(vnf_info_serializer.errors)
+            vnfs_instance_serializer = VnfInstanceSerializer(data=resp_data)
+            if not vnfs_instance_serializer.is_valid():
+                raise NFLCMException(vnfs_instance_serializer.errors)
 
-            return Response(data=vnf_info_serializer.data, status=status.HTTP_200_OK)
+            return Response(data=vnfs_instance_serializer.data, status=status.HTTP_200_OK)
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
