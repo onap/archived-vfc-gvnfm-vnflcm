@@ -22,6 +22,7 @@ from lcm.nf.const import vnfpackage_info
 from lcm.pub.database.models import NfInstModel, JobStatusModel
 from lcm.pub.utils import restcall
 from lcm.pub.utils.timeutil import now_time
+import uuid
 
 
 class TestNFInstantiate(TestCase):
@@ -64,15 +65,16 @@ class TestNFInstantiate(TestCase):
         self.assertEqual({'error': 'VNF is already exist.'}, context)
 
     @mock.patch.object(restcall, 'call_req')
-    def test_create_vnf_identifier(self, mock_call_req):
+    @mock.patch.object(uuid, 'uuid4')
+    def test_create_vnf_identifier(self, mock_uuid4, mock_call_req):
         r2_get_vnfpackage_from_catalog = [0, json.JSONEncoder().encode(vnfpackage_info), '200']
-        mock_call_req.side_effect = [r2_get_vnfpackage_from_catalog]
+        mock_call_req.return_value = r2_get_vnfpackage_from_catalog
+        mock_uuid4.return_value = "1"
         data = {
             "vnfdId": "111",
             "vnfInstanceName": "vFW_01",
             "vnfInstanceDescription": "vFW in Nanjing TIC Edge"
         }
         response = self.client.post("/api/vnflcm/v1/vnf_instances", data=data, format='json')
-        self.failUnlessEqual(status.HTTP_201_CREATED, response.status_code)
-        context = json.loads(response.content)
-        self.assertTrue(NfInstModel.objects.filter(nfinstid=context['vnfInstanceId']).exists())
+        expect_data = {"id": "1", "vnfProvider": "huawei", "vnfdVersion": "1.0", "vnfPkgId": "111"}
+        self.assertEqual(expect_data, response.data)
