@@ -99,9 +99,10 @@ class QueryVnf:
             "vnfPkgId": vnf.package_id,
             "vnfdVersion": vnf.version,
             "vnfProvider": vnf.vendor,
+            "instantiationState": vnf.status,
             "instantiatedVnfInfo": {
                 "flavourId": vnf.flavour_id,
-                "vnfState": vnf.status,
+                "vnfState": "STARTED",
                 "scaleStatus": [],
                 "extCpInfo": [],
                 "extVirtualLinkInfo": [],

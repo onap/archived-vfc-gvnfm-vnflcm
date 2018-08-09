@@ -95,9 +95,9 @@ class VnfInstanceSerializer(serializers.Serializer):
     instantiationState = serializers.ChoiceField(
         help_text="The instantiation state of the VNF.",
         choices=["NOT_INSTANTIATED", "INSTANTIATED"],
-        required=False,
-        allow_null=True,
-        allow_blank=True)
+        required=True,
+        allow_null=False,
+        allow_blank=False)
     instantiatedVnfInfo = InstantiatedVnfInfoSerializer(
         help_text="Information specific to an instantiated VNF instance. \
         This attribute shall be present if the instantiateState attribute value is INSTANTIATED",

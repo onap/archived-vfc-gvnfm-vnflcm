@@ -27,8 +27,9 @@ class ResourceTest(TestCase):
             "id": "1",
             "vnfInstanceName": "VNF1",
             "vnfProvider": None,
+            "instantiationState": "INSTANTIATED",
             "instantiatedVnfInfo": {
-                "vnfState": None,
+                "vnfState": "STARTED",
                 "extCpInfo": [],
                 "virtualStorageResourceInfo": [
                     {
@@ -54,8 +55,9 @@ class ResourceTest(TestCase):
                 "id": "1",
                 "vnfInstanceName": "VNF1",
                 "vnfProvider": None,
+                "instantiationState": "INSTANTIATED",
                 "instantiatedVnfInfo": {
-                    "vnfState": None,
+                    "vnfState": "STARTED",
                     "extCpInfo": [],
                     "virtualStorageResourceInfo": [
                         {
@@ -80,8 +82,9 @@ class ResourceTest(TestCase):
                 "id": "2",
                 "vnfInstanceName": "VNF2",
                 "vnfProvider": None,
+                "instantiationState": "INSTANTIATED",
                 "instantiatedVnfInfo": {
-                    "vnfState": None,
+                    "vnfState": "STARTED",
                     "extCpInfo": [],
                     "virtualStorageResourceInfo": [
                         {
@@ -109,7 +112,7 @@ class ResourceTest(TestCase):
 
     def test_get_vnf(self):
         vnf_inst_id = "1"
-        NfInstModel(nfinstid=vnf_inst_id, nf_name='VNF1').save()
+        NfInstModel(nfinstid=vnf_inst_id, nf_name='VNF1', status='INSTANTIATED').save()
         StorageInstModel(storageid='s02',
                          vimid='vim01',
                          resouceid='resource01',
@@ -122,7 +125,8 @@ class ResourceTest(TestCase):
     def test_get_vnfs(self):
         for i in range(1, 3):
             NfInstModel(nfinstid='%s' % i,
-                        nf_name='VNF%s' % i).save()
+                        nf_name='VNF%s' % i,
+                        status='INSTANTIATED').save()
             StorageInstModel(storageid='s0%s' % i,
                              vimid='vim0%s' % i,
                              resouceid='resource0%s' % i,
