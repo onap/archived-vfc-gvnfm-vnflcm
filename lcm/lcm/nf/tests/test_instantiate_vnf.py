@@ -36,7 +36,7 @@ class TestNFInstantiate(TestCase):
         self.client = APIClient()
         self.grant_result = {
             "vimid": 'vimid_1',
-            "tenant": 'tenantname_1'
+            "tenant": 'tenantname_1',
         }
 
     def tearDown(self):
@@ -50,7 +50,7 @@ class TestNFInstantiate(TestCase):
 
     @mock.patch.object(InstantiateVnf, 'run')
     def test_instantiate_vnf(self, mock_run):
-        NfInstModel(nfinstid='12', nf_name='VNF1').save()
+        NfInstModel(nfinstid='12', nf_name='VNF1', status="UN_INSTANTIATED").save()
         mock_run.re.return_value = None
         response = self.client.post("/api/vnflcm/v1/vnf_instances/12/instantiate", data=inst_req_data, format='json')
         self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
