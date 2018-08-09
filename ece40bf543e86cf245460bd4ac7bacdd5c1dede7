@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_3afc593e",
+        "filename": "lcm/lcm/nf/serializers/cp_protocol_data.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-08-09T03:46:11Z",
+      "side": 1,
+      "message": "Miss \"Copyright 2018 ZTE Corporation\" in License Header",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 32
+      },
+      "revId": "ece40bf543e86cf245460bd4ac7bacdd5c1dede7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_5af9154c",
+        "filename": "lcm/lcm/nf/serializers/ip_over_ethernet_address_data.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-08-09T03:46:11Z",
+      "side": 1,
+      "message": "Miss \"Copyright 2018 ZTE Corporation\" in License Header",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 66
+      },
+      "revId": "ece40bf543e86cf245460bd4ac7bacdd5c1dede7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
