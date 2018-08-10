@@ -21,7 +21,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from lcm.nf.biz.terminate_vnf import TerminateVnf
-from lcm.nf.serializers.serializers import InstOrTeriVnfResponseSerializer, TerminateVnfRequestSerializer
+from lcm.nf.serializers.terminate_vnf_req import TerminateVnfRequestSerializer
+from lcm.nf.serializers.job_identifier import JobIdentifierSerializer
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.utils.jobutil import JobUtil
 
@@ -33,7 +34,7 @@ class TerminateVnfView(APIView):
     @swagger_auto_schema(
         request_body=TerminateVnfRequestSerializer(),
         responses={
-            status.HTTP_202_ACCEPTED: InstOrTeriVnfResponseSerializer(),
+            status.HTTP_202_ACCEPTED: JobIdentifierSerializer(),
             status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal error"
         }
     )
@@ -48,7 +49,7 @@ class TerminateVnfView(APIView):
             JobUtil.add_job_status(job_id, 0, "TERM_VNF_READY")
             TerminateVnf(terminate_vnf_request_serializer.data, instanceid, job_id).start()
 
-            terminate_vnf_response_serializer = InstOrTeriVnfResponseSerializer(data={"jobId": job_id})
+            terminate_vnf_response_serializer = JobIdentifierSerializer(data={"jobId": job_id})
             if not terminate_vnf_response_serializer.is_valid():
                 raise NFLCMException(terminate_vnf_response_serializer.errors)
 

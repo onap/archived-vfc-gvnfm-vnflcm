@@ -74,7 +74,8 @@ class CreateVnfAndQueryVnfs(APIView):
             create_vnf_resp_serializer = VnfInstanceSerializer(data={"id": nf_inst.nfinstid,
                                                                      "vnfProvider": nf_inst.vendor,
                                                                      "vnfdVersion": nf_inst.version,
-                                                                     "vnfPkgId": nf_inst.package_id})
+                                                                     "vnfPkgId": nf_inst.package_id,
+                                                                     "instantiationState": nf_inst.status},)
             if not create_vnf_resp_serializer.is_valid():
                 raise NFLCMException(create_vnf_resp_serializer.errors)
             return Response(data=create_vnf_resp_serializer.data, status=status.HTTP_201_CREATED)
