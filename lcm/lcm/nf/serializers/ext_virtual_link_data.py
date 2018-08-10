@@ -42,6 +42,11 @@ class ExtVirtualLinkDataSerizlizer(serializers.Serializer):
         max_length=255,
         required=True,
         allow_null=False)
+    resourceSubnetId = serializers.CharField(
+        help_text="Subnet defined by the identifier of the subnet resource in the VIM.",
+        max_length=255,
+        required=True,
+        allow_null=False)
     extCps = VnfExtCpDataSerializer(
         help_text="External CPs of the VNF to be connected to this external VL.",
         many=True,
