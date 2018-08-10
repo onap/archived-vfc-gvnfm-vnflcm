@@ -25,74 +25,85 @@ RESOURCE_MAP = {'Storage': 'volumn', 'Network': 'network', 'SubNetwork': 'subnet
 inst_req_data = {
     "flavourId": "flavour_1",
     "instantiationLevelId": "instantiationLevel_1",
-    "vnfmId": "vnfm_1",
     "extVirtualLinks": [
         {
-            "vlInstanceId": "1",
-            "vim": {
-                "vimInfoId": "1",
-                "vimId": "1",
-                "interfaceInfo": {
-                    "vimType": "vim",
-                    "apiVersion": "v2",
-                    "protocolType": "http"
-                },
-                "accessInfo": {
-                    "tenant": "tenant_vCPE",
-                    "username": "vCPE",
-                    "password": "vCPE_321"
-                },
-                "interfaceEndpoint": "http://10.43.21.105:80/"
-            },
-            "resourceId": "1246",
+            "id": "extVirtualLink_1",
+            "vimConnectionId": "vimConnection_1",
+            "resourceProviderId": "resourceProvider_1",
+            "resourceId": "resource_1",
             "extCps": [
                 {
-                    "cpdId": "11",
-                    "addresses": [
+                    "cpdId": "cpd_1",
+                    "cpConfig": [
                         {
-                            "addressType": "MAC",
-                            "l2AddressData": "00:f3:43:20:a2:a3"
-                        },
-                        {
-                            "addressType": "IP",
-                            "l3AddressData": {
-                                "iPAddressType": "IPv4",
-                                "iPAddress": "192.168.104.2"
-                            }
+                            "cpInstanceId": "cpInstance_1",
+                            "linkPortId": "linkPort_1",
+                            "cpProtocolData": [
+                                {
+                                    "layerProtocol": "IP_OVER_ETHERNET",
+                                    "ipOverEthernet": {
+                                        "macAddress": "00:f3:43:20:a2:a3",
+                                        "ipAddresses": [
+                                            {
+                                                "type": "IPV4",
+                                                "fixedAddresses": ["192.168.104.2", ],
+                                                "numDynamicAddresses": 0,
+                                                "addressRange": None,
+                                                "subnetId": "subnet_1",
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
                         }
-                    ],
-                    "numDynamicAddresses": 0
+                    ]
+                }
+            ],
+            "extLinkPorts": [
+                {
+                    "id": "extLinkPort_1",
+                    "resourceHandle": {
+                        "vimConnectionId": "vimConnection_1",
+                        "resourceProviderId": "resourceProvider_1",
+                        "resourceId": "resource_1",
+                        "vimLevelResourceType": "vimLevelResourceType_1",
+                    }
                 }
             ]
-        },
+        }
+    ],
+    "extManagedVirtualLinks": [
         {
-            "vlInstanceId": '55',
-            "resourceId": '55_network',
-            "resourceSubnetId": '55_subnet',
-            "cpdId": 'cpId1',
-            "vim": {
-                "vimId": '55_vimid'
-            }
+            "id": 'extManagedVirtualLink_1',
+            "virtualLinkDescId": 'virtualLinkDesc_1',
+            "vimConnectionId": 'vimConnection_1',
+            "resourceProviderId": 'resourceProvider_1',
+            "resourceId": 'resource_1',
+        }
+    ],
+    "vimConnectionInfo": [
+        {
+            "id": 'vimConnection_1',
+            "vimId": 'vim_1',
+            "vimType": 'vim',
+            "interfaceInfo": {
+                "apiVersion": "apiVersion_1",
+                "protocolType": "http"
+            },
+            "accessInfo": {
+                "tenant": "tenant_vCPE",
+                "username": "vCPE",
+                "password": "vCPE_321",
+            },
+            "extra": None,
         }
     ],
     "localizationLanguage": "en_US",
     "additionalParams": {
-        "vimId": "vim_1",
-        "inputs": {
-            "key1": "test1",
-            "key2": "test2"
-        },
-        "extVirtualLinks": [
-            {
-                "vlInstanceId": '55',
-                "resourceId": '55_network',
-                "resourceSubnetId": '55_subnet',
-                "cpdId": 'cpId1',
-                "vim": {
-                    "vimId": '55_vimid'
-                }
-            }
-        ]
+        # "inputs": {
+        "key1": "test1",
+        "key2": "test2"
+        # }
     }
 }
 

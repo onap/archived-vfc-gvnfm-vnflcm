@@ -21,7 +21,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from lcm.nf.serializers.serializers import InstOrTeriVnfResponseSerializer, InstantiateVnfRequestSerializer
+# from lcm.nf.serializers.serializers import InstantiateVnfRequestSerializer, InstOrTeriVnfResponseSerializer
+from lcm.nf.serializers.instantiate_vnf_request import InstantiateVnfRequestSerializer
+from lcm.nf.serializers.inst_or_teri_vnf_response import InstOrTeriVnfResponseSerializer
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.utils.jobutil import JobUtil
 

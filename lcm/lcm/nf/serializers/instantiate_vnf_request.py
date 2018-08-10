@@ -46,7 +46,6 @@ class InstantiateVnfRequestSerializer(serializers.Serializer):
         or refer to external / externally-managed virtual links.",
         many=True,
         required=False,
-        max_length=255,
         allow_null=True)
     localizationLanguage = serializers.CharField(
         help_text="Localization language of the VNF to be instantiated. \
