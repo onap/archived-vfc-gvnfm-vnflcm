@@ -19,7 +19,7 @@ import uuid
 from threading import Thread
 
 from lcm.pub.database.models import NfInstModel, VmInstModel, NetworkInstModel, \
-    SubNetworkInstModel, PortInstModel, StorageInstModel, FlavourInstModel, VNFCInstModel, NfvoRegInfoModel
+    SubNetworkInstModel, PortInstModel, StorageInstModel, FlavourInstModel, VNFCInstModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.msapi.gvnfmdriver import apply_grant_to_nfvo, notify_lcm_to_nfvo
 from lcm.pub.msapi.sdc_run_catalog import query_vnfpackage_by_id
@@ -65,7 +65,7 @@ class InstantiateVnf(Thread):
         self.vnfd_id = vnf_insts[0].vnfdid
         JobUtil.add_job_status(self.job_id, 10, 'Get vnf package info from catalog by csar_id')
         input_parameters = []
-        inputs = ignore_case_get(self.data['additionalParams'], "inputs")
+        inputs = ignore_case_get(self.data, "additionalParams")
         if inputs:
             if isinstance(inputs, (str, unicode)):
                 inputs = json.loads(inputs)
@@ -91,17 +91,19 @@ class InstantiateVnf(Thread):
                    status='NOT_INSTANTIATED',
                    vnfdid=self.vnfd_id,
                    localizationLanguage=ignore_case_get(self.data, 'localizationLanguage'),
-                   input_params=self.data,
+                   input_params=input_parameters,
                    vnfSoftwareVersion=vnfsoftwareversion,
                    lastuptime=now_time())
 
         logger.info("VimId = %s" % self.vim_id)
+        '''
         is_exist = NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id).exists()
         if not is_exist:
             NfvoRegInfoModel.objects.create(
                 nfvoid=self.nf_inst_id,
-                # vnfminstid=ignore_case_get(self.data, "vnfmId"),
+                vnfminstid=ignore_case_get(self.data, "vnfmId"),
                 apiurl=self.vim_id)
+        '''
         JobUtil.add_job_status(self.job_id, 15, 'Nf instancing pre-check finish')
         logger.info("Nf instancing pre-check finish")
 
@@ -130,11 +132,14 @@ class InstantiateVnf(Thread):
             res_index += 1
 
         logger.debug("VnfInst = %s", self.nf_inst_id)
+        '''
         vnfmInfo = NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id)
         if len(vnfmInfo) == 0:
             raise NFLCMException('VnfInst(%s) does not exist' % self.nf_inst_id)
-        content_args['additionalParam']['vnfmid'] = vnfmInfo[0].vnfminstid
-        content_args['additionalParam']['vimid'] = vnfmInfo[0].apiurl
+        '''
+        nfInsts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
+        content_args['additionalParam']['vnfmid'] = nfInsts[0].vnfminstid
+        content_args['additionalParam']['vimid'] = self.vim_id
         logger.info('Grant request data = %s', content_args)
 
         apply_result = apply_grant_to_nfvo(json.dumps(content_args))
@@ -206,10 +211,13 @@ class InstantiateVnf(Thread):
             'affectedCp': affected_cp
         }
 
+        '''
         vnfmInfo = NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id)
         if len(vnfmInfo) == 0:
             raise NFLCMException('nf_inst_id(%s) does not exist in NfvoRegInfoModel' % self.nf_inst_id)
-        content_args['VNFMID'] = vnfmInfo[0].vnfminstid
+        '''
+        nfInsts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
+        content_args['VNFMID'] = nfInsts[0].vnfminstid
         logger.info('Notify request data = %s' % content_args)
         resp = notify_lcm_to_nfvo(json.dumps(content_args))
         logger.info('Lcm notify end, response %s' % resp)
@@ -226,12 +234,13 @@ class InstantiateVnf(Thread):
 
     def update_cps(self):
         for extlink in ignore_case_get(self.data, "extVirtualLinks"):
-            for cp in ignore_case_get(self.vnfd_info, "cps"):
-                cpdid = ignore_case_get(extlink, "cpdId")
-                if cpdid == ignore_case_get(cp, "cp_id"):
-                    cp["networkId"] = ignore_case_get(extlink, "resourceId")
-                    cp["subnetId"] = ignore_case_get(extlink, "resourceSubnetId")
-                    break
+            for ext_cp in ignore_case_get(extlink, "extCps"):
+                cpdid = ignore_case_get(ext_cp, "cpdId")
+                for cp in ignore_case_get(self.vnfd_info, "cps"):
+                    if cpdid == ignore_case_get(cp, "cp_id"):
+                        cp["networkId"] = ignore_case_get(extlink, "resourceId")
+                        cp["subnetId"] = ignore_case_get(extlink, "resourceSubnetId")
+                        break
 
     def set_location(self, apply_result):
         for resource_type in ['vdus', 'vls']:
@@ -243,6 +252,17 @@ class InstantiateVnf(Thread):
                     resource["properties"]["location_info"] = {
                         "vimid": ignore_case_get(apply_result, "vimid"),
                         "tenant": ignore_case_get(apply_result, "tenant")}
+
+    '''
+    def get_subnet_ids(self, ext_cp):
+        subnet_ids = []
+        for cp_conf in ignore_case_get(ext_cp, "cpConfig"):
+            for cp_protocol in ignore_case_get(ext_cp, "cpProtocolData"):
+                ip_over_ethernet = ignore_case_get(cp_protocol, "ipOverEthernet")
+                for ip_address in ignore_case_get(ip_over_ethernet, "ipAddresses"):
+                    subnet_ids.append(ignore_case_get(ip_address, "subnetId"))
+        return subnet_ids
+    '''
 
 
 def volume_save(job_id, nf_inst_id, ret):
