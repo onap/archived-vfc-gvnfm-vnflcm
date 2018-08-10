@@ -25,3 +25,8 @@ class TerminateVnfRequestSerializer(serializers.Serializer):
         help_text="This attribute is only applicable in case of graceful termination",
         default=120,
         required=False)
+    additionalParams = serializers.DictField(
+        help_text="Additional parameters passed by the NFVO as input to the termination process",
+        child=serializers.CharField(help_text="KeyValue Pairs", allow_blank=True),
+        required=False,
+        allow_null=True)
