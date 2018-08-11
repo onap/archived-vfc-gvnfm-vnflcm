@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_d674199e",
+        "filename": "lcm/lcm/pub/database/models.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-08-11T00:34:38Z",
+      "side": 1,
+      "message": "nfvoid is not needed, delete it.",
+      "range": {
+        "startLine": 24,
+        "startChar": 2,
+        "endLine": 24,
+        "endChar": 65
+      },
+      "revId": "bd6316e1f36ccd9c25b544c1f62ad5c0d46300e0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
