@@ -25,7 +25,8 @@ from lcm.nf.serializers.terminate_vnf_req import TerminateVnfRequestSerializer
 from lcm.nf.serializers.job_identifier import JobIdentifierSerializer
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.utils.jobutil import JobUtil
-
+from lcm.pub.utils.timeutil import now_time
+from lcm.pub.database.models import NfInstModel
 
 logger = logging.getLogger(__name__)
 
@@ -55,9 +56,14 @@ class TerminateVnfView(APIView):
 
             return Response(data=terminate_vnf_response_serializer.data, status=status.HTTP_202_ACCEPTED)
         except NFLCMException as e:
-            logger.error(e.message)
+            self.vnf_term_failed_handle(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             logger.error(e.message)
-            logger.error(traceback.format_exc())
+            self.vnf_term_failed_handle(traceback.format_exc())
             return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def vnf_term_failed_handle(self, error_msg):
+        logger.error('VNF termination failed, detail message: %s' % error_msg)
+        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='failed', lastuptime=now_time())
+        JobUtil.add_job_status(self.job_id, 255, error_msg)
