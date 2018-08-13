@@ -14,6 +14,7 @@
 
 import json
 import logging
+import traceback
 from threading import Thread
 
 from lcm.nf.const import VNF_STATUS, RESOURCE_MAP
@@ -40,6 +41,7 @@ class TerminateVnf(Thread):
         self.inst_resource = {'volumn': [], 'network': [], 'subnet': [], 'port': [], 'flavor': [], 'vm': []}
 
     def run(self):
+        try:
             if self.term_pre():
                 self.grant_resource()
                 self.query_inst_resource()
@@ -47,6 +49,11 @@ class TerminateVnf(Thread):
                 self.delete_resource()
                 self.lcm_notify()
             JobUtil.add_job_status(self.job_id, 100, "Terminate Vnf success.")
+        except NFLCMException as e:
+            self.vnf_term_failed_handle(e.message)
+        except Exception as e:
+            logger.error(e.message)
+            self.vnf_term_failed_handle(traceback.format_exc())
 
     def term_pre(self):
         vnf_insts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
@@ -194,3 +201,8 @@ class TerminateVnf(Thread):
         logger.info('Send notify request to nfvo')
         resp = notify_lcm_to_nfvo(json.dumps(self.notify_data))
         logger.info('Lcm notify end, response: %s' % resp)
+
+    def vnf_term_failed_handle(self, error_msg):
+        logger.error('VNF termination failed, detail message: %s' % error_msg)
+        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='failed', lastuptime=now_time())
+        JobUtil.add_job_status(self.job_id, 255, error_msg)
