@@ -21,6 +21,7 @@ class NfInstModel(models.Model):
 
     nfinstid = models.CharField(db_column='NFINSTID', max_length=200, primary_key=True)
     nf_name = models.CharField(db_column='NFNAME', max_length=100, blank=True, null=True)  # CreateVnfRequest.vnfInstanceName
+    vnfminstid = models.CharField(max_length=255, db_column='VNFMINSTID')
     package_id = models.CharField(db_column='PACKAGEID', max_length=200, blank=True, null=True)
     status = models.CharField(db_column='STATUS', max_length=20, blank=True, null=True)
     flavour_id = models.CharField(db_column='FLAVOURID', max_length=200, blank=True, null=True)  # InstantiateVnfRequest.flavourId
