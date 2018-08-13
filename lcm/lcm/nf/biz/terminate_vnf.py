@@ -19,7 +19,7 @@ from threading import Thread
 
 from lcm.nf.const import VNF_STATUS, RESOURCE_MAP
 from lcm.pub.database.models import NfInstModel, VmInstModel, NetworkInstModel, StorageInstModel, \
-    PortInstModel, VNFCInstModel, NfvoRegInfoModel, FlavourInstModel, SubNetworkInstModel
+    PortInstModel, VNFCInstModel, FlavourInstModel, SubNetworkInstModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.msapi.gvnfmdriver import apply_grant_to_nfvo, notify_lcm_to_nfvo
 from lcm.pub.utils.jobutil import JobUtil
@@ -91,11 +91,9 @@ class TerminateVnf(Thread):
             content_args['removeResource'].append(res_def)
             res_index += 1
 
-        vnfmInfo = NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id)
-        if len(vnfmInfo) == 0:
-            raise NFLCMException('VnfId(%s) does not exist' % self.nf_inst_id)
-        content_args['additionalParam']['vnfmid'] = vnfmInfo[0].vnfminstid
-        content_args['additionalParam']['vimid'] = vnfmInfo[0].apiurl
+        vnfInsts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
+        content_args['additionalParam']['vnfmid'] = vnfInsts[0].vnfminstid
+        content_args['additionalParam']['vimid'] = vdus[0].vimid
         logger.info('Grant request data=%s' % content_args)
         self.apply_result = apply_grant_to_nfvo(json.dumps(content_args))
         logger.info("Grant resource end, response: %s" % self.apply_result)
@@ -179,10 +177,8 @@ class TerminateVnf(Thread):
             'affectedVirtualStorage': affected_vs,
             'affectedCp': affected_cp}
 
-        vnfmInfo = NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id)
-        if len(vnfmInfo) == 0:
-            raise NFLCMException('VnfId(%s) does not exist' % self.nf_inst_id)
-        self.notify_data['VNFMID'] = vnfmInfo[0].vnfminstid
+        vnfInsts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
+        self.notify_data['VNFMID'] = vnfInsts[0].vnfminstid
         logger.info('Notify request data=%s' % self.notify_data)
 
     def delete_resource(self):

@@ -22,7 +22,7 @@ from rest_framework import status
 
 from lcm.nf.biz.terminate_vnf import TerminateVnf
 from lcm.pub.database.models import NfInstModel, JobStatusModel, VmInstModel, NetworkInstModel, SubNetworkInstModel, \
-    PortInstModel, FlavourInstModel, StorageInstModel, NfvoRegInfoModel
+    PortInstModel, FlavourInstModel, StorageInstModel
 from lcm.pub.utils import restcall
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
@@ -78,9 +78,6 @@ class TestNFTerminate(TestCase):
                                    vmname="test_01",
                                    is_predefined=1,
                                    operationalstate=1)
-        NfvoRegInfoModel.objects.create(nfvoid='1111',
-                                        vnfminstid='11111',
-                                        apiurl='1')
 
     def tearDown(self):
         VmInstModel.objects.all().delete()
@@ -121,6 +118,7 @@ class TestNFTerminate(TestCase):
     def test_terminate_vnf_success(self, mock_call, mock_call_req):
         NfInstModel.objects.create(nfinstid='1111',
                                    nf_name='2222',
+                                   vnfminstid='1',
                                    package_id='todo',
                                    version='',
                                    vendor='',
