@@ -67,6 +67,29 @@ class TestNFInstantiate(TestCase):
         InstantiateVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
         self.assert_job_result(self.job_id, 255, "VNF nf_inst_id is not exist.")
 
+    def test_instantiate_vnf_when_already_instantiated(self):
+        NfInstModel.objects.create(nfinstid='1111',
+                                   nf_name='vFW_01',
+                                   package_id='222',
+                                   version='',
+                                   vendor='',
+                                   netype='',
+                                   vnfd_model='',
+                                   status='INSTANTIATED',
+                                   nf_desc='vFW in Nanjing TIC Edge',
+                                   vnfdid='111',
+                                   create_time=now_time())
+        self.nf_inst_id = '1111'
+        self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
+        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+        jobs = JobStatusModel.objects.filter(jobid=self.job_id,
+                                             progress=0,
+                                             descp="INST_VNF_READY")
+        self.assertEqual(1, len(jobs))
+        data = inst_req_data
+        InstantiateVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
+        self.assert_job_result(self.job_id, 255, "VNF instantiationState is not NOT_INSTANTIATED.")
+
     @mock.patch.object(restcall, 'call_req')
     def test_instantiate_vnf_when_get_packageinfo_by_csarid_failed(self, mock_call_req):
         NfInstModel.objects.create(nfinstid='1111',

@@ -31,6 +31,7 @@ inst_req_data = {
             "vimConnectionId": "vimConnection_1",
             "resourceProviderId": "resourceProvider_1",
             "resourceId": "resource_1",
+            "resourceSubnetId": "resourceSubnet_1",
             "extCps": [
                 {
                     "cpdId": "cpd_1",
@@ -100,10 +101,9 @@ inst_req_data = {
     ],
     "localizationLanguage": "en_US",
     "additionalParams": {
-        # "inputs": {
+        "vimId": "vim_1",
         "key1": "test1",
-        "key2": "test2"
-        # }
+        "key2": "test2",
     }
 }
 
