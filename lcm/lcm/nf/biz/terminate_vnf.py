@@ -90,12 +90,9 @@ class TerminateVnf(Thread):
                 'resDesId': vdu.resouceid}
             content_args['removeResource'].append(res_def)
             res_index += 1
-
-        vnfmInfo = NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id)
-        if len(vnfmInfo) == 0:
-            raise NFLCMException('VnfId(%s) does not exist' % self.nf_inst_id)
-        content_args['additionalParam']['vnfmid'] = vnfmInfo[0].vnfminstid
-        content_args['additionalParam']['vimid'] = vnfmInfo[0].apiurl
+        nfInsts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
+        content_args['additionalParam']['vnfmid'] = nfInsts[0].vnfminstid
+        content_args['additionalParam']['vimid'] = vdus[0].vimid
         logger.info('Grant request data=%s' % content_args)
         self.apply_result = apply_grant_to_nfvo(json.dumps(content_args))
         logger.info("Grant resource end, response: %s" % self.apply_result)
@@ -179,10 +176,8 @@ class TerminateVnf(Thread):
             'affectedVirtualStorage': affected_vs,
             'affectedCp': affected_cp}
 
-        vnfmInfo = NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id)
-        if len(vnfmInfo) == 0:
-            raise NFLCMException('VnfId(%s) does not exist' % self.nf_inst_id)
-        self.notify_data['VNFMID'] = vnfmInfo[0].vnfminstid
+        nfInsts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
+        self.notify_data['VNFMID'] = nfInsts[0].vnfminstid
         logger.info('Notify request data=%s' % self.notify_data)
 
     def delete_resource(self):
