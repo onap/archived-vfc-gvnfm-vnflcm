@@ -133,8 +133,15 @@ class TestNFTerminate(TestCase):
                                    create_time=now_time())
         t1_apply_grant_result = [0, json.JSONEncoder().encode(
             {
-                "vimid": 'vimid_1',
-                "tenant": 'tenantname_1'
+                "id": "1",
+                "vnfInstanceId": "1",
+                "vnfLcmOpOccId": "2",
+                "vimConnections": [
+                    {
+                        "id": "1",
+                        "vimId": "1"
+                    }
+                ]
             }), '200']
         t2_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
         t3_delete_flavor = [0, json.JSONEncoder().encode({"vim_id": "vimid_1"}), '200']

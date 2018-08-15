@@ -74,7 +74,7 @@ class TerminateVnf(Thread):
             'vnfInstanceId': self.nf_inst_id,
             'vnfDescriptorId': '',
             'lifecycleOperation': 'Terminate',
-            'jobId': self.job_id,
+            'vnfLcmOpOccId': self.job_id,
             'addResource': [],
             'removeResource': [],
             'placementConstraint': [],
