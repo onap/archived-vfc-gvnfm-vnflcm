@@ -158,57 +158,75 @@ class InstantiateVnf(Thread):
 
     def lcm_notify(self):
         logger.info('Send notify request to nfvo')
-        affected_vnfc = []
+        affected_vnfcs = []
         vnfcs = VNFCInstModel.objects.filter(instid=self.nf_inst_id)
         for vnfc in vnfcs:
             vm_resource = {}
             if vnfc.vmid:
                 vm = VmInstModel.objects.filter(vmid=vnfc.vmid)
                 if vm:
-                    vm_resource = {'vimId': vm[0].vimid, 'resourceId': vm[0].resouceid,
-                                   'resourceName': vm[0].vmname, 'resourceType': 'vm'}
-            affected_vnfc.append(
-                {'vnfcInstanceId': vnfc.vnfcinstanceid,
+                    vm_resource = {'vimId': vm[0].vimConnectionId, 'resourceId': vm[0].resouceid,
+                                   'resourceProviderId': vm[0].vmname, 'vimLevelResourceType': 'vm'}
+                    # TODO: is resourceName mapped to resourceProviderId?
+            affected_vnfcs.append(
+                {'id': vnfc.vnfcinstanceid,
                  'vduId': vnfc.vduid,
-                 'changeType': 'added',
+                 'changeType': 'ADDED',
                  'computeResource': vm_resource})
-        affected_vl = []
+        affected_vls = []
         networks = NetworkInstModel.objects.filter(instid=self.nf_inst_id)
         for network in networks:
-            network_resource = {'vimId': network.vimid, 'resourceId': network.resouceid,
-                                'resourceName': network.name, 'resourceType': 'network'}
-            affected_vl.append(
-                {'vlInstanceId': network.networkid,
-                 'vldid': network.nodeId,
-                 'changeType': 'added',
+            network_resource = {'vimConnectionId': network.vimid, 'resourceId': network.resouceid,
+                                'resourceProviderId': network.name, 'vimLevelResourceType': 'network'}
+            # TODO: is resourceName mapped to resourceProviderId?
+            affected_vls.append(
+                {'id': network.networkid,
+                 'virtualLinkDescId': network.nodeId,
+                 'changeType': 'ADDED',
                  'networkResource': network_resource})
-        affected_cp = []
+        ext_link_ports = []
         ports = PortInstModel.objects.filter(instid=self.nf_inst_id)
         for port in ports:
-            affected_cp.append(
-                {'vsInstanceId': port.portid,
-                 'cpdid': port.nodeId,
-                 'changeType': 'added',
-                 'portResource': {'vimId': port.vimid, 'resourceId': port.resouceid,
-                                  'resourceName': port.name, 'resourceType': 'port'}})
-        affected_vs = []
+            ext_link_ports.append({
+                'id': port.portid,  # TODO: port.portid or port.nodeid?
+                'resourceHandle': {
+                    'vimConnectionId': port.vimid,
+                    'resourceId': port.resouceid,
+                    'resourceProviderId': port.name,
+                    'vimLevelResourceType': 'port'
+                },
+                # TODO: is resourceName mapped to resourceProviderId?
+                'cpInstanceId': port.cpinstanceid
+            }),
+        affected_vss = []
         vss = StorageInstModel.objects.filter(instid=self.nf_inst_id)
         for vs in vss:
-            affected_vs.append(
-                {'vsInstanceId': vs.storageid,
-                 'vsdId': vs.nodeId,
-                 'changeType': 'added',
-                 'storageResource': {'vimId': vs.vimid, 'resourceId': vs.resouceid,
-                                     'resourceName': vs.name, 'resourceType': 'volume'}})
+            affected_vss.append({
+                'id': vs.storageid,
+                'virtualStorageDescId': vs.nodeId,
+                'changeType': 'ADDED',
+                'storageResource': {
+                    'vimConnectionId': vs.vimid,
+                    'resourceId': vs.resouceid,
+                    'resourceProviderId': vs.name,
+                    'vimLevelResourceType': 'volume'
+                }
+            })
+            # TODO: is resourceName mapped to resourceProviderId?
         content_args = {
-            "status": 'result',
+            "notificationType": 'VnfLcmOperationOccurrenceNotification',
+            "notificationStatus": 'Result',
             "vnfInstanceId": self.nf_inst_id,
-            "operation": 'instantiate',
-            "jobId": self.job_id,
-            'affectedVnfc': affected_vnfc,
-            'affectedVirtualLink': affected_vl,
-            'affectedVirtualStorage': affected_vs,
-            'affectedCp': affected_cp
+            "operation": 'INSTANTIATE',
+            "vnfLcmOpOccId": self.job_id,
+            'affectedVnfcs': affected_vnfcs,
+            'affectedVirtualLinks': affected_vls,
+            'affectedVirtualStorages': affected_vss,
+            'chengedExtConnectivity': [{
+                'id': None,  # TODO
+                'resourceHandle': None,  # TODO
+                'extLinkPorts': ext_link_ports
+            }]
         }
 
         '''
@@ -217,7 +235,7 @@ class InstantiateVnf(Thread):
             raise NFLCMException('nf_inst_id(%s) does not exist in NfvoRegInfoModel' % self.nf_inst_id)
         '''
         nfInsts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
-        content_args['VNFMID'] = nfInsts[0].vnfminstid
+        content_args['vnfmInstId'] = nfInsts[0].vnfminstid
         logger.info('Notify request data = %s' % content_args)
         resp = notify_lcm_to_nfvo(json.dumps(content_args))
         logger.info('Lcm notify end, response %s' % resp)
