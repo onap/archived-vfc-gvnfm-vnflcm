@@ -21,9 +21,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-# from lcm.nf.serializers.serializers import InstantiateVnfRequestSerializer, InstOrTeriVnfResponseSerializer
 from lcm.nf.serializers.instantiate_vnf_request import InstantiateVnfRequestSerializer
-from lcm.nf.serializers.inst_or_teri_vnf_response import InstOrTeriVnfResponseSerializer
+from lcm.nf.serializers.job_identifier import JobIdentifierSerializer
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.utils.jobutil import JobUtil
 
@@ -34,7 +33,7 @@ class InstantiateVnfView(APIView):
     @swagger_auto_schema(
         request_body=InstantiateVnfRequestSerializer(),
         responses={
-            status.HTTP_202_ACCEPTED: InstOrTeriVnfResponseSerializer(),
+            status.HTTP_202_ACCEPTED: JobIdentifierSerializer(),
             status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal error"
         }
     )
@@ -49,12 +48,12 @@ class InstantiateVnfView(APIView):
             JobUtil.add_job_status(job_id, 0, "INST_VNF_READY")
             InstantiateVnf(instantiate_vnf_request_serializer.data, instanceid, job_id).start()
 
-            instantiate_vnf_response_serializer = InstOrTeriVnfResponseSerializer(data={"jobId": job_id})
-            resp_isvalid = instantiate_vnf_response_serializer.is_valid()
+            job_identifier_serializer = JobIdentifierSerializer(data={"jobId": job_id})
+            resp_isvalid = job_identifier_serializer.is_valid()
             if not resp_isvalid:
-                raise NFLCMException(instantiate_vnf_response_serializer.errors)
+                raise NFLCMException(job_identifier_serializer.errors)
 
-            return Response(data=instantiate_vnf_response_serializer.data, status=status.HTTP_202_ACCEPTED)
+            return Response(data=job_identifier_serializer.data, status=status.HTTP_202_ACCEPTED)
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
