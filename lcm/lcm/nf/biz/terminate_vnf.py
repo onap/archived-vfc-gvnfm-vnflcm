@@ -120,65 +120,87 @@ class TerminateVnf(Thread):
 
     def query_notify_data(self):
         logger.info('Send notify request to nfvo')
-        affected_vnfc = []
+        affected_vnfcs = []
         vnfcs = VNFCInstModel.objects.filter(instid=self.nf_inst_id)
         for vnfc in vnfcs:
             vm_resource = {}
             if vnfc.vmid:
                 vm = VmInstModel.objects.filter(vmid=vnfc.vmid)
                 if vm:
-                    vm_resource = {'vimId': vm[0].vimid, 'resourceId': vm[0].resouceid,
-                                   'resourceName': vm[0].vmname, 'resourceType': 'vm'}
-            affected_vnfc.append(
-                {'vnfcInstanceId': vnfc.vnfcinstanceid,
-                 'vduId': vnfc.vduid,
-                 'changeType': 'removed',
-                 'computeResource': vm_resource})
-        affected_vl = []
+                    vm_resource = {
+                        'vimId': vm[0].vimid,
+                        'resourceId': vm[0].resouceid,
+                        'resourceProviderId': vm[0].vmname,
+                        'vimLevelResourceType': 'vm'
+                    }
+            affected_vnfcs.append({
+                'id': vnfc.vnfcinstanceid,
+                'vduId': vnfc.vduid,
+                'changeType': 'REMOVED',
+                'computeResource': vm_resource
+            })
+        affected_vls = []
         networks = NetworkInstModel.objects.filter(instid=self.nf_inst_id)
         for network in networks:
             network_resource = {
-                'vimId': network.vimid,
+                'vimConnectionId': network.vimid,
                 'resourceId': network.resouceid,
-                'resourceName': network.name,
-                'resourceType': 'network'}
-            affected_vl.append(
-                {'vlInstanceId': network.networkid,
-                 'vldid': network.nodeId,
-                 'changeType': 'removed',
-                 'networkResource': network_resource})
-        affected_cp = []
+                'resourceProviderId': network.name,
+                'vimLevelResourceType': 'network'
+            }
+            affected_vls.append({
+                'id': network.networkid,
+                'virtualLinkDescId': network.nodeId,
+                'changeType': 'REMOVED',
+                'networkResource': network_resource
+            })
+        ext_link_ports = []
         ports = PortInstModel.objects.filter(instid=self.nf_inst_id)
         for port in ports:
-            affected_cp.append(
-                {'vsInstanceId': port.portid,
-                 'cpdid': port.nodeId,
-                 'changeType': 'removed',
-                 'storageResource': {'vimId': port.vimid, 'resourceId': port.resouceid,
-                                     'resourceName': port.name, 'resourceType': 'port'}})
-        affected_vs = []
+            ext_link_ports.append({
+                'id': port.portid,
+                'resourceHandle': {
+                    'vimConnectionId': port.vimid,
+                    'resourceId': port.resouceid,
+                    'resourceProviderId': port.name,
+                    'vimLevelResourceType': 'port'
+                },
+                'cpInstanceId': port.cpinstanceid
+            })
+        affected_vss = []
         vss = StorageInstModel.objects.filter(instid=self.nf_inst_id)
         for vs in vss:
-            affected_vs.append(
-                {'vsInstanceId': vs.storageid,
-                 'vsdId': vs.nodeId,
-                 'changeType': 'removed',
-                 'storageResource': {'vimId': vs.vimid, 'resourceId': vs.resouceid,
-                                     'resourceName': vs.name, 'resourceType': 'volume'}})
+            affected_vss.append({
+                'id': vs.storageid,
+                'virtualStorageDescId': vs.nodeId,
+                'changeType': 'REMOVED',
+                'storageResource': {
+                    'vimConnectionId': vs.vimid,
+                    'resourceId': vs.resouceid,
+                    'resourceProviderId': vs.name,
+                    'vimLevelResourceType': 'volume'
+                }
+            })
         FlavourInstModel.objects.filter(instid=self.nf_inst_id)
         SubNetworkInstModel.objects.filter(instid=self.nf_inst_id)
         self.notify_data = {
-            "status": 'result',
+            "notificationType": 'VnfLcmOperationOccurrenceNotification',
+            "notificationStatus": 'RESULT',
             "vnfInstanceId": self.nf_inst_id,
-            "operation": 'Terminal',
-            "jobId": self.job_id,
-            'affectedVnfc': affected_vnfc,
-            'affectedVirtualLink': affected_vl,
-            'affectedVirtualStorage': affected_vs,
-            'affectedCp': affected_cp}
+            "operation": 'TERMINATE',
+            "vnfLcmOpOccId": self.job_id,
+            'affectedVnfcs': affected_vnfcs,
+            'affectedVirtualLinks': affected_vls,
+            'affectedVirtualStorages': affected_vss,
+            'chengedExtConnectivity': [{
+                'id': None,  # TODO
+                'resourceHandle': None,  # TODO
+                'extLinkPorts': ext_link_ports
+            }]
+        }
 
         vnfInsts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
-        self.notify_data['VNFMID'] = vnfInsts[0].vnfminstid
+        self.notify_data['vnfmInstId'] = vnfInsts[0].vnfminstid
         logger.info('Notify request data=%s' % self.notify_data)
 
     def delete_resource(self):
