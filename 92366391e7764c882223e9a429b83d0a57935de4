@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_c86f8891",
+        "filename": "lcm/lcm/nf/biz/grant_vnf.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-08-15T07:51:21Z",
+      "side": 1,
+      "message": "Change to 2018",
+      "range": {
+        "startLine": 1,
+        "startChar": 11,
+        "endLine": 1,
+        "endChar": 16
+      },
+      "revId": "92366391e7764c882223e9a429b83d0a57935de4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_28063ccf",
+        "filename": "lcm/lcm/nf/biz/grant_vnf.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-08-15T07:51:21Z",
+      "side": 1,
+      "message": "Need move back this line",
+      "range": {
+        "startLine": 54,
+        "startChar": 4,
+        "endLine": 54,
+        "endChar": 78
+      },
+      "revId": "92366391e7764c882223e9a429b83d0a57935de4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
