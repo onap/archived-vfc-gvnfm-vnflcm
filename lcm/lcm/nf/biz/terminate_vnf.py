@@ -21,11 +21,12 @@ from lcm.nf.const import VNF_STATUS, RESOURCE_MAP
 from lcm.pub.database.models import NfInstModel, VmInstModel, NetworkInstModel, StorageInstModel, \
     PortInstModel, VNFCInstModel, FlavourInstModel, SubNetworkInstModel
 from lcm.pub.exceptions import NFLCMException
-from lcm.pub.msapi.gvnfmdriver import apply_grant_to_nfvo, notify_lcm_to_nfvo
+from lcm.pub.msapi.gvnfmdriver import notify_lcm_to_nfvo
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.values import ignore_case_get
 from lcm.pub.vimapi import adaptor
+from lcm.nf.biz.grant_vnf import grant_resource
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +44,8 @@ class TerminateVnf(Thread):
     def run(self):
         try:
             if self.term_pre():
-                self.grant_resource()
+                grant_resource(nf_inst_id=self.nf_inst_id, job_id=self.job_id)
+                JobUtil.add_job_status(self.job_id, 20, 'Nf terminating grant_resource finish')
                 self.query_inst_resource()
                 self.query_notify_data()
                 self.delete_resource()
@@ -67,37 +69,6 @@ class TerminateVnf(Thread):
         JobUtil.add_job_status(self.job_id, 10, 'Nf terminating pre-check finish')
         logger.info("Nf terminating pre-check finish")
         return True
-
-    def grant_resource(self):
-        logger.info("Grant resource begin")
-        content_args = {
-            'vnfInstanceId': self.nf_inst_id,
-            'vnfDescriptorId': '',
-            'lifecycleOperation': 'Terminate',
-            'vnfLcmOpOccId': self.job_id,
-            'addResource': [],
-            'removeResource': [],
-            'placementConstraint': [],
-            'additionalParam': {}
-        }
-
-        vdus = VmInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
-        res_index = 1
-        for vdu in vdus:
-            res_def = {
-                'type': 'VDU',
-                'resDefId': str(res_index),
-                'resDesId': vdu.resouceid}
-            content_args['removeResource'].append(res_def)
-            res_index += 1
-
-        vnfInsts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
-        content_args['additionalParam']['vnfmid'] = vnfInsts[0].vnfminstid
-        content_args['additionalParam']['vimid'] = vdus[0].vimid
-        logger.info('Grant request data=%s' % content_args)
-        self.apply_result = apply_grant_to_nfvo(json.dumps(content_args))
-        logger.info("Grant resource end, response: %s" % self.apply_result)
-        JobUtil.add_job_status(self.job_id, 20, 'Nf terminating grant_resource finish')
 
     def query_inst_resource(self):
         logger.info('Query resource begin')
