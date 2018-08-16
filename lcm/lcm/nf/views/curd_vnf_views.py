@@ -57,7 +57,7 @@ class CreateVnfAndQueryVnfs(APIView):
             return Response(data={'error': 'Failed to get Vnfs'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @swagger_auto_schema(
-        request_body=VnfInstanceSerializer(),
+        request_body=CreateVnfReqSerializer(),
         responses={
             status.HTTP_201_CREATED: VnfInstanceSerializer(),
             status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal error"
