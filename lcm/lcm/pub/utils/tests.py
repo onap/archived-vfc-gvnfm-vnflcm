@@ -20,6 +20,7 @@ import urllib2
 import syscomm
 import timeutil
 import values
+import platform
 
 from lcm.pub.database.models import JobStatusModel, JobModel
 from lcm.pub.utils.jobutil import JobUtil
@@ -57,7 +58,10 @@ class UtilsTest(unittest.TestCase):
         fileutil.delete_dirs("abc")
         is_ok, f_name = fileutil.download_file_from_http("1", "abc", "1.txt")
         self.assertTrue(is_ok)
-        self.assertTrue(f_name.endswith("abc/1.txt"))
+        if platform.system() == 'Windows':
+            self.assertTrue(f_name.endswith("abc\\1.txt"))
+        else:
+            self.assertTrue(f_name.endswith("abc/1.txt"))
         fileutil.delete_dirs("abc")
 
     def test_query_job_status(self):
