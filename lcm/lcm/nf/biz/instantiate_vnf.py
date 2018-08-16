@@ -165,25 +165,35 @@ class InstantiateVnf(Thread):
             if vnfc.vmid:
                 vm = VmInstModel.objects.filter(vmid=vnfc.vmid)
                 if vm:
-                    vm_resource = {'vimId': vm[0].vimConnectionId, 'resourceId': vm[0].resouceid,
-                                   'resourceProviderId': vm[0].vmname, 'vimLevelResourceType': 'vm'}
+                    vm_resource = {
+                        'vimId': vm[0].vimConnectionId,
+                        'resourceId': vm[0].resouceid,
+                        'resourceProviderId': vm[0].vmname,
+                        'vimLevelResourceType': 'vm'
+                    }
                     # TODO: is resourceName mapped to resourceProviderId?
-            affected_vnfcs.append(
-                {'id': vnfc.vnfcinstanceid,
-                 'vduId': vnfc.vduid,
-                 'changeType': 'ADDED',
-                 'computeResource': vm_resource})
+            affected_vnfcs.append({
+                'id': vnfc.vnfcinstanceid,
+                'vduId': vnfc.vduid,
+                'changeType': 'ADDED',
+                'computeResource': vm_resource
+            })
         affected_vls = []
         networks = NetworkInstModel.objects.filter(instid=self.nf_inst_id)
         for network in networks:
-            network_resource = {'vimConnectionId': network.vimid, 'resourceId': network.resouceid,
-                                'resourceProviderId': network.name, 'vimLevelResourceType': 'network'}
+            network_resource = {
+                'vimConnectionId': network.vimid,
+                'resourceId': network.resouceid,
+                'resourceProviderId': network.name,
+                'vimLevelResourceType': 'network'
+            }
             # TODO: is resourceName mapped to resourceProviderId?
-            affected_vls.append(
-                {'id': network.networkid,
-                 'virtualLinkDescId': network.nodeId,
-                 'changeType': 'ADDED',
-                 'networkResource': network_resource})
+            affected_vls.append({
+                'id': network.networkid,
+                'virtualLinkDescId': network.nodeId,
+                'changeType': 'ADDED',
+                'networkResource': network_resource
+            })
         ext_link_ports = []
         ports = PortInstModel.objects.filter(instid=self.nf_inst_id)
         for port in ports:
@@ -215,7 +225,7 @@ class InstantiateVnf(Thread):
             # TODO: is resourceName mapped to resourceProviderId?
         content_args = {
             "notificationType": 'VnfLcmOperationOccurrenceNotification',
-            "notificationStatus": 'Result',
+            "notificationStatus": 'RESULT',
             "vnfInstanceId": self.nf_inst_id,
             "operation": 'INSTANTIATE',
             "vnfLcmOpOccId": self.job_id,
