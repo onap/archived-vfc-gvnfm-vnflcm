@@ -21,12 +21,13 @@ from threading import Thread
 from lcm.pub.database.models import NfInstModel, VmInstModel, NetworkInstModel, \
     SubNetworkInstModel, PortInstModel, StorageInstModel, FlavourInstModel, VNFCInstModel
 from lcm.pub.exceptions import NFLCMException
-from lcm.pub.msapi.gvnfmdriver import apply_grant_to_nfvo, notify_lcm_to_nfvo
+from lcm.pub.msapi.gvnfmdriver import notify_lcm_to_nfvo
 from lcm.pub.msapi.sdc_run_catalog import query_vnfpackage_by_id
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.values import ignore_case_get, get_none, get_boolean, get_integer
 from lcm.pub.vimapi import adaptor
+from lcm.nf.biz.grant_vnf import grant_resource
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +39,7 @@ class InstantiateVnf(Thread):
         self.nf_inst_id = nf_inst_id
         self.job_id = job_id
         self.vim_id = ignore_case_get(ignore_case_get(self.data, "additionalParams"), "vimId")
+        self.grant_type = "instantiate"
 
     def run(self):
         try:
@@ -108,41 +110,9 @@ class InstantiateVnf(Thread):
         logger.info("Nf instancing pre-check finish")
 
     def apply_grant(self):
-        logger.info('Send resource grand request to nfvo')
-        content_args = {
-            'vnfInstanceId': self.nf_inst_id,
-            'vnfDescriptorId': '',
-            'lifecycleOperation': 'Instantiate',
-            'jobId': self.job_id,
-            'addResource': [],
-            'removeResource': [],
-            'placementConstraint': [],
-            'additionalParam': {}
-        }
-
         vdus = ignore_case_get(self.vnfd_info, "vdus")
-        res_index = 1
-        for vdu in vdus:
-            res_def = {
-                'type': 'VDU',
-                'resDefId': str(res_index),
-                'resDesId': ignore_case_get(vdu, "vdu_id")
-            }
-            content_args['addResource'].append(res_def)
-            res_index += 1
-
-        logger.debug("VnfInst = %s", self.nf_inst_id)
-        '''
-        vnfmInfo = NfvoRegInfoModel.objects.filter(nfvoid=self.nf_inst_id)
-        if len(vnfmInfo) == 0:
-            raise NFLCMException('VnfInst(%s) does not exist' % self.nf_inst_id)
-        '''
-        nfInsts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
-        content_args['additionalParam']['vnfmid'] = nfInsts[0].vnfminstid
-        content_args['additionalParam']['vimid'] = self.vim_id
-        logger.info('Grant request data = %s', content_args)
-
-        apply_result = apply_grant_to_nfvo(json.dumps(content_args))
+        apply_result = grant_resource(data=self.data, nf_inst_id=self.nf_inst_id, job_id=self.job_id,
+                                      grant_type=self.grant_type, vdus=vdus)
         self.set_location(apply_result)
 
         logger.info('VnfdInfo = %s' % self.vnfd_info)
