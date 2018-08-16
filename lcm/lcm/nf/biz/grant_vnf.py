@@ -15,38 +15,56 @@
 import json
 import logging
 
-from lcm.pub.database.models import NfInstModel, VmInstModel
+from lcm.pub.database.models import NfInstModel
 from lcm.pub.msapi.gvnfmdriver import apply_grant_to_nfvo
+from lcm.pub.utils.values import ignore_case_get
 
 logger = logging.getLogger(__name__)
 
 
-def grant_resource(nf_inst_id, job_id):
+def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
     logger.info("Grant resource begin")
+    if grant_type == "Terminate":
+        lifecycleOperration = "Terminate"
+    elif grant_type == "instantiate":
+        lifecycleOperration = "Instantiate"
+
     content_args = {
         'vnfInstanceId': nf_inst_id,
         'vnfDescriptorId': '',
-        'lifecycleOperation': 'Terminate',
+        'lifecycleOperation': lifecycleOperration,
         'vnfLcmOpOccId': job_id,
-        'addResource': [],
-        'removeResource': [],
+        'addResources': [],
+        'removeResources': [],
         'placementConstraint': [],
         'additionalParam': {}
     }
 
-    vdus = VmInstModel.objects.filter(instid=nf_inst_id, is_predefined=1)
-    res_index = 1
-    for vdu in vdus:
-        res_def = {
-            'type': 'VDU',
-            'resDefId': str(res_index),
-            'resDesId': vdu.resouceid}
-        content_args['removeResource'].append(res_def)
-        res_index += 1
+    if grant_type == "Terminate":
+        res_index = 1
+        for vdu in vdus:
+            res_def = {
+                'type': 'VDU',
+                'resDefId': str(res_index),
+                'resDesId': vdu.resouceid}
+            content_args['removeResources'].append(res_def)
+            res_index += 1
+        content_args['additionalParam']['vimid'] = vdus[0].vimid
+    elif grant_type == "Instantiate":
+        vim_id = ignore_case_get(ignore_case_get(data, "additionalParams"), "vimId")
+        res_index = 1
+        for vdu in vdus:
+            res_def = {
+                'type': 'VDU',
+                'resDefId': str(res_index),
+                'resDesId': ignore_case_get(vdu, "vdu_id")
+            }
+            content_args['addResources'].append(res_def)
+            res_index += 1
+        content_args['additionalParam']['vimid'] = vim_id
 
     vnfInsts = NfInstModel.objects.filter(nfinstid=nf_inst_id)
     content_args['additionalParam']['vnfmid'] = vnfInsts[0].vnfminstid
-    content_args['additionalParam']['vimid'] = vdus[0].vimid
     logger.info('Grant request data=%s' % content_args)
     apply_result = apply_grant_to_nfvo(json.dumps(content_args))
-    logger.info("Grant resource end, response: %s" % apply_result)
+    return apply_result

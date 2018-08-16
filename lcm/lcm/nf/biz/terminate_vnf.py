@@ -40,11 +40,15 @@ class TerminateVnf(Thread):
         self.terminationType = ignore_case_get(self.data, "terminationType")
         self.gracefulTerminationTimeout = ignore_case_get(self.data, "gracefulTerminationTimeout")
         self.inst_resource = {'volumn': [], 'network': [], 'subnet': [], 'port': [], 'flavor': [], 'vm': []}
+        self.grant_type = "Terminate"
 
     def run(self):
         try:
             if self.term_pre():
-                grant_resource(nf_inst_id=self.nf_inst_id, job_id=self.job_id)
+                vdus = VmInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
+                apply_result = grant_resource(data=self.data, nf_inst_id=self.nf_inst_id, job_id=self.job_id,
+                                              grant_type=self.grant_type, vdus=vdus)
+                logger.info("Grant resource end, response: %s" % apply_result)
                 JobUtil.add_job_status(self.job_id, 20, 'Nf terminating grant_resource finish')
                 self.query_inst_resource()
                 self.query_notify_data()
