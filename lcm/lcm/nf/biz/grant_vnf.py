@@ -26,7 +26,7 @@ def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
     logger.info("Grant resource begin")
     if grant_type == "Terminate":
         lifecycleOperration = "Terminate"
-    elif grant_type == "instantiate":
+    elif grant_type == "Instantiate":
         lifecycleOperration = "Instantiate"
 
     content_args = {
@@ -36,8 +36,8 @@ def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
         'vnfLcmOpOccId': job_id,
         'addResources': [],
         'removeResources': [],
-        'placementConstraint': [],
-        'additionalParam': {}
+        'placementConstraints': [],
+        'additionalParams': {}
     }
 
     if grant_type == "Terminate":
@@ -49,7 +49,7 @@ def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
                 'resDesId': vdu.resouceid}
             content_args['removeResources'].append(res_def)
             res_index += 1
-        content_args['additionalParam']['vimid'] = vdus[0].vimid
+        content_args['additionalParams']['vimid'] = vdus[0].vimid
     elif grant_type == "Instantiate":
         vim_id = ignore_case_get(ignore_case_get(data, "additionalParams"), "vimId")
         res_index = 1
@@ -61,10 +61,10 @@ def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
             }
             content_args['addResources'].append(res_def)
             res_index += 1
-        content_args['additionalParam']['vimid'] = vim_id
+        content_args['additionalParams']['vimid'] = vim_id
 
     vnfInsts = NfInstModel.objects.filter(nfinstid=nf_inst_id)
-    content_args['additionalParam']['vnfmid'] = vnfInsts[0].vnfminstid
+    content_args['additionalParams']['vnfmid'] = vnfInsts[0].vnfminstid
     logger.info('Grant request data=%s' % content_args)
     apply_result = apply_grant_to_nfvo(json.dumps(content_args))
     return apply_result
