@@ -586,7 +586,22 @@ c10_data_get_vm = {
 }
 
 vnfdModel = {
-    "volume_storages": [],
+    "volume_storages": [
+        {
+            "volume_storage_id": "test",
+            "properties": {
+                "location_info": {
+                    "vimid": "test",
+                    "tenant": "tenantname_1",
+                    "availability_zone": "test",
+                },
+                "volume_name": "test",
+                "custom_volume_type": "test",
+                "size": "1",
+            },
+            "image_file": "test",
+        },
+    ],
     "inputs": {
         "pe1_id": {
             "type": "string",
