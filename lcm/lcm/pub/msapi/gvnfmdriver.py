@@ -17,6 +17,10 @@ import logging
 
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.utils.restcall import req_by_msb
+from lcm.pub.database.models import (
+    NfInstModel, VmInstModel, NetworkInstModel,
+    PortInstModel, StorageInstModel, VNFCInstModel
+)
 
 logger = logging.getLogger(__name__)
 
@@ -43,3 +47,87 @@ def notify_lcm_to_nfvo(data):
         logger.error("Status code is %s, detail is %s.", ret[2], ret[1])
         raise NFLCMException("Nf lcm notify exception")
     return ret[1]
+
+
+def prepare_notification_data(nfinstid, jobid, changetype):
+    logger.info('Send notify request to nfvo')
+    affected_vnfcs = []
+    vnfcs = VNFCInstModel.objects.filter(instid=nfinstid)
+    for vnfc in vnfcs:
+        vm_resource = {}
+        if vnfc.vmid:
+            vm = VmInstModel.objects.filter(vmid=vnfc.vmid)
+            if vm:
+                vm_resource = {
+                    'vimId': vm[0].vimConnectionId,
+                    'resourceId': vm[0].resouceid,
+                    'resourceProviderId': vm[0].vmname,  # TODO: is resourceName mapped to resourceProviderId?
+                    'vimLevelResourceType': 'vm'
+                }
+        affected_vnfcs.append({
+            'id': vnfc.vnfcinstanceid,
+            'vduId': vnfc.vduid,
+            'changeType': changetype,
+            'computeResource': vm_resource
+        })
+    affected_vls = []
+    networks = NetworkInstModel.objects.filter(instid=nfinstid)
+    for network in networks:
+        network_resource = {
+            'vimConnectionId': network.vimid,
+            'resourceId': network.resouceid,
+            'resourceProviderId': network.name,  # TODO: is resourceName mapped to resourceProviderId?
+            'vimLevelResourceType': 'network'
+        }
+        affected_vls.append({
+            'id': network.networkid,
+            'virtualLinkDescId': network.nodeId,
+            'changeType': changetype,
+            'networkResource': network_resource
+        })
+    ext_link_ports = []
+    ports = PortInstModel.objects.filter(instid=nfinstid)
+    for port in ports:
+        ext_link_ports.append({
+            'id': port.portid,  # TODO: port.portid or port.nodeid?
+            'resourceHandle': {
+                'vimConnectionId': port.vimid,
+                'resourceId': port.resouceid,
+                'resourceProviderId': port.name,  # TODO: is resourceName mapped to resourceProviderId?
+                'vimLevelResourceType': 'port'
+            },
+            'cpInstanceId': port.cpinstanceid
+        }),
+    affected_vss = []
+    vss = StorageInstModel.objects.filter(instid=nfinstid)
+    for vs in vss:
+        affected_vss.append({
+            'id': vs.storageid,
+            'virtualStorageDescId': vs.nodeId,
+            'changeType': changetype,
+            'storageResource': {
+                'vimConnectionId': vs.vimid,
+                'resourceId': vs.resouceid,
+                'resourceProviderId': vs.name,  # TODO: is resourceName mapped to resourceProviderId?
+                'vimLevelResourceType': 'volume'
+            }
+        })
+    notification_content = {
+        "notificationType": 'VnfLcmOperationOccurrenceNotification',
+        "notificationStatus": 'RESULT',
+        "vnfInstanceId": nfinstid,
+        "operation": 'INSTANTIATE',
+        "vnfLcmOpOccId": jobid,
+        'affectedVnfcs': affected_vnfcs,
+        'affectedVirtualLinks': affected_vls,
+        'affectedVirtualStorages': affected_vss,
+        'chengedExtConnectivity': [{
+            'id': None,  # TODO
+            'resourceHandle': None,  # TODO
+            'extLinkPorts': ext_link_ports
+        }]
+    }
+    nfInsts = NfInstModel.objects.filter(nfinstid=nfinstid)
+    notification_content['vnfmInstId'] = nfInsts[0].vnfminstid
+    logger.info('Notify request data = %s' % notification_content)
+    return notification_content
