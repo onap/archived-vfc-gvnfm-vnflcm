@@ -182,7 +182,7 @@ def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
                 vdu["cps"].append(port["cp_id"])
             break
     if not location_info:
-        err_msg = "vdu_id(%s) for cp(%s) is not defined"
+        err_msg = "vdu_id(%s) for cp(%s) is not defined."
         raise VimException(err_msg % (port_ref_vdu_id, port["cp_id"]), ERR_CODE)
     network_id = ignore_case_get(port, "networkId")
     subnet_id = ignore_case_get(port, "subnetId")
@@ -197,7 +197,7 @@ def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
     set_opt_val(param, "macAddress", ignore_case_get(port["properties"], "mac_address"))
     ip_address = []
     for one_protocol_data in port["properties"]["protocol_data"]:
-        l3_address_data = one_protocol_data["address_data"]["l3_address_data"]
+        l3_address_data = one_protocol_data["address_data"]["l3_address_data"]  # l3 is not 13
         fixed_ip_address = ignore_case_get(l3_address_data, "fixed_ip_address")
         ip_address.extend(fixed_ip_address)
     set_opt_val(param, "ip", ",".join(ip_address))
@@ -266,7 +266,7 @@ def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
     vdu_memory_requirements = ignore_case_get(virtual_memory, "vdu_memory_requirements")
     if "memoryPageSize" in vdu_memory_requirements:
         memory_page_size = int(vdu_memory_requirements["memoryPageSize"].replace('MB', '').strip())
-        flavor_extra_specs = ("hw:mem_page_size=%sMB" % memory_page_size)
+        flavor_extra_specs = {"hw": memory_page_size, }  # TODO
         logger.debug("flavor_extra_specs:%s" % flavor_extra_specs)
 
     # FIXME: search aai flavor
