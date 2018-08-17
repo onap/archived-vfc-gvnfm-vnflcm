@@ -122,6 +122,11 @@ class ResourceTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self.test_data_single_vnf, response.data)
 
+    def test_get_vnf_not_exist(self):
+        response = self.client.get("/api/vnflcm/v1/vnf_instances/x", format='json')
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual({'error': 'VnfInst(x) does not exist'}, response.data)
+
     def test_get_vnfs(self):
         for i in range(1, 3):
             NfInstModel(nfinstid='%s' % i,
@@ -135,3 +140,8 @@ class ResourceTest(TestCase):
         response = self.client.get("/api/vnflcm/v1/vnf_instances", format='json')
         self.failUnlessEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(self.test_data_multi_vnf, response.data)
+
+    def test_get_vnfs_not_exist(self):
+        response = self.client.get("/api/vnflcm/v1/vnf_instances", format='json')
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual({'error': 'VnfInsts does not exist'}, response.data)
