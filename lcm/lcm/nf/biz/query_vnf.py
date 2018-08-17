@@ -29,14 +29,14 @@ class QueryVnf:
     def query_single_vnf(self):
         vnf_inst = NfInstModel.objects.filter(nfinstid=self.vnf_inst_id)
         if not vnf_inst.exists():
-            raise NFLCMException('VnfInst(%s) does not exist' % self.vnf_inst_id)
+            raise NFLCMException('VnfInst(%s) does not exist.' % self.vnf_inst_id)
         resp_data = self.fill_resp_data(vnf_inst[0])
         return resp_data
 
     def query_multi_vnf(self):
         vnf_insts = NfInstModel.objects.all()
         if not vnf_insts:
-            raise NFLCMException('VnfInsts does not exist')
+            raise NFLCMException('VnfInsts does not exist.')
         resp_data = []
         for vnf_inst in vnf_insts:
             resp_data.append(self.fill_resp_data(vnf_inst))
@@ -78,7 +78,8 @@ class QueryVnf:
             vm = VmInstModel.objects.filter(vmid=vnfc.vmid)
             if not vm:
                 raise NFLCMException('VmInst(%s) does not exist.' % vnfc.vmid)
-            storage = StorageInstModel.objects.filter(ownerid=vm[0].vmid)
+            storage = StorageInstModel.objects.filter(vimid=vm[0].vmid)
+            # TODO: previously, ownerid=vm[0].vmid, but ownerid is not a field of StorageInstModel.
             if not storage:
                 raise NFLCMException('StorageInst(%s) does not exist.' % vm[0].vmid)
             vnfc_dic = {
