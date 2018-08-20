@@ -15,7 +15,8 @@
 from django.test import TestCase, Client
 from rest_framework import status
 
-from lcm.pub.database.models import NfInstModel, StorageInstModel
+from lcm.pub.database.models import (NfInstModel, VLInstModel,
+                                     VNFCInstModel, VmInstModel, StorageInstModel)
 
 
 class ResourceTest(TestCase):
@@ -125,7 +126,33 @@ class ResourceTest(TestCase):
     def test_get_vnf_not_exist(self):
         response = self.client.get("/api/vnflcm/v1/vnf_instances/x", format='json')
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        self.assertEqual({'error': 'VnfInst(x) does not exist'}, response.data)
+        self.assertEqual({'error': 'VnfInst(x) does not exist.'}, response.data)
+
+    def test_get_vnf_net_not_exist(self):
+        vnf_inst_id = "1"
+        NfInstModel(nfinstid=vnf_inst_id, nf_name='VNF1', status='INSTANTIATED').save()
+        VLInstModel(ownerid=vnf_inst_id, relatednetworkid='x', ownertype='0').save()
+        response = self.client.get("/api/vnflcm/v1/vnf_instances/%s" % vnf_inst_id, format='json')
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual({'error': 'NetworkInst(x) does not exist.'}, response.data)
+
+    def test_get_vnf_vm_not_exist(self):
+        vnf_inst_id = "1"
+        NfInstModel(nfinstid=vnf_inst_id, nf_name='VNF1', status='INSTANTIATED').save()
+        VNFCInstModel(instid=vnf_inst_id, vmid='x').save()
+        response = self.client.get("/api/vnflcm/v1/vnf_instances/%s" % vnf_inst_id, format='json')
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual({'error': 'VmInst(x) does not exist.'}, response.data)
+
+    def test_get_vnf_storage_not_exist(self):
+        vnf_inst_id = "1"
+        NfInstModel(nfinstid=vnf_inst_id, nf_name='VNF1', status='INSTANTIATED').save()
+        VNFCInstModel(instid=vnf_inst_id,
+                      vmid='x',).save()
+        VmInstModel(vmid='x', insttype='0').save()
+        response = self.client.get("/api/vnflcm/v1/vnf_instances/%s" % vnf_inst_id, format='json')
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual({'error': 'StorageInst(x) does not exist.'}, response.data)
 
     def test_get_vnfs(self):
         for i in range(1, 3):
@@ -144,4 +171,4 @@ class ResourceTest(TestCase):
     def test_get_vnfs_not_exist(self):
         response = self.client.get("/api/vnflcm/v1/vnf_instances", format='json')
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        self.assertEqual({'error': 'VnfInsts does not exist'}, response.data)
+        self.assertEqual({'error': 'VnfInsts does not exist.'}, response.data)

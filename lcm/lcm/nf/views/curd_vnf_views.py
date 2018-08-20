@@ -109,7 +109,7 @@ class DeleteVnfAndQueryVnf(APIView):
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
-            logger.eror(e.message)
+            logger.error(e.message)
             logger.error(traceback.format_exc())
             return Response(data={'error': 'Failed to get Vnf(%s)' % instanceid},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
