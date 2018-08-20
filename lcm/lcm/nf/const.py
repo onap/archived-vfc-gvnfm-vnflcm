@@ -422,7 +422,7 @@ c1_data_get_tenant_id = {
     "tenants": [
         {
             "id": "1",
-            "name": "tenantname_1"
+            "name": "chinamobile"
         }
     ]
 }
@@ -591,17 +591,56 @@ vnfdModel = {
             "volume_storage_id": "test",
             "properties": {
                 "location_info": {
-                    "vimid": "test",
-                    "tenant": "tenantname_1",
+                    "vimid": "vim_1",
+                    "tenant": "chinamobile",
                     "availability_zone": "test",
                 },
                 "volume_name": "test",
                 "custom_volume_type": "test",
-                "size": "1",
+                "size": "10 GB",
             },
             "image_file": "test",
         },
     ],
+    "vdus": [
+    ],
+    "image_files": [],
+    "routers": [],
+    "local_storages": [],
+    "vnf_exposed": {
+        "external_cps": [],
+        "forward_cps": []
+    },
+    "vls": [
+        {
+            "vl_id": "test",
+            "properties": {
+                "location_info": {
+                    "vimid": "test",
+                    "tenant": "chinamobile",
+                },
+                "vl_profile": {
+                    "networkName": "test",
+                    "networkType": "test",
+                    "physicalNetwork": "test",
+                    "vlanTransparent": "test",
+                    "segmentationId": "1",
+                    "cidr": "test",
+                    "dhcpEnabled": "test",
+                    "gatewayIp": "test",
+                    "startIp": "test",
+                    "endIp": "test",
+                },
+                "connectivity_type": {
+                    "layer_protocol": "ipv4",
+                },
+                "dns_nameservers": "test",
+                "host_routes": "test",
+            },
+            "route_external": "test",
+        }
+    ],
+    "cps": [],  # TODO
     "inputs": {
         "pe1_id": {
             "type": "string",
@@ -664,16 +703,6 @@ vnfdModel = {
             "description": "Nameofunderlayervpn"
         }
     },
-    "vdus": [],
-    "image_files": [],
-    "routers": [],
-    "local_storages": [],
-    "vnf_exposed": {
-        "external_cps": [],
-        "forward_cps": []
-    },
-    "vls": [],
-    "cps": [],
     "metadata": {
         "designer": "sdno",
         "name": "underlayervpn",

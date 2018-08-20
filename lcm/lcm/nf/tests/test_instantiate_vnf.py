@@ -35,8 +35,8 @@ class TestNFInstantiate(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.grant_result = {
-            "vimid": 'vimid_1',
-            "tenant": 'tenantname_1',
+            "vimid": 'vim_1',
+            "tenant": 'chinamobile',
         }
 
     def tearDown(self):
@@ -178,9 +178,13 @@ class TestNFInstantiate(TestCase):
         r2_apply_grant_result = [0, json.JSONEncoder().encode(self.grant_result), '200']
         r3_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
         mock_call_req.side_effect = [r1_get_vnfpackage_by_vnfdid, r2_apply_grant_result, r3_lcm_notify_result]
-        mock_call.side_effect = [c1_data_get_tenant_id, c2_data_create_volume, c3_data_get_volume,
-                                 c4_data_create_network, c5_data_create_subnet, c6_data_create_port,
-                                 c7_data_create_flavor, c8_data_list_image, c9_data_create_vm, c10_data_get_vm]
+        mock_call.side_effect = [c1_data_get_tenant_id,
+                                 c2_data_create_volume, c3_data_get_volume,
+                                 c4_data_create_network,
+                                 c5_data_create_subnet,
+                                 c6_data_create_port,
+                                 c7_data_create_flavor,
+                                 c8_data_list_image, c9_data_create_vm, c10_data_get_vm]
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
         JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
