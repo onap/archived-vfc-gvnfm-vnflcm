@@ -59,7 +59,7 @@ def prepare_notification_data(nfinstid, jobid, changetype):
             vm = VmInstModel.objects.filter(vmid=vnfc.vmid)
             if vm:
                 vm_resource = {
-                    'vimId': vm[0].vimConnectionId,
+                    'vimId': vm[0].vimid,
                     'resourceId': vm[0].resouceid,
                     'resourceProviderId': vm[0].vmname,  # TODO: is resourceName mapped to resourceProviderId?
                     'vimLevelResourceType': 'vm'
@@ -96,7 +96,7 @@ def prepare_notification_data(nfinstid, jobid, changetype):
                 'resourceProviderId': port.name,  # TODO: is resourceName mapped to resourceProviderId?
                 'vimLevelResourceType': 'port'
             },
-            'cpInstanceId': port.cpinstanceid
+            'cpInstanceId': port.cpinstanceid  # TODO: port.cpinstanceid is not initiated when create port resource.
         }),
     affected_vss = []
     vss = StorageInstModel.objects.filter(instid=nfinstid)
