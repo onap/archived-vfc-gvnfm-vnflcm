@@ -602,15 +602,6 @@ vnfdModel = {
             "image_file": "test",
         },
     ],
-    "vdus": [
-    ],
-    "image_files": [],
-    "routers": [],
-    "local_storages": [],
-    "vnf_exposed": {
-        "external_cps": [],
-        "forward_cps": []
-    },
     "vls": [
         {
             "vl_id": "test",
@@ -640,7 +631,81 @@ vnfdModel = {
             "route_external": "test",
         }
     ],
-    "cps": [],  # TODO
+    "cps": [
+        {
+            "vdu_id": "test",
+            "cp_id": "cp1",
+            "networkId": "",  # TODO
+            "subnetId": "",  # TODO
+            "vl_id": "test",
+            "properties": {
+                "name": "test",
+                "mac_address": "test",
+                "protocol_data": [
+                    {
+                        "address_data": {
+                            "l3_address_data": {
+                                "fixed_ip_address": "test"
+                            },
+                        },
+                    },
+                ],
+                "vnic_type": "test",
+            }
+        }
+    ],
+    "vdus": [
+        {
+            "vdu_id": "test",
+            "properties": {
+                "location_info": {
+                    "vimid": "test",
+                    "tenant": "chinamobile",
+                    "availability_zone": "test",
+                },
+                "name": "test",
+                "inject_files": [],
+                "user_data": "test",
+                "meta_data": {},
+            },
+            "cps": [],
+            "type": "tosca.nodes.nfv.Vdu.Compute",
+            "virtual_compute": {
+                "virtual_cpu": {
+                    "num_virtual_cpu": "16",
+                },
+                "virtual_memory": {
+                    "virtual_mem_size": "8000 MB",
+                    "vdu_memory_requirements": {
+                        "memoryPageSize": "8 MB",
+                    },
+                },
+            },
+            "virtual_storage": {
+                "type_of_storage": "ephemeral",
+                "size_of_storage": "10 GB",
+            },
+            "type": "tosca.nodes.nfv.Vdu.Compute",
+            "artifacts": [
+                {
+                    "artifact_name": "sw_image",
+                    "file": "sss.vmdk",
+                },
+            ],
+            "volume_storages": [
+                {
+                    "volume_storage_id": "test",
+                }
+            ],
+        },
+    ],
+    "image_files": [],
+    "routers": [],
+    "local_storages": [],
+    "vnf_exposed": {
+        "external_cps": [],
+        "forward_cps": []
+    },
     "inputs": {
         "pe1_id": {
             "type": "string",
