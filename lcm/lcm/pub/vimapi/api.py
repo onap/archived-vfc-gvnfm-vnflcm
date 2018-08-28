@@ -145,6 +145,11 @@ def get_vm(vim_id, tenant_id, vm_id):
 def list_vm(vim_id, tenant_id):
     return call(vim_id, tenant_id, "servers", "GET")
 
+
+# Used to start/stop/restart a vm
+def action_vm(vim_id, tenant_id, vm_id, data):
+    return call(vim_id, tenant_id, "servers/%s/action" % vm_id, "POST", data)
+
 ######################################################################
 
 

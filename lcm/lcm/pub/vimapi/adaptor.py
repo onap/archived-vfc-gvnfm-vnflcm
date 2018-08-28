@@ -20,6 +20,7 @@ from lcm.pub.utils.values import ignore_case_get, set_opt_val
 from lcm.pub.msapi.aai import get_flavor_info
 from . import api
 from .exceptions import VimException
+from lcm.nf.const import ACTION_TYPE
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +64,50 @@ def get_res_id(res_cache, res_type, key):
     if key not in res_cache[res_type]:
         raise VimException("%s(%s) not found in cache" % (res_type, key), ERR_CODE)
     return res_cache[res_type][key]
+
+
+def action_vm(action_type, server, vimId, tenantId):
+    param = {}
+    if action_type == ACTION_TYPE.START:
+        param = {
+            "os-start": None,
+        }
+    elif action_type == ACTION_TYPE.STOP:
+        param = {
+            "os-stop": None,
+        }
+    elif action_type == ACTION_TYPE.REBOOT:
+        param = {
+            "reboot": {}
+        }
+        if server["status"] == "ACTIVE":
+            param["reboot"]["type"] = "SOFT"
+        else:
+            param["reboot"]["type"] = "HARD"
+    res_id = server["id"]
+    api.action_vm(vimId, tenantId, res_id, param)
+
+
+# TODO Have to check if the resources should be started and stopped in some order.
+def operate_vim_res(data, changeStateTo, stopType, gracefulStopTimeout, do_notify_op):
+    for res in ignore_case_get(data, "vm"):
+        try:
+            if changeStateTo == "STARTED":
+                action_vm(ACTION_TYPE.START, res, res["vim_id"], res["tenant_id"])
+                do_notify_op("ACTIVE", res["id"])
+            elif changeStateTo == "STOPPED":
+                if stopType == "GRACEFUL":
+                    if gracefulStopTimeout > 60:
+                        gracefulStopTimeout = 60
+                    time.sleep(gracefulStopTimeout)
+                action_vm(ACTION_TYPE.STOP, res, res["vim_id"], res["tenant_id"])
+                # TODO check if the we should poll getvm to get the status or the action_vm api
+                # successful return should suffice to mark vm as Active/Inactive
+                do_notify_op("INACTIVE", res["id"])
+        except VimException as e:
+            # TODO Have to update database appropriately on failure
+            logger.error("Failed to Heal %s(%s)", RES_VM, res["res_id"])
+            logger.error("%s:%s", e.http_code, e.message)
 
 
 def create_vim_res(data, do_notify):

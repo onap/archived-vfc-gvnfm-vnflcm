@@ -39,6 +39,7 @@ class NfInstModel(models.Model):
     vnfSoftwareVersion = models.CharField(db_column='VNFSOFTWAREVER', max_length=200, blank=True, null=True)
     vnfConfigurableProperties = models.TextField(db_column='VNFCONFIGURABLEPROPERTIES', max_length=20000, blank=True, null=True)
     localizationLanguage = models.CharField(db_column='LOCALIZATIONLANGUAGE', max_length=255, null=True)
+    operationState = models.CharField(db_column='OPERATIONSTATE', max_length=255, null=True)
 
 
 class JobModel(models.Model):
