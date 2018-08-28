@@ -15,3 +15,11 @@
 
 class NFLCMException(Exception):
     pass
+
+
+class NFLCMExceptionNotFound(Exception):
+    pass
+
+
+class NFLCMExceptionConflict(Exception):
+    pass

@@ -18,16 +18,14 @@ import logging
 from lcm.pub.database.models import NfInstModel
 from lcm.pub.msapi.gvnfmdriver import apply_grant_to_nfvo
 from lcm.pub.utils.values import ignore_case_get
+from lcm.nf.const import GRANT_TYPE
 
 logger = logging.getLogger(__name__)
 
 
 def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
     logger.info("Grant resource begin")
-    if grant_type == "Terminate":
-        lifecycleOperration = "Terminate"
-    elif grant_type == "Instantiate":
-        lifecycleOperration = "Instantiate"
+    lifecycleOperration = grant_type
 
     content_args = {
         'vnfInstanceId': nf_inst_id,
@@ -35,6 +33,7 @@ def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
         'lifecycleOperation': lifecycleOperration,
         'vnfLcmOpOccId': job_id,
         'addResources': [],
+        'updateResources': [],
         'removeResources': [],
         'placementConstraints': [],
         'additionalParams': {}
@@ -62,6 +61,16 @@ def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
             content_args['addResources'].append(res_def)
             res_index += 1
         content_args['additionalParams']['vimid'] = vim_id
+    elif grant_type == GRANT_TYPE.OPERATE:
+        res_index = 1
+        for vdu in vdus:
+            res_def = {
+                'type': 'VDU',
+                'resDefId': str(res_index),
+                'resDesId': vdu.resouceid}
+            content_args['updateResources'].append(res_def)
+            res_index += 1
+        content_args['additionalParams']['vimid'] = vdus[0].vimid
 
     vnfInsts = NfInstModel.objects.filter(nfinstid=nf_inst_id)
     content_args['additionalParams']['vnfmid'] = vnfInsts[0].vnfminstid
