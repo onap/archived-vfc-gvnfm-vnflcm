@@ -330,13 +330,6 @@ vnfd_model_dict = {
                 }
             },
             "artifacts": [
-                {
-                    "artifact_name": "software_version_file",
-                    "type": "tosca.artifacts.Deployment",
-                    "file": "AppSoftwares/zte-cn-xgw-V5.16.11_NFV-version.zip",
-                    "repository": "",
-                    "deploy_path": ""
-                }
             ]
         }
     ],
@@ -499,6 +492,15 @@ c1_data_get_tenant_id = {
         }
     ]
 }
+c1_data_get_tenant_id_1 = {
+    "tenants": [
+        {
+            "id": "1",
+            "name": "tenantname"
+        }
+    ]
+}
+
 
 # create_volume
 c2_data_create_volume = {
