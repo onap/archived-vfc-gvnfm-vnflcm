@@ -57,7 +57,7 @@ class CreateVnf:
                                    version=version,
                                    vendor=provider,
                                    netype=netype,
-                                   vnfd_model=self.vnfd_info,
+                                   vnfd_model=json.dumps(self.vnfd_info),
                                    status='NOT_INSTANTIATED',
                                    nf_desc=self.description,
                                    vnfdid=self.csar_id,

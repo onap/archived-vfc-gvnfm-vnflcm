@@ -40,6 +40,8 @@ class NfInstModel(models.Model):
     vnfConfigurableProperties = models.TextField(db_column='VNFCONFIGURABLEPROPERTIES', max_length=20000, blank=True, null=True)
     localizationLanguage = models.CharField(db_column='LOCALIZATIONLANGUAGE', max_length=255, null=True)
     operationState = models.CharField(db_column='OPERATIONSTATE', max_length=255, null=True)
+    resInfo = models.TextField(db_column='RESINFO', max_length=20000, blank=True, null=True)
+    vimInfo = models.TextField(db_column='VIMINFO', max_length=20000, blank=True, null=True)
 
 
 class JobModel(models.Model):
