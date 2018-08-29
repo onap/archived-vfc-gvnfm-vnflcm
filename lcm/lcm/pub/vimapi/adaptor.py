@@ -20,7 +20,8 @@ from lcm.pub.utils.values import ignore_case_get, set_opt_val
 from lcm.pub.msapi.aai import get_flavor_info
 from . import api
 from .exceptions import VimException
-from lcm.nf.const import ACTION_TYPE
+from lcm.pub.exceptions import NFLCMException
+from lcm.nf.const import ACTION_TYPE, HEAL_ACTION_TYPE
 
 logger = logging.getLogger(__name__)
 
@@ -101,17 +102,30 @@ def operate_vim_res(data, changeStateTo, stopType, gracefulStopTimeout, do_notif
                         gracefulStopTimeout = 60
                     time.sleep(gracefulStopTimeout)
                 action_vm(ACTION_TYPE.STOP, res, res["vim_id"], res["tenant_id"])
-                # TODO check if the we should poll getvm to get the status or the action_vm api
-                # successful return should suffice to mark vm as Active/Inactive
                 do_notify_op("INACTIVE", res["id"])
         except VimException as e:
-            # TODO Have to update database appropriately on failure
-            logger.error("Failed to Heal %s(%s)", RES_VM, res["res_id"])
+            logger.error("Failed to Operate %s(%s)", RES_VM, res["res_id"])
             logger.error("%s:%s", e.http_code, e.message)
+            raise NFLCMException("Failed to Operate %s(%s)", RES_VM, res["res_id"])
 
 
-def create_vim_res(data, do_notify):
-    vim_cache, res_cache = {}, {}
+def heal_vim_res(vdus, vnfd_info, do_notify, data, vim_cache, res_cache):
+    try:
+        vimid = data["vimid"]
+        tenant = data["tenant"]
+        actionType = data["action"]
+        if actionType == HEAL_ACTION_TYPE.START:
+            create_vm(vim_cache, res_cache, vnfd_info, vdus[0], do_notify, RES_VM)
+        elif actionType == HEAL_ACTION_TYPE.RESTART:
+            vm_info = api.get_vm(vimid, tenant, vdus[0].resouceid)
+            action_vm(ACTION_TYPE.REBOOT, vm_info, vimid, tenant)
+    except VimException as e:
+        logger.error("Failed to Heal %s(%s)", RES_VM, vdus[0]["vdu_id"])
+        logger.error("%s:%s", e.http_code, e.message)
+        raise NFLCMException("Failed to Heal %s(%s)", RES_VM, vdus[0]["vdu_id"])
+
+
+def create_vim_res(data, do_notify, vim_cache={}, res_cache={}):
     for vol in ignore_case_get(data, "volume_storages"):
         create_volume(vim_cache, res_cache, vol, do_notify, RES_VOLUME)
     for network in ignore_case_get(data, "vls"):

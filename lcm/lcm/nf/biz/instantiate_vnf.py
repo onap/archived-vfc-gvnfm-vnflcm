@@ -89,7 +89,7 @@ class InstantiateVnf(Thread):
                    version=version,
                    vendor=vendor,
                    netype=netype,
-                   vnfd_model=self.vnfd_info,
+                   vnfd_model=json.dumps(self.vnfd_info),
                    status='NOT_INSTANTIATED',
                    vnfdid=self.vnfd_id,
                    localizationLanguage=ignore_case_get(self.data, 'localizationLanguage'),
@@ -122,8 +122,12 @@ class InstantiateVnf(Thread):
 
     def create_res(self):
         logger.info("Create resource start")
-        adaptor.create_vim_res(self.vnfd_info, self.do_notify)
+        vim_cache, res_cache = {}, {}
+        adaptor.create_vim_res(self.vnfd_info, self.do_notify, vim_cache=vim_cache, res_cache=res_cache)
         JobUtil.add_job_status(self.job_id, 70, '[NF instantiation] create resource finish')
+        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).\
+            update(vimInfo=json.dumps(vim_cache),
+                   resInfo=json.dumps(res_cache))
         logger.info("Create resource finish")
 
     def lcm_notify(self):

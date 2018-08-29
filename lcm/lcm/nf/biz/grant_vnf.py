@@ -26,6 +26,8 @@ logger = logging.getLogger(__name__)
 def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
     logger.info("Grant resource begin")
     lifecycleOperration = grant_type
+    if (grant_type == GRANT_TYPE.HEAL_CREATE or grant_type == GRANT_TYPE.HEAL_RESTART):
+        lifecycleOperration = "Heal"
 
     content_args = {
         'vnfInstanceId': nf_inst_id,
@@ -60,6 +62,24 @@ def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
             }
             content_args['addResources'].append(res_def)
             res_index += 1
+        content_args['additionalParams']['vimid'] = vim_id
+    elif grant_type == GRANT_TYPE.HEAL_RESTART:
+        res_index = 1
+        res_def = {
+            'type': 'VDU',
+            'resDefId': str(res_index),
+            'resDesId': vdus[0].resouceid}
+        content_args['updateResources'].append(res_def)
+        content_args['additionalParams']['vimid'] = vdus[0].vimid
+    elif grant_type == GRANT_TYPE.HEAL_CREATE:
+        vim_id = vdus[0]["properties"]["location_info"]["vimid"]
+        res_index = 1
+        res_def = {
+            'type': 'VDU',
+            'resDefId': str(res_index),
+            'resDesId': ignore_case_get(vdus[0], "vdu_id")
+        }
+        content_args['addResources'].append(res_def)
         content_args['additionalParams']['vimid'] = vim_id
     elif grant_type == GRANT_TYPE.OPERATE:
         res_index = 1
