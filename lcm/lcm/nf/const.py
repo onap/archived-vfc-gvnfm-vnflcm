@@ -22,6 +22,16 @@ VNF_STATUS = enum(NULL='null', INSTANTIATING="instantiating", INACTIVE='inactive
 RESOURCE_MAP = {'Storage': 'volumn', 'Network': 'network', 'SubNetwork': 'subnet', 'Port': 'port',
                 'Flavour': 'flavor', 'Vm': 'vm'}
 
+ROOT_URI = "api/vnflcm/v1/subscriptions/"
+
+AUTH_TYPES = ["BASIC", "OAUTH2_CLIENT_CREDENTIALS", "TLS_CERT"]
+
+BASIC = "BASIC"
+
+OAUTH2_CLIENT_CREDENTIALS = "OAUTH2_CLIENT_CREDENTIALS"
+
+LCCNNOTIFICATION = "VnfLcmOperationOccurrenceNotification"
+
 inst_req_data = {
     "flavourId": "flavour_1",
     "instantiationLevelId": "instantiationLevel_1",
