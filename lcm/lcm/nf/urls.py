@@ -17,8 +17,10 @@ from django.conf.urls import url
 from lcm.nf.views.curd_vnf_views import DeleteVnfAndQueryVnf, CreateVnfAndQueryVnfs
 from lcm.nf.views.instantiate_vnf_view import InstantiateVnfView
 from lcm.nf.views.terminate_vnf_view import TerminateVnfView
+from lcm.nf.views.subscriptions_view import SubscriptionsView
 
 urlpatterns = [
+    url(r'^api/vnflcm/v1/subscriptions$', SubscriptionsView.as_view()),
     url(r'^api/vnflcm/v1/vnf_instances$', CreateVnfAndQueryVnfs.as_view()),
     url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)/instantiate$', InstantiateVnfView.as_view()),
     url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)$', DeleteVnfAndQueryVnf.as_view()),
