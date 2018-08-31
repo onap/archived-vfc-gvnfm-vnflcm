@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "1a76adc5_bbdb224e",
+        "filename": "lcm/lcm/nf/biz/subscribe_notification.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 141
+      },
+      "writtenOn": "2018-08-31T07:51:14Z",
+      "side": 1,
+      "message": "Awesome job.\nCould it be possible to use the create_subscription as the file and class name? In later, get_subscription,delete_,... will be clear for the later coder. Thanks",
+      "range": {
+        "startLine": 15,
+        "startChar": 7,
+        "endLine": 15,
+        "endChar": 10
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_5b8bee67",
         "filename": "lcm/lcm/nf/biz/subscribe_notification.py",
         "patchSetId": 1
@@ -18,6 +41,76 @@
         "startChar": 4,
         "endLine": 83,
         "endChar": 69
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_dbb7fef3",
+        "filename": "lcm/lcm/nf/biz/subscribe_notification.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 141
+      },
+      "writtenOn": "2018-08-31T07:51:14Z",
+      "side": 1,
+      "message": "It mainly check whether notification_types equals to const.LCCNNOTIFICATION. In my mind, if swagger can help, it is fine, but I am not very sure. Please Jinhua confirm it.\nI think whether the empty or null of notification_types is allowed. If it is allowed, a default value const.LCCNNOTIFICATION can be set. If in request, there are other values being set, it should throw exception.",
+      "parentUuid": "1a76adc5_5b8bee67",
+      "range": {
+        "startLine": 71,
+        "startChar": 4,
+        "endLine": 83,
+        "endChar": 69
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_7bd02a1f",
+        "filename": "lcm/lcm/nf/biz/subscribe_notification.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 141
+      },
+      "writtenOn": "2018-08-31T07:51:14Z",
+      "side": 1,
+      "message": "should we do a real connection check with the callback uri and auth ?",
+      "range": {
+        "startLine": 85,
+        "startChar": 34,
+        "endLine": 85,
+        "endChar": 36
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_fbdf5a0b",
+        "filename": "lcm/lcm/nf/biz/subscribe_notification.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 141
+      },
+      "writtenOn": "2018-08-31T07:51:14Z",
+      "side": 1,
+      "message": "Only checking the count maybe is not enough.\nShould we only create only one subscription for one callback uri and merge the filter parameters in one subscription to avoid overlapping and same filter? thanks",
+      "range": {
+        "startLine": 95,
+        "startChar": 37,
+        "endLine": 95,
+        "endChar": 39
       },
       "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
@@ -317,6 +410,29 @@
         "startChar": 6,
         "endLine": 43,
         "endChar": 36
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_1bdb3651",
+        "filename": "lcm/lcm/nf/views/subscribe_notifications_view.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 141
+      },
+      "writtenOn": "2018-08-31T07:51:14Z",
+      "side": 1,
+      "message": "Excellent work. A little suggestion:\n\nCould it be possible to change subscribe_notifications_view name to subscriptions_view to support post/get and later the single subscription as invidual_subscriptions_view to support get/del ?  The name will be easy to align to SOL document.\nHope it useful",
+      "range": {
+        "startLine": 15,
+        "startChar": 7,
+        "endLine": 15,
+        "endChar": 10
       },
       "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
