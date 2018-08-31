@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_1b333664",
+        "filename": "lcm/lcm/nf/biz/subscribe_notification.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 747
+      },
+      "writtenOn": "2018-08-31T09:39:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_bbdb224e",
+      "range": {
+        "startLine": 15,
+        "startChar": 7,
+        "endLine": 15,
+        "endChar": 10
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_5b8bee67",
         "filename": "lcm/lcm/nf/biz/subscribe_notification.py",
         "patchSetId": 1
@@ -72,6 +96,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_bb332261",
+        "filename": "lcm/lcm/nf/biz/subscribe_notification.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 747
+      },
+      "writtenOn": "2018-08-31T09:39:31Z",
+      "side": 1,
+      "message": "According to SOL003 if we set operation_type or operation_state then notification_type must be \u0027VnfLcmOperationOccurrenceNotification\u0027. I am not sure, how we can validate that in swagger, because to validate one parameter we have to check the value of other parameter",
+      "parentUuid": "1a76adc5_5b8bee67",
+      "range": {
+        "startLine": 71,
+        "startChar": 4,
+        "endLine": 83,
+        "endChar": 69
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_7bd02a1f",
         "filename": "lcm/lcm/nf/biz/subscribe_notification.py",
         "patchSetId": 1
@@ -83,6 +131,30 @@
       "writtenOn": "2018-08-31T07:51:14Z",
       "side": 1,
       "message": "should we do a real connection check with the callback uri and auth ?",
+      "range": {
+        "startLine": 85,
+        "startChar": 34,
+        "endLine": 85,
+        "endChar": 36
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_db385e3f",
+        "filename": "lcm/lcm/nf/biz/subscribe_notification.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 747
+      },
+      "writtenOn": "2018-08-31T09:39:31Z",
+      "side": 1,
+      "message": "Yes, as part of sol003 create subscription flow, before saving we need to send GET request to the callbackURI and check for 204 status code.",
+      "parentUuid": "1a76adc5_7bd02a1f",
       "range": {
         "startLine": 85,
         "startChar": 34,
@@ -118,6 +190,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_7b410aa8",
+        "filename": "lcm/lcm/nf/biz/subscribe_notification.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 747
+      },
+      "writtenOn": "2018-08-31T09:39:31Z",
+      "side": 1,
+      "message": "We are not checking just count but also the contents in the list",
+      "parentUuid": "1a76adc5_fbdf5a0b",
+      "range": {
+        "startLine": 95,
+        "startChar": 37,
+        "endLine": 95,
+        "endChar": 39
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_5b152ee3",
         "filename": "lcm/lcm/nf/biz/subscribe_notification.py",
         "patchSetId": 1
@@ -129,6 +225,30 @@
       "writtenOn": "2018-08-31T07:06:58Z",
       "side": 1,
       "message": "list type should be changed to string type by using json.dumps()?",
+      "range": {
+        "startLine": 132,
+        "startChar": 60,
+        "endLine": 132,
+        "endChar": 83
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_5b8e8ed1",
+        "filename": "lcm/lcm/nf/biz/subscribe_notification.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 747
+      },
+      "writtenOn": "2018-08-31T09:39:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_5b152ee3",
       "range": {
         "startLine": 132,
         "startChar": 60,
@@ -164,6 +284,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_dbeb7e76",
+        "filename": "lcm/lcm/nf/serializers/lccn_filter_data.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 747
+      },
+      "writtenOn": "2018-08-31T09:39:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_db713ea9",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 1
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_7b6a6ab4",
         "filename": "lcm/lcm/nf/serializers/lccn_filter_data.py",
         "patchSetId": 1
@@ -175,6 +319,30 @@
       "writtenOn": "2018-08-31T07:06:58Z",
       "side": 1,
       "message": "Can be deleted because those can be checked by swagger framework",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 82
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_7b04aa49",
+        "filename": "lcm/lcm/nf/serializers/lccn_filter_data.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 747
+      },
+      "writtenOn": "2018-08-31T09:39:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_7b6a6ab4",
       "range": {
         "startLine": 48,
         "startChar": 0,
@@ -210,6 +378,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_bb9d620c",
+        "filename": "lcm/lcm/nf/serializers/lccn_filter_data.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 747
+      },
+      "writtenOn": "2018-08-31T09:39:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_db5a9e29",
+      "range": {
+        "startLine": 77,
+        "startChar": 6,
+        "endLine": 77,
+        "endChar": 26
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_7b434a42",
         "filename": "lcm/lcm/nf/serializers/lccn_filter_data.py",
         "patchSetId": 1
@@ -221,6 +413,30 @@
       "writtenOn": "2018-08-31T07:06:58Z",
       "side": 1,
       "message": "Should be changed to serializers.ChoiceField by SOL003",
+      "range": {
+        "startLine": 79,
+        "startChar": 14,
+        "endLine": 79,
+        "endChar": 35
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_dba29e4a",
+        "filename": "lcm/lcm/nf/serializers/lccn_filter_data.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 747
+      },
+      "writtenOn": "2018-08-31T09:39:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_7b434a42",
       "range": {
         "startLine": 79,
         "startChar": 14,
@@ -256,6 +472,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_7b8b4ac3",
+        "filename": "lcm/lcm/nf/serializers/lccn_filter_data.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 747
+      },
+      "writtenOn": "2018-08-31T09:39:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_5b468e50",
+      "range": {
+        "startLine": 85,
+        "startChar": 14,
+        "endLine": 85,
+        "endChar": 35
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_bb6c82d1",
         "filename": "lcm/lcm/nf/serializers/lccn_filter_data.py",
         "patchSetId": 1
@@ -267,6 +507,30 @@
       "writtenOn": "2018-08-31T07:06:58Z",
       "side": 1,
       "message": "This should be LcmOperationStateType which can be defined with serializers.ChoiceField",
+      "range": {
+        "startLine": 92,
+        "startChar": 14,
+        "endLine": 92,
+        "endChar": 35
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_9b88a6c6",
+        "filename": "lcm/lcm/nf/serializers/lccn_filter_data.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 747
+      },
+      "writtenOn": "2018-08-31T09:39:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_bb6c82d1",
       "range": {
         "startLine": 92,
         "startChar": 14,
@@ -302,6 +566,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_db0ffe86",
+        "filename": "lcm/lcm/nf/serializers/lccn_subscription.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 747
+      },
+      "writtenOn": "2018-08-31T09:39:31Z",
+      "side": 1,
+      "message": "But it has href. In SOL003 I think we have few different types of \"_links\" with different contents. So I defined it here",
+      "parentUuid": "1a76adc5_dbe05efc",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 25
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_9be66614",
         "filename": "lcm/lcm/nf/serializers/subscription_auth_data.py",
         "patchSetId": 1
@@ -325,6 +613,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_3b1e32bc",
+        "filename": "lcm/lcm/nf/serializers/subscription_auth_data.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 747
+      },
+      "writtenOn": "2018-08-31T09:39:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_9be66614",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 21
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_7be90ae5",
         "filename": "lcm/lcm/nf/serializers/subscription_auth_data.py",
         "patchSetId": 1
@@ -336,6 +648,30 @@
       "writtenOn": "2018-08-31T07:28:16Z",
       "side": 1,
       "message": "Need be changed to serializers.ChoiceField",
+      "range": {
+        "startLine": 66,
+        "startChar": 14,
+        "endLine": 66,
+        "endChar": 35
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_9b25060b",
+        "filename": "lcm/lcm/nf/serializers/subscription_auth_data.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 747
+      },
+      "writtenOn": "2018-08-31T09:39:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_7be90ae5",
       "range": {
         "startLine": 66,
         "startChar": 14,
@@ -428,6 +764,30 @@
       "writtenOn": "2018-08-31T07:51:14Z",
       "side": 1,
       "message": "Excellent work. A little suggestion:\n\nCould it be possible to change subscribe_notifications_view name to subscriptions_view to support post/get and later the single subscription as invidual_subscriptions_view to support get/del ?  The name will be easy to align to SOL document.\nHope it useful",
+      "range": {
+        "startLine": 15,
+        "startChar": 7,
+        "endLine": 15,
+        "endChar": 10
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_bb81e2c4",
+        "filename": "lcm/lcm/nf/views/subscribe_notifications_view.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 747
+      },
+      "writtenOn": "2018-08-31T09:39:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_1bdb3651",
       "range": {
         "startLine": 15,
         "startChar": 7,
