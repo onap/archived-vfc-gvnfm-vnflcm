@@ -120,6 +120,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_9695dd88",
+        "filename": "lcm/lcm/nf/biz/subscribe_notification.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 141
+      },
+      "writtenOn": "2018-08-31T11:08:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_bb332261",
+      "range": {
+        "startLine": 71,
+        "startChar": 4,
+        "endLine": 83,
+        "endChar": 69
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_7bd02a1f",
         "filename": "lcm/lcm/nf/biz/subscribe_notification.py",
         "patchSetId": 1
@@ -202,6 +226,30 @@
       "side": 1,
       "message": "We are not checking just count but also the contents in the list",
       "parentUuid": "1a76adc5_fbdf5a0b",
+      "range": {
+        "startLine": 95,
+        "startChar": 37,
+        "endLine": 95,
+        "endChar": 39
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_b63fb986",
+        "filename": "lcm/lcm/nf/biz/subscribe_notification.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 141
+      },
+      "writtenOn": "2018-08-31T11:08:50Z",
+      "side": 1,
+      "message": "In the \"is_filter_type_equal\", I only see the count checking. If the list elements are different or order different, it can not work.\nIt is important to define what is same and whether to allow overlap in the different subscriptions of one callbackURI endpoint. In logic, one callbackURI endponit using one  subscription and in the subscription,parameters can be merged is enough in use in my mind.",
+      "parentUuid": "1a76adc5_7b410aa8",
       "range": {
         "startLine": 95,
         "startChar": 37,
@@ -577,6 +625,54 @@
       "writtenOn": "2018-08-31T09:39:31Z",
       "side": 1,
       "message": "But it has href. In SOL003 I think we have few different types of \"_links\" with different contents. So I defined it here",
+      "parentUuid": "1a76adc5_dbe05efc",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 25
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_5650a5d3",
+        "filename": "lcm/lcm/nf/serializers/lccn_subscription.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 141
+      },
+      "writtenOn": "2018-08-31T11:08:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_db0ffe86",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 25
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_3653a9e3",
+        "filename": "lcm/lcm/nf/serializers/lccn_subscription.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 141
+      },
+      "writtenOn": "2018-08-31T11:08:50Z",
+      "side": 1,
+      "message": "Done",
       "parentUuid": "1a76adc5_dbe05efc",
       "range": {
         "startLine": 20,
