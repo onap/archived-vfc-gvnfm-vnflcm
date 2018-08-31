@@ -183,6 +183,167 @@
       "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_dbe05efc",
+        "filename": "lcm/lcm/nf/serializers/lccn_subscription.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-08-31T07:28:16Z",
+      "side": 1,
+      "message": "This is already defined in link.py",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 25
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_9be66614",
+        "filename": "lcm/lcm/nf/serializers/subscription_auth_data.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-08-31T07:28:16Z",
+      "side": 1,
+      "message": "Can be deleted because it can be checked by swagger validation",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 21
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_7be90ae5",
+        "filename": "lcm/lcm/nf/serializers/subscription_auth_data.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-08-31T07:28:16Z",
+      "side": 1,
+      "message": "Need be changed to serializers.ChoiceField",
+      "range": {
+        "startLine": 66,
+        "startChar": 14,
+        "endLine": 66,
+        "endChar": 35
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_3bef12eb",
+        "filename": "lcm/lcm/nf/serializers/vnf_instance_subscription_filter.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-08-31T07:28:16Z",
+      "side": 1,
+      "message": "Need be changed to VersionsSerializer",
+      "range": {
+        "startLine": 18,
+        "startChar": 6,
+        "endLine": 18,
+        "endChar": 24
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_5bec4ef3",
+        "filename": "lcm/lcm/nf/serializers/vnf_instance_subscription_filter.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-08-31T07:28:16Z",
+      "side": 1,
+      "message": "Need be changed to VnfProductsSerializer",
+      "range": {
+        "startLine": 30,
+        "startChar": 6,
+        "endLine": 30,
+        "endChar": 27
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_fbbc3ade",
+        "filename": "lcm/lcm/nf/serializers/vnf_instance_subscription_filter.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-08-31T07:28:16Z",
+      "side": 1,
+      "message": "Need be changed to VnfProductsProvidersSerializer",
+      "range": {
+        "startLine": 43,
+        "startChar": 6,
+        "endLine": 43,
+        "endChar": 36
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_1bc25659",
+        "filename": "lcm/lcm/pub/database/models.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-08-31T07:28:16Z",
+      "side": 1,
+      "message": "Why not merge into one line, to keep consistent with other fields",
+      "range": {
+        "startLine": 304,
+        "startChar": 0,
+        "endLine": 311,
+        "endChar": 53
+      },
+      "revId": "487edc50b673c1a40d778a2a8147f603247ec3e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
