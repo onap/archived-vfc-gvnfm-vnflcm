@@ -2,6 +2,52 @@
   "comments": [
     {
       "key": {
+        "uuid": "1a76adc5_4f8ec37a",
+        "filename": "lcm/lcm/nf/serializers/operate_vnf_req.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 4497
+      },
+      "writtenOn": "2018-09-04T04:52:11Z",
+      "side": 1,
+      "message": "A child field instance should be used for validating the values in the dictionary. If this argument is not provided then values in the mapping will not be validated.\nWe expect a CharField child.",
+      "range": {
+        "startLine": 30,
+        "startChar": 4,
+        "endLine": 35,
+        "endChar": 24
+      },
+      "revId": "d6b6d812e27d68a7951af3e643f4ae36e7dea236",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_2ff10702",
+        "filename": "lcm/lcm/nf/serializers/response.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4497
+      },
+      "writtenOn": "2018-09-04T04:52:11Z",
+      "side": 1,
+      "message": "Please align it with the definition of ProblemDetails in sol003.",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 86
+      },
+      "revId": "d6b6d812e27d68a7951af3e643f4ae36e7dea236",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_6f8b7f68",
         "filename": "lcm/lcm/nf/views/operate_vnf_view.py",
         "patchSetId": 1
