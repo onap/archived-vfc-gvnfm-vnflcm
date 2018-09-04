@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_2ae575dc",
+        "filename": "lcm/lcm/nf/serializers/operate_vnf_req.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4497
+      },
+      "writtenOn": "2018-09-04T10:10:16Z",
+      "side": 1,
+      "message": "An additional child field is expected inside the brackets of DictField, e.g. child \u003d serializers.Charfield(...)",
+      "range": {
+        "startLine": 34,
+        "startChar": 8,
+        "endLine": 34,
+        "endChar": 23
+      },
+      "revId": "c9829d847d2f8d34ba888a0d007a5fee79bc42c1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
