@@ -219,12 +219,12 @@ inst_res_data = {
                 "role": "root",
                 "virtual_network_interface_requirements": [
                     {
-                        "requirement": {
-                            "SRIOV": "true"
+                        "network_interface_requirements": {
+                            "interfaceType": '{"schema-version": "0", "schema-location":"", "platform-id": "generic", "mandatory": false, "configuration-value": "SR-IOV"}'
                         },
                         "support_mandatory": False,
-                        "name": "sriov",
-                        "description": "sriov"
+                        "name": "sriov-support",
+                        "description": "sriov"     
                     }
                 ],
                 "layer_protocol": "ipv4",
