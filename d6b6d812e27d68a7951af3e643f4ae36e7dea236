@@ -96,6 +96,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_6a8e0dd2",
+        "filename": "lcm/lcm/nf/serializers/response.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4247
+      },
+      "writtenOn": "2018-09-04T10:40:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_2ff10702",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 86
+      },
+      "revId": "d6b6d812e27d68a7951af3e643f4ae36e7dea236",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_6f8b7f68",
         "filename": "lcm/lcm/nf/views/operate_vnf_view.py",
         "patchSetId": 1
