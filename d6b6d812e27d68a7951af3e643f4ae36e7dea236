@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_0ff1ab6a",
+        "filename": "lcm/lcm/nf/serializers/operate_vnf_req.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 4247
+      },
+      "writtenOn": "2018-09-04T08:45:56Z",
+      "side": 1,
+      "message": "Hi Li,\nIf we use charField the value should always be a string. So to accept any data type for value I have not added the chaField here. Let me know your thoughts on this.",
+      "parentUuid": "1a76adc5_4f8ec37a",
+      "range": {
+        "startLine": 30,
+        "startChar": 4,
+        "endLine": 35,
+        "endChar": 24
+      },
+      "revId": "d6b6d812e27d68a7951af3e643f4ae36e7dea236",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_2ff10702",
         "filename": "lcm/lcm/nf/serializers/response.py",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2018-09-04T04:52:11Z",
       "side": 1,
       "message": "Please align it with the definition of ProblemDetails in sol003.",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 86
+      },
+      "revId": "d6b6d812e27d68a7951af3e643f4ae36e7dea236",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_4fe323a4",
+        "filename": "lcm/lcm/nf/serializers/response.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4247
+      },
+      "writtenOn": "2018-09-04T08:45:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_2ff10702",
       "range": {
         "startLine": 18,
         "startChar": 0,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_2aa33502",
+        "filename": "lcm/lcm/nf/views/operate_vnf_view.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4247
+      },
+      "writtenOn": "2018-09-04T08:45:56Z",
+      "side": 1,
+      "message": "Hi Jinhua,\nAccording to the table 5.4.10.3.1-2 in ETSI GS NFV-SOL 003\nthe body of the 202 Accepted is n/a. So the body is empty.\nBut now I have updated the header with Location.\nCurrently I am using the job id in URI(of Location) but that would be replaced with lcm operation occurence id in future.\n\nsample header: \nContent-Length: 0\nX-Frame-Options: SAMEORIGIN\nLocation: /vnf_lc_ops/NF-OPERATE-12-2a3be946-b01d-11e8-9302-08002705b121\nVary: Accept, Cookie\nAllow: POST, OPTIONS",
+      "parentUuid": "1a76adc5_6f8b7f68",
+      "range": {
+        "startLine": 55,
+        "startChar": 12,
+        "endLine": 55,
+        "endChar": 71
+      },
+      "revId": "d6b6d812e27d68a7951af3e643f4ae36e7dea236",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_6fb4df34",
         "filename": "lcm/lcm/nf/views/operate_vnf_view.py",
         "patchSetId": 1
@@ -82,6 +154,30 @@
       "writtenOn": "2018-09-04T01:24:08Z",
       "side": 1,
       "message": "Duplicated, need be deleted.",
+      "range": {
+        "startLine": 73,
+        "startChar": 12,
+        "endLine": 73,
+        "endChar": 35
+      },
+      "revId": "d6b6d812e27d68a7951af3e643f4ae36e7dea236",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_af019739",
+        "filename": "lcm/lcm/nf/views/operate_vnf_view.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 4247
+      },
+      "writtenOn": "2018-09-04T08:45:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_6fb4df34",
       "range": {
         "startLine": 73,
         "startChar": 12,
