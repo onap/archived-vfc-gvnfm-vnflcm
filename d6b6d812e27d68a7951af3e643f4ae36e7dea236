@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_6f8b7f68",
+        "filename": "lcm/lcm/nf/views/operate_vnf_view.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-09-04T01:24:08Z",
+      "side": 1,
+      "message": "In SOL003, The HTTP response shall include a \"Location\" HTTP\nheader that contains the URI of the newly-created\n\"VNF LCM operation occurrence\" resource\ncorresponding to the operation.\nIn our codes, we use jobid to replace the VNF LCM operation occurrence, so the response here should contains jobid(see  JobIdentifierSerializer)",
+      "range": {
+        "startLine": 55,
+        "startChar": 12,
+        "endLine": 55,
+        "endChar": 71
+      },
+      "revId": "d6b6d812e27d68a7951af3e643f4ae36e7dea236",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_6fb4df34",
+        "filename": "lcm/lcm/nf/views/operate_vnf_view.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-09-04T01:24:08Z",
+      "side": 1,
+      "message": "Duplicated, need be deleted.",
+      "range": {
+        "startLine": 73,
+        "startChar": 12,
+        "endLine": 73,
+        "endChar": 35
+      },
+      "revId": "d6b6d812e27d68a7951af3e643f4ae36e7dea236",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
