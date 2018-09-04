@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_4fc6c369",
+        "filename": "lcm/lcm/nf/serializers/lccn_subscription.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4497
+      },
+      "writtenOn": "2018-09-04T06:03:52Z",
+      "side": 1,
+      "message": "Rename as _LinksSerializer",
+      "range": {
+        "startLine": 20,
+        "startChar": 6,
+        "endLine": 20,
+        "endChar": 20
+      },
+      "revId": "8f75d6276d4f1a8c5e9da1c77f2def362db11596",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_6fc37f57",
+        "filename": "lcm/lcm/nf/serializers/lccn_subscription.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4497
+      },
+      "writtenOn": "2018-09-04T06:03:52Z",
+      "side": 1,
+      "message": "Change to LinkSerializer in defined link.py, because Link is a common data type in sol003(see page 30)",
+      "range": {
+        "startLine": 21,
+        "startChar": 11,
+        "endLine": 21,
+        "endChar": 32
+      },
+      "revId": "8f75d6276d4f1a8c5e9da1c77f2def362db11596",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
