@@ -154,7 +154,7 @@ inst_res_data = {
         "external_cps": [
             {
                 "key_name": "sriov_plane",
-                "cp_id": "SRIOV_Port"
+                "cp_id": "sriov-support"
             }
         ],
         "forward_cps": [
@@ -215,15 +215,15 @@ inst_res_data = {
                         },
                     }
                 ],
-                "vnic_type": "normal",
+                "vnic_type": "direct",
                 "role": "root",
                 "virtual_network_interface_requirements": [
                     {
-                        "requirement": {
-                            "SRIOV": "true"
+                        "network_interface_requirements": {
+                            "interfaceType": '{"schema-version": "0", "schema-location":"", "platform-id": "generic", "mandatory": false, "configuration-value": "SR-IOV"}'
                         },
                         "support_mandatory": False,
-                        "name": "sriov",
+                        "name": "sriov-support",
                         "description": "sriov"
                     }
                 ],

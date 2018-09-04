@@ -489,7 +489,7 @@ c4_data_create_network = {
     "vlanTransparent": True,
     "networkType": "vlan",
     "segmentationId": 202,
-    "physicalNetwork": "ctrl",
+    "physicalNetwork": "physnet1",
     "routerExternal": False
 }
 
@@ -533,7 +533,7 @@ c6_data_create_port = {
     "subnetName": "subnet1",
     "macAddress": "212.12.61.23",
     "ip": "10.43.38.11",
-    "vnicType": "normal",
+    "vnicType": "direct",
     "securityGroups": ""
 }
 
@@ -663,7 +663,18 @@ vnfdModel = {
                         },
                     },
                 ],
-                "vnic_type": "test",
+                "vnic_type": "direct",
+                "role": "root",
+                "virtual_network_interface_requirements": [
+                    {
+                        "network_interface_requirements": {
+                            "interfaceType": '{"schema-version": "0", "schema-location":"", "platform-id": "generic", "mandatory": false, "configuration-value": "SR-IOV"}'
+                        },
+                        "support_mandatory": False,
+                        "name": "SRIOV_Port",
+                        "description": "sriov"
+                    }
+                ]
             }
         }
     ],
