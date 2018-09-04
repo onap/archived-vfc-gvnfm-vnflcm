@@ -311,3 +311,25 @@ class SubscriptionModel(models.Model):
     vnf_instance_filter = models.TextField(db_column='VNFINSTANCEFILTER',
                                            null=True)
     links = models.TextField(db_column='LINKS', max_length=20000)
+
+
+class VNFLcmOpOccModel(models.Model):
+    class Meta:
+        db_table = 'VNFLCMOPOCCS'
+
+    id = models.CharField(db_column='ID', max_length=255, primary_key=True)
+    operation_state = models.CharField(db_column='OPERATIONSTATE', null=False, max_length=30)
+    state_entered_time = models.CharField(db_column='STATEENTEREDTIME', null=False, max_length=30)
+    start_time = models.CharField(db_column='STARTTIME', null=False, max_length=30)
+    vnf_instance_id = models.CharField(db_column='VNFINSTANCEID', null=False, max_length=255)
+    grant_id = models.CharField(db_column='GRANTID', null=True, max_length=255)
+    operation = models.CharField(db_column='OPERATION', null=False, max_length=30)
+    is_automatic_invocation = models.CharField(db_column='ISAUTOMATICINVOCATION', null=False, max_length=5)
+    operation_params = models.TextField(db_column='OPERATIONPARAMS', null=False)
+    is_cancel_pending = models.CharField(db_column='ISCANCELPENDING', null=False, max_length=5)
+    cancel_mode = models.TextField(db_column='CANCELMODE', null=True)
+    error = models.TextField(db_column='ERROR', null=True)
+    resource_changes = models.TextField(db_column='RESOURCECHANGES', null=True)
+    changed_info = models.TextField(db_column='CHANGEDINFO', null=True)
+    changed_ext_connectivity = models.TextField(db_column='CHANGEDEXTCONNECTIVITY', null=True)
+    links = models.TextField(db_column='LINKS', null=False)

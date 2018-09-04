@@ -19,6 +19,7 @@ from lcm.nf.views.instantiate_vnf_view import InstantiateVnfView
 from lcm.nf.views.terminate_vnf_view import TerminateVnfView
 from lcm.nf.views.subscriptions_view import SubscriptionsView
 from lcm.nf.views.operate_vnf_view import OperateVnfView
+from lcm.nf.views.lcm_op_occs_view import QueryMultiVnfLcmOpOccs
 
 urlpatterns = [
     url(r'^api/vnflcm/v1/subscriptions$', SubscriptionsView.as_view()),
@@ -27,4 +28,5 @@ urlpatterns = [
     url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)$', DeleteVnfAndQueryVnf.as_view()),
     url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)/terminate$', TerminateVnfView.as_view()),
     url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)/operate$', OperateVnfView.as_view()),
+    url(r'^api/vnflcm/v1/vnf_lcm_op_occs$', QueryMultiVnfLcmOpOccs.as_view()),
 ]
