@@ -70,3 +70,10 @@ class QueryVnfLcmOpOcc:
             '_links': json.loads(lcm_op.links)
         }
         return resp_data
+
+    def query_single_vnf_lcm_op_occ(self):
+        lcm_op = VNFLcmOpOccModel.objects.filter(id=self.vnf_lcm_op_occ_id)
+        if not lcm_op.exists():
+            raise NFLCMException('LCM Operation Occurance does not exist')
+        resp_data = self.fill_resp_data(lcm_op[0])
+        return resp_data

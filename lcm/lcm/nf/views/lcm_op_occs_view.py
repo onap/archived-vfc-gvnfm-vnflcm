@@ -22,6 +22,7 @@ from rest_framework.views import APIView
 
 from lcm.nf.biz.query_vnf_lcm_op_occ import QueryVnfLcmOpOcc
 from lcm.nf.serializers.response import ProblemDetailsSerializer
+from lcm.nf.serializers.vnf_lcm_op_occ import VNFLCMOpOccSerializer
 from lcm.nf.serializers.vnf_lcm_op_occs import VNFLCMOpOccsSerializer
 from lcm.pub.exceptions import NFLCMException
 
@@ -75,6 +76,34 @@ class QueryMultiVnfLcmOpOccs(APIView):
             problem_details_serializer = get_problem_details_serializer(status.HTTP_500_INTERNAL_SERVER_ERROR, e.message)
             return Response(data=problem_details_serializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+        except Exception as e:
+            logger.error(e.message)
+            logger.error(traceback.format_exc())
+            problem_details_serializer = get_problem_details_serializer(status.HTTP_500_INTERNAL_SERVER_ERROR, e.message)
+            return Response(data=problem_details_serializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class QuerySingleVnfLcmOpOcc(APIView):
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: VNFLCMOpOccSerializer(),
+            status.HTTP_500_INTERNAL_SERVER_ERROR: ProblemDetailsSerializer()
+        }
+    )
+    def get(self, request, lcmopoccid):
+        logger.debug("QuerySingleVnfLcmOpOcc--get::> %s" % request.query_params)
+        try:
+            resp_data = QueryVnfLcmOpOcc(request.query_params, lcm_op_occ_id=lcmopoccid).query_single_vnf_lcm_op_occ()
+
+            vnf_lcm_op_occ_serializer = VNFLCMOpOccSerializer(data=resp_data)
+            if not vnf_lcm_op_occ_serializer.is_valid():
+                raise NFLCMException(vnf_lcm_op_occ_serializer.errors)
+
+            return Response(data=vnf_lcm_op_occ_serializer.data, status=status.HTTP_200_OK)
+        except NFLCMException as e:
+            logger.error(e.message)
+            problem_details_serializer = get_problem_details_serializer(status.HTTP_500_INTERNAL_SERVER_ERROR, e.message)
+            return Response(data=problem_details_serializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             logger.error(e.message)
             logger.error(traceback.format_exc())
