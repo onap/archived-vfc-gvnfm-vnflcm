@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_edf1d201",
+        "filename": "lcm/lcm/nf/biz/query_vnf_lcm_op_occ.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 747
+      },
+      "writtenOn": "2018-09-05T02:47:26Z",
+      "side": 1,
+      "message": "True",
+      "parentUuid": "1a76adc5_f281afc3",
+      "range": {
+        "startLine": 51,
+        "startChar": 8,
+        "endLine": 54,
+        "endChar": 24
+      },
+      "revId": "9bce0dc289a4840e1289028e199e2c0815c78f73",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_3215e79b",
         "filename": "lcm/lcm/nf/views/lcm_op_occs_view.py",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2018-09-05T00:57:45Z",
       "side": 1,
       "message": "should use status.HTTP_400_BAD_REQUEST",
+      "range": {
+        "startLine": 57,
+        "startChar": 76,
+        "endLine": 57,
+        "endChar": 79
+      },
+      "revId": "9bce0dc289a4840e1289028e199e2c0815c78f73",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_addf5a68",
+        "filename": "lcm/lcm/nf/views/lcm_op_occs_view.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 747
+      },
+      "writtenOn": "2018-09-05T02:47:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_3215e79b",
       "range": {
         "startLine": 57,
         "startChar": 76,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_cddc1676",
+        "filename": "lcm/lcm/nf/views/lcm_op_occs_view.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 747
+      },
+      "writtenOn": "2018-09-05T02:47:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_521ae3cc",
+      "range": {
+        "startLine": 75,
+        "startChar": 72,
+        "endLine": 75,
+        "endChar": 75
+      },
+      "revId": "9bce0dc289a4840e1289028e199e2c0815c78f73",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_f20a0f78",
         "filename": "lcm/lcm/nf/views/lcm_op_occs_view.py",
         "patchSetId": 2
@@ -82,6 +154,30 @@
       "writtenOn": "2018-09-05T00:57:45Z",
       "side": 1,
       "message": "should use status.HTTP_500_INTERNAL_SERVER_ERROR",
+      "range": {
+        "startLine": 81,
+        "startChar": 72,
+        "endLine": 81,
+        "endChar": 75
+      },
+      "revId": "9bce0dc289a4840e1289028e199e2c0815c78f73",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_8de29e2d",
+        "filename": "lcm/lcm/nf/views/lcm_op_occs_view.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 747
+      },
+      "writtenOn": "2018-09-05T02:47:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_f20a0f78",
       "range": {
         "startLine": 81,
         "startChar": 72,
