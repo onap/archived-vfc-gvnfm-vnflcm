@@ -24,7 +24,7 @@ from ext_virtual_link_info import ExtVirtualLinkInfoSerializer
 from vnf_info_modifications import VnfInfoModificationsSerializer
 
 
-class LinksSerializer(serializers.Serializer):
+class LccnLinksSerializer(serializers.Serializer):
     vnfInstance = LinkSerializer(
         help_text="Link to the resource representing the VNF instance to "
         "which the notified change applies.",
@@ -123,6 +123,6 @@ class VnfLcmOperationOccurrenceNotification(serializers.Serializer):
         allow_null=True,
         required=False
     )
-    _links = LinksSerializer(
+    _links = LccnLinksSerializer(
         help_text="Links to resources related to this resource.",
         required=True)
