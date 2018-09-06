@@ -42,7 +42,9 @@ class TestVNFLcmOpOccs(TestCase):
             "changedInfo": None,
             "changedExtConnectivity": None,
             "_links": {
-                "self": "demo",
+                "self": {
+                    "href": "demo"
+                },
                 "vnfInstance": "demo"
             }
         }
@@ -58,7 +60,9 @@ class TestVNFLcmOpOccs(TestCase):
             "isCancelPending": False,
             "cancelMode": None,
             "_links": {
-                "self": "demo",
+                "self": {
+                    "href": "demo"
+                },
                 "vnfInstance": "demo"
             }
         }]
@@ -80,7 +84,9 @@ class TestVNFLcmOpOccs(TestCase):
             "changedInfo": None,
             "changedExtConnectivity": None,
             "_links": {
-                "self": "demo",
+                "self": {
+                    "href": "demo"
+                },
                 "vnfInstance": "demo"
             }
         }]
@@ -99,7 +105,7 @@ class TestVNFLcmOpOccs(TestCase):
                          grant_id=None, operation="SCALE", is_automatic_invocation=False,
                          operation_params='{}', is_cancel_pending=False, cancel_mode=None,
                          error=None, resource_changes=None, changed_ext_connectivity=None,
-                         links=json.dumps({"self": "demo", "vnfInstance": "demo"})).save()
+                         links=json.dumps({"self": {"href": "demo"}, "vnfInstance": "demo"})).save()
         response = self.client.get("/api/vnflcm/v1/vnf_lcm_op_occs", format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual([self.test_single_vnf_lcm_op], response.data)
@@ -122,7 +128,7 @@ class TestVNFLcmOpOccs(TestCase):
                          grant_id=None, operation="INSTANTIATE", is_automatic_invocation=False,
                          operation_params='{}', is_cancel_pending=False, cancel_mode=None,
                          error=None, resource_changes=None, changed_ext_connectivity=None,
-                         links=json.dumps({"self": "demo", "vnfInstance": "demo"})).save()
+                         links=json.dumps({"self": {"href": "demo"}, "vnfInstance": "demo"})).save()
 
         lcm_op_id = "99442b18-a5c7-11e8-998c-bf1755941f16"
         VNFLcmOpOccModel(id=lcm_op_id, operation_state="STARTING",
@@ -131,7 +137,7 @@ class TestVNFLcmOpOccs(TestCase):
                          grant_id=None, operation="SCALE", is_automatic_invocation=False,
                          operation_params='{}', is_cancel_pending=False, cancel_mode=None,
                          error=None, resource_changes=None, changed_ext_connectivity=None,
-                         links=json.dumps({"self": "demo", "vnfInstance": "demo"})).save()
+                         links=json.dumps({"self": {"href": "demo"}, "vnfInstance": "demo"})).save()
         response = self.client.get("/api/vnflcm/v1/vnf_lcm_op_occs", format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self.test_multiple_vnf_lcm_op, response.data)
@@ -153,7 +159,7 @@ class TestVNFLcmOpOccs(TestCase):
                          grant_id=None, operation="SCALE", is_automatic_invocation=False,
                          operation_params='{}', is_cancel_pending=False, cancel_mode=None,
                          error=None, resource_changes=None, changed_ext_connectivity=None,
-                         links=json.dumps({"self": "demo", "vnfInstance": "demo"})).save()
+                         links=json.dumps({"self": {"href": "demo"}, "vnfInstance": "demo"})).save()
         response = self.client.get("/api/vnflcm/v1/vnf_lcm_op_occs?exclude_default", format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self.test_vnflcmop_with_exclude_default, response.data)
@@ -167,7 +173,7 @@ class TestVNFLcmOpOccs(TestCase):
                          grant_id=None, operation="SCALE", is_automatic_invocation=False,
                          operation_params='{}', is_cancel_pending=False, cancel_mode=None,
                          error=None, resource_changes=None, changed_ext_connectivity=None,
-                         links=json.dumps({"self": "demo", "vnfInstance": "demo"})).save()
+                         links=json.dumps({"self": {"href": "demo"}, "vnfInstance": "demo"})).save()
         response = self.client.get("/api/vnflcm/v1/vnf_lcm_op_occs/" + lcm_op_id, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self.test_single_vnf_lcm_op, response.data)

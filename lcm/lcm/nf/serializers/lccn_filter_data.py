@@ -15,34 +15,7 @@
 from rest_framework import serializers
 
 from vnf_instance_subscription_filter import VnfInstanceSubscriptionFilter
-
-
-NOTIFICATION_TYPES = [
-    "VnfLcmOperationOccurrenceNotification",
-    "VnfIdentifierCreationNotification",
-    "VnfIdentifierDeletionNotification"]
-
-LCM_OPERATION_TYPES = [
-    "INSTANTIATE",
-    "SCALE",
-    "SCALE_TO_LEVEL",
-    "CHANGE_FLAVOUR",
-    "TERMINATE",
-    "HEAL",
-    "OPERATE",
-    "CHANGE_EXT_CONN",
-    "MODIFY_INFO"
-]
-
-LCM_OPERATION_STATE_TYPES = [
-    "STARTING",
-    "PROCESSING",
-    "COMPLETED",
-    "FAILED_TEMP",
-    "FAILED",
-    "ROLLING_BACK",
-    "ROLLED_BACK"
-]
+from lcm.nf.const import NOTIFICATION_TYPES, LCM_OPERATION_TYPES, LCM_OPERATION_STATE_TYPES
 
 
 class LifeCycleChangeNotificationsFilter(serializers.Serializer):
