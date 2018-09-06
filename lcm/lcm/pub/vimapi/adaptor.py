@@ -15,6 +15,7 @@
 import logging
 import time
 import ast
+import json
 
 from lcm.pub.utils.values import ignore_case_get, set_opt_val
 from lcm.pub.msapi.aai import get_flavor_info
@@ -245,8 +246,17 @@ def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
         l3_address_data = one_protocol_data["address_data"]["l3_address_data"]  # l3 is not 13
         fixed_ip_address = ignore_case_get(l3_address_data, "fixed_ip_address")
         ip_address.extend(fixed_ip_address)
+    for one_virtual_network_interface in port["properties"]["virtual_network_interface_requirements"]:
+        interfaceTypeString = one_virtual_network_interface["network_interface_requirements"]["interfaceType"]
+        interfaceType = json.loads(interfaceTypeString)["configuration-value"]
+        vnic_type = ignore_case_get(port["properties"], "vnic_type")
+        if vnic_type == "":
+            if interfaceType == "SR-IOV":
+                set_opt_val(param, "vnicType", "direct")
+        else:
+            set_opt_val(param, "vnicType", vnic_type)
+
     set_opt_val(param, "ip", ",".join(ip_address))
-    set_opt_val(param, "vnicType", ignore_case_get(port["properties"], "vnic_type"))
     set_opt_val(param, "securityGroups", "")   # TODO
     vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
     tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
