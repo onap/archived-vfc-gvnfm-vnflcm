@@ -16,14 +16,16 @@ import unittest
 import mock
 import enumutil
 import fileutil
+import json
 import urllib2
 import syscomm
 import timeutil
 import values
 import platform
 
-from lcm.pub.database.models import JobStatusModel, JobModel
+from lcm.pub.database.models import JobStatusModel, JobModel, SubscriptionModel
 from lcm.pub.utils.jobutil import JobUtil
+from lcm.pub.utils.notificationsutil import NotificationsUtil
 
 
 class MockReq():
@@ -225,3 +227,78 @@ class UtilsTest(unittest.TestCase):
         self.assertEqual("def", values.ignore_case_get(data, 'abc'))
         self.assertEqual("klm", values.ignore_case_get(data, 'hig'))
         self.assertEqual("bbb", values.ignore_case_get(data, 'aaa', 'bbb'))
+
+
+class TestNotificationUtils(unittest.TestCase):
+    def setUp(self):
+        subscription_id = 1
+        auth_params = {
+            "authType": ["BASIC"],
+            "paramsBasic": {
+                "username": "username",
+                "password": "password"
+            }
+        }
+        notification_types = ["VnfLcmOperationOccurrenceNotification"]
+        operation_types = ["INSTANTIATE"]
+        operation_states = ["STARTING"]
+        vnf_instance_filter = {
+            'vnfdIds': ['99442b18-a5c7-11e8-998c-bf1755941f13', '9fe4080c-b1a3-11e8-bb96-645106374fd3'],
+            'vnfInstanceIds': ['99442b18-a5c7-11e8-998c-bf1755941f12'],
+            'vnfInstanceNames': ['demo'],
+            'vnfProductsFromProviders': {
+                'vnfProvider': u'string',
+                'vnfProducts': {
+                    'vnfProductName': 'string',
+                    'versions': {
+                        'vnfSoftwareVersion': u'string',
+                        'vnfdVersions': 'string'
+                    }
+                }
+            }
+        }
+        links = {
+            "self": "demo"
+        }
+        SubscriptionModel(subscription_id=subscription_id, callback_uri="http://demo",
+                          auth_info=json.dumps(auth_params),
+                          notification_types=json.dumps(notification_types),
+                          operation_types=json.dumps(operation_types),
+                          operation_states=json.dumps(operation_states),
+                          vnf_instance_filter=json.dumps(vnf_instance_filter),
+                          links=json.dumps(links)).save()
+
+    def tearDown(self):
+        SubscriptionModel.objects.all().delete()
+
+    @mock.patch('requests.post')
+    def test_send_notification(self, mock_post):
+        dummy_notification = {
+            "vnfInstanceId": "99442b18-a5c7-11e8-998c-bf1755941f13",
+            "operationState": "STARTING",
+            "operation": "INSTANTIATE",
+        }
+        mock_post.return_value.status_code = 204
+        NotificationsUtil().send_notification(dummy_notification)
+        mock_post.assert_called_once()
+
+    @mock.patch('requests.post')
+    def test_send_notification_with_empty_filters(self, mock_post):
+        dummy_notification = {
+            "vnfInstanceId": "9fe4080c-b1a3-11e8-bb96-645106374fd3",
+            "operationState": "",
+            "operation": "",
+        }
+        mock_post.return_value.status_code = 204
+        NotificationsUtil().send_notification(dummy_notification)
+        mock_post.assert_called_once()
+
+    @mock.patch('requests.post')
+    def test_send_notification_unmatched_filters(self, mock_post):
+        dummy_notification = {
+            "vnfInstanceId": "9fe4080c-b1a3-11e8-bb96-xxxxx",
+            "operationState": "DUMMY",
+            "operation": "DUMMY",
+        }
+        NotificationsUtil().send_notification(dummy_notification)
+        mock_post.assert_not_called()

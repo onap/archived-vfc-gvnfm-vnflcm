@@ -35,6 +35,35 @@ OAUTH2_CLIENT_CREDENTIALS = "OAUTH2_CLIENT_CREDENTIALS"
 
 LCCNNOTIFICATION = "VnfLcmOperationOccurrenceNotification"
 
+NOTIFICATION_TYPES = [
+    "VnfLcmOperationOccurrenceNotification",
+    "VnfIdentifierCreationNotification",
+    "VnfIdentifierDeletionNotification"
+]
+
+LCM_OPERATION_TYPES = [
+    "INSTANTIATE",
+    "SCALE",
+    "SCALE_TO_LEVEL",
+    "CHANGE_FLAVOUR",
+    "TERMINATE",
+    "HEAL",
+    "OPERATE",
+    "CHANGE_EXT_CONN",
+    "MODIFY_INFO"
+]
+
+LCM_OPERATION_STATE_TYPES = [
+    "STARTING",
+    "PROCESSING",
+    "COMPLETED",
+    "FAILED_TEMP",
+    "FAILED",
+    "ROLLING_BACK",
+    "ROLLED_BACK"
+]
+
+
 inst_req_data = {
     "flavourId": "flavour_1",
     "instantiationLevelId": "instantiationLevel_1",
