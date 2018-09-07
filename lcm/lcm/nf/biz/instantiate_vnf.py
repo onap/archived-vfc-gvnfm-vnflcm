@@ -28,6 +28,7 @@ from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.values import ignore_case_get, get_none, get_boolean, get_integer
 from lcm.pub.vimapi import adaptor
 from lcm.nf.biz.grant_vnf import grant_resource
+from lcm.nf.const import GRANT_TYPE
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,7 @@ class InstantiateVnf(Thread):
         self.nf_inst_id = nf_inst_id
         self.job_id = job_id
         self.vim_id = ignore_case_get(ignore_case_get(self.data, "additionalParams"), "vimId")
-        self.grant_type = "Instantiate"
+        self.grant_type = GRANT_TYPE.INSTANTIATE
 
     def run(self):
         try:
@@ -73,8 +74,9 @@ class InstantiateVnf(Thread):
                 inputs = json.loads(inputs)
             for key, val in inputs.items():
                 input_parameters.append({"key": key, "value": val})
-        vnf_package_info = query_vnfpackage_by_id(self.vnfd_id)
-        self.vnfd_info = json.loads(ignore_case_get(ignore_case_get(vnf_package_info, "packageInfo"), "vnfdModel"))
+        vnf_package = query_vnfpackage_by_id(self.vnfd_id)
+        pkg_info = ignore_case_get(vnf_package, "packageInfo")
+        self.vnfd_info = json.loads(ignore_case_get(pkg_info, "vnfdModel"))
 
         self.update_cps()
         metadata = ignore_case_get(self.vnfd_info, "metadata")
@@ -180,7 +182,7 @@ def volume_save(job_id, nf_inst_id, ret):
     StorageInstModel.objects.create(
         storageid=str(uuid.uuid4()),
         vimid=ignore_case_get(ret, "vimId"),
-        resouceid=ignore_case_get(ret, "id"),
+        resourceid=ignore_case_get(ret, "id"),
         name=ignore_case_get(ret, "name"),
         tenant=ignore_case_get(ret, "tenantId"),
         create_time=ignore_case_get(ret, "createTime"),
@@ -198,7 +200,7 @@ def network_save(job_id, nf_inst_id, ret):
         networkid=str(uuid.uuid4()),
         name=ignore_case_get(ret, "name"),
         vimid=ignore_case_get(ret, "vimId"),
-        resouceid=ignore_case_get(ret, "id"),
+        resourceid=ignore_case_get(ret, "id"),
         tenant=ignore_case_get(ret, "tenantId"),
         segmentid=str(ignore_case_get(ret, "segmentationId")),
         network_type=ignore_case_get(ret, "networkType"),
@@ -218,7 +220,7 @@ def subnet_save(job_id, nf_inst_id, ret):
         subnetworkid=str(uuid.uuid4()),
         name=ignore_case_get(ret, "name"),
         vimid=ignore_case_get(ret, "vimId"),
-        resouceid=ignore_case_get(ret, "id"),
+        resourceid=ignore_case_get(ret, "id"),
         tenant=ignore_case_get(ret, "tenantId"),
         networkid=ignore_case_get(ret, "networkId"),
         cidr=ignore_case_get(ret, "cidr"),
@@ -241,7 +243,7 @@ def port_save(job_id, nf_inst_id, ret):
         subnetworkid=ignore_case_get(ret, "subnetId"),
         name=ignore_case_get(ret, "name"),
         vimid=ignore_case_get(ret, "vimId"),
-        resouceid=ignore_case_get(ret, "id"),
+        resourceid=ignore_case_get(ret, "id"),
         tenant=ignore_case_get(ret, "tenantId"),
         macaddress=ignore_case_get(ret, "macAddress"),
         ipaddress=ignore_case_get(ret, "ip"),
@@ -259,7 +261,7 @@ def flavor_save(job_id, nf_inst_id, ret):
         flavourid=str(uuid.uuid4()),
         name=ignore_case_get(ret, "name"),
         vimid=ignore_case_get(ret, "vimId"),
-        resouceid=ignore_case_get(ret, "id"),
+        resourceid=ignore_case_get(ret, "id"),
         tenant=ignore_case_get(ret, "tenantId"),
         vcpu=get_integer(ignore_case_get(ret, "vcpu")),
         memory=get_integer(ignore_case_get(ret, "memory")),
@@ -279,7 +281,7 @@ def vm_save(job_id, nf_inst_id, ret):
         vmid=vm_id,
         vmname=ignore_case_get(ret, "name"),
         vimid=ignore_case_get(ret, "vimId"),
-        resouceid=ignore_case_get(ret, "id"),
+        resourceid=ignore_case_get(ret, "id"),
         tenant=ignore_case_get(ret, "tenantId"),
         nic_array=ignore_case_get(ret, "nicArray"),
         metadata=ignore_case_get(ret, "metadata"),

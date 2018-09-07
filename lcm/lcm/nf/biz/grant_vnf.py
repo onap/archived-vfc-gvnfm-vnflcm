@@ -25,38 +25,53 @@ logger = logging.getLogger(__name__)
 
 def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
     logger.info("Grant resource begin")
-    lifecycleOperration = grant_type
 
     content_args = {
         'vnfInstanceId': nf_inst_id,
-        'vnfDescriptorId': '',
-        'lifecycleOperation': lifecycleOperration,
         'vnfLcmOpOccId': job_id,
+        'vnfdId': None,  # TODO
+        'flavourId': None,  # TODO
+        'operate': grant_type,
+        'isAutomaticInvocation': True,  # TODO
+        'instantiationLevelId': None,  # TODO
         'addResources': [],
+        'tmpResources': [],
         'updateResources': [],
         'removeResources': [],
         'placementConstraints': [],
-        'additionalParams': {}
+        'vimConstraints': [],
+        'additionalParams': {},
+        '_links': None  # TODO
     }
 
-    if grant_type == "Terminate":
+    if grant_type == GRANT_TYPE.TERMINATE:
         res_index = 1
         for vdu in vdus:
             res_def = {
-                'type': 'VDU',
-                'resDefId': str(res_index),
-                'resDesId': vdu.resouceid}
+                'id': str(res_index),
+                'type': 'COMPUTE',
+                'vduId': None,
+                'resourceTemplateId': None,
+                'resource': {
+                    'vimConnectionId': None,
+                    'resourceProviderId': None,
+                    'resourceid': vdu.resourceid,
+                    'vimLevelResourceType': None
+                }
+            }
             content_args['removeResources'].append(res_def)
             res_index += 1
         content_args['additionalParams']['vimid'] = vdus[0].vimid
-    elif grant_type == "Instantiate":
+    elif grant_type == GRANT_TYPE.INSTANTIATE:
         vim_id = ignore_case_get(ignore_case_get(data, "additionalParams"), "vimId")
         res_index = 1
         for vdu in vdus:
             res_def = {
-                'type': 'VDU',
-                'resDefId': str(res_index),
-                'resDesId': ignore_case_get(vdu, "vdu_id")
+                'id': str(res_index),
+                'type': 'COMPUTE',
+                'vduId': None,
+                'resourceTemplateId': None,  # TODO: shall be present for the planned creation of new resources.
+                'resource': None
             }
             content_args['addResources'].append(res_def)
             res_index += 1
@@ -65,9 +80,17 @@ def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
         res_index = 1
         for vdu in vdus:
             res_def = {
-                'type': 'VDU',
-                'resDefId': str(res_index),
-                'resDesId': vdu.resouceid}
+                'id': str(res_index),
+                'type': 'COMPUTE',
+                'vduId': None,
+                'resourceTemplateId': None,
+                'resource': {
+                    'vimConnectionId': None,
+                    'resourceProviderId': None,
+                    'resourceid': vdu.resourceid,
+                    'vimLevelResourceType': None
+                }
+            }
             content_args['updateResources'].append(res_def)
             res_index += 1
         content_args['additionalParams']['vimid'] = vdus[0].vimid

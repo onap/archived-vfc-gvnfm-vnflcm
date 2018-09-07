@@ -87,7 +87,7 @@ class TestNFOperate(TestCase):
 
         VmInstModel.objects.create(vmid="1",
                                    vimid="1",
-                                   resouceid="11",
+                                   resourceid="11",
                                    insttype=0,
                                    instid="1111",
                                    vmname="test_01",
@@ -105,7 +105,7 @@ class TestNFOperate(TestCase):
         self.job_id = JobUtil.create_job('NF', 'OPERATE', self.nf_inst_id)
         JobUtil.add_job_status(self.job_id, 0, "OPERATE_VNF_READY")
         OperateVnf(req_data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        vm = VmInstModel.objects.filter(vmid="1", vimid="1", resouceid="11")
+        vm = VmInstModel.objects.filter(vmid="1", vimid="1", resourceid="11")
         self.assertEqual("ACTIVE", vm[0].operationalstate)
         self.assert_job_result(self.job_id, 100, "Operate Vnf success.")
 
@@ -130,7 +130,7 @@ class TestNFOperate(TestCase):
 
         VmInstModel.objects.create(vmid="1",
                                    vimid="1",
-                                   resouceid="11",
+                                   resourceid="11",
                                    insttype=0,
                                    instid="1111",
                                    vmname="test_01",
@@ -148,7 +148,7 @@ class TestNFOperate(TestCase):
         self.job_id = JobUtil.create_job('NF', 'OPERATE', self.nf_inst_id)
         JobUtil.add_job_status(self.job_id, 0, "OPERATE_VNF_READY")
         OperateVnf(req_data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        vm = VmInstModel.objects.filter(vmid="1", vimid="1", resouceid="11")
+        vm = VmInstModel.objects.filter(vmid="1", vimid="1", resourceid="11")
         self.assertEqual("INACTIVE", vm[0].operationalstate)
         self.assert_job_result(self.job_id, 100, "Operate Vnf success.")
 
@@ -173,7 +173,7 @@ class TestNFOperate(TestCase):
 
         VmInstModel.objects.create(vmid="1",
                                    vimid="1",
-                                   resouceid="11",
+                                   resourceid="11",
                                    insttype=0,
                                    instid="1111",
                                    vmname="test_01",
@@ -193,7 +193,7 @@ class TestNFOperate(TestCase):
         self.job_id = JobUtil.create_job('NF', 'OPERATE', self.nf_inst_id)
         JobUtil.add_job_status(self.job_id, 0, "OPERATE_VNF_READY")
         OperateVnf(req_data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        vm = VmInstModel.objects.filter(vmid="1", vimid="1", resouceid="11")
+        vm = VmInstModel.objects.filter(vmid="1", vimid="1", resourceid="11")
         self.assertEqual("INACTIVE", vm[0].operationalstate)
         self.assert_job_result(self.job_id, 100, "Operate Vnf success.")
 
@@ -218,7 +218,7 @@ class TestNFOperate(TestCase):
 
         VmInstModel.objects.create(vmid="1",
                                    vimid="1",
-                                   resouceid="11",
+                                   resourceid="11",
                                    insttype=0,
                                    instid="1111",
                                    vmname="test_01",
@@ -237,6 +237,6 @@ class TestNFOperate(TestCase):
         self.job_id = JobUtil.create_job('NF', 'OPERATE', self.nf_inst_id)
         JobUtil.add_job_status(self.job_id, 0, "OPERATE_VNF_READY")
         OperateVnf(req_data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        vm = VmInstModel.objects.filter(vmid="1", vimid="1", resouceid="11")
+        vm = VmInstModel.objects.filter(vmid="1", vimid="1", resourceid="11")
         self.assertEqual("INACTIVE", vm[0].operationalstate)
         self.assert_job_result(self.job_id, 100, "Operate Vnf success.")

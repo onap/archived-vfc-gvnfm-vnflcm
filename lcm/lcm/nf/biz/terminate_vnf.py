@@ -30,6 +30,7 @@ from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.values import ignore_case_get
 from lcm.pub.vimapi import adaptor
 from lcm.nf.biz.grant_vnf import grant_resource
+from lcm.nf.const import GRANT_TYPE
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ class TerminateVnf(Thread):
         self.terminationType = ignore_case_get(self.data, "terminationType")
         self.gracefulTerminationTimeout = ignore_case_get(self.data, "gracefulTerminationTimeout")
         self.inst_resource = {'volumn': [], 'network': [], 'subnet': [], 'port': [], 'flavor': [], 'vm': []}
-        self.grant_type = "Terminate"
+        self.grant_type = GRANT_TYPE.TERMINATE
 
     def run(self):
         try:
@@ -83,7 +84,7 @@ class TerminateVnf(Thread):
             resource_table = globals().get(resource_type + 'InstModel')
             resource_insts = resource_table.objects.filter(instid=self.nf_inst_id)
             for resource_inst in resource_insts:
-                if not resource_inst.resouceid:
+                if not resource_inst.resourceid:
                     continue
                 self.inst_resource[RESOURCE_MAP.get(resource_type)].append(self.get_resource(resource_inst))
         logger.info('Query resource end, resource=%s' % self.inst_resource)
@@ -92,7 +93,7 @@ class TerminateVnf(Thread):
         return {
             "vim_id": resource.vimid,
             "tenant_id": resource.tenant,
-            "res_id": resource.resouceid,
+            "res_id": resource.resourceid,
             "is_predefined": resource.is_predefined
         }
 
@@ -114,7 +115,7 @@ class TerminateVnf(Thread):
         logger.error('Deleting [%s] resource, resourceid [%s]' % (res_type, res_id))
         resource_type = RESOURCE_MAP.keys()[RESOURCE_MAP.values().index(res_type)]
         resource_table = globals().get(resource_type + 'InstModel')
-        resource_table.objects.filter(instid=self.nf_inst_id, resouceid=res_id).delete()
+        resource_table.objects.filter(instid=self.nf_inst_id, resourceid=res_id).delete()
 
     def lcm_notify(self):
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='NOT_INSTANTIATED', lastuptime=now_time())
