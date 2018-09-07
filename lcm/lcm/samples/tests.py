@@ -87,7 +87,18 @@ inst_res_data = {
                     "vimid": "f1e33529-4a88-4155-9d7a-893cf2c80527",
                     "tenant": "vnfm",
                     "availability_zone": "zone1",
-                    "host": "host1"
+                    "host": "host1",
+                    "vnfId": "",
+                    "vnfName": "",
+                    "cloudOwner": "",
+                    "cloudRegionId": "",
+                    "vduInfo": [
+                        {
+                            "vduName": "VDU_vbng_0",
+                            "flavorName": "flavor_1",
+                            "directive": "",
+                        },
+                    ]
                 },
                 "descrption": "the virtual machine of vNat",
                 "boot_order": [
@@ -304,28 +315,17 @@ c4_data_create_port = {
     "nodeId": "",
     "id": "456"
 }
+c5_data_create_flavor = {
+    "vimId": "f1e33529-4a88-4155-9d7a-893cf2c80527",
+    "nodeId": "",
+    "id": "6456",
+}
 
 c5_data_get_flavor = {
     "flavor": [
         {
             "flavor-id": "111111",
-            "flavor-name": "onap.large",
-            "hpa-capabilities":
-            {
-                "hpa-capability":
-                [
-                    {
-                        "hpa-capability-id": "1243",
-                        "hpa-feature-attributes":
-                        [
-                            {
-                                "hpa-attribute-key": "memoryPageSize",
-                                "hpa-attribute-value": '{"value": "2", "unit": "MB"}'
-                            }
-                        ]
-                    }
-                ]
-            }
+            "flavor-name": "flavor_1",
         }
     ]
 }
@@ -373,6 +373,7 @@ class SampleViewTest(unittest.TestCase):
         r3_data_create_subnet = [0, json.JSONEncoder().encode(c3_data_create_subnet), '200']
         r4_data_create_port = [0, json.JSONEncoder().encode(c4_data_create_port), '200']
         r5_data_get_flavor = [0, json.JSONEncoder().encode(c5_data_get_flavor), '200']
+        r5_data_create_flavor = [0, json.JSONEncoder().encode(c5_data_create_flavor), '200']
         r6_data_list_image = [0, json.JSONEncoder().encode(c6_data_list_image), '200']
         r6_data_create_vm = [0, json.JSONEncoder().encode(c6_data_create_vm), '200']
         r6_data_get_vm = [0, json.JSONEncoder().encode(c6_data_get_vm), '200']
@@ -382,7 +383,7 @@ class SampleViewTest(unittest.TestCase):
                                      r2_data_create_network,
                                      r3_data_create_subnet,
                                      r4_data_create_port,
-                                     r5_data_get_flavor,
+                                     r5_data_get_flavor, r5_data_create_flavor,
                                      r6_data_list_image, r6_data_create_vm, r6_data_get_vm]
         resp = self.client.post(inst_res_url, data=json.dumps(inst_res_data), content_type='application/json')
         self.failUnlessEqual(status.HTTP_204_NO_CONTENT, resp.status_code)

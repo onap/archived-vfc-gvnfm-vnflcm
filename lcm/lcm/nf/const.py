@@ -715,6 +715,17 @@ vnfdModel = {
                     "vimid": "test",
                     "tenant": "chinamobile",
                     "availability_zone": "test",
+                    "vnfId": "",
+                    "vnfName": "",
+                    "cloudOwner": "",
+                    "cloudRegionId": "",
+                    "vduInfo": [
+                        {
+                            "vduName": "VDU_vbng_0",
+                            "flavorName": "flavor_1",
+                            "directive": ""
+                        }
+                    ]
                 },
                 "name": "test",
                 "inject_files": [],
