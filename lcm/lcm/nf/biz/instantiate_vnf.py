@@ -155,15 +155,38 @@ class InstantiateVnf(Thread):
                         break
 
     def set_location(self, apply_result):
+        vim_connections = ignore_case_get(apply_result, "vimConnections")
+        vnfid = ignore_case_get(apply_result, "vnfInstanceId")
+        directive = ignore_case_get(apply_result, "directive")
+        vim_assets = ignore_case_get(apply_result, "vimAssets")
+        access_info = ignore_case_get(vim_connections[0], "accessInfo")
+        tenant = ignore_case_get(access_info, "tenant")
+        vimid = ignore_case_get(vim_connections[0], "vimId")
+        cloud_owner, cloud_regionid = vimid.split("_")
+        vdu_info = []
+
+        for flavor in ignore_case_get(vim_assets, "vimComputeResourceFlavour"):
+            vdu_info.append({"vduName": flavor["resourceProviderId"],
+                             "flavorName": flavor["vimFlavourId"],
+                             "directive": directive})
+
         for resource_type in ['vdus', 'vls']:
             for resource in ignore_case_get(self.vnfd_info, resource_type):
                 if "location_info" in resource["properties"]:
-                    resource["properties"]["location_info"]["vimid"] = ignore_case_get(apply_result, "vimid")
-                    resource["properties"]["location_info"]["tenant"] = ignore_case_get(apply_result, "tenant")
+                    resource["properties"]["location_info"]["vimid"] = vimid
+                    resource["properties"]["location_info"]["tenant"] = tenant
+                    resource["properties"]["location_info"]["vnfId"] = vnfid
+                    resource["properties"]["location_info"]["cloudOwner"] = cloud_owner
+                    resource["properties"]["location_info"]["cloudRegionId"] = cloud_regionid
+                    resource["properties"]["location_info"]["vduInfo"] = vdu_info
                 else:
                     resource["properties"]["location_info"] = {
-                        "vimid": ignore_case_get(apply_result, "vimid"),
-                        "tenant": ignore_case_get(apply_result, "tenant")}
+                        "vimid": vimid,
+                        "tenant": tenant,
+                        "vnfId": vnfid,
+                        "cloudOwner": cloud_owner,
+                        "cloudRegionId": cloud_regionid,
+                        "vduInfo": vdu_info}
 
     '''
     def get_subnet_ids(self, ext_cp):

@@ -35,8 +35,26 @@ class TestNFInstantiate(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.grant_result = {
-            "vimid": 'vim_1',
-            "tenant": 'chinamobile',
+            "vimConnections": [
+                {
+                    "vimid": 'vim_1',
+                    "accessInfo":
+                    {
+                        "tenant": 'chinamobile'
+                    }
+                },
+            ],
+            "vnfId":"413aa1fe-b4d1-11e8-8268-dff5aab95c63",
+            "vimAssets":
+            {
+                "vimComputeResourceFlavour": [
+                    {
+                        "resourceProviderId": "vgw",
+                        "vimFlavourId": "yui",
+                        "directive": ""
+                    },
+                ]
+            }
         }
 
     def tearDown(self):
