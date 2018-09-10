@@ -14,13 +14,13 @@
 
 from rest_framework import serializers
 
+from link import LinkSerializer
 from lccn_filter_data import LifeCycleChangeNotificationsFilter
 
 
 class LinkSerializer(serializers.Serializer):
-    self = serializers.CharField(
+    self = LinkSerializer(
         help_text="URI of this resource.",
-        max_length=255,
         required=True,
         allow_null=False)
 

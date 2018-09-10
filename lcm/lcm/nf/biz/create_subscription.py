@@ -124,7 +124,9 @@ class CreateSubscription:
         logger.debug("SubscribeNotification--post::> Saving the subscription "
                      "%s to the database" % self.subscription_id)
         links = {
-            "self": const.ROOT_URI + self.subscription_id
+            "self": {
+                "href": const.ROOT_URI + self.subscription_id
+            }
         }
         SubscriptionModel.objects.create(subscription_id=self.subscription_id,
                                          callback_uri=self.callback_uri,

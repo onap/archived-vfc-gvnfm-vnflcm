@@ -36,6 +36,7 @@ class TestSubscription(TestCase):
         mock_requests.get.status_code = 204
         mock_uuid4.return_value = temp_uuid
         response = self.client.post("/api/vnflcm/v1/subscriptions", data=dummy_subscription, format='json')
+        self.assertEqual(201, response.status_code)
         self.assertEqual(dummy_subscription["callbackUri"], response.data["callbackUri"])
         self.assertEqual(temp_uuid, response.data["id"])
 
@@ -66,6 +67,7 @@ class TestSubscription(TestCase):
         mock_requests.get.return_value.status_code = 204
         mock_uuid4.return_value = temp_uuid
         response = self.client.post("/api/vnflcm/v1/subscriptions", data=dummy_subscription, format='json')
+        self.assertEqual(201, response.status_code)
         self.assertEqual(dummy_subscription["callbackUri"], response.data["callbackUri"])
         self.assertEqual(temp_uuid, response.data["id"])
 
@@ -96,6 +98,7 @@ class TestSubscription(TestCase):
             'error': 'Auth type should be BASIC'
         }
         response = self.client.post("/api/vnflcm/v1/subscriptions", data=dummy_subscription, format='json')
+        self.assertEqual(500, response.status_code)
         self.assertEqual(expected_data, response.data)
 
     @mock.patch("requests.get")
@@ -119,6 +122,7 @@ class TestSubscription(TestCase):
             'notificationTypes must be VnfLcmOperationOccurrenceNotification'
         }
         response = self.client.post("/api/vnflcm/v1/subscriptions", data=dummy_subscription, format='json')
+        self.assertEqual(500, response.status_code)
         self.assertEqual(expected_data, response.data)
 
     @mock.patch("requests.get")
@@ -141,6 +145,7 @@ class TestSubscription(TestCase):
         mock_requests.get.return_value.status_code = 204
         mock_uuid4.return_value = temp_uuid
         response = self.client.post("/api/vnflcm/v1/subscriptions", data=dummy_subscription, format='json')
+        self.assertEqual(201, response.status_code)
         self.assertEqual(dummy_subscription["callbackUri"], response.data["callbackUri"])
         self.assertEqual(temp_uuid, response.data["id"])
         response = self.client.post("/api/vnflcm/v1/subscriptions", data=dummy_subscription, format='json')
