@@ -17,17 +17,16 @@ import logging
 import traceback
 from threading import Thread
 
-from lcm.pub.database.models import NfInstModel, VmInstModel
+from lcm.pub.database.models import NfInstModel, VmInstModel, VNFCInstModel
 from lcm.pub.exceptions import NFLCMException
-from lcm.pub.msapi.gvnfmdriver import prepare_notification_data
-# from lcm.pub.msapi.gvnfmdriver import notify_lcm_to_nfvo
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.notificationsutil import NotificationsUtil
 from lcm.pub.utils.values import ignore_case_get
 from lcm.pub.vimapi import adaptor
 from lcm.nf.biz.grant_vnf import grant_resource
-from lcm.nf.const import VNF_STATUS, RESOURCE_MAP, CHANGE_TYPE, GRANT_TYPE, OPERATION_TYPE
+from lcm.nf.const import VNF_STATUS, RESOURCE_MAP, GRANT_TYPE
+import uuid
 
 logger = logging.getLogger(__name__)
 
@@ -46,12 +45,14 @@ class OperateVnf(Thread):
 
     def run(self):
         try:
+            self.lcm_notify("START", "STARTING")
             self.apply_grant()
             self.query_inst_resource()
+            self.lcm_notify("RESULT", "PROCESSING")
             self.operate_resource()
             JobUtil.add_job_status(self.job_id, 100, "Operate Vnf success.")
-            NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='INSTANTIATED', lastuptime=now_time(), operationState=self.changeStateTo)
-            self.lcm_notify()
+            NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='INSTANTIATED', lastuptime=now_time())
+            self.lcm_notify("RESULT", "COMPLETED")
         except NFLCMException as e:
             self.vnf_operate_failed_handle(e.message)
         except Exception as e:
@@ -89,12 +90,11 @@ class OperateVnf(Thread):
         adaptor.operate_vim_res(self.inst_resource, self.changeStateTo, self.stopType, self.gracefulStopTimeout, self.do_notify_op)
         logger.info('Operate resource complete')
 
-    def lcm_notify(self):
-        notification_content = prepare_notification_data(self.nf_inst_id, self.job_id, CHANGE_TYPE.MODIFIED, OPERATION_TYPE.OPERATE)
-        logger.info('Notify request data = %s' % notification_content)
-        # resp = notify_lcm_to_nfvo(json.dumps(notification_content))
-        # logger.info('Lcm notify end, response %s' % resp)
+    def lcm_notify(self, status, opState):
+        notification_content = self.prepareNotificationData(status, opState)
+        logger.info('Notify data = %s' % notification_content)
         NotificationsUtil().send_notification(notification_content)
+        logger.info('Notify end')
 
     def vnf_operate_failed_handle(self, error_msg):
         logger.error('VNF Operation failed, detail message: %s' % error_msg)
@@ -103,4 +103,49 @@ class OperateVnf(Thread):
 
     def do_notify_op(self, status, resid):
         logger.error('VNF resource %s updated to: %s' % (resid, status))
-        VmInstModel.objects.filter(instid=self.nf_inst_id, resourceid=resid).update(operationalstate=status)
+
+    def prepareNotificationData(self, status, opState):
+        affected_vnfcs = []
+        if status == "RESULT" and opState == "COMPLETED":
+            vnfcs = VNFCInstModel.objects.filter(instid=self.nf_inst_id)
+            for vnfc in vnfcs:
+                vm_resource = {}
+                if vnfc.vmid:
+                    vm = VmInstModel.objects.filter(vmid=vnfc.vmid)
+                    if vm:
+                        vm_resource = {
+                            'vimId': vm[0].vimid,
+                            'resourceId': vm[0].resourceid,
+                            'resourceProviderId': vm[0].vmname,  # TODO: is resourceName mapped to resourceProviderId?
+                            'vimLevelResourceType': 'vm'
+                        }
+                affected_vnfcs.append({
+                    'id': vnfc.vnfcinstanceid,
+                    'vduId': vnfc.vduid,
+                    'changeType': "MODIFIED",
+                    'computeResource': vm_resource
+                })
+
+        notification_content = {
+            "id": str(uuid.uuid4()),
+            "notificationType": "VnfLcmOperationOccurrenceNotification",
+            "subscriptionId": "",
+            "timeStamp": now_time(),
+            "notificationStatus": status,
+            "operationState": opState,
+            "vnfInstanceId": self.nf_inst_id,
+            "operation": "OPERATE",
+            "isAutomaticInvocation": "false",
+            "vnfLcmOpOccId": self.job_id,
+            "affectedVnfcs": affected_vnfcs,
+            "affectedVirtualLinks": [],
+            "affectedVirtualStorages": [],
+            "changedInfo": {},
+            "changedExtConnectivity": [],
+            "_links": {"vnfInstance": {"href": ""},
+                       "subscription": {"href": ""},
+                       "vnfLcmOpOcc": {"href": ""}}
+        }
+        notification_content["_links"]["vnfInstance"]["href"] = "/vnf_instances/%s" % self.nf_inst_id
+        notification_content["_links"]["vnfLcmOpOcc"]["href"] = "/vnf_lc_ops/%s" % self.job_id
+        return notification_content
