@@ -105,7 +105,7 @@ class StorageInstModel(models.Model):
 
     storageid = models.CharField(db_column='STORAGEID', primary_key=True, max_length=255)
     vimid = models.CharField(db_column='VIMID', max_length=255)
-    resouceid = models.CharField(db_column='RESOURCEID', max_length=255)
+    resourceid = models.CharField(db_column='RESOURCEID', max_length=255)
     insttype = models.IntegerField(db_column='INSTTYPE')
     instid = models.CharField(db_column='INSTID', max_length=255)
     name = models.CharField(db_column='NAME', max_length=255, null=True)
@@ -130,7 +130,7 @@ class VmInstModel(models.Model):
     vmid = models.CharField(db_column='VMID', primary_key=True, max_length=255)
     vimid = models.CharField(db_column='VIMID', max_length=255)
     tenant = models.CharField(db_column='TENANT', max_length=255, null=True)
-    resouceid = models.CharField(db_column='RESOURCEID', max_length=255)
+    resourceid = models.CharField(db_column='RESOURCEID', max_length=255)
     vmname = models.CharField(db_column='VMNAME', max_length=255)
     nic_array = models.CharField(db_column='NICARRAY', max_length=255)
     metadata = models.CharField(db_column='METADATA', max_length=255)
@@ -165,7 +165,7 @@ class FlavourInstModel(models.Model):
 
     flavourid = models.CharField(db_column='FLAVOURID', max_length=255, primary_key=True)
     vimid = models.CharField(db_column='VIMID', max_length=255)
-    resouceid = models.CharField(db_column='RESOURCEID', max_length=255)
+    resourceid = models.CharField(db_column='RESOURCEID', max_length=255)
     name = models.CharField(db_column='NAME', max_length=255)
     tenant = models.CharField(db_column='TENANT', max_length=255, null=True)
     vcpu = models.IntegerField(db_column='VCPU', null=True)
@@ -186,7 +186,7 @@ class NetworkInstModel(models.Model):
 
     networkid = models.CharField(db_column='NETWORKID', primary_key=True, max_length=255)
     vimid = models.CharField(db_column='VIMID', max_length=255)
-    resouceid = models.CharField(db_column='RESOURCEID', max_length=255)
+    resourceid = models.CharField(db_column='RESOURCEID', max_length=255)
     insttype = models.IntegerField(db_column='INSTTYPE')
     instid = models.CharField(db_column='INSTID', max_length=255)
     name = models.CharField(db_column='NAME', max_length=255)
@@ -213,7 +213,7 @@ class SubNetworkInstModel(models.Model):
 
     subnetworkid = models.CharField(db_column='SUBNETWORKID', primary_key=True, max_length=255)
     vimid = models.CharField(db_column='VIMID', max_length=255)
-    resouceid = models.CharField(db_column='RESOURCEID', max_length=255)
+    resourceid = models.CharField(db_column='RESOURCEID', max_length=255)
     networkid = models.CharField(db_column='NETWORKID', max_length=255)
     insttype = models.IntegerField(db_column='INSTTYPE')
     instid = models.CharField(db_column='INSTID', max_length=255)
@@ -256,7 +256,7 @@ class PortInstModel(models.Model):
     networkid = models.CharField(db_column='NETWORKID', max_length=255)
     subnetworkid = models.CharField(db_column='SUBNETWORKID', max_length=255, null=True)
     vimid = models.CharField(db_column='VIMID', max_length=255)
-    resouceid = models.CharField(db_column='RESOURCEID', max_length=255)
+    resourceid = models.CharField(db_column='RESOURCEID', max_length=255)
     name = models.CharField(db_column='NAME', max_length=255, null=True)
     insttype = models.IntegerField(db_column='INSTTYPE')
     instid = models.CharField(db_column='INSTID', max_length=255)

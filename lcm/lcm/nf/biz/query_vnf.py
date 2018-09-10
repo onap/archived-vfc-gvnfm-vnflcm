@@ -51,7 +51,7 @@ class QueryVnf:
                 "id": s.storageid,
                 "storageResource": {
                     "vimConnectionId": s.vimid,
-                    "resourceId": s.resouceid
+                    "resourceId": s.resourceid
                 }
             }
             arr.append(storage)
@@ -67,7 +67,7 @@ class QueryVnf:
                 "virtualLinkDescId": v.vldid,
                 "networkResource": {
                     "vimConnectionId": net[0].vimid,
-                    "resourceId": net[0].resouceid
+                    "resourceId": net[0].resourceid
                 }
             }
             vl_arr.append(v_dic)
@@ -87,7 +87,7 @@ class QueryVnf:
                 "vduId": vnfc.vduid,
                 "computeResource": {
                     "vimConnectionId": vm[0].vimid,
-                    "resourceId": vm[0].resouceid
+                    "resourceId": vm[0].resourceid
                 },
                 "storageResourceIds": [s.storageid for s in storage]
             }

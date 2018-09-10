@@ -60,7 +60,7 @@ def prepare_notification_data(nfinstid, jobid, changetype):
             if vm:
                 vm_resource = {
                     'vimId': vm[0].vimid,
-                    'resourceId': vm[0].resouceid,
+                    'resourceId': vm[0].resourceid,
                     'resourceProviderId': vm[0].vmname,  # TODO: is resourceName mapped to resourceProviderId?
                     'vimLevelResourceType': 'vm'
                 }
@@ -75,7 +75,7 @@ def prepare_notification_data(nfinstid, jobid, changetype):
     for network in networks:
         network_resource = {
             'vimConnectionId': network.vimid,
-            'resourceId': network.resouceid,
+            'resourceId': network.resourceid,
             'resourceProviderId': network.name,  # TODO: is resourceName mapped to resourceProviderId?
             'vimLevelResourceType': 'network'
         }
@@ -92,7 +92,7 @@ def prepare_notification_data(nfinstid, jobid, changetype):
             'id': port.portid,  # TODO: port.portid or port.nodeid?
             'resourceHandle': {
                 'vimConnectionId': port.vimid,
-                'resourceId': port.resouceid,
+                'resourceId': port.resourceid,
                 'resourceProviderId': port.name,  # TODO: is resourceName mapped to resourceProviderId?
                 'vimLevelResourceType': 'port'
             },
@@ -107,7 +107,7 @@ def prepare_notification_data(nfinstid, jobid, changetype):
             'changeType': changetype,
             'storageResource': {
                 'vimConnectionId': vs.vimid,
-                'resourceId': vs.resouceid,
+                'resourceId': vs.resourceid,
                 'resourceProviderId': vs.name,  # TODO: is resourceName mapped to resourceProviderId?
                 'vimLevelResourceType': 'volume'
             }

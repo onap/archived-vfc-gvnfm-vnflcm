@@ -70,7 +70,7 @@ class OperateVnf(Thread):
         resource_table = globals().get(resource_type + 'InstModel')
         resource_insts = resource_table.objects.filter(instid=self.nf_inst_id)
         for resource_inst in resource_insts:
-            if not resource_inst.resouceid:
+            if not resource_inst.resourceid:
                 continue
             self.inst_resource[RESOURCE_MAP.get(resource_type)].append(self.get_resource(resource_inst))
         logger.info('Query resource end, resource=%s' % self.inst_resource)
@@ -79,7 +79,7 @@ class OperateVnf(Thread):
         return {
             "vim_id": resource.vimid,
             "tenant_id": resource.tenant,
-            "id": resource.resouceid
+            "id": resource.resourceid
         }
 
     def operate_resource(self):
@@ -100,4 +100,4 @@ class OperateVnf(Thread):
 
     def do_notify_op(self, status, resid):
         logger.error('VNF resource %s updated to: %s' % (resid, status))
-        VmInstModel.objects.filter(instid=self.nf_inst_id, resouceid=resid).update(operationalstate=status)
+        VmInstModel.objects.filter(instid=self.nf_inst_id, resourceid=resid).update(operationalstate=status)

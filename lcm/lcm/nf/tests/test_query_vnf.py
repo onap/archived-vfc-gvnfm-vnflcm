@@ -116,7 +116,7 @@ class ResourceTest(TestCase):
         NfInstModel(nfinstid=vnf_inst_id, nf_name='VNF1', status='INSTANTIATED').save()
         StorageInstModel(storageid='s02',
                          vimid='vim01',
-                         resouceid='resource01',
+                         resourceid='resource01',
                          insttype=1,
                          instid=vnf_inst_id).save()
         response = self.client.get("/api/vnflcm/v1/vnf_instances/%s" % vnf_inst_id, format='json')
@@ -161,7 +161,7 @@ class ResourceTest(TestCase):
                         status='INSTANTIATED').save()
             StorageInstModel(storageid='s0%s' % i,
                              vimid='vim0%s' % i,
-                             resouceid='resource0%s' % i,
+                             resourceid='resource0%s' % i,
                              insttype=1,
                              instid='%s' % i).save()
         response = self.client.get("/api/vnflcm/v1/vnf_instances", format='json')
