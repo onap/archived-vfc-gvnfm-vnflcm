@@ -136,8 +136,6 @@ class TestNFOperate(TestCase):
         self.job_id = JobUtil.create_job('NF', 'OPERATE', self.nf_inst_id)
         JobUtil.add_job_status(self.job_id, 0, "OPERATE_VNF_READY")
         OperateVnf(req_data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        vm = VmInstModel.objects.filter(vmid="1", vimid="1", resourceid="11")
-        self.assertEqual("ACTIVE", vm[0].operationalstate)
         self.assert_job_result(self.job_id, 100, "Operate Vnf success.")
 
     @mock.patch.object(restcall, 'call_req')
@@ -208,8 +206,6 @@ class TestNFOperate(TestCase):
         self.job_id = JobUtil.create_job('NF', 'OPERATE', self.nf_inst_id)
         JobUtil.add_job_status(self.job_id, 0, "OPERATE_VNF_READY")
         OperateVnf(req_data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        vm = VmInstModel.objects.filter(vmid="1", vimid="1", resourceid="11")
-        self.assertEqual("INACTIVE", vm[0].operationalstate)
         self.assert_job_result(self.job_id, 100, "Operate Vnf success.")
 
     @mock.patch.object(restcall, 'call_req')
@@ -253,8 +249,6 @@ class TestNFOperate(TestCase):
         self.job_id = JobUtil.create_job('NF', 'OPERATE', self.nf_inst_id)
         JobUtil.add_job_status(self.job_id, 0, "OPERATE_VNF_READY")
         OperateVnf(req_data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        vm = VmInstModel.objects.filter(vmid="1", vimid="1", resourceid="11")
-        self.assertEqual("INACTIVE", vm[0].operationalstate)
         self.assert_job_result(self.job_id, 100, "Operate Vnf success.")
 
     @mock.patch.object(restcall, 'call_req')
@@ -297,6 +291,4 @@ class TestNFOperate(TestCase):
         self.job_id = JobUtil.create_job('NF', 'OPERATE', self.nf_inst_id)
         JobUtil.add_job_status(self.job_id, 0, "OPERATE_VNF_READY")
         OperateVnf(req_data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        vm = VmInstModel.objects.filter(vmid="1", vimid="1", resourceid="11")
-        self.assertEqual("INACTIVE", vm[0].operationalstate)
         self.assert_job_result(self.job_id, 100, "Operate Vnf success.")
