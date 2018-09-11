@@ -99,4 +99,5 @@ def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
     content_args['additionalParams']['vnfmid'] = vnfInsts[0].vnfminstid
     logger.info('Grant request data=%s' % content_args)
     apply_result = apply_grant_to_nfvo(json.dumps(content_args))
+    logger.info("apply_result: %s" % apply_result)
     return apply_result
