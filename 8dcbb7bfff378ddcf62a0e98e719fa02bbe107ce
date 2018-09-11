@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_f84f3232",
+        "filename": "lcm/lcm/nf/biz/heal_vnf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4247
+      },
+      "writtenOn": "2018-09-11T09:38:00Z",
+      "side": 1,
+      "message": "I am using few functions from Instantiate vnf class when the  action in vmStart during heal.",
+      "parentUuid": "1a76adc5_45952385",
+      "range": {
+        "startLine": 34,
+        "startChar": 14,
+        "endLine": 34,
+        "endChar": 28
+      },
+      "revId": "8dcbb7bfff378ddcf62a0e98e719fa02bbe107ce",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_e58d4f7d",
         "filename": "lcm/lcm/nf/biz/heal_vnf.py",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2018-09-11T05:42:31Z",
       "side": 1,
       "message": "Should use VNF_STATUS which is defined in const.py",
+      "range": {
+        "startLine": 56,
+        "startChar": 79,
+        "endLine": 56,
+        "endChar": 93
+      },
+      "revId": "8dcbb7bfff378ddcf62a0e98e719fa02bbe107ce",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_38760ad8",
+        "filename": "lcm/lcm/nf/biz/heal_vnf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4247
+      },
+      "writtenOn": "2018-09-11T09:38:00Z",
+      "side": 1,
+      "message": "In VNF_STATUS we dont have enum for INSTANTIATED. DO you want me to add that in VNF_STATUS ?",
+      "parentUuid": "1a76adc5_e58d4f7d",
       "range": {
         "startLine": 56,
         "startChar": 79,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_58cf4629",
+        "filename": "lcm/lcm/nf/biz/heal_vnf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 4247
+      },
+      "writtenOn": "2018-09-11T09:38:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_058bab68",
+      "range": {
+        "startLine": 66,
+        "startChar": 8,
+        "endLine": 66,
+        "endChar": 97
+      },
+      "revId": "8dcbb7bfff378ddcf62a0e98e719fa02bbe107ce",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_c5f05300",
         "filename": "lcm/lcm/nf/biz/heal_vnf.py",
         "patchSetId": 2
@@ -82,6 +154,30 @@
       "writtenOn": "2018-09-11T05:42:31Z",
       "side": 1,
       "message": "Can be replaced by if not (self.vm_id and self.vdu_id and self.vm_name)",
+      "range": {
+        "startLine": 72,
+        "startChar": 8,
+        "endLine": 72,
+        "endChar": 75
+      },
+      "revId": "8dcbb7bfff378ddcf62a0e98e719fa02bbe107ce",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_b8ce9a2c",
+        "filename": "lcm/lcm/nf/biz/heal_vnf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 4247
+      },
+      "writtenOn": "2018-09-11T09:38:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_c5f05300",
       "range": {
         "startLine": 72,
         "startChar": 8,
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_d8e2769f",
+        "filename": "lcm/lcm/nf/biz/heal_vnf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4247
+      },
+      "writtenOn": "2018-09-11T09:38:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_85f6dbf7",
+      "range": {
+        "startLine": 81,
+        "startChar": 12,
+        "endLine": 81,
+        "endChar": 32
+      },
+      "revId": "8dcbb7bfff378ddcf62a0e98e719fa02bbe107ce",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_25dfc76a",
         "filename": "lcm/lcm/nf/biz/heal_vnf.py",
         "patchSetId": 2
@@ -128,6 +248,30 @@
       "writtenOn": "2018-09-11T05:42:31Z",
       "side": 1,
       "message": "Can be replaced by if not self.vdu",
+      "range": {
+        "startLine": 88,
+        "startChar": 12,
+        "endLine": 88,
+        "endChar": 32
+      },
+      "revId": "8dcbb7bfff378ddcf62a0e98e719fa02bbe107ce",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_f8df32d4",
+        "filename": "lcm/lcm/nf/biz/heal_vnf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 4247
+      },
+      "writtenOn": "2018-09-11T09:38:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_25dfc76a",
       "range": {
         "startLine": 88,
         "startChar": 12,
@@ -163,6 +307,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_38012a38",
+        "filename": "lcm/lcm/nf/views/heal_vnf_view.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 4247
+      },
+      "writtenOn": "2018-09-11T09:38:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_c5a293fc",
+      "range": {
+        "startLine": 59,
+        "startChar": 66,
+        "endLine": 59,
+        "endChar": 69
+      },
+      "revId": "8dcbb7bfff378ddcf62a0e98e719fa02bbe107ce",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_65a37f00",
         "filename": "lcm/lcm/nf/views/heal_vnf_view.py",
         "patchSetId": 2
@@ -186,6 +354,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_d8f9164f",
+        "filename": "lcm/lcm/nf/views/heal_vnf_view.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 4247
+      },
+      "writtenOn": "2018-09-11T09:38:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_65a37f00",
+      "range": {
+        "startLine": 65,
+        "startChar": 66,
+        "endLine": 65,
+        "endChar": 69
+      },
+      "revId": "8dcbb7bfff378ddcf62a0e98e719fa02bbe107ce",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_45ae83e7",
         "filename": "lcm/lcm/nf/views/heal_vnf_view.py",
         "patchSetId": 2
@@ -197,6 +389,30 @@
       "writtenOn": "2018-09-11T05:42:31Z",
       "side": 1,
       "message": "Should use VNF_STATUS which is defined in const.py",
+      "range": {
+        "startLine": 83,
+        "startChar": 34,
+        "endLine": 83,
+        "endChar": 48
+      },
+      "revId": "8dcbb7bfff378ddcf62a0e98e719fa02bbe107ce",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_b86a1aec",
+        "filename": "lcm/lcm/nf/views/heal_vnf_view.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 4247
+      },
+      "writtenOn": "2018-09-11T09:38:00Z",
+      "side": 1,
+      "message": "In VNF_STATUS we dont have enum for \u0027INSTANTIATED\u0027. Shall I create one in VNF_STATUS ?",
+      "parentUuid": "1a76adc5_45ae83e7",
       "range": {
         "startLine": 83,
         "startChar": 34,
