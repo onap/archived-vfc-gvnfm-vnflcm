@@ -17,16 +17,18 @@ import logging
 import traceback
 from threading import Thread
 
-from lcm.pub.database.models import NfInstModel, VmInstModel
+from lcm.pub.database.models import NfInstModel, VmInstModel, VNFCInstModel
 from lcm.pub.exceptions import NFLCMException
-from lcm.pub.msapi.gvnfmdriver import notify_lcm_to_nfvo, prepare_notification_data
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.values import ignore_case_get
 from lcm.pub.vimapi import adaptor
 from lcm.nf.biz.grant_vnf import grant_resource
-from lcm.nf.const import VNF_STATUS, GRANT_TYPE, HEAL_ACTION_TYPE, CHANGE_TYPE, OPERATION_TYPE
+from lcm.nf.const import VNF_STATUS, GRANT_TYPE, HEAL_ACTION_TYPE
 from lcm.nf.biz import common
+import uuid
+from lcm.pub.utils.notificationsutil import NotificationsUtil
+
 
 logger = logging.getLogger(__name__)
 
@@ -49,11 +51,13 @@ class HealVnf(Thread):
     def run(self):
         try:
             self.heal_pre()
+            self.lcm_notify("START", "STARTING")
             self.apply_grant()
+            self.lcm_notify("RESULT", "PROCESSING")
             self.heal_resource()
             JobUtil.add_job_status(self.job_id, 100, "Heal Vnf success.")
             NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='INSTANTIATED', lastuptime=now_time())
-            self.lcm_notify()
+            self.lcm_notify("RESULT", "COMPLETED")
         except NFLCMException as e:
             logger.error(e.message)
             self.vnf_heal_failed_handle(e.message)
@@ -105,13 +109,61 @@ class HealVnf(Thread):
         resource_save_method = getattr(common, res_type + '_save')
         resource_save_method(self.job_id, self.nf_inst_id, ret)
 
-    def lcm_notify(self):
-        notification_content = prepare_notification_data(self.nf_inst_id, self.job_id, CHANGE_TYPE.MODIFIED, OPERATION_TYPE.HEAL)
-        logger.info('Notify request data = %s' % notification_content)
-        resp = notify_lcm_to_nfvo(json.dumps(notification_content))
-        logger.info('Lcm notify end, response %s' % resp)
-
     def vnf_heal_failed_handle(self, error_msg):
         logger.error('VNF Healing failed, detail message: %s' % error_msg)
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status=VNF_STATUS.FAILED, lastuptime=now_time())
         JobUtil.add_job_status(self.job_id, 255, error_msg)
+
+    def lcm_notify(self, status, opState):
+        notification_content = self.prepareNotificationData(status, opState)
+        logger.info('Notify data = %s' % notification_content)
+        NotificationsUtil().send_notification(notification_content)
+        logger.info('Notify end')
+
+    def prepareNotificationData(self, status, opState):
+        affected_vnfcs = []
+        if status == "RESULT" and opState == "COMPLETED":
+            chtype = ""
+            if self.action == HEAL_ACTION_TYPE.START:
+                chtype = "ADDED"
+            else:
+                chtype = "MODIFIED"
+            vnfcs = VNFCInstModel.objects.filter(instid=self.nf_inst_id, vmid=self.vm_id)
+            vm_resource = {}
+            vm = VmInstModel.objects.filter(instid=self.nf_inst_id, vmid=self.vm_id)
+            if vm:
+                vm_resource = {
+                    'vimConnectionId': vm[0].vimid,
+                    'resourceId': vm[0].resourceid,
+                    'vimLevelResourceType': 'vm'
+                }
+            affected_vnfcs.append({
+                'id': vnfcs[0].vnfcinstanceid,
+                'vduId': vnfcs[0].vduid,
+                'changeType': chtype,
+                'computeResource': vm_resource
+            })
+
+        notification_content = {
+            "id": str(uuid.uuid4()),
+            "notificationType": "VnfLcmOperationOccurrenceNotification",
+            "subscriptionId": "",
+            "timeStamp": now_time(),
+            "notificationStatus": status,
+            "operationState": opState,
+            "vnfInstanceId": self.nf_inst_id,
+            "operation": "HEAL",
+            "isAutomaticInvocation": "false",
+            "vnfLcmOpOccId": self.job_id,
+            "affectedVnfcs": affected_vnfcs,
+            "affectedVirtualLinks": [],
+            "affectedVirtualStorages": [],
+            "changedInfo": {},
+            "changedExtConnectivity": [],
+            "_links": {"vnfInstance": {"href": ""},
+                       "subscription": {"href": ""},
+                       "vnfLcmOpOcc": {"href": ""}}
+        }
+        notification_content["_links"]["vnfInstance"]["href"] = "/vnf_instances/%s" % self.nf_inst_id
+        notification_content["_links"]["vnfLcmOpOcc"]["href"] = "/vnf_lc_ops/%s" % self.job_id
+        return notification_content
