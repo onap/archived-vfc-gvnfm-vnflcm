@@ -19,15 +19,29 @@ import traceback
 
 from drf_yasg.utils import swagger_auto_schema
 from lcm.nf.biz.create_subscription import CreateSubscription
+from lcm.nf.biz.query_subscription import QuerySubscription
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from lcm.nf.serializers.lccn_subscription_request import LccnSubscriptionRequestSerializer
 from lcm.nf.serializers.lccn_subscription import LccnSubscriptionSerializer
+from lcm.nf.serializers.lccn_subscriptions import LccnSubscriptionsSerializer
+from lcm.nf.serializers.response import ProblemDetailsSerializer
 from lcm.pub.exceptions import NFLCMException
 
 logger = logging.getLogger(__name__)
+VALID_FILTERS = ["operationTypes", "operationStates", "notificationTypes", "vnfInstanceId"]
+
+
+def get_problem_details_serializer(status_code, error_message):
+    problem_details = {
+        "status": status_code,
+        "detail": error_message
+    }
+    problem_details_serializer = ProblemDetailsSerializer(data=problem_details)
+    problem_details_serializer.is_valid()
+    return problem_details_serializer
 
 
 class SubscriptionsView(APIView):
@@ -35,8 +49,8 @@ class SubscriptionsView(APIView):
         request_body=LccnSubscriptionRequestSerializer(),
         responses={
             status.HTTP_201_CREATED: LccnSubscriptionSerializer(),
-            status.HTTP_303_SEE_OTHER: "",
-            status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal error"
+            status.HTTP_303_SEE_OTHER: ProblemDetailsSerializer(),
+            status.HTTP_500_INTERNAL_SERVER_ERROR: ProblemDetailsSerializer()
         }
     )
     def post(self, request):
@@ -72,3 +86,36 @@ class SubscriptionsView(APIView):
             logger.error(e.message)
             logger.error(traceback.format_exc())
             return Response(data={'error': e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: LccnSubscriptionsSerializer(),
+            status.HTTP_400_BAD_REQUEST: ProblemDetailsSerializer(),
+            status.HTTP_500_INTERNAL_SERVER_ERROR: ProblemDetailsSerializer()
+        }
+    )
+    def get(self, request):
+        logger.debug("SubscribeNotification--get::> %s" % request.query_params)
+        try:
+            if request.query_params and not set(request.query_params).issubset(set(VALID_FILTERS)):
+                problem_details_serializer = get_problem_details_serializer(status.HTTP_400_BAD_REQUEST, "Not a valid filter")
+                return Response(data=problem_details_serializer.data, status=status.HTTP_400_BAD_REQUEST)
+            resp_data = QuerySubscription(request.query_params).query_multi_subscriptions()
+
+            subscriptions_serializer = LccnSubscriptionsSerializer(data=resp_data)
+            if not subscriptions_serializer.is_valid():
+                raise NFLCMException(subscriptions_serializer.errors)
+
+            logger.debug("SubscribeNotification--get::> Remove default fields if exclude_default" +
+                         " is specified")
+            return Response(data=subscriptions_serializer.data, status=status.HTTP_200_OK)
+        except NFLCMException as e:
+            logger.error(e.message)
+            problem_details_serializer = get_problem_details_serializer(status.HTTP_500_INTERNAL_SERVER_ERROR, traceback.format_exc())
+            return Response(data=problem_details_serializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        except Exception as e:
+            logger.error(e.message)
+            logger.error(traceback.format_exc())
+            problem_details_serializer = get_problem_details_serializer(status.HTTP_500_INTERNAL_SERVER_ERROR, traceback.format_exc())
+            return Response(data=problem_details_serializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
