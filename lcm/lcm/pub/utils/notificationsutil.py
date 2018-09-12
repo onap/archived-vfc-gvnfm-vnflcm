@@ -46,6 +46,7 @@ class NotificationsUtil(object):
         for subscription in subscriptions:
             # set subscription id
             notification["subscriptionId"] = subscription.subscription_id
+            notification["_link"]['subscription'] = {'href': '/api/vnflcm/v1/subscriptions/%s' % subscription.subscription_id}
             callbackUri = subscription.callback_uri
             auth_info = json.loads(subscription.auth_info)
             if auth_info["authType"] == const.OAUTH2_CLIENT_CREDENTIALS:

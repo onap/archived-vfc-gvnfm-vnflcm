@@ -21,10 +21,12 @@ from threading import Thread
 from lcm.pub.database.models import NfInstModel, VmInstModel, NetworkInstModel, \
     SubNetworkInstModel, PortInstModel, StorageInstModel, FlavourInstModel, VNFCInstModel
 from lcm.pub.exceptions import NFLCMException
-from lcm.pub.msapi.gvnfmdriver import notify_lcm_to_nfvo, prepare_notification_data
+from lcm.pub.msapi.gvnfmdriver import prepare_notification_data
+# from lcm.pub.msapi.gvnfmdriver import notify_lcm_to_nfvo
 from lcm.pub.msapi.sdc_run_catalog import query_vnfpackage_by_id
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
+from lcm.pub.utils.notificationsutil import NotificationsUtil
 from lcm.pub.utils.values import ignore_case_get, get_none, get_boolean, get_integer
 from lcm.pub.vimapi import adaptor
 from lcm.nf.biz.grant_vnf import grant_resource
@@ -131,8 +133,9 @@ class InstantiateVnf(Thread):
     def lcm_notify(self):
         notification_content = prepare_notification_data(self.nf_inst_id, self.job_id, "ADDED")
         logger.info('Notify request data = %s' % notification_content)
-        resp = notify_lcm_to_nfvo(json.dumps(notification_content))
-        logger.info('Lcm notify end, response %s' % resp)
+        # resp = notify_lcm_to_nfvo(json.dumps(notification_content))
+        # logger.info('Lcm notify end, response %s' % resp)
+        NotificationsUtil().send_notification(notification_content)
 
     def vnf_inst_failed_handle(self, error_msg):
         logger.error('VNF instantiation failed, detail message: %s' % error_msg)
