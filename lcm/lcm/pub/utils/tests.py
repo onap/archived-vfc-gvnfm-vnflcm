@@ -277,6 +277,7 @@ class TestNotificationUtils(unittest.TestCase):
             "vnfInstanceId": "99442b18-a5c7-11e8-998c-bf1755941f13",
             "operationState": "STARTING",
             "operation": "INSTANTIATE",
+            "_links": {}
         }
         mock_post.return_value.status_code = 204
         NotificationsUtil().send_notification(dummy_notification)
@@ -288,6 +289,7 @@ class TestNotificationUtils(unittest.TestCase):
             "vnfInstanceId": "9fe4080c-b1a3-11e8-bb96-645106374fd3",
             "operationState": "",
             "operation": "",
+            "_links": {}
         }
         mock_post.return_value.status_code = 204
         NotificationsUtil().send_notification(dummy_notification)

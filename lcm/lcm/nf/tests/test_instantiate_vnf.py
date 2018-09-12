@@ -24,10 +24,11 @@ from lcm.nf.biz.instantiate_vnf import InstantiateVnf
 from lcm.nf.const import c1_data_get_tenant_id, c4_data_create_network, c2_data_create_volume, \
     c5_data_create_subnet, c3_data_get_volume, c6_data_create_port, c7_data_create_flavor, c8_data_list_image, \
     c9_data_create_vm, c10_data_get_vm, inst_req_data, vnfpackage_info
-from lcm.pub.database.models import NfInstModel, JobStatusModel
+from lcm.pub.database.models import NfInstModel, JobStatusModel, SubscriptionModel
 from lcm.pub.utils import restcall
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
+from lcm.pub.utils.notificationsutil import NotificationsUtil
 from lcm.pub.vimapi import api
 
 
@@ -68,22 +69,22 @@ class TestNFInstantiate(TestCase):
 
     @mock.patch.object(InstantiateVnf, 'run')
     def test_instantiate_vnf(self, mock_run):
-        NfInstModel(nfinstid='12', nf_name='VNF1', status="UN_INSTANTIATED").save()
+        NfInstModel(nfinstid='12', nf_name='VNF1', status='UN_INSTANTIATED').save()
         mock_run.re.return_value = None
-        response = self.client.post("/api/vnflcm/v1/vnf_instances/12/instantiate", data=inst_req_data, format='json')
+        response = self.client.post('/api/vnflcm/v1/vnf_instances/12/instantiate', data=inst_req_data, format='json')
         self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
 
     def test_instantiate_vnf_when_inst_id_not_exist(self):
         self.nf_inst_id = str(uuid.uuid4())
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
-        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+        JobUtil.add_job_status(self.job_id, 0, 'INST_VNF_READY')
         jobs = JobStatusModel.objects.filter(jobid=self.job_id,
                                              progress=0,
-                                             descp="INST_VNF_READY")
+                                             descp='INST_VNF_READY')
         self.assertEqual(1, len(jobs))
         data = inst_req_data
         InstantiateVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        self.assert_job_result(self.job_id, 255, "VNF nf_inst_id is not exist.")
+        self.assert_job_result(self.job_id, 255, 'VNF nf_inst_id is not exist.')
 
     def test_instantiate_vnf_when_already_instantiated(self):
         NfInstModel.objects.create(nfinstid='1111',
@@ -99,14 +100,14 @@ class TestNFInstantiate(TestCase):
                                    create_time=now_time())
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
-        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+        JobUtil.add_job_status(self.job_id, 0, 'INST_VNF_READY')
         jobs = JobStatusModel.objects.filter(jobid=self.job_id,
                                              progress=0,
-                                             descp="INST_VNF_READY")
+                                             descp='INST_VNF_READY')
         self.assertEqual(1, len(jobs))
         data = inst_req_data
         InstantiateVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        self.assert_job_result(self.job_id, 255, "VNF instantiationState is not NOT_INSTANTIATED.")
+        self.assert_job_result(self.job_id, 255, 'VNF instantiationState is not NOT_INSTANTIATED.')
 
     @mock.patch.object(restcall, 'call_req')
     def test_instantiate_vnf_when_get_packageinfo_by_csarid_failed(self, mock_call_req):
@@ -125,10 +126,10 @@ class TestNFInstantiate(TestCase):
         mock_call_req.side_effect = [r1_get_vnfpackage_by_vnfdid]
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
-        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+        JobUtil.add_job_status(self.job_id, 0, 'INST_VNF_READY')
         data = inst_req_data
         InstantiateVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        self.assert_job_result(self.job_id, 255, "Failed to query vnf CSAR(111) from catalog.")
+        self.assert_job_result(self.job_id, 255, 'Failed to query vnf CSAR(111) from catalog.')
 
     @mock.patch.object(restcall, 'call_req')
     def test_instantiate_vnf_when_applay_grant_failed(self, mock_call_req):
@@ -148,10 +149,10 @@ class TestNFInstantiate(TestCase):
         mock_call_req.side_effect = [r1_get_vnfpackage_by_vnfdid, r2_apply_grant_result]
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
-        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+        JobUtil.add_job_status(self.job_id, 0, 'INST_VNF_READY')
         data = inst_req_data
         InstantiateVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        self.assert_job_result(self.job_id, 255, "Nf instancing apply grant exception")
+        self.assert_job_result(self.job_id, 255, 'Nf instancing apply grant exception')
 
     @mock.patch.object(restcall, 'call_req')
     @mock.patch.object(api, 'call')
@@ -173,14 +174,15 @@ class TestNFInstantiate(TestCase):
         mock_call.side_effect = [c1_data_get_tenant_id, c2_data_create_volume, c3_data_get_volume]
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
-        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+        JobUtil.add_job_status(self.job_id, 0, 'INST_VNF_READY')
         data = inst_req_data
         InstantiateVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        self.assert_job_result(self.job_id, 255, "unexpected exception")
+        self.assert_job_result(self.job_id, 255, 'unexpected exception')
 
     @mock.patch.object(restcall, 'call_req')
     @mock.patch.object(api, 'call')
-    def test_instantiate_vnf_success(self, mock_call, mock_call_req):
+    @mock.patch.object(NotificationsUtil, 'post_notification')
+    def test_instantiate_vnf_success(self, mock_post_notification, mock_call, mock_call_req):
         NfInstModel.objects.create(nfinstid='1111',
                                    nf_name='vFW_01',
                                    package_id='222',
@@ -192,11 +194,36 @@ class TestNFInstantiate(TestCase):
                                    nf_desc='vFW in Nanjing TIC Edge',
                                    vnfdid='111',
                                    create_time=now_time())
+        SubscriptionModel.objects.create(
+            subscription_id=str(uuid.uuid4()),
+            callback_uri='api/gvnfmdriver/v1/vnfs/lifecyclechangesnotification',
+            auth_info=json.JSONEncoder().encode({
+                'authType': ['BASIC'],
+                'paramsBasic': {
+                    'userName': 'username',
+                    'password': 'password'
+                }
+            }),
+            notification_types=str([
+                'VnfLcmOperationOccurrenceNotification',
+                'VnfIdentifierCreationNotification',
+                'VnfIdentifierDeletionNotification'
+            ]),
+            operation_types=str(['INSTANTIATE']),
+            operation_states=str(['COMPLETED']),
+            vnf_instance_filter=json.JSONEncoder().encode({
+                'vnfdIds': ['111'],
+                'vnfProductsFromProviders': [],
+                'vnfInstanceIds': ['1111'],
+                'vnfInstanceNames': [],
+            })
+        )
         r1_get_vnfpackage_by_vnfdid = [0, json.JSONEncoder().encode(vnfpackage_info), '200']
         r2_apply_grant_result = [0, json.JSONEncoder().encode(self.grant_result), '200']
         r3_all_aai_result = [1, json.JSONEncoder().encode(''), '404']
-        r4_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
-        mock_call_req.side_effect = [r1_get_vnfpackage_by_vnfdid, r2_apply_grant_result, r3_all_aai_result, r4_lcm_notify_result]
+        # r4_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
+        # mock_call_req.side_effect = [r1_get_vnfpackage_by_vnfdid, r2_apply_grant_result, r3_all_aai_result, r4_lcm_notify_result]
+        mock_call_req.side_effect = [r1_get_vnfpackage_by_vnfdid, r2_apply_grant_result, r3_all_aai_result]
         mock_call.side_effect = [c1_data_get_tenant_id,
                                  c2_data_create_volume, c3_data_get_volume,
                                  c4_data_create_network,
@@ -204,9 +231,10 @@ class TestNFInstantiate(TestCase):
                                  c6_data_create_port,
                                  c7_data_create_flavor,
                                  c8_data_list_image, c9_data_create_vm, c10_data_get_vm]
+        mock_post_notification.side_effect = None
         self.nf_inst_id = '1111'
         self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
-        JobUtil.add_job_status(self.job_id, 0, "INST_VNF_READY")
+        JobUtil.add_job_status(self.job_id, 0, 'INST_VNF_READY')
         data = inst_req_data
         InstantiateVnf(data, nf_inst_id=self.nf_inst_id, job_id=self.job_id).run()
-        self.assert_job_result(self.job_id, 100, "Instantiate Vnf success.")
+        self.assert_job_result(self.job_id, 100, 'Instantiate Vnf success.')
