@@ -30,7 +30,7 @@ from lcm.pub.utils.notificationsutil import NotificationsUtil
 from lcm.pub.utils.values import ignore_case_get, get_none, get_boolean, get_integer
 from lcm.pub.vimapi import adaptor
 from lcm.nf.biz.grant_vnf import grant_resource
-from lcm.nf.const import GRANT_TYPE
+from lcm.nf.const import CHANGE_TYPE, GRANT_TYPE, OPERATION_TYPE
 
 logger = logging.getLogger(__name__)
 
@@ -131,7 +131,7 @@ class InstantiateVnf(Thread):
         logger.info("Create resource finish")
 
     def lcm_notify(self):
-        notification_content = prepare_notification_data(self.nf_inst_id, self.job_id, "ADDED")
+        notification_content = prepare_notification_data(self.nf_inst_id, self.job_id, CHANGE_TYPE.ADDED, OPERATION_TYPE.INSTANTIATE)
         logger.info('Notify request data = %s' % notification_content)
         # resp = notify_lcm_to_nfvo(json.dumps(notification_content))
         # logger.info('Lcm notify end, response %s' % resp)

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
+# import json
 import logging
 import traceback
 from threading import Thread
@@ -24,13 +24,15 @@ from lcm.pub.database.models import (
     FlavourInstModel, SubNetworkInstModel
 )
 from lcm.pub.exceptions import NFLCMException
-from lcm.pub.msapi.gvnfmdriver import prepare_notification_data, notify_lcm_to_nfvo
+from lcm.pub.msapi.gvnfmdriver import prepare_notification_data
+# from lcm.pub.msapi.gvnfmdriver import notify_lcm_to_nfvo
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
+from lcm.pub.utils.notificationsutil import NotificationsUtil
 from lcm.pub.utils.values import ignore_case_get
 from lcm.pub.vimapi import adaptor
 from lcm.nf.biz.grant_vnf import grant_resource
-from lcm.nf.const import GRANT_TYPE
+from lcm.nf.const import CHANGE_TYPE, GRANT_TYPE, OPERATION_TYPE
 
 logger = logging.getLogger(__name__)
 
@@ -98,7 +100,7 @@ class TerminateVnf(Thread):
         }
 
     def query_notify_data(self):
-        self.notify_data = prepare_notification_data(self.nf_inst_id, self.job_id, "RMOVED")
+        self.notify_data = prepare_notification_data(self.nf_inst_id, self.job_id, CHANGE_TYPE.REMOVED, OPERATION_TYPE.TERMINATE)
         NetworkInstModel.objects.filter(instid=self.nf_inst_id)
         StorageInstModel.objects.filter(instid=self.nf_inst_id)
         PortInstModel.objects.filter(instid=self.nf_inst_id)
@@ -120,8 +122,9 @@ class TerminateVnf(Thread):
     def lcm_notify(self):
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='NOT_INSTANTIATED', lastuptime=now_time())
         logger.info('Send notify request to nfvo')
-        resp = notify_lcm_to_nfvo(json.dumps(self.notify_data))
-        logger.info('Lcm notify end, response: %s' % resp)
+        # resp = notify_lcm_to_nfvo(json.dumps(self.notify_data))
+        # logger.info('Lcm notify end, response: %s' % resp)
+        NotificationsUtil().send_notification(self.notify_data)
 
     def vnf_term_failed_handle(self, error_msg):
         logger.error('VNF termination failed, detail message: %s' % error_msg)

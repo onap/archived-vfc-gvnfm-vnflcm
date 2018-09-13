@@ -51,7 +51,7 @@ def notify_lcm_to_nfvo(data):
     return ret[1]
 
 
-def prepare_notification_data(nfinstid, jobid, changetype):
+def prepare_notification_data(nfinstid, jobid, changetype, operation):
     logger.info('Send notify request to nfvo')
     affected_vnfcs = []
     vnfcs = VNFCInstModel.objects.filter(instid=nfinstid)
@@ -122,7 +122,7 @@ def prepare_notification_data(nfinstid, jobid, changetype):
         'notificationStatus': 'RESULT',
         'operationState': 'COMPLETED',
         'vnfInstanceId': nfinstid,
-        'operation': 'INSTANTIATE',
+        'operation': operation,
         'isAutomaticInvocation': False,
         'vnfLcmOpOccId': jobid,
         'affectedVnfcs': affected_vnfcs,
