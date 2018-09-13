@@ -73,6 +73,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_f7e653e7",
+        "filename": "lcm/lcm/nf/biz/heal_vnf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 141
+      },
+      "writtenOn": "2018-09-13T02:03:01Z",
+      "side": 1,
+      "message": "I suggest you add a new common class which includes the common functions, and heal function can inherite from it. Later others can do the same if needed",
+      "parentUuid": "1a76adc5_7aeb0ddc",
+      "range": {
+        "startLine": 34,
+        "startChar": 14,
+        "endLine": 34,
+        "endChar": 28
+      },
+      "revId": "8dcbb7bfff378ddcf62a0e98e719fa02bbe107ce",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_e58d4f7d",
         "filename": "lcm/lcm/nf/biz/heal_vnf.py",
         "patchSetId": 2
