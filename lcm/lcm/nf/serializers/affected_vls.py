@@ -16,14 +16,15 @@
 from rest_framework import serializers
 
 from resource_handle import ResourceHandleSerializer
+from lcm.nf.const import CHANGE_TYPE
 
 CHANGE_TYPES = [
-    "ADDED",
-    "REMOVED",
-    "MODIFIED",
-    "TEMPORARY",
-    "LINK_PORT_ADDED",
-    "LINK_PORT_REMOVED"
+    CHANGE_TYPE.ADDED,
+    CHANGE_TYPE.REMOVED,
+    CHANGE_TYPE.MODIFIED,
+    CHANGE_TYPE.TEMPORARY,
+    CHANGE_TYPE.LINK_PORT_ADDED,
+    CHANGE_TYPE.LINK_PORT_REMOVED
 ]
 
 

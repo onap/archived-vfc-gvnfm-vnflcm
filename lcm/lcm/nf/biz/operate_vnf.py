@@ -12,20 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
+# import json
 import logging
 import traceback
 from threading import Thread
 
 from lcm.pub.database.models import NfInstModel, VmInstModel
 from lcm.pub.exceptions import NFLCMException
-from lcm.pub.msapi.gvnfmdriver import notify_lcm_to_nfvo, prepare_notification_data
+from lcm.pub.msapi.gvnfmdriver import prepare_notification_data
+# from lcm.pub.msapi.gvnfmdriver import notify_lcm_to_nfvo
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
+from lcm.pub.utils.notificationsutil import NotificationsUtil
 from lcm.pub.utils.values import ignore_case_get
 from lcm.pub.vimapi import adaptor
 from lcm.nf.biz.grant_vnf import grant_resource
-from lcm.nf.const import VNF_STATUS, RESOURCE_MAP, GRANT_TYPE
+from lcm.nf.const import VNF_STATUS, RESOURCE_MAP, CHANGE_TYPE, GRANT_TYPE, OPERATION_TYPE
 
 logger = logging.getLogger(__name__)
 
@@ -88,10 +90,11 @@ class OperateVnf(Thread):
         logger.info('Operate resource complete')
 
     def lcm_notify(self):
-        notification_content = prepare_notification_data(self.nf_inst_id, self.job_id, "MODIFIED")
+        notification_content = prepare_notification_data(self.nf_inst_id, self.job_id, CHANGE_TYPE.MODIFIED, OPERATION_TYPE.OPERATE)
         logger.info('Notify request data = %s' % notification_content)
-        resp = notify_lcm_to_nfvo(json.dumps(notification_content))
-        logger.info('Lcm notify end, response %s' % resp)
+        # resp = notify_lcm_to_nfvo(json.dumps(notification_content))
+        # logger.info('Lcm notify end, response %s' % resp)
+        NotificationsUtil().send_notification(notification_content)
 
     def vnf_operate_failed_handle(self, error_msg):
         logger.error('VNF Operation failed, detail message: %s' % error_msg)

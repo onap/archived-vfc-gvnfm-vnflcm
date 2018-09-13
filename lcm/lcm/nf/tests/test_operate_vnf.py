@@ -13,15 +13,17 @@
 # limitations under the License.
 
 import json
+import uuid
 
 import mock
 from django.test import TestCase, Client
 from rest_framework import status
 
 from lcm.nf.biz.operate_vnf import OperateVnf
-from lcm.pub.database.models import NfInstModel, JobStatusModel, VmInstModel
+from lcm.pub.database.models import NfInstModel, JobStatusModel, VmInstModel, SubscriptionModel
 from lcm.pub.utils import restcall
 from lcm.pub.utils.jobutil import JobUtil
+from lcm.pub.utils.notificationsutil import NotificationsUtil
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.vimapi import api
 
@@ -68,7 +70,8 @@ class TestNFOperate(TestCase):
 
     @mock.patch.object(restcall, 'call_req')
     @mock.patch.object(api, 'call')
-    def test_operate_vnf_success_start(self, mock_call, mock_call_req):
+    @mock.patch.object(NotificationsUtil, 'post_notification')
+    def test_operate_vnf_success_start(self, mock_post_notification, mock_call, mock_call_req):
         NfInstModel.objects.create(nfinstid='1111',
                                    nf_name='2222',
                                    vnfminstid='1',
@@ -93,11 +96,39 @@ class TestNFOperate(TestCase):
                                    vmname="test_01",
                                    is_predefined=1,
                                    operationalstate=1)
+
+        SubscriptionModel.objects.create(
+            subscription_id=str(uuid.uuid4()),
+            callback_uri='api/gvnfmdriver/v1/vnfs/lifecyclechangesnotification',
+            auth_info=json.JSONEncoder().encode({
+                'authType': ['BASIC'],
+                'paramsBasic': {
+                    'userName': 'username',
+                    'password': 'password'
+                }
+            }),
+            notification_types=str([
+                'VnfLcmOperationOccurrenceNotification',
+                'VnfIdentifierCreationNotification',
+                'VnfIdentifierDeletionNotification'
+            ]),
+            operation_types=str(['OPERATE']),
+            operation_states=str(['COMPLETED']),
+            vnf_instance_filter=json.JSONEncoder().encode({
+                'vnfdIds': [],
+                'vnfProductsFromProviders': [],
+                'vnfInstanceIds': ['1111'],
+                'vnfInstanceNames': [],
+            })
+        )
+
         t1_apply_grant_result = [0, json.JSONEncoder().encode(''), '200']
-        t2_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
+        # t2_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
         t3_action_vm_start_result = [0, json.JSONEncoder().encode(''), '202']
-        mock_call_req.side_effect = [t1_apply_grant_result, t2_lcm_notify_result, t3_action_vm_start_result]
+        # mock_call_req.side_effect = [t1_apply_grant_result, t2_lcm_notify_result, t3_action_vm_start_result]
+        mock_call_req.side_effect = [t1_apply_grant_result, t3_action_vm_start_result]
         mock_call.return_value = None
+        mock_post_notification.return_value = None
         req_data = {
             "changeStateTo": "STARTED"
         }
@@ -111,7 +142,8 @@ class TestNFOperate(TestCase):
 
     @mock.patch.object(restcall, 'call_req')
     @mock.patch.object(api, 'call')
-    def test_operate_vnf_success_stop(self, mock_call, mock_call_req):
+    @mock.patch.object(NotificationsUtil, 'post_notification')
+    def test_operate_vnf_success_stop(self, mock_post_notification, mock_call, mock_call_req):
         NfInstModel.objects.create(nfinstid='1111',
                                    nf_name='2222',
                                    vnfminstid='1',
@@ -136,11 +168,39 @@ class TestNFOperate(TestCase):
                                    vmname="test_01",
                                    is_predefined=1,
                                    operationalstate=1)
+
+        SubscriptionModel.objects.create(
+            subscription_id=str(uuid.uuid4()),
+            callback_uri='api/gvnfmdriver/v1/vnfs/lifecyclechangesnotification',
+            auth_info=json.JSONEncoder().encode({
+                'authType': ['BASIC'],
+                'paramsBasic': {
+                    'userName': 'username',
+                    'password': 'password'
+                }
+            }),
+            notification_types=str([
+                'VnfLcmOperationOccurrenceNotification',
+                'VnfIdentifierCreationNotification',
+                'VnfIdentifierDeletionNotification'
+            ]),
+            operation_types=str(['OPERATE']),
+            operation_states=str(['COMPLETED']),
+            vnf_instance_filter=json.JSONEncoder().encode({
+                'vnfdIds': [],
+                'vnfProductsFromProviders': [],
+                'vnfInstanceIds': ['1111'],
+                'vnfInstanceNames': [],
+            })
+        )
+
         t1_apply_grant_result = [0, json.JSONEncoder().encode(''), '200']
-        t2_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
+        # t2_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
         t3_action_vm_stop_result = [0, json.JSONEncoder().encode(''), '202']
-        mock_call_req.side_effect = [t1_apply_grant_result, t2_lcm_notify_result, t3_action_vm_stop_result]
+        # mock_call_req.side_effect = [t1_apply_grant_result, t2_lcm_notify_result, t3_action_vm_stop_result]
+        mock_call_req.side_effect = [t1_apply_grant_result, t3_action_vm_stop_result]
         mock_call.return_value = None
+        mock_post_notification.return_value = None
         req_data = {
             "changeStateTo": "STOPPED"
         }

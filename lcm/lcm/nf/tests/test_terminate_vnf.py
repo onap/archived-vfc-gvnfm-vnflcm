@@ -22,10 +22,11 @@ from rest_framework import status
 
 from lcm.nf.biz.terminate_vnf import TerminateVnf
 from lcm.pub.database.models import NfInstModel, JobStatusModel, VmInstModel, NetworkInstModel, SubNetworkInstModel, \
-    PortInstModel, FlavourInstModel, StorageInstModel
+    PortInstModel, FlavourInstModel, StorageInstModel, SubscriptionModel
 from lcm.pub.utils import restcall
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
+from lcm.pub.utils.notificationsutil import NotificationsUtil
 from lcm.pub.vimapi import api
 
 
@@ -115,7 +116,8 @@ class TestNFTerminate(TestCase):
 
     @mock.patch.object(restcall, 'call_req')
     @mock.patch.object(api, 'call')
-    def test_terminate_vnf_success(self, mock_call, mock_call_req):
+    @mock.patch.object(NotificationsUtil, 'post_notification')
+    def test_terminate_vnf_success(self, mock_post_notification, mock_call, mock_call_req):
         NfInstModel.objects.create(nfinstid='1111',
                                    nf_name='2222',
                                    vnfminstid='1',
@@ -131,6 +133,32 @@ class TestNFTerminate(TestCase):
                                    vnfConfigurableProperties='todo',
                                    localizationLanguage='EN_US',
                                    create_time=now_time())
+
+        SubscriptionModel.objects.create(
+            subscription_id=str(uuid.uuid4()),
+            callback_uri='api/gvnfmdriver/v1/vnfs/lifecyclechangesnotification',
+            auth_info=json.JSONEncoder().encode({
+                'authType': ['BASIC'],
+                'paramsBasic': {
+                    'userName': 'username',
+                    'password': 'password'
+                }
+            }),
+            notification_types=str([
+                'VnfLcmOperationOccurrenceNotification',
+                'VnfIdentifierCreationNotification',
+                'VnfIdentifierDeletionNotification'
+            ]),
+            operation_types=str(['TERMINATE']),
+            operation_states=str(['COMPLETED']),
+            vnf_instance_filter=json.JSONEncoder().encode({
+                'vnfdIds': ['111'],
+                'vnfProductsFromProviders': [],
+                'vnfInstanceIds': ['1111'],
+                'vnfInstanceNames': [],
+            })
+        )
+
         t1_apply_grant_result = [0, json.JSONEncoder().encode(
             {
                 "id": "1",
@@ -143,10 +171,12 @@ class TestNFTerminate(TestCase):
                     }
                 ]
             }), '200']
-        t2_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
+        # t2_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
         t3_delete_flavor = [0, json.JSONEncoder().encode({"vim_id": "vimid_1"}), '200']
-        mock_call_req.side_effect = [t1_apply_grant_result, t2_lcm_notify_result, t3_delete_flavor]
+        # mock_call_req.side_effect = [t1_apply_grant_result, t2_lcm_notify_result, t3_delete_flavor]
+        mock_call_req.side_effect = [t1_apply_grant_result, t3_delete_flavor]
         mock_call.return_value = None
+        mock_post_notification.return_value = None
         data = {
             "terminationType": "FORCEFUL",
             "gracefulTerminationTimeout": 120

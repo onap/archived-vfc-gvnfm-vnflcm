@@ -16,12 +16,13 @@
 from rest_framework import serializers
 
 from resource_handle import ResourceHandleSerializer
+from lcm.nf.const import CHANGE_TYPE
 
 CHANGE_TYPES = [
-    "ADDED",
-    "REMOVED",
-    "MODIFIED",
-    "TEMPORARY"
+    CHANGE_TYPE.ADDED,
+    CHANGE_TYPE.REMOVED,
+    CHANGE_TYPE.MODIFIED,
+    CHANGE_TYPE.TEMPORARY
 ]
 
 
