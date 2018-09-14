@@ -97,6 +97,54 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_401adac6",
+        "filename": "lcm/lcm/nf/biz/heal_vnf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4247
+      },
+      "writtenOn": "2018-09-14T11:15:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_7aeb0ddc",
+      "range": {
+        "startLine": 34,
+        "startChar": 14,
+        "endLine": 34,
+        "endChar": 28
+      },
+      "revId": "8dcbb7bfff378ddcf62a0e98e719fa02bbe107ce",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_201f9eb8",
+        "filename": "lcm/lcm/nf/biz/heal_vnf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4247
+      },
+      "writtenOn": "2018-09-14T11:15:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_f7e653e7",
+      "range": {
+        "startLine": 34,
+        "startChar": 14,
+        "endLine": 34,
+        "endChar": 28
+      },
+      "revId": "8dcbb7bfff378ddcf62a0e98e719fa02bbe107ce",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_e58d4f7d",
         "filename": "lcm/lcm/nf/biz/heal_vnf.py",
         "patchSetId": 2
@@ -156,6 +204,30 @@
       "side": 1,
       "message": "After heal, is the status active?",
       "parentUuid": "1a76adc5_38760ad8",
+      "range": {
+        "startLine": 56,
+        "startChar": 79,
+        "endLine": 56,
+        "endChar": 93
+      },
+      "revId": "8dcbb7bfff378ddcf62a0e98e719fa02bbe107ce",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_602916e5",
+        "filename": "lcm/lcm/nf/biz/heal_vnf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4247
+      },
+      "writtenOn": "2018-09-14T11:15:42Z",
+      "side": 1,
+      "message": "yes Maopeng, The precondition is vnf instance should be in INSTANTIATED state and the post condition is same, the vnf should be in INSTANTIATED state.",
+      "parentUuid": "1a76adc5_9a986979",
       "range": {
         "startLine": 56,
         "startChar": 79,
