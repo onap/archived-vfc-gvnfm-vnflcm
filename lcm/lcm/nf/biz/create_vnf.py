@@ -47,10 +47,10 @@ class CreateVnf:
 
     def save_db(self):
         metadata = ignore_case_get(self.vnfd_info, "metadata")
-        version = ignore_case_get(metadata, "csarVersion")
-        provider = ignore_case_get(metadata, "csarProvider")
-        netype = ignore_case_get(metadata, "type")
-        vnfsoftwareversion = ignore_case_get(metadata, "version")
+        version = ignore_case_get(metadata, "csarVersion", "undefined")
+        provider = ignore_case_get(metadata, "csarProvider", "undefined")
+        netype = ignore_case_get(metadata, "type", "undefined")
+        vnfsoftwareversion = ignore_case_get(metadata, "version", "undefined")
         NfInstModel.objects.create(nfinstid=self.nf_inst_id,
                                    nf_name=self.vnf_instance_mame,
                                    package_id=self.csar_id,
