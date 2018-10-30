@@ -50,9 +50,9 @@ class VnfInstanceSerializer(serializers.Serializer):
         help_text="Provider of the VNF and the VNFD. \
         The value is copied from the VNFD. ",
         max_length=255,
-        required=True,
+        required=False,
         allow_null=True,
-        allow_blank=False)
+        allow_blank=True)
     vnfProductName = serializers.CharField(
         help_text="Name to identify the VNF Product. \
         The value is copied from the VNFD.",
@@ -71,22 +71,22 @@ class VnfInstanceSerializer(serializers.Serializer):
         help_text="Identifies the version of the VNFD. \
         The value is copied from the VNFD.",
         max_length=255,
-        required=True,
+        required=False,
         allow_null=True,
-        allow_blank=False)
+        allow_blank=True)
     vnfPkgId = serializers.CharField(
         help_text="Identifier of information held by the NFVO about the specific VNF package on which the VNF is based. \
         This attribute can be modified with the PATCH method.",
         max_length=255,
-        required=True,
+        required=False,
         allow_null=True,
-        allow_blank=False)
+        allow_blank=True)
     vnfConfigurableProperties = serializers.DictField(
         help_text="Current values of the configurable properties of the VNF instance. \
         Configurable properties referred in this attribute are declared in the VNFD",
         child=serializers.CharField(help_text="KeyValue Pairs", allow_blank=True),
         required=False,
-        allow_null=True,)
+        allow_null=True)
     vimConnectionInfo = VimConnectionInfoSerializer(
         help_text="Information about VIM connections to be used for managing the resources for the VNF instance. \
         This attribute can be modified with the PATCH method.",
