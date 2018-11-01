@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_724f9693",
+        "filename": "lcm/lcm/nf/biz/instantiate_vnf.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-11-01T07:41:47Z",
+      "side": 1,
+      "message": "First use vimConnectionId in vimAssets.computeResourceFlavours, if the value is \"none\" or \"\", then use vimid in vim_connections[0]",
+      "range": {
+        "startLine": 169,
+        "startChar": 0,
+        "endLine": 170,
+        "endChar": 54
+      },
+      "revId": "a0e3bc25f34c4424ef9d179a243c75947d430106",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_f27386e5",
+        "filename": "lcm/lcm/nf/biz/instantiate_vnf.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-11-01T07:41:47Z",
+      "side": 1,
+      "message": "need be changed to computeResourceFlavours",
+      "range": {
+        "startLine": 173,
+        "startChar": 51,
+        "endLine": 173,
+        "endChar": 76
+      },
+      "revId": "a0e3bc25f34c4424ef9d179a243c75947d430106",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
