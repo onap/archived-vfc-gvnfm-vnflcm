@@ -163,7 +163,6 @@ class InstantiateVnf(Thread):
     def set_location(self, apply_result):
         vim_connections = ignore_case_get(apply_result, "vimConnections")
         vnfid = ignore_case_get(apply_result, "vnfInstanceId")
-        directive = ignore_case_get(apply_result, "directive")
         vim_assets = ignore_case_get(apply_result, "vimAssets")
         access_info = ignore_case_get(vim_connections[0], "accessInfo")
         tenant = ignore_case_get(access_info, "tenant")
@@ -173,8 +172,7 @@ class InstantiateVnf(Thread):
 
         for flavor in ignore_case_get(vim_assets, "vimComputeResourceFlavour"):
             vdu_info.append({"vduName": flavor["resourceProviderId"],
-                             "flavorName": flavor["vimFlavourId"],
-                             "directive": directive})
+                             "flavorName": flavor["vimFlavourId"]})
 
         for resource_type in ['vdus', 'vls']:
             for resource in ignore_case_get(self.vnfd_info, resource_type):
