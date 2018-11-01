@@ -48,11 +48,11 @@ class TestNFInstantiate(TestCase):
             "vnfId": "413aa1fe-b4d1-11e8-8268-dff5aab95c63",
             "vimAssets":
             {
-                "vimComputeResourceFlavour": [
+                "computeResourceFlavours": [
                     {
                         "resourceProviderId": "vgw",
                         "vimFlavourId": "yui",
-                        "directive": ""
+                        "vimConnectionId": ""
                     },
                 ]
             }

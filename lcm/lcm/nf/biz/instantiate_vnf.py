@@ -163,7 +163,6 @@ class InstantiateVnf(Thread):
     def set_location(self, apply_result):
         vim_connections = ignore_case_get(apply_result, "vimConnections")
         vnfid = ignore_case_get(apply_result, "vnfInstanceId")
-        directive = ignore_case_get(apply_result, "directive")
         vim_assets = ignore_case_get(apply_result, "vimAssets")
         access_info = ignore_case_get(vim_connections[0], "accessInfo")
         tenant = ignore_case_get(access_info, "tenant")
@@ -171,10 +170,13 @@ class InstantiateVnf(Thread):
         cloud_owner, cloud_regionid = vimid.split("_")
         vdu_info = []
 
-        for flavor in ignore_case_get(vim_assets, "vimComputeResourceFlavour"):
+        for flavor in ignore_case_get(vim_assets, "computeResourceFlavours"):
+            oof_vimid = flavor["vimConnectionId"]
+            if oof_vimid:
+                vimid = oof_vimid
             vdu_info.append({"vduName": flavor["resourceProviderId"],
                              "flavorName": flavor["vimFlavourId"],
-                             "directive": directive})
+                             "vimid": vimid})
 
         for resource_type in ['vdus', 'vls']:
             for resource in ignore_case_get(self.vnfd_info, resource_type):
