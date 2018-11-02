@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_fe690d26",
+        "filename": "lcm/lcm/nf/biz/instantiate_vnf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2018-11-02T02:09:24Z",
+      "side": 1,
+      "message": "need to consider the case that oof_vimid is \"none\"",
+      "range": {
+        "startLine": 175,
+        "startChar": 12,
+        "endLine": 175,
+        "endChar": 25
+      },
+      "revId": "ac1b0e7f7ee285f86ae17c5badf40f8d306464e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
