@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_8931ada4",
+        "filename": "lcm/lcm/nf/biz/instantiate_vnf.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2018-11-02T08:44:54Z",
+      "side": 1,
+      "message": "We will use vdu_info in below code",
+      "parentUuid": "9adffdf1_09f61dd8",
+      "range": {
+        "startLine": 179,
+        "startChar": 29,
+        "endLine": 179,
+        "endChar": 43
+      },
+      "revId": "2e7b4ae13e0f0802a34bfbfc030dd67aef1ee203",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_a90271b2",
         "filename": "lcm/lcm/nf/tests/test_instantiate_vnf.py",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2018-11-02T08:38:50Z",
       "side": 1,
       "message": "Should we put the oofvimid here?",
+      "range": {
+        "startLine": 55,
+        "startChar": 43,
+        "endLine": 55,
+        "endChar": 45
+      },
+      "revId": "2e7b4ae13e0f0802a34bfbfc030dd67aef1ee203",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_692c894b",
+        "filename": "lcm/lcm/nf/tests/test_instantiate_vnf.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2018-11-02T08:44:54Z",
+      "side": 1,
+      "message": "yes",
+      "parentUuid": "9adffdf1_a90271b2",
       "range": {
         "startLine": 55,
         "startChar": 43,
