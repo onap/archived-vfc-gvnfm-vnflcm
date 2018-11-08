@@ -160,11 +160,11 @@ def delete_vim_res(data, do_notify):
 def create_volume(vim_cache, res_cache, vol, do_notify, res_type):
     location_info = vol["properties"]["location_info"]
     param = {
-        "name": vol["properties"]["volume_name"],
-        "volumeSize": int(ignore_case_get(vol["properties"], "size", "0").replace('GB', '').strip())
+        "name": vol["properties"]["volume_name"] if vol["properties"].get("volume_name", None) else vol["volume_storage_id"],
+        "volumeSize": int(ignore_case_get(vol["properties"], "size_of_storage", "0").replace('GB', '').replace('"', '').strip())
     }
     set_opt_val(param, "imageName", ignore_case_get(vol, "image_file"))
-    set_opt_val(param, "volumeType", ignore_case_get(vol["properties"], "custom_volume_type"))
+    set_opt_val(param, "volumeType", ignore_case_get(vol["properties"], "type_of_storage"))
     set_opt_val(param, "availabilityZone", ignore_case_get(location_info, "availability_zone"))
     vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
     tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
@@ -190,7 +190,7 @@ def create_network(vim_cache, res_cache, network, do_notify, res_type):
     param = {
         "name": vl_profile["networkName"],
         "shared": False,
-        "networkType": vl_profile["networkType"],
+        "networkType": ignore_case_get(vl_profile, "networkType"),
         "physicalNetwork": ignore_case_get(vl_profile, "physicalNetwork")
     }
     set_opt_val(param, "vlanTransparent", ignore_case_get(vl_profile, "vlanTransparent"))
@@ -259,7 +259,7 @@ def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
         l3_address_data = one_protocol_data["address_data"]["l3_address_data"]  # l3 is not 13
         fixed_ip_address = ignore_case_get(l3_address_data, "fixed_ip_address")
         ip_address.extend(fixed_ip_address)
-    for one_virtual_network_interface in port["properties"]["virtual_network_interface_requirements"]:
+    for one_virtual_network_interface in port["properties"].get("virtual_network_interface_requirements", []):
         interfaceTypeString = one_virtual_network_interface["network_interface_requirements"]["interfaceType"]
         interfaceType = json.loads(interfaceTypeString)["configuration-value"]
         vnic_type = ignore_case_get(port["properties"], "vnic_type")

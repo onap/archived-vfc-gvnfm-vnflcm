@@ -178,7 +178,7 @@ class InstantiateVnf(Thread):
                              "flavorName": flavor["vimFlavourId"],
                              "vimid": vimid})
 
-        for resource_type in ['vdus', 'vls']:
+        for resource_type in ['vdus', 'vls', 'cps', 'volume_storages']:
             for resource in ignore_case_get(self.vnfd_info, resource_type):
                 if "location_info" in resource["properties"]:
                     resource["properties"]["location_info"]["vimid"] = vimid
