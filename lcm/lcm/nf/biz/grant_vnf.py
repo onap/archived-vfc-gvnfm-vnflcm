@@ -29,23 +29,24 @@ def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
     content_args = {
         'vnfInstanceId': nf_inst_id,
         'vnfLcmOpOccId': job_id,
-        'vnfdId': None,  # TODO
-        'flavourId': None,  # TODO
-        'operate': grant_type,
+        # 'vnfdId': None,  # TODO
+        # 'flavourId': "default",  # TODO
+        'operation': grant_type,
         'isAutomaticInvocation': True,  # TODO
-        'instantiationLevelId': None,  # TODO
-        'addResources': [],
-        'tmpResources': [],
-        'updateResources': [],
-        'removeResources': [],
-        'placementConstraints': [],
-        'vimConstraints': [],
-        'additionalParams': {},
-        '_links': None  # TODO
+        # 'instantiationLevelId': None,  # TODO
+        # 'addResources': [],
+        # 'tmpResources': [],
+        # 'updateResources': [],
+        # 'removeResources': [],
+        # 'placementConstraints': [],
+        # 'vimConstraints': [],
+        # 'additionalParams': {}
+        # '_links': None  # TODO
     }
 
     if grant_type == GRANT_TYPE.TERMINATE:
         res_index = 1
+        content_args['removeResources'] = []
         for vdu in vdus:
             res_def = {
                 'id': str(res_index),
@@ -61,23 +62,29 @@ def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
             }
             content_args['removeResources'].append(res_def)
             res_index += 1
-        content_args['additionalParams']['vimid'] = vdus[0].vimid
+        if vdus[0].vimid:
+            content_args['additionalParams'] = {}
+            content_args['additionalParams']['vimid'] = vdus[0].vimid
     elif grant_type == GRANT_TYPE.INSTANTIATE:
         vim_id = ignore_case_get(ignore_case_get(data, "additionalParams"), "vimId")
         res_index = 1
+        content_args['addResources'] = []
         for vdu in vdus:
             res_def = {
                 'id': str(res_index),
                 'type': 'COMPUTE',
-                'vduId': None,
-                'resourceTemplateId': None,  # TODO: shall be present for the planned creation of new resources.
-                'resource': None
+                # 'vduId': vdu["vdu_id"],
+                'resourceTemplateId': vdu["vdu_id"]  # , None,
+                # 'resource': None
             }
             content_args['addResources'].append(res_def)
             res_index += 1
-        content_args['additionalParams']['vimid'] = vim_id
+        if vim_id:
+            content_args['additionalParams'] = {}
+            content_args['additionalParams']['vimid'] = vim_id
     elif grant_type == GRANT_TYPE.OPERATE:
         res_index = 1
+        content_args['updateResources'] = []
         for vdu in vdus:
             res_def = {
                 'id': str(res_index),
@@ -93,7 +100,9 @@ def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
             }
             content_args['updateResources'].append(res_def)
             res_index += 1
-        content_args['additionalParams']['vimid'] = vdus[0].vimid
+        if vdus[0].vimid:
+            content_args['additionalParams'] = {}
+            content_args['additionalParams']['vimid'] = vdus[0].vimid
 
     vnfInsts = NfInstModel.objects.filter(nfinstid=nf_inst_id)
     content_args['additionalParams']['vnfmid'] = vnfInsts[0].vnfminstid

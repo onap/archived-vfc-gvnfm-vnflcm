@@ -30,4 +30,5 @@ class CreateVnfReqSerializer(serializers.Serializer):
         help_text="Human-readable description of the VNF instance to be created.",
         max_length=255,
         required=False,
-        allow_null=True)
+        allow_null=True,
+        allow_blank=True)
