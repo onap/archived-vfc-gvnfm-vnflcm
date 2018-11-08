@@ -53,10 +53,10 @@ class InstantiateVnfRequestSerializer(serializers.Serializer):
         max_length=255,
         required=False,
         allow_null=True)
-    additionalParams = serializers.DictField(
+    additionalParams = serializers.JSONField(
         help_text="Additional input parameters for the instantiation process, \
         specific to the VNF being instantiated, \
         as declared in the VNFD as part of InstantiateVnfOpConfig.",
-        child=serializers.CharField(help_text="KeyValue Pairs", allow_blank=True),
+        # child=serializers.CharField(help_text="KeyValue Pairs", allow_blank=True),
         required=False,
         allow_null=True)
