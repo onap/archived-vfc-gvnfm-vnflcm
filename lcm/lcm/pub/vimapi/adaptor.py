@@ -15,6 +15,7 @@
 import logging
 import time
 import json
+import os
 
 from lcm.pub.utils.values import ignore_case_get, set_opt_val
 from lcm.pub.msapi.aai import get_flavor_info
@@ -369,7 +370,7 @@ def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
         for artifact in vm["artifacts"]:
             if artifact["artifact_name"] == "sw_image":
                 # TODO: after DM define
-                img_name = artifact["file"]
+                img_name = os.path.basename(artifact["file"])
                 break
         if not img_name:
             raise VimException("Undefined image(%s)" % vm["artifacts"], ERR_CODE)
