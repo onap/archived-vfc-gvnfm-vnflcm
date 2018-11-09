@@ -247,9 +247,9 @@ vnfd_model_dict = {
                 "local_storage_id1",
                 "local_storage_id2"
             ],
-            "volume_storages": [
+            "virtual_storages": [
                 {
-                    "volume_storage_id": "volume_storage1",
+                    "virtual_storage_id": "volume_storage1",
                     "location": "/usr/data",
                     "device": "/dev/hda1"
                 }
@@ -340,7 +340,7 @@ vnfd_model_dict = {
             "volume_storage_id": "volume_storage1",
             "description": "",
             "properties": {
-                "size": "100 GB",
+                "size": "\"100 GB\"",
                 "volume_id": "",
                 "volume_name": "volumeStorage1",
                 "custom_volume_type": "type1",
@@ -674,7 +674,7 @@ vnfdModel = {
                 },
                 "volume_name": "test",
                 "custom_volume_type": "test",
-                "size": "10 GB",
+                "size_of_storage": "\"10 GB\"",
             },
             "image_file": "test",
         },
@@ -780,10 +780,11 @@ vnfdModel = {
                     },
                 },
             },
-            "virtual_storage": {
+            "virtual_storages": [{
+                "virtual_storage_id": "test",
                 "type_of_storage": "ephemeral",
                 "size_of_storage": "10 GB",
-            },
+            }],
             "type": "tosca.nodes.nfv.Vdu.Compute",
             "artifacts": [
                 {

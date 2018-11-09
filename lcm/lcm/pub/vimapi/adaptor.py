@@ -306,7 +306,7 @@ def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
     location_info = flavor["properties"]["location_info"]
     vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
     virtual_compute = flavor["virtual_compute"]
-    virtual_storage = flavor["virtual_storage"]
+    virtual_storages = flavor["virtual_storages"]
     virtual_cpu = ignore_case_get(virtual_compute, "virtual_cpu")
     virtual_memory = ignore_case_get(virtual_compute, "virtual_memory")
     param = {
@@ -318,10 +318,11 @@ def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
 
     # Using flavor name returned by OOF to search falvor
     vdu_id = ignore_case_get(flavor, "vdu_id")
+    aai_flavor = None
     for one_vdu in location_info["vduInfo"]:
         if one_vdu["vduName"] == vdu_id:
+            aai_flavor = search_flavor_aai(vim_id, one_vdu["flavorName"])
             break
-    aai_flavor = search_flavor_aai(vim_id, one_vdu["flavorName"])
 
     # Add aai flavor
     if aai_flavor:
@@ -329,15 +330,18 @@ def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
         do_notify(res_type, ret)
         set_res_cache(res_cache, res_type, flavor["vdu_id"], ret["flavor-id"])
     else:
-        disk_type = ignore_case_get(virtual_storage, "type_of_storage")
-        disk_size = int(ignore_case_get(virtual_storage, "size_of_storage").replace('GB', '').strip())
-        if disk_type == "root":
-            param["disk"] = disk_size
-        elif disk_type == "ephemeral":
-            param["ephemeral"] = disk_size
-        elif disk_type == "swap":
-            param["swap"] = disk_size
-
+        for virtual_storage in virtual_storages:
+            vs_id = virtual_storage["virtual_storage_id"]
+            for vs in data["volume_storages"]:
+                if vs["volume_storage_id"] == vs_id:
+                    disk_type = ignore_case_get(vs["properties"], "type_of_storage")
+                    disk_size = int(ignore_case_get(vs["properties"], "size_of_storage").replace('GB', '').replace('"', '').strip())
+                    if disk_type == "root":
+                        param["disk"] = disk_size
+                    elif disk_type == "ephemeral":
+                        param["ephemeral"] = disk_size
+                    elif disk_type == "swap":
+                        param["swap"] = disk_size
         tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
         logger.debug("param:%s" % param)
         ret = api.create_flavor(vim_id, tenant_id, param)
@@ -376,9 +380,9 @@ def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
                 break
         if "imageId" not in param["boot"]:
             raise VimException("Undefined artifacts image(%s)" % vm["artifacts"], ERR_CODE)
-    elif vm["volume_storages"]:
+    elif vm["virtual_storages"]:
         param["boot"]["type"] = BOOT_FROM_VOLUME
-        vol_id = vm["volume_storages"][0]["volume_storage_id"]
+        vol_id = vm["virtual_storages"][0]["virtual_storage_id"]
         param["boot"]["volumeId"] = get_res_id(res_cache, RES_VOLUME, vol_id)
     else:
         raise VimException("No image and volume defined", ERR_CODE)

@@ -40,10 +40,11 @@ inst_res_data = {
                     "cpu_architecture": "generic"
                 },
             },
-            "virtual_storage": {
+            "virtual_storages": [{
+                "virtual_storage_id": "volume_storage1",
                 "type_of_storage": "root",
-                "size_of_storage": "40 GB"
-            },
+                "size_of_storage": "\"40 GB\""
+            }],
             "artifacts": [
                 {
                     "artifact_name": "sw_image",
@@ -112,11 +113,11 @@ inst_res_data = {
             "volume_storage_id": "volume_storage1",
             "description": "",
             "properties": {
-                "size": "100 GB",
+                "size_of_storage": "\"100 GB\"",
                 "volume_id": "",
                 "volume_name": "volumeStorage1",
                 "custom_volume_type": "type1",
-                "disk_type": "data",
+                "type_of_storage": "root",
                 "delete_on_termination_vm": True,
                 "location_info": {
                     "vimid": "f1e33529-4a88-4155-9d7a-893cf2c80527",
@@ -136,7 +137,7 @@ inst_res_data = {
             "local_storage_id": "omp_local_disk1",
             "description": "",
             "properties": {
-                "size": "100 GB",
+                "size": "\"100 GB\"",
                 "disk_type": "root",
             },
         }

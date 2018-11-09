@@ -18,16 +18,16 @@ from rest_framework import serializers
 class JobHistorySerializer(serializers.Serializer):
     status = serializers.CharField(help_text="Status of job", required=True)
     progress = serializers.CharField(help_text="Progress of job", required=True)
-    statusDescription = serializers.CharField(help_text="Description of job", required=False, allow_null=True)
-    errorCode = serializers.CharField(help_text="Error code of job", required=False, allow_null=True)
+    statusDescription = serializers.CharField(help_text="Description of job", required=False, allow_null=True, allow_blank=True)
+    errorCode = serializers.CharField(help_text="Error code of job", required=False, allow_null=True, allow_blank=True)
     responseId = serializers.CharField(help_text="Response index of job", required=True)
 
 
 class JobDescriptorSerializer(serializers.Serializer):
     status = serializers.CharField(help_text="Status of job", required=True)
     progress = serializers.CharField(help_text="Progress of job", required=True)
-    statusDescription = serializers.CharField(help_text="Description of job", required=False, allow_null=True)
-    errorCode = serializers.CharField(help_text="Error code of job", required=False, allow_null=True)
+    statusDescription = serializers.CharField(help_text="Description of job", required=False, allow_null=True, allow_blank=True)
+    errorCode = serializers.CharField(help_text="Error code of job", required=False, allow_null=True, allow_blank=True)
     responseId = serializers.CharField(help_text="Response index of job", required=True)
     responseHistoryList = JobHistorySerializer(help_text="History of job", many=True)
 
