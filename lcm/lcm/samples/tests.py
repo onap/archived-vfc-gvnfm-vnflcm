@@ -232,7 +232,7 @@ inst_res_data = {
                 "virtual_network_interface_requirements": [
                     {
                         "network_interface_requirements": {
-                            "interfaceType": '{"schema-version": "0", "schema-location":"", "platform-id": "generic", "mandatory": false, "configuration-value": "SR-IOV"}'
+                            "interfaceType": '{"schemaVersion": "0", "schemaLocation":"", "platformId": "generic", "mandatory": false, "configurationValue": "SR-IOV"}'
                         },
                         "support_mandatory": False,
                         "name": "sriov-support",
