@@ -62,7 +62,7 @@ def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
             }
             content_args['removeResources'].append(res_def)
             res_index += 1
-        if vdus[0].vimid:
+        if vdus and vdus[0].vimid:
             content_args['additionalParams'] = {}
             content_args['additionalParams']['vimid'] = vdus[0].vimid
     elif grant_type == GRANT_TYPE.INSTANTIATE:
