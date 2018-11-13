@@ -114,7 +114,7 @@ class TerminateVnf(Thread):
         logger.info('Rollback resource complete')
 
     def do_notify_delete(self, res_type, res_id):
-        logger.error('Deleting [%s] resource, resourceid [%s]' % (res_type, res_id))
+        logger.debug('Deleting [%s] resource, resourceid [%s]' % (res_type, res_id))
         resource_type = RESOURCE_MAP.keys()[RESOURCE_MAP.values().index(res_type)]
         resource_table = globals().get(resource_type + 'InstModel')
         resource_table.objects.filter(instid=self.nf_inst_id, resourceid=res_id).delete()
