@@ -152,7 +152,6 @@ class ResourceTest(TestCase):
         VmInstModel(vmid='x', insttype='0').save()
         response = self.client.get("/api/vnflcm/v1/vnf_instances/%s" % vnf_inst_id, format='json')
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        self.assertEqual({'error': 'StorageInst(x) does not exist.'}, response.data)
 
     def test_get_vnfs(self):
         for i in range(1, 3):
