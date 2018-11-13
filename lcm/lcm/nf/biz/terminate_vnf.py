@@ -128,5 +128,5 @@ class TerminateVnf(Thread):
 
     def vnf_term_failed_handle(self, error_msg):
         logger.error('VNF termination failed, detail message: %s' % error_msg)
-        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='failed', lastuptime=now_time())
+        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(lastuptime=now_time())
         JobUtil.add_job_status(self.job_id, 255, error_msg)

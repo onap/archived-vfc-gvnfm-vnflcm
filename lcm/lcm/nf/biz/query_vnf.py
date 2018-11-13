@@ -78,10 +78,10 @@ class QueryVnf:
             vm = VmInstModel.objects.filter(vmid=vnfc.vmid)
             if not vm:
                 raise NFLCMException('VmInst(%s) does not exist.' % vnfc.vmid)
-            storage = StorageInstModel.objects.filter(vimid=vm[0].vmid)
-            # TODO: previously, ownerid=vm[0].vmid, but ownerid is not a field of StorageInstModel.
-            if not storage:
-                raise NFLCMException('StorageInst(%s) does not exist.' % vm[0].vmid)
+            if vm[0].volume_array:
+                storage = StorageInstModel.objects.filter(resourceid__in=vm[0].volume_array)
+            else:
+                storage = []
             vnfc_dic = {
                 "id": vnfc.vnfcinstanceid,
                 "vduId": vnfc.vduid,
