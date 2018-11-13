@@ -25,7 +25,6 @@ logger = logging.getLogger(__name__)
 
 def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
     logger.info("Grant resource begin")
-
     content_args = {
         'vnfInstanceId': nf_inst_id,
         'vnfLcmOpOccId': job_id,
@@ -40,7 +39,7 @@ def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
         # 'removeResources': [],
         # 'placementConstraints': [],
         # 'vimConstraints': [],
-        # 'additionalParams': {}
+        'additionalParams': {}
         # '_links': None  # TODO
     }
 
@@ -51,19 +50,18 @@ def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
             res_def = {
                 'id': str(res_index),
                 'type': 'COMPUTE',
-                'vduId': None,
-                'resourceTemplateId': None,
+                # 'vduId': None,
+                # 'resourceTemplateId': None,
                 'resource': {
-                    'vimConnectionId': None,
-                    'resourceProviderId': None,
-                    'resourceid': vdu.resourceid,
-                    'vimLevelResourceType': None
+                    #  'vimConnectionId': None,
+                    #  'resourceProviderId': None,
+                    'resourceId': vdu.resourceid,
+                    #  'vimLevelResourceType': None
                 }
             }
             content_args['removeResources'].append(res_def)
             res_index += 1
         if vdus and vdus[0].vimid:
-            content_args['additionalParams'] = {}
             content_args['additionalParams']['vimid'] = vdus[0].vimid
     elif grant_type == GRANT_TYPE.INSTANTIATE:
         vim_id = ignore_case_get(ignore_case_get(data, "additionalParams"), "vimId")
@@ -80,7 +78,6 @@ def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
             content_args['addResources'].append(res_def)
             res_index += 1
         if vim_id:
-            content_args['additionalParams'] = {}
             content_args['additionalParams']['vimid'] = vim_id
     elif grant_type == GRANT_TYPE.OPERATE:
         res_index = 1
@@ -94,20 +91,26 @@ def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
                 'resource': {
                     'vimConnectionId': None,
                     'resourceProviderId': None,
-                    'resourceid': vdu.resourceid,
+                    'resourceId': vdu.resourceid,
                     'vimLevelResourceType': None
                 }
             }
             content_args['updateResources'].append(res_def)
             res_index += 1
-        if vdus[0].vimid:
-            content_args['additionalParams'] = {}
+        if vdus and vdus[0].vimid:
             content_args['additionalParams']['vimid'] = vdus[0].vimid
 
-    vnfInsts = NfInstModel.objects.filter(nfinstid=nf_inst_id)
-    if vnfInsts[0].vnfminstid:
-        content_args['additionalParams'] = {}
-        content_args['additionalParams']['vnfmid'] = vnfInsts[0].vnfminstid
+    vnfInst_list = NfInstModel.objects.filter(nfinstid=nf_inst_id)
+    addition_paras = content_args['additionalParams']
+    for vnf in vnfInst_list:
+        if vnf.vnfminstid:
+            addition_paras['vnfmid'] = vnf.vnfminstid
+        if vnf.vimInfo and 'vimid' not in addition_paras:
+            vim_info = json.loads(vnf.vimInfo)
+            vimid = ""
+            for key in vim_info.iterkeys():
+                vimid = key
+            addition_paras['vimid'] = vimid
     logger.info('Grant request data=%s' % content_args)
     apply_result = apply_grant_to_nfvo(json.dumps(content_args))
     logger.info("apply_result: %s" % apply_result)
