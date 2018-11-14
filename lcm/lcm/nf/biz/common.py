@@ -120,13 +120,14 @@ def flavor_save(job_id, nf_inst_id, ret):
 def vm_save(job_id, nf_inst_id, ret):
     JobUtil.add_job_status(job_id, 70, 'Create vms!')
     vm_id = str(uuid.uuid4())
+    nics = ignore_case_get(ret, "nicArray")
     VmInstModel.objects.create(
         vmid=vm_id,
         vmname=ignore_case_get(ret, "name"),
         vimid=ignore_case_get(ret, "vimId"),
         resourceid=ignore_case_get(ret, "id"),
         tenant=ignore_case_get(ret, "tenantId"),
-        nic_array=ignore_case_get(ret, "nicArray"),
+        nic_array=nics if nics else "null",
         metadata=ignore_case_get(ret, "metadata"),
         volume_array=ignore_case_get(ret, "volumeArray"),
         server_group=ignore_case_get(ret, "serverGroup"),
