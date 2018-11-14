@@ -52,8 +52,9 @@ class OperateVnfView(APIView):
             JobUtil.add_job_status(job_id, 0, "OPERATE_VNF_READY")
             self.operate_pre_check(instanceid, job_id)
             OperateVnf(operate_vnf_request_serializer.data, instanceid, job_id).start()
-            response = Response(data=None, status=status.HTTP_202_ACCEPTED)
-            response["Location"] = "/vnf_lc_ops/%s" % job_id
+            response = Response(data={"jobId": job_id}, status=status.HTTP_202_ACCEPTED)
+            # Location todo, it use job as the status storage
+            # response["Location"] = "/api/vnflcm/v1/vnf_lcm_op_occs/%s" % lcmopoccid
             return response
         except NFLCMExceptionNotFound as e:
             probDetail = ProblemDetailsSerializer(data={"status": 404, "detail": "VNF Instance not found"})

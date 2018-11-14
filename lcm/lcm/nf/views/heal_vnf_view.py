@@ -52,8 +52,9 @@ class HealVnfView(APIView):
             JobUtil.add_job_status(job_id, 0, "HEAL_VNF_READY")
             self.heal_pre_check(instanceid, job_id)
             HealVnf(heal_vnf_request_serializer.data, instanceid, job_id).start()
-            response = Response(data=None, status=status.HTTP_202_ACCEPTED)
-            response["Location"] = "/vnf_lc_ops/%s" % job_id
+            response = Response(data={"jobId": job_id}, status=status.HTTP_202_ACCEPTED)
+            # todo, heal_vnf codes uses job as the status storage, not in VNFLcmOpOccModel.
+            # response["Location"] = "/api/vnflcm/v1/vnf_lc_ops/%s" % lcmopoccid
             return response
         except NFLCMExceptionNotFound as e:
             probDetail = ProblemDetailsSerializer(data={"status": status.HTTP_404_NOT_FOUND, "detail": "VNF Instance not found"})
