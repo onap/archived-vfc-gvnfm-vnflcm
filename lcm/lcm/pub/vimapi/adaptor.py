@@ -16,6 +16,7 @@ import logging
 import time
 import json
 import os
+import base64
 
 from lcm.pub.utils.values import ignore_case_get, set_opt_val
 from lcm.pub.msapi.aai import get_flavor_info
@@ -251,7 +252,7 @@ def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
         subnet_id = get_res_id(res_cache, RES_SUBNET, port["vl_id"])
     param = {
         "networkId": network_id,
-        "name": port["cp_id"]
+        "name": port["properties"].get("name", "")
     }
     set_opt_val(param, "subnetId", subnet_id)
     set_opt_val(param, "macAddress", ignore_case_get(port["properties"], "mac_address"))
@@ -400,8 +401,9 @@ def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
             "volumeId": get_res_id(res_cache, RES_VOLUME, vol_id)
         })
 
+    user_data = base64.encodestring(ignore_case_get(vm["properties"], "user_data"))
     set_opt_val(param, "availabilityZone", ignore_case_get(location_info, "availability_zone"))
-    set_opt_val(param, "userdata", ignore_case_get(vm["properties"], "user_data"))
+    set_opt_val(param, "userdata", user_data)
     set_opt_val(param, "metadata", ignore_case_get(vm["properties"], "meta_data"))
     set_opt_val(param, "securityGroups", "")   # TODO List of names of security group
     set_opt_val(param, "serverGroup", "")      # TODO the ServerGroup for anti-affinity and affinity
