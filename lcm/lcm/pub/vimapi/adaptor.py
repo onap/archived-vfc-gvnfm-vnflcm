@@ -252,7 +252,8 @@ def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
         subnet_id = get_res_id(res_cache, RES_SUBNET, port["vl_id"])
     param = {
         "networkId": network_id,
-        "name": port["properties"].get("name", "")
+        #"name": port["properties"].get("name", "")
+        "name": port["cp_id"]
     }
     set_opt_val(param, "subnetId", subnet_id)
     set_opt_val(param, "macAddress", ignore_case_get(port["properties"], "mac_address"))
