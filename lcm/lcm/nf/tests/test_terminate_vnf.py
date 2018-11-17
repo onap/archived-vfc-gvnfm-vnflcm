@@ -171,10 +171,9 @@ class TestNFTerminate(TestCase):
                     }
                 ]
             }), '200']
-        # t2_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
+        t2_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
         t3_delete_flavor = [0, json.JSONEncoder().encode({"vim_id": "vimid_1"}), '200']
-        # mock_call_req.side_effect = [t1_apply_grant_result, t2_lcm_notify_result, t3_delete_flavor]
-        mock_call_req.side_effect = [t1_apply_grant_result, t3_delete_flavor]
+        mock_call_req.side_effect = [t1_apply_grant_result, t2_lcm_notify_result, t3_delete_flavor]
         mock_call.return_value = None
         mock_post_notification.return_value = None
         data = {

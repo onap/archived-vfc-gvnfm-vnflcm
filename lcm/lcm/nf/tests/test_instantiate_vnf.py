@@ -221,9 +221,8 @@ class TestNFInstantiate(TestCase):
         r1_get_vnfpackage_by_vnfdid = [0, json.JSONEncoder().encode(vnfpackage_info), '200']
         r2_apply_grant_result = [0, json.JSONEncoder().encode(self.grant_result), '200']
         r3_all_aai_result = [1, json.JSONEncoder().encode(''), '404']
-        # r4_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
-        # mock_call_req.side_effect = [r1_get_vnfpackage_by_vnfdid, r2_apply_grant_result, r3_all_aai_result, r4_lcm_notify_result]
-        mock_call_req.side_effect = [r1_get_vnfpackage_by_vnfdid, r2_apply_grant_result, r3_all_aai_result]
+        r4_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
+        mock_call_req.side_effect = [r1_get_vnfpackage_by_vnfdid, r2_apply_grant_result, r3_all_aai_result, r4_lcm_notify_result]
         mock_call.side_effect = [c1_data_get_tenant_id,
                                  c2_data_create_volume, c3_data_get_volume,
                                  c4_data_create_network,
