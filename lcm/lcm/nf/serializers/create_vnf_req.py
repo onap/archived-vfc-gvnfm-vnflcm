@@ -32,3 +32,9 @@ class CreateVnfReqSerializer(serializers.Serializer):
         required=False,
         allow_null=True,
         allow_blank=True)
+    vnfmInstId = serializers.CharField(
+        help_text="VNFM instance ID passed from nfvo.",
+        max_length=255,
+        required=False,
+        allow_null=True,
+        allow_blank=True)
