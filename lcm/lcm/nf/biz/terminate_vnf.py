@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# import json
+import json
 import logging
 import traceback
 from threading import Thread
@@ -25,7 +25,7 @@ from lcm.pub.database.models import (
 )
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.msapi.gvnfmdriver import prepare_notification_data
-# from lcm.pub.msapi.gvnfmdriver import notify_lcm_to_nfvo
+from lcm.pub.msapi.gvnfmdriver import notify_lcm_to_nfvo
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.notificationsutil import NotificationsUtil
@@ -122,8 +122,11 @@ class TerminateVnf(Thread):
     def lcm_notify(self):
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='NOT_INSTANTIATED', lastuptime=now_time())
         logger.info('Send notify request to nfvo')
-        # resp = notify_lcm_to_nfvo(json.dumps(self.notify_data))
-        # logger.info('Lcm notify end, response: %s' % resp)
+        try:
+            resp = notify_lcm_to_nfvo(json.dumps(self.notify_data))
+            logger.info('Lcm notify end, response: %s' % resp)
+        except Exception as e:
+            logger.error("Lcm terminate notify failed: %s", e.message)
         NotificationsUtil().send_notification(self.notify_data)
 
     def vnf_term_failed_handle(self, error_msg):

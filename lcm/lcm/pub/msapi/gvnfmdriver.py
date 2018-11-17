@@ -61,7 +61,7 @@ def prepare_notification_data(nfinstid, jobid, changetype, operation):
             vm = VmInstModel.objects.filter(vmid=vnfc.vmid)
             if vm:
                 vm_resource = {
-                    'vimId': vm[0].vimid,
+                    'vimConnectionId': vm[0].vimid,
                     'resourceId': vm[0].resourceid,
                     'resourceProviderId': vm[0].vmname,  # TODO: is resourceName mapped to resourceProviderId?
                     'vimLevelResourceType': 'vm'
@@ -87,10 +87,13 @@ def prepare_notification_data(nfinstid, jobid, changetype, operation):
             'changeType': changetype,
             'networkResource': network_resource
         })
-    ext_link_ports = []
+    ext_connectivity = []
+    ext_connectivity_map = {}
     ports = PortInstModel.objects.filter(instid=nfinstid)
     for port in ports:
-        ext_link_ports.append({
+        if port.networkid not in ext_connectivity_map:
+            ext_connectivity_map[port.networkid] = []
+        ext_connectivity_map[port.networkid].append({
             'id': port.portid,  # TODO: port.portid or port.nodeid?
             'resourceHandle': {
                 'vimConnectionId': port.vimid,
@@ -99,7 +102,21 @@ def prepare_notification_data(nfinstid, jobid, changetype, operation):
                 'vimLevelResourceType': 'port'
             },
             'cpInstanceId': port.cpinstanceid  # TODO: port.cpinstanceid is not initiated when create port resource.
-        }),
+        })
+    for network_id, ext_link_ports in ext_connectivity_map.items():
+        networks = NetworkInstModel.objects.filter(networkid=network_id)
+        network = networks[0]
+        network_resource = {
+            'vimConnectionId': network.vimid,
+            'resourceId': network.resourceid,
+            'resourceProviderId': network.name,  # TODO: is resourceName mapped to resourceProviderId?
+            'vimLevelResourceType': 'network'
+        }
+        ext_connectivity.append({
+            'id': network_id,
+            'resourceHandle': network_resource,
+            'extLinkPorts': ext_link_ports
+        })
     affected_vss = []
     vss = StorageInstModel.objects.filter(instid=nfinstid)
     for vs in vss:
@@ -128,11 +145,7 @@ def prepare_notification_data(nfinstid, jobid, changetype, operation):
         'affectedVnfcs': affected_vnfcs,
         'affectedVirtualLinks': affected_vls,
         'affectedVirtualStorages': affected_vss,
-        'chengedExtConnectivity': [{
-            'id': None,  # TODO
-            'resourceHandle': None,  # TODO
-            'extLinkPorts': ext_link_ports
-        }],
+        'changedExtConnectivity': ext_connectivity,
         '_links': {
             'vnfInstance': {'href': '/api/vnflcm/v1/vnf_instances/%s' % nfinstid},
             # set 'subscription' link after filtering for subscribers
@@ -140,6 +153,6 @@ def prepare_notification_data(nfinstid, jobid, changetype, operation):
         }
     }
     nfInsts = NfInstModel.objects.filter(nfinstid=nfinstid)
-    notification_content['vnfmInstId'] = nfInsts[0].vnfminstid
+    notification_content['vnfmInstId'] = nfInsts[0].vnfminstid if nfInsts[0].vnfminstid else '1'
     logger.info('Notify request data = %s' % notification_content)
     return notification_content
