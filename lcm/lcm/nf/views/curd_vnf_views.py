@@ -70,7 +70,7 @@ class CreateVnfAndQueryVnfs(APIView):
             if not req_serializer.is_valid():
                 raise NFLCMException(req_serializer.errors)
 
-            nf_inst = CreateVnf(req_serializer.data).do_biz()
+            nf_inst = CreateVnf(request.data).do_biz()
             create_vnf_resp_serializer = VnfInstanceSerializer(data={"id": nf_inst.nfinstid,
                                                                      "vnfProvider": nf_inst.vendor,
                                                                      "vnfdVersion": nf_inst.version,

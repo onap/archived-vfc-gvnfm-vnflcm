@@ -52,6 +52,7 @@ class CreateVnf:
         netype = ignore_case_get(metadata, "type", "undefined")
         vnfsoftwareversion = ignore_case_get(metadata, "version", "undefined")
         NfInstModel.objects.create(nfinstid=self.nf_inst_id,
+                                   vnfminstid=ignore_case_get(self.data, "vnfmInstId", "undefined"),
                                    nf_name=self.vnf_instance_mame,
                                    package_id=self.csar_id,
                                    version=version,
