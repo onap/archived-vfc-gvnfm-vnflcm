@@ -143,12 +143,13 @@ class HealVnf(Thread):
                     'resourceId': vm[0].resourceid,
                     'vimLevelResourceType': 'vm'
                 }
-            affected_vnfcs.append({
-                'id': vnfcs[0].vnfcinstanceid,
-                'vduId': vnfcs[0].vduid,
-                'changeType': chtype,
-                'computeResource': vm_resource
-            })
+            if vnfcs:
+                affected_vnfcs.append({
+                    'id': vnfcs[0].vnfcinstanceid,
+                    'vduId': vnfcs[0].vduid,
+                    'changeType': chtype,
+                    'computeResource': vm_resource
+                })
 
         notification_content = {
             "id": str(uuid.uuid4()),
