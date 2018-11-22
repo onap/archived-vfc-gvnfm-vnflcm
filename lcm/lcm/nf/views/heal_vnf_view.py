@@ -81,9 +81,6 @@ class HealVnfView(APIView):
         if not vnf_insts.exists():
             raise NFLCMExceptionNotFound("VNF nf_inst_id does not exist.")
 
-        if vnf_insts[0].status != 'INSTANTIATED':
-            raise NFLCMExceptionConflict("VNF instantiationState is not INSTANTIATED.")
-
         NfInstModel.objects.filter(nfinstid=nf_inst_id).update(status=VNF_STATUS.HEALING)
         JobUtil.add_job_status(job_id, 15, 'Nf healing pre-check finish')
         logger.info("Nf healing pre-check finish")
