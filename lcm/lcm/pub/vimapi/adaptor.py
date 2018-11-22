@@ -258,7 +258,7 @@ def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
         subnet_id = get_res_id(res_cache, RES_SUBNET, port["vl_id"])
     param = {
         "networkId": network_id,
-        "name": port["properties"].get("name", "")
+        "name": port["cp_id"]
     }
     set_opt_val(param, "subnetId", subnet_id)
     set_opt_val(param, "macAddress", ignore_case_get(port["properties"], "mac_address"))
@@ -287,29 +287,6 @@ def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
     set_res_cache(res_cache, res_type, port["cp_id"], ret["id"])
 
 
-def parse_unit(val, base_unit):
-    recognized_units = ["B", "kB", "KiB", "MB", "MiB", "GB", "GiB", "TB", "TiB"]
-    units_rate = [1, 1000, 1024, 1000000, 1048576, 1000000000, 1073741824, 1000000000000, 1099511627776]
-    unit_rate_map = {unit.upper(): rate for unit, rate in zip(recognized_units, units_rate)}
-    num_unit = val.strip().split(" ")
-    if len(num_unit) != 2:
-        return val.strip
-    num, unit = num_unit[0], num_unit[1]
-    return int(num) * unit_rate_map[unit.upper()] / unit_rate_map[base_unit.upper()]
-
-
-def search_flavor_aai(vim_id, flavor_name):
-    aai_flavors = get_flavor_info(vim_id)
-    if not aai_flavors:
-        return None
-    aai_flavor = aai_flavors["flavor"]
-    for one_aai_flavor in aai_flavor:
-        if one_aai_flavor["flavor-name"].find(flavor_name) == -1:
-            return one_aai_flavor
-
-    return None
-
-
 def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
     location_info = flavor["properties"]["location_info"]
     vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
@@ -324,19 +301,19 @@ def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
         "isPublic": True
     }
 
-    # Using flavor name returned by OOF to search falvor
-    vdu_id = ignore_case_get(flavor, "vdu_id")
-    aai_flavor = None
+    # Get flavor id from OOF
+    vdu_id = ignore_case_get(flavor, "vdu_id", "")
+    flavor_id =  ""
     for one_vdu in location_info["vduInfo"]:
         if one_vdu["vduName"] == vdu_id:
-            aai_flavor = search_flavor_aai(vim_id, one_vdu["flavorName"])
+            flavor_id = ignore_case_get(one_vdu, "flavorId", "")
             break
 
-    # Add aai flavor
-    if aai_flavor:
-        ret = aai_flavor
-        do_notify(res_type, ret)
-        set_res_cache(res_cache, res_type, flavor["vdu_id"], ret["flavor-id"])
+    # Add check if OOF return flavor id has value
+    # If value is not None, we use it.
+    # If value is None, we will create flavor again.
+    if flavor_id:
+        set_res_cache(res_cache, res_type, flavor["vdu_id"], flavor_id)
     else:
         for virtual_storage in virtual_storages:
             vs_id = virtual_storage["virtual_storage_id"]

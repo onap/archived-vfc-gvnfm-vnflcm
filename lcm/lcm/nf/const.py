@@ -757,7 +757,7 @@ vnfdModel = {
                     "vduInfo": [
                         {
                             "vduName": "VDU_vbng_0",
-                            "flavorName": "flavor_1",
+                            "flavorId": "12345",
                             "directive": ""
                         }
                     ]
