@@ -178,7 +178,7 @@ class InstantiateVnf(Thread):
             if oof_vimid and oof_vimid != "none":
                 vimid = oof_vimid
             vdu_info.append({"vduName": flavor["resourceProviderId"],
-                             "flavorName": flavor["vimFlavourId"],
+                             "flavorId": flavor["vimFlavourId"],
                              "vimid": vimid})
 
         for resource_type in ['vdus', 'vls', 'cps', 'volume_storages']:
