@@ -88,6 +88,7 @@ def action_vm(action_type, server, vimId, tenantId):
         else:
             param["reboot"]["type"] = "HARD"
     res_id = server["id"]
+    logger.debug("%s,%s,%s,%s", vimId, tenantId, res_id, param)
     api.action_vm(vimId, tenantId, res_id, param)
 
 
@@ -116,15 +117,20 @@ def heal_vim_res(vdus, vnfd_info, do_notify, data, vim_cache, res_cache):
         vimid = data["vimid"]
         tenant = data["tenant"]
         actionType = data["action"]
+        resid = ''
         if actionType == HEAL_ACTION_TYPE.START:
+            resid = vdus[0]["vdu_id"]
             create_vm(vim_cache, res_cache, vnfd_info, vdus[0], do_notify, RES_VM)
         elif actionType == HEAL_ACTION_TYPE.RESTART:
+            resid = vdus[0].resourceid
+            logger.debug("Start restart vm(%s)", resid)
             vm_info = api.get_vm(vimid, tenant, vdus[0].resourceid)
+            logger.debug("vminfo=%s", vm_info)
             action_vm(ACTION_TYPE.REBOOT, vm_info, vimid, tenant)
     except VimException as e:
-        logger.error("Failed to Heal %s(%s)", RES_VM, vdus[0]["vdu_id"])
+        logger.error("Failed to Heal %s(%s)", RES_VM, resid)
         logger.error("%s:%s", e.http_code, e.message)
-        raise NFLCMException("Failed to Heal %s(%s)", RES_VM, vdus[0]["vdu_id"])
+        raise NFLCMException("Failed to Heal %s(%s)" % (RES_VM, resid))
 
 
 def create_vim_res(data, do_notify, vim_cache={}, res_cache={}):
