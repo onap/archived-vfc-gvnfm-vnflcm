@@ -70,7 +70,7 @@ class HealVnf(Thread):
 
     def heal_pre(self):
         if self.action not in (HEAL_ACTION_TYPE.START, HEAL_ACTION_TYPE.RESTART):
-            raise NFLCMException("Action type in Request in invalid. Should be %s or %s" % (HEAL_ACTION_TYPE.START, HEAL_ACTION_TYPE.RESTART))
+            raise NFLCMException("Action should be %s or %s" % (HEAL_ACTION_TYPE.START, HEAL_ACTION_TYPE.RESTART))
 
         self.vm_id = ignore_case_get(self.affectedvm, "vmid")
         self.vdu_id = ignore_case_get(self.affectedvm, "vduid")
@@ -83,21 +83,24 @@ class HealVnf(Thread):
 
     def apply_grant(self):
         if self.action == HEAL_ACTION_TYPE.RESTART:
-            self.vdu = VmInstModel.objects.filter(instid=self.nf_inst_id, vmid=self.vm_id, vmname=self.vm_name)
+            self.vdu = VmInstModel.objects.filter(instid=self.nf_inst_id, resourceid=self.vm_id)
             if not self.vdu:
-                raise NFLCMException("VNF Vm does not exist.")
+                raise NFLCMException("VNF Vm(%s) does not exist." % self.vm_id)
             self.vimid = self.vdu[0].vimid
             self.tenant = self.vdu[0].tenant
-        elif self.action == HEAL_ACTION_TYPE.START:
-            vdus = ignore_case_get(self.vnfd_info, "vdus")
-            self.vdu = [elem for elem in vdus if ignore_case_get(elem, "vdu_id") == self.vdu_id]
-            if not self.vdu:
-                raise NFLCMException("VNF Vm does not exist.")
+            logger.debug("Get heal vnf vm(%s,%s) info successfully.", self.vm_id, self.vm_name)
+            JobUtil.add_job_status(self.job_id, 20, 'Nf Healing get vnf vm info finish')
+            return
+
+        vdus = ignore_case_get(self.vnfd_info, "vdus")
+        self.vdu = [elem for elem in vdus if ignore_case_get(elem, "vdu_id") == self.vdu_id]
+        if not self.vdu:
+            raise NFLCMException("VNF Vdu(%s) does not exist." % self.vdu_id)
         apply_result = grant_resource(data=self.data, nf_inst_id=self.nf_inst_id, job_id=self.job_id,
                                       grant_type=self.grant_type, vdus=self.vdu)
-        if self.action == HEAL_ACTION_TYPE.START:
-            self.vimid = ignore_case_get(apply_result, "vimid"),
-            self.tenant = ignore_case_get(apply_result, "tenant")
+
+        self.vimid = ignore_case_get(apply_result, "vimid"),
+        self.tenant = ignore_case_get(apply_result, "tenant")
         logger.info("Grant resource, response: %s" % apply_result)
         JobUtil.add_job_status(self.job_id, 20, 'Nf Healing grant_resource finish')
 
@@ -133,7 +136,7 @@ class HealVnf(Thread):
                 chtype = CHANGE_TYPE.MODIFIED
             vnfcs = VNFCInstModel.objects.filter(instid=self.nf_inst_id, vmid=self.vm_id)
             vm_resource = {}
-            vm = VmInstModel.objects.filter(instid=self.nf_inst_id, vmid=self.vm_id)
+            vm = VmInstModel.objects.filter(instid=self.nf_inst_id, resourceid=self.vm_id)
             if vm:
                 vm_resource = {
                     'vimConnectionId': vm[0].vimid,
