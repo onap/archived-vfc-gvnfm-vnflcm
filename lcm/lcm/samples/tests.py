@@ -96,7 +96,7 @@ inst_res_data = {
                     "vduInfo": [
                         {
                             "vduName": "VDU_vbng_0",
-                            "flavorName": "flavor_1",
+                            "flavorId": "12345",
                             "directive": "",
                         },
                     ]
@@ -322,15 +322,6 @@ c5_data_create_flavor = {
     "id": "6456",
 }
 
-c5_data_get_flavor = {
-    "flavor": [
-        {
-            "flavor-id": "111111",
-            "flavor-name": "flavor_1",
-        }
-    ]
-}
-
 c6_data_list_image = {
     "images": [
         {
@@ -373,8 +364,7 @@ class SampleViewTest(unittest.TestCase):
         r2_data_create_network = [0, json.JSONEncoder().encode(c2_data_create_network), '200']
         r3_data_create_subnet = [0, json.JSONEncoder().encode(c3_data_create_subnet), '200']
         r4_data_create_port = [0, json.JSONEncoder().encode(c4_data_create_port), '200']
-        r5_data_get_flavor = [0, json.JSONEncoder().encode(c5_data_get_flavor), '200']
-        r5_data_create_flavor = [0, json.JSONEncoder().encode(c5_data_create_flavor), '200']
+        # r5_data_create_flavor = [0, json.JSONEncoder().encode(c5_data_create_flavor), '200']
         r6_data_list_image = [0, json.JSONEncoder().encode(c6_data_list_image), '200']
         r6_data_create_vm = [0, json.JSONEncoder().encode(c6_data_create_vm), '200']
         r6_data_get_vm = [0, json.JSONEncoder().encode(c6_data_get_vm), '200']
@@ -384,7 +374,6 @@ class SampleViewTest(unittest.TestCase):
                                      r2_data_create_network,
                                      r3_data_create_subnet,
                                      r4_data_create_port,
-                                     r5_data_get_flavor, r5_data_create_flavor,
                                      r6_data_list_image, r6_data_create_vm, r6_data_get_vm]
         resp = self.client.post(inst_res_url, data=json.dumps(inst_res_data), content_type='application/json')
         self.failUnlessEqual(status.HTTP_204_NO_CONTENT, resp.status_code)
