@@ -13,12 +13,15 @@
 # limitations under the License.
 
 import json
+from multiprocessing import Lock
 
 from lcm.pub.msapi.aai import delete_aai_flavor
 from lcm.pub.utils.restcall import req_by_msb
 from .exceptions import VimException
 
 VIM_DRIVER_BASE_URL = "api/multicloud/v0"
+MUTEX_NET = Lock()
+MUTEX_SUBNET = Lock()
 
 
 def call(vim_id, tenant_id, res, method, data=''):
@@ -56,7 +59,8 @@ def list_image(vim_id, tenant_id):
 
 
 def create_network(vim_id, tenant_id, data):
-    return call(vim_id, tenant_id, "networks", "POST", data)
+    with MUTEX_NET:
+        return call(vim_id, tenant_id, "networks", "POST", data)
 
 
 def delete_network(vim_id, tenant_id, network_id):
@@ -74,7 +78,8 @@ def list_network(vim_id, tenant_id):
 
 
 def create_subnet(vim_id, tenant_id, data):
-    return call(vim_id, tenant_id, "subnets", "POST", data)
+    with MUTEX_SUBNET:
+        return call(vim_id, tenant_id, "subnets", "POST", data)
 
 
 def delete_subnet(vim_id, tenant_id, subnet_id):
