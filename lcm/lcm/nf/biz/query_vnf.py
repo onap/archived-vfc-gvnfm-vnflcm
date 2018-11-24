@@ -35,11 +35,12 @@ class QueryVnf:
 
     def query_multi_vnf(self):
         vnf_insts = NfInstModel.objects.all()
-        if not vnf_insts:
-            raise NFLCMException('VnfInsts does not exist.')
+        # if not vnf_insts:
+        #    raise NFLCMException('VnfInsts does not exist.')
         resp_data = []
-        for vnf_inst in vnf_insts:
-            resp_data.append(self.fill_resp_data(vnf_inst))
+        if isinstance(vnf_insts, list):
+            for vnf_inst in vnf_insts:
+                resp_data.append(self.fill_resp_data(vnf_inst))
         return resp_data
 
     def fill_resp_data(self, vnf):
