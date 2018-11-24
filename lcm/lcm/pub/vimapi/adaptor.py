@@ -401,7 +401,7 @@ def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
     while retry_count < max_retry_count:
         vm_info = api.get_vm(vim_id, tenant_id, vm_id)
         if vm_info["status"].upper() == "ACTIVE":
-            logger.debug("Vm(%s) is active", vim_id)
+            logger.debug("Vm(%s) is active", vm_id)
             return
         if vm_info["status"].upper() == "ERROR":
             opt_vm_status = vm_info["status"]
