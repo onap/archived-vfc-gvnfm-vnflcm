@@ -23,6 +23,7 @@ from .exceptions import VimException
 VIM_DRIVER_BASE_URL = "api/multicloud/v0"
 MUTEX_NET = Lock()
 MUTEX_SUBNET = Lock()
+MUTEX_PORT = Lock()
 
 
 def call(vim_id, tenant_id, res, method, data=''):
@@ -102,7 +103,8 @@ def list_subnet(vim_id, tenant_id):
 
 
 def create_port(vim_id, tenant_id, data):
-    return call(vim_id, tenant_id, "ports", "POST", data)
+    with MUTEX_PORT:
+        return call(vim_id, tenant_id, "ports", "POST", data)
 
 
 def delete_port(vim_id, tenant_id, port_id):
