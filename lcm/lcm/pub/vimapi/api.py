@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import json
+import time
 from multiprocessing import Lock
 
 from lcm.pub.msapi.aai import delete_aai_flavor
@@ -32,10 +33,14 @@ def call(vim_id, tenant_id, res, method, data=''):
                          vim_id=vim_id,
                          tenant_id="/" + tenant_id if tenant_id else "",
                          res=res)
-    ret = req_by_msb(url, method, data)
-    if ret[0] > 0:
-        raise VimException(ret[1], ret[2])
-    return json.JSONDecoder().decode(ret[1]) if ret[1] else {}
+    for i in range(10):
+        ret = req_by_msb(url, method, data)
+        if ret[0] > 0:
+            if ret[2] == '409' and "InUse" in ret[1] and method == "DELETE":
+                time.sleep(5)
+                continue
+            raise VimException(ret[1], ret[2])
+        return json.JSONDecoder().decode(ret[1]) if ret[1] else {}
 
 ######################################################################
 
