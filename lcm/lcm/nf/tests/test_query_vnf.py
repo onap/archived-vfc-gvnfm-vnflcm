@@ -169,5 +169,4 @@ class ResourceTest(TestCase):
 
     def test_get_vnfs_not_exist(self):
         response = self.client.get("/api/vnflcm/v1/vnf_instances", format='json')
-        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        self.assertEqual({'error': 'VnfInsts does not exist.'}, response.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

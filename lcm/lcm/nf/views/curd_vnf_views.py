@@ -42,7 +42,8 @@ class CreateVnfAndQueryVnfs(APIView):
         logger.debug("QueryMultiVnf--get::> %s" % request.data)
         try:
             resp_data = QueryVnf(request.data).query_multi_vnf()
-
+            if len(resp_data) == 0:
+                return Response(data=[], status=status.HTTP_200_OK)
             vnf_instances_serializer = VnfInstancesSerializer(data=resp_data)
             if not vnf_instances_serializer.is_valid():
                 raise NFLCMException(vnf_instances_serializer.errors)
