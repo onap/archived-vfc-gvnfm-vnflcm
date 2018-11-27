@@ -23,7 +23,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.onap.vfc.gvnfm.vnflcm</groupId>
     <artifactId>vfc-gvnfm-vnflcm</artifactId>
-    <version>1.2.1-SNAPSHOT</version>
+    <version>1.2.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>vfc-gvnfm-vnflcm</name>
     <description>vfc gvnfm vnflcm</description>
