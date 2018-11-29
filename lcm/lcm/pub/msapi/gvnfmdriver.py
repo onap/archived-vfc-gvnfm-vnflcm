@@ -104,12 +104,13 @@ def prepare_notification_data(nfinstid, jobid, changetype, operation):
             'cpInstanceId': port.cpinstanceid  # TODO: port.cpinstanceid is not initiated when create port resource.
         })
     for network_id, ext_link_ports in ext_connectivity_map.items():
+        net_vimid = ext_link_ports[0]['resourceHandle']['vimConnectionId']
         networks = NetworkInstModel.objects.filter(networkid=network_id)
-        network = networks[0]
+        net_name = networks[0].name if networks else network_id
         network_resource = {
-            'vimConnectionId': network.vimid,
-            'resourceId': network.resourceid,
-            'resourceProviderId': network.name,  # TODO: is resourceName mapped to resourceProviderId?
+            'vimConnectionId': net_vimid,
+            'resourceId': network_id,
+            'resourceProviderId': net_name,  # TODO: is resourceName mapped to resourceProviderId?
             'vimLevelResourceType': 'network'
         }
         ext_connectivity.append({
