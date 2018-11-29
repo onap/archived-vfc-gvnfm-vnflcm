@@ -117,6 +117,7 @@ def prepare_notification_data(nfinstid, jobid, changetype, operation):
             'resourceHandle': network_resource,
             'extLinkPorts': ext_link_ports
         })
+    logger.debug("ext_connectivity=%s", ext_connectivity)
     affected_vss = []
     vss = StorageInstModel.objects.filter(instid=nfinstid)
     for vs in vss:
@@ -145,7 +146,7 @@ def prepare_notification_data(nfinstid, jobid, changetype, operation):
         'affectedVnfcs': affected_vnfcs,
         'affectedVirtualLinks': affected_vls,
         'affectedVirtualStorages': affected_vss,
-        'changedExtConnectivity': ext_connectivity,
+        'changedExtConnectivity': [], # TODO: will add in R4
         '_links': {
             'vnfInstance': {'href': '/api/vnflcm/v1/vnf_instances/%s' % nfinstid},
             # set 'subscription' link after filtering for subscribers
