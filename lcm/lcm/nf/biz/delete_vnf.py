@@ -25,9 +25,9 @@ class DeleteVnf:
         self.nf_inst_id = instanceid
 
     def do_biz(self):
-            self.check_parameter()
-            self.delete_info_from_db()
-            logger.debug('VnfInst(%s) is deleted.' % self.nf_inst_id)
+        self.check_parameter()
+        self.delete_info_from_db()
+        logger.debug('VnfInst(%s) is deleted.' % self.nf_inst_id)
 
     def check_parameter(self):
         vnf_insts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
