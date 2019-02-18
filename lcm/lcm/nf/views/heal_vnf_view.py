@@ -66,7 +66,7 @@ class HealVnfView(APIView):
             probDetail = ProblemDetailsSerializer(data={"status": status.HTTP_409_CONFLICT, "detail": "VNF Instance not in Instantiated State"})
             resp_isvalid = probDetail.is_valid()
             if not resp_isvalid:
-                    raise NFLCMException(probDetail.errors)
+                raise NFLCMException(probDetail.errors)
             return Response(data=probDetail.data, status=status.HTTP_409_CONFLICT)
         except NFLCMException as e:
             logger.error(e.message)
