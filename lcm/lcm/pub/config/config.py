@@ -24,9 +24,9 @@ REDIS_PASSWD = ''
 # [mysql]
 DB_IP = "127.0.0.1"
 DB_PORT = 3306
-DB_NAME = "gvnfm"
-DB_USER = "gvnfm"
-DB_PASSWD = "gvnfm"
+DB_NAME = "test"
+DB_USER = "liuskyter"
+DB_PASSWD = "liuskyter"
 
 # [MDC]
 SERVICE_NAME = "vnflcm"
