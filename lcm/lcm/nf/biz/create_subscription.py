@@ -42,7 +42,7 @@ class CreateSubscription:
         self.authentication = ignore_case_get(self.data, "authentication", {})
         self.notification_types = ignore_case_get(self.filter, "notificationTypes", [])
         self.operation_types = ignore_case_get(self.filter, "operationTypes", [])
-        self.operation_states = ignore_case_get(self.filter, "notificationStates", [])
+        self.operation_states = ignore_case_get(self.filter, "operationStates", [])
         self.vnf_filter = \
             ignore_case_get(self.filter, "vnfInstanceSubscriptionFilter", {})
 
