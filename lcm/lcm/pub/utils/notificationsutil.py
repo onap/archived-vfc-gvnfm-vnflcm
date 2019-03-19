@@ -32,7 +32,6 @@ class NotificationsUtil(object):
     def send_notification(self, notification):
         logger.info("Send Notifications to the callbackUri")
         filters = {
-            "vnfInstanceId": "vnf_instance_filter",
             "operationState": "operation_states",
             "operation": "operation_types"
         }
@@ -51,7 +50,10 @@ class NotificationsUtil(object):
             auth_info = json.loads(subscription.auth_info)
             if auth_info["authType"] == const.OAUTH2_CLIENT_CREDENTIALS:
                 pass
-            self.post_notification(callbackUri, auth_info, notification)
+            try:
+                self.post_notification(callbackUri, auth_info, notification)
+            except Exception as e:
+                logger.error("Failed to post notification: %s", e.message)
 
     def post_notification(self, callbackUri, auth_info, notification):
         params = auth_info.get("paramsBasic", {})
