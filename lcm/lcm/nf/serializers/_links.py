@@ -14,47 +14,47 @@
 
 from rest_framework import serializers
 
-from link import LinkSerializer
+from link import linkSerializer
 
 
 class _LinksSerializer(serializers.Serializer):
-    href = LinkSerializer(
+    href = linkSerializer(
         help_text="URI of this resource.",
         required=True,
         allow_null=False)
-    indicators = LinkSerializer(
+    indicators = linkSerializer(
         help_text="Indicators related to this VNF instance.",
         required=False,
         allow_null=True)
-    instantiate = LinkSerializer(
+    instantiate = linkSerializer(
         help_text="Link to the instantiate task resource.",
         required=False,
         allow_null=True)
-    termiante = LinkSerializer(
+    termiante = linkSerializer(
         help_text="Link to the terminate task resource.",
         required=False,
         allow_null=True)
-    scale = LinkSerializer(
+    scale = linkSerializer(
         help_text="Link to the scale task resource.",
         required=False,
         allow_null=True)
-    scaleToLevel = LinkSerializer(
+    scaleToLevel = linkSerializer(
         help_text="Link to the scale_to_level task resource.",
         required=False,
         allow_null=True)
-    changeFlavour = LinkSerializer(
+    changeFlavour = linkSerializer(
         help_text="Link to the change_flavour task resource.",
         required=False,
         allow_null=True)
-    heal = LinkSerializer(
+    heal = linkSerializer(
         help_text="Link to the heal task resource.",
         required=False,
         allow_null=True)
-    operate = LinkSerializer(
+    operate = linkSerializer(
         help_text="Link to the operate task resource.",
         required=False,
         allow_null=True)
-    changeExtConn = LinkSerializer(
+    changeExtConn = linkSerializer(
         help_text="Link to the change_ext_conn task resource.",
         required=False,
         allow_null=True)

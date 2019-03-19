@@ -18,23 +18,23 @@ from affected_vnfcs import AffectedVnfcsSerializer
 from affected_vls import AffectedVLsSerializer
 from affected_storages import AffectedStoragesSerializer
 from lcm.nf.const import LCM_OPERATION_TYPES, LCM_OPERATION_STATE_TYPES
-from link import LinkSerializer
+from link import linkSerializer
 from response import ProblemDetailsSerializer
 from ext_virtual_link_info import ExtVirtualLinkInfoSerializer
 from vnf_info_modifications import VnfInfoModificationsSerializer
 
 
 class LccnLinksSerializer(serializers.Serializer):
-    vnfInstance = LinkSerializer(
+    vnfInstance = linkSerializer(
         help_text="Link to the resource representing the VNF instance to "
         "which the notified change applies.",
         required=True,
         allow_null=False)
-    subscription = LinkSerializer(
+    subscription = linkSerializer(
         help_text="Link to the related subscription.",
         required=True,
         allow_null=False)
-    vnfLcmOpOcc = LinkSerializer(
+    vnfLcmOpOcc = linkSerializer(
         help_text="Link to the VNF lifecycle management operation"
         "occurrence that this notification is related to. Shall be"
         "present if there is a related lifecycle operation occurance.",
