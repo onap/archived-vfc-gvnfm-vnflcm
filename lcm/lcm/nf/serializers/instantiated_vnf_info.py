@@ -57,9 +57,9 @@ class InstantiatedVnfInfoSerializer(serializers.Serializer):
         many=True,
         required=False,
         allow_null=True)
-    monitoringParameters = serializers.DictField(
+    monitoringParameters = serializers.ListSerializer(
         help_text="Active monitoring parameters.",
-        child=serializers.CharField(help_text="KeyValue Pairs", allow_blank=True),
+        child=serializers.CharField(help_text="monitoring parameter", allow_blank=True),
         required=False,
         allow_null=True)
     localizationLanguage = serializers.CharField(

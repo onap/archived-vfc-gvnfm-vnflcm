@@ -27,7 +27,13 @@ class ResourceTest(TestCase):
         self.test_data_single_vnf = {
             "id": "1",
             "vnfInstanceName": "VNF1",
-            "vnfProvider": None,
+            "vnfInstanceDescription": "VNF DESC",
+            "vnfdId": "1",
+            "vnfProvider": "ZTE",
+            "vnfProductName": "XGW",
+            "vnfSoftwareVersion": "V1",
+            "vnfdVersion": "V1",
+            "vnfPkgId": "2",
             "instantiationState": "INSTANTIATED",
             "instantiatedVnfInfo": {
                 "vnfState": "STARTED",
@@ -43,19 +49,23 @@ class ResourceTest(TestCase):
                 ],
                 "extVirtualLinkInfo": [],
                 "vnfcResourceInfo": [],
-                "monitoringParameters": {},
+                "monitoringParameters": [],
                 "flavourId": None,
                 "vnfVirtualLinkResourceInfo": [],
                 "scaleStatus": []
-            },
-            "vnfdVersion": None,
-            "vnfPkgId": None
+            }
         }
         self.test_data_multi_vnf = [
             {
                 "id": "1",
                 "vnfInstanceName": "VNF1",
-                "vnfProvider": None,
+                "vnfInstanceDescription": "VNF DESC",
+                "vnfdId": "1",
+                "vnfProvider": "ZTE",
+                "vnfProductName": "XGW",
+                "vnfSoftwareVersion": "V1",
+                "vnfdVersion": "V1",
+                "vnfPkgId": "2",
                 "instantiationState": "INSTANTIATED",
                 "instantiatedVnfInfo": {
                     "vnfState": "STARTED",
@@ -71,18 +81,22 @@ class ResourceTest(TestCase):
                     ],
                     "extVirtualLinkInfo": [],
                     "vnfcResourceInfo": [],
-                    "monitoringParameters": {},
+                    "monitoringParameters": [],
                     "flavourId": None,
                     "vnfVirtualLinkResourceInfo": [],
                     "scaleStatus": []
-                },
-                "vnfdVersion": None,
-                "vnfPkgId": None
+                }
             },
             {
                 "id": "2",
                 "vnfInstanceName": "VNF2",
-                "vnfProvider": None,
+                "vnfInstanceDescription": "VNF DESC",
+                "vnfdId": "1",
+                "vnfProvider": "ZTE",
+                "vnfProductName": "XGW",
+                "vnfSoftwareVersion": "V1",
+                "vnfdVersion": "V1",
+                "vnfPkgId": "2",
                 "instantiationState": "INSTANTIATED",
                 "instantiatedVnfInfo": {
                     "vnfState": "STARTED",
@@ -98,13 +112,11 @@ class ResourceTest(TestCase):
                     ],
                     "extVirtualLinkInfo": [],
                     "vnfcResourceInfo": [],
-                    "monitoringParameters": {},
+                    "monitoringParameters": [],
                     "flavourId": None,
                     "vnfVirtualLinkResourceInfo": [],
                     "scaleStatus": []
-                },
-                "vnfdVersion": None,
-                "vnfPkgId": None
+                }
             }
         ]
 
@@ -113,7 +125,16 @@ class ResourceTest(TestCase):
 
     def test_get_vnf(self):
         vnf_inst_id = "1"
-        NfInstModel(nfinstid=vnf_inst_id, nf_name='VNF1', status='INSTANTIATED').save()
+        NfInstModel(nfinstid=vnf_inst_id,
+                    nf_name='VNF1',
+                    nf_desc="VNF DESC",
+                    vnfdid="1",
+                    netype="XGW",
+                    vendor="ZTE",
+                    vnfSoftwareVersion="V1",
+                    version="V1",
+                    package_id="2",
+                    status='INSTANTIATED').save()
         StorageInstModel(storageid='s02',
                          vimid='vim01',
                          resourceid='resource01',
@@ -157,6 +178,13 @@ class ResourceTest(TestCase):
         for i in range(1, 3):
             NfInstModel(nfinstid='%s' % i,
                         nf_name='VNF%s' % i,
+                        nf_desc="VNF DESC",
+                        vnfdid="1",
+                        netype="XGW",
+                        vendor="ZTE",
+                        vnfSoftwareVersion="V1",
+                        version="V1",
+                        package_id="2",
                         status='INSTANTIATED').save()
             StorageInstModel(storageid='s0%s' % i,
                              vimid='vim0%s' % i,
