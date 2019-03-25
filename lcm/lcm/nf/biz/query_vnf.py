@@ -98,9 +98,13 @@ class QueryVnf:
         resp_data = {
             "id": vnf.nfinstid,
             "vnfInstanceName": vnf.nf_name,
-            "vnfPkgId": vnf.package_id,
-            "vnfdVersion": vnf.version,
+            "vnfInstanceDescription": vnf.nf_desc,
+            "vnfdId": vnf.vnfdid,
             "vnfProvider": vnf.vendor,
+            "vnfProductName": vnf.netype,
+            "vnfSoftwareVersion": vnf.vnfSoftwareVersion,
+            "vnfdVersion": vnf.version,
+            "vnfPkgId": vnf.package_id,
             "instantiationState": vnf.status,
             "instantiatedVnfInfo": {
                 "flavourId": vnf.flavour_id,
@@ -108,10 +112,11 @@ class QueryVnf:
                 "scaleStatus": [],
                 "extCpInfo": [],
                 "extVirtualLinkInfo": [],
-                "monitoringParameters": {},
+                "monitoringParameters": [],
                 "vnfcResourceInfo": vnfc_arr,
                 "vnfVirtualLinkResourceInfo": vl_arr,
                 "virtualStorageResourceInfo": arr
             }
         }
+        logger.debug("vnf instance: %s", resp_data)
         return resp_data
