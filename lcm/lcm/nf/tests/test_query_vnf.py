@@ -27,7 +27,13 @@ class ResourceTest(TestCase):
         self.test_data_single_vnf = {
             "id": "1",
             "vnfInstanceName": "VNF1",
+            "vnfInstanceDescription": "VNF DESC",
+            "vnfdId": "1",
             "vnfProvider": None,
+            "vnfProductName": "XGW",
+            "vnfSoftwareVersion": "V1",
+            "vnfdVersion": "V1",
+            "vnfPkgId": "2",
             "instantiationState": "INSTANTIATED",
             "instantiatedVnfInfo": {
                 "vnfState": "STARTED",
@@ -43,19 +49,23 @@ class ResourceTest(TestCase):
                 ],
                 "extVirtualLinkInfo": [],
                 "vnfcResourceInfo": [],
-                "monitoringParameters": {},
+                "monitoringParameters": [],
                 "flavourId": None,
                 "vnfVirtualLinkResourceInfo": [],
                 "scaleStatus": []
-            },
-            "vnfdVersion": None,
-            "vnfPkgId": None
+            }
         }
         self.test_data_multi_vnf = [
             {
                 "id": "1",
                 "vnfInstanceName": "VNF1",
+                "vnfInstanceDescription": "VNF DESC",
+                "vnfdId": "1",
                 "vnfProvider": None,
+                "vnfProductName": "XGW",
+                "vnfSoftwareVersion": "V1",
+                "vnfdVersion": "V1",
+                "vnfPkgId": "2",
                 "instantiationState": "INSTANTIATED",
                 "instantiatedVnfInfo": {
                     "vnfState": "STARTED",
@@ -71,18 +81,22 @@ class ResourceTest(TestCase):
                     ],
                     "extVirtualLinkInfo": [],
                     "vnfcResourceInfo": [],
-                    "monitoringParameters": {},
+                    "monitoringParameters": [],
                     "flavourId": None,
                     "vnfVirtualLinkResourceInfo": [],
                     "scaleStatus": []
-                },
-                "vnfdVersion": None,
-                "vnfPkgId": None
+                }
             },
             {
                 "id": "2",
                 "vnfInstanceName": "VNF2",
+                "vnfInstanceDescription": "VNF DESC",
+                "vnfdId": "1",
                 "vnfProvider": None,
+                "vnfProductName": "XGW",
+                "vnfSoftwareVersion": "V1",
+                "vnfdVersion": "V1",
+                "vnfPkgId": "2",
                 "instantiationState": "INSTANTIATED",
                 "instantiatedVnfInfo": {
                     "vnfState": "STARTED",
@@ -98,13 +112,11 @@ class ResourceTest(TestCase):
                     ],
                     "extVirtualLinkInfo": [],
                     "vnfcResourceInfo": [],
-                    "monitoringParameters": {},
+                    "monitoringParameters": [],
                     "flavourId": None,
                     "vnfVirtualLinkResourceInfo": [],
                     "scaleStatus": []
-                },
-                "vnfdVersion": None,
-                "vnfPkgId": None
+                }
             }
         ]
 
