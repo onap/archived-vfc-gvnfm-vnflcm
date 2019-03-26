@@ -151,23 +151,50 @@ class ResourceTest(TestCase):
 
     def test_get_vnf_net_not_exist(self):
         vnf_inst_id = "1"
-        NfInstModel(nfinstid=vnf_inst_id, nf_name='VNF1', status='INSTANTIATED').save()
-        VLInstModel(ownerid=vnf_inst_id, relatednetworkid='x', ownertype='0').save()
+        NfInstModel(nfinstid=vnf_inst_id,
+                    nf_name='VNF1',
+                    vnfdid="1",
+                    netype="XGW",
+                    vendor="ZTE",
+                    vnfSoftwareVersion="V1",
+                    version="V1",
+                    package_id="2",
+                    status='INSTANTIATED').save()
+        VLInstModel(ownerid=vnf_inst_id,
+                    relatednetworkid='x',
+                    ownertype='0').save()
         response = self.client.get("/api/vnflcm/v1/vnf_instances/%s" % vnf_inst_id, format='json')
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
         self.assertEqual({'error': 'NetworkInst(x) does not exist.'}, response.data)
 
     def test_get_vnf_vm_not_exist(self):
         vnf_inst_id = "1"
-        NfInstModel(nfinstid=vnf_inst_id, nf_name='VNF1', status='INSTANTIATED').save()
-        VNFCInstModel(instid=vnf_inst_id, vmid='x').save()
+        NfInstModel(nfinstid=vnf_inst_id,
+                    nf_name='VNF1',
+                    vnfdid="1",
+                    netype="XGW",
+                    vendor="ZTE",
+                    vnfSoftwareVersion="V1",
+                    version="V1",
+                    package_id="2",
+                    status='INSTANTIATED').save()
+        VNFCInstModel(instid=vnf_inst_id,
+                      vmid='x').save()
         response = self.client.get("/api/vnflcm/v1/vnf_instances/%s" % vnf_inst_id, format='json')
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
         self.assertEqual({'error': 'VmInst(x) does not exist.'}, response.data)
 
     def test_get_vnf_storage_not_exist(self):
         vnf_inst_id = "1"
-        NfInstModel(nfinstid=vnf_inst_id, nf_name='VNF1', status='INSTANTIATED').save()
+        NfInstModel(nfinstid=vnf_inst_id,
+                    nf_name='VNF1',
+                    vnfdid="1",
+                    netype="XGW",
+                    vendor="ZTE",
+                    vnfSoftwareVersion="V1",
+                    version="V1",
+                    package_id="2",
+                    status='INSTANTIATED').save()
         VNFCInstModel(instid=vnf_inst_id,
                       vmid='x',).save()
         VmInstModel(vmid='x', insttype='0').save()
