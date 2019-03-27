@@ -57,11 +57,20 @@ class TestNFInstantiate(TestCase):
     @mock.patch.object(HealVnf, 'run')
     def test_heal_vnf_success(self, mock_run):
         req_data = {}
-        NfInstModel(nfinstid='12', nf_name='VNF1', status='INSTANTIATED').save()
+        NfInstModel(nfinstid='12',
+                    nf_name='VNF1',
+                    nf_desc="VNF DESC",
+                    vnfdid="1",
+                    netype="XGW",
+                    vendor="ZTE",
+                    vnfSoftwareVersion="V1",
+                    version="V1",
+                    package_id="2",
+                    status='INSTANTIATED').save()
         response = self.client.post("/api/vnflcm/v1/vnf_instances/12/heal", data=req_data, format='json')
         mock_run.re.return_value = None
         self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
-        NfInstModel(nfinstid='12', nf_name='VNF1', status='INSTANTIATED').delete()
+        NfInstModel(nfinstid='12').delete()
 
     @mock.patch.object(restcall, 'call_req')
     @mock.patch.object(api, 'call')
