@@ -13,6 +13,7 @@
 # limitations under the License.
 import json
 
+from lcm.pub.config import config
 from lcm.pub.utils.jobutil import enum
 
 HEAL_ACTION_TYPE = enum(START="vmCreate", RESTART="vmReset")
@@ -34,6 +35,11 @@ OPERATION_TYPE = enum(
     MODIFY_INFO="MODIFY_INFO"
 )
 
+INSTANTIATION_STATE = enum(
+    NOT_INSTANTIATED="NOT_INSTANTIATED",
+    INSTANTIATED="INSTANTIATED"
+)
+
 LCM_NOTIFICATION_STATUS = enum(START="START", RESULT="RESULT")
 
 OPERATION_STATE_TYPE = enum(
@@ -44,6 +50,25 @@ OPERATION_STATE_TYPE = enum(
     FAILED="FAILED",
     ROLLING_BACK="ROLLING_BACK",
     ROLLED_BACK="ROLLED_BACK"
+)
+
+RESULT_RANGE = (
+    OPERATION_STATE_TYPE.COMPLETED,
+    OPERATION_STATE_TYPE.FAILED_TEMP,
+    OPERATION_STATE_TYPE.FAILED,
+    OPERATION_STATE_TYPE.ROLLED_BACK
+)
+
+RUNNING_RANGE = (
+    OPERATION_STATE_TYPE.STARTING,
+    OPERATION_STATE_TYPE.PROCESSING,
+    OPERATION_STATE_TYPE.ROLLING_BACK
+)
+
+FINAL_STATE_RANGE = (
+    OPERATION_STATE_TYPE.COMPLETED,
+    OPERATION_STATE_TYPE.FAILED,
+    OPERATION_STATE_TYPE.ROLLED_BACK
 )
 
 CHANGE_TYPE = enum(
@@ -57,6 +82,8 @@ CHANGE_TYPE = enum(
 
 RESOURCE_MAP = {'Storage': 'volumn', 'Network': 'network', 'SubNetwork': 'subnet', 'Port': 'port',
                 'Flavour': 'flavor', 'Vm': 'vm'}
+
+URL_PREFIX = "http://%s:%s/api/vnflcm/v1" % (config.MSB_SERVICE_IP, config.MSB_SERVICE_PORT)
 
 ROOT_URI = "api/vnflcm/v1/subscriptions/"
 
