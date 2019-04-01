@@ -27,6 +27,7 @@ from lcm.nf.serializers.create_vnf_req import CreateVnfReqSerializer
 from lcm.nf.serializers.vnf_instance import VnfInstanceSerializer
 from lcm.nf.serializers.vnf_instances import VnfInstancesSerializer
 from lcm.pub.exceptions import NFLCMException
+from lcm.pub.exceptions import NFLCMExceptionNotFound
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +110,8 @@ class DeleteVnfAndQueryVnf(APIView):
         except NFLCMException as e:
             logger.error(e.message)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except NFLCMExceptionNotFound as e:
+            return Response(data={'error': '%s' % e.message}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             logger.error(e.message)
             logger.error(traceback.format_exc())
