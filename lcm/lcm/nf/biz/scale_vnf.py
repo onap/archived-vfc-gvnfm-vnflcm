@@ -48,7 +48,13 @@ class ScaleVnf(Thread):
     def run(self):
         try:
             self.heal_pre()
+            JobUtil.add_job_status(self.job_id,
+                                   50,
+                                   "Start to apply grant.")
             self.apply_grant()
+            JobUtil.add_job_status(self.job_id,
+                                   75,
+                                   "Start to scale Vnf.")
             self.do_operation()
             JobUtil.add_job_status(self.job_id,
                                    100,

@@ -54,33 +54,40 @@ class ScaleVnfView(APIView):
 
             ScaleVnf(scale_vnf_request_serializer.data, instanceid, job_id).start()
 
-            response = Response(data={"jobId": job_id}, status=status.HTTP_202_ACCEPTED)
+            response = Response(data={"jobId": job_id},
+                                status=status.HTTP_202_ACCEPTED)
             return response
         except NFLCMExceptionNotFound as e:
-            probDetail = ProblemDetailsSerializer(data={"status": status.HTTP_404_NOT_FOUND, "detail": "VNF Instance not found"})
+            probDetail = ProblemDetailsSerializer(data={"status": status.HTTP_404_NOT_FOUND,
+                                                        "detail": "VNF Instance not found"})
             resp_isvalid = probDetail.is_valid()
             if not resp_isvalid:
                 raise NFLCMException(probDetail.errors)
-            return Response(data=probDetail.data, status=status.HTTP_404_NOT_FOUND)
+            return Response(data=probDetail.data,
+                            status=status.HTTP_404_NOT_FOUND)
         except NFLCMExceptionConflict as e:
-            probDetail = ProblemDetailsSerializer(data={"status": status.HTTP_409_CONFLICT, "detail": "VNF Instance not in Instantiated State"})
+            probDetail = ProblemDetailsSerializer(data={"status": status.HTTP_409_CONFLICT,
+                                                        "detail": "VNF Instance not in Instantiated State"})
             resp_isvalid = probDetail.is_valid()
             if not resp_isvalid:
                 raise NFLCMException(probDetail.errors)
-            return Response(data=probDetail.data, status=status.HTTP_409_CONFLICT)
+            return Response(data=probDetail.data,
+                            status=status.HTTP_409_CONFLICT)
         except NFLCMException as e:
             logger.error(e.message)
-            return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(data={'error': '%s' % e.message},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             logger.error(e.message)
             logger.error(traceback.format_exc())
-            return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(data={'error': 'unexpected exception'},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def scale_pre_check(self, nf_inst_id, job_id):
         vnf_insts = NfInstModel.objects.filter(nfinstid=nf_inst_id)
         if not vnf_insts.exists():
             raise NFLCMExceptionNotFound("VNF nf_inst_id does not exist.")
 
-        NfInstModel.objects.filter(nfinstid=nf_inst_id).update(status=VNF_STATUS.SCALING)
+        vnf_insts.update(status=VNF_STATUS.SCALING)
         JobUtil.add_job_status(job_id, 15, 'Nf scaling pre-check finish')
         logger.info("Nf scaling pre-check finish")
