@@ -26,6 +26,7 @@ from lcm.pub.exceptions import NFLCMException, NFLCMExceptionNotFound, NFLCMExce
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.database.models import NfInstModel
 from lcm.nf.const import VNF_STATUS
+from lcm.nf.biz.scale_vnf import ScaleVnf
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +51,9 @@ class ScaleVnfView(APIView):
             job_id = JobUtil.create_job('NF', 'SCALE', instanceid)
             JobUtil.add_job_status(job_id, 0, "SCALE_VNF_READY")
             self.scale_pre_check(instanceid, job_id)
-            # TODO: do scale logic
+
+            ScaleVnf(scale_vnf_request_serializer.data, instanceid, job_id).start()
+
             response = Response(data={"jobId": job_id}, status=status.HTTP_202_ACCEPTED)
             return response
         except NFLCMExceptionNotFound as e:
