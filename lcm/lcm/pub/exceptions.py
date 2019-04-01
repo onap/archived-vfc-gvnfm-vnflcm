@@ -23,3 +23,19 @@ class NFLCMExceptionNotFound(Exception):
 
 class NFLCMExceptionConflict(Exception):
     pass
+
+
+class NFLCMExceptionPreconditionFailed(Exception):
+    pass
+
+
+class NFLCMExceptionBadRequest(Exception):
+    pass
+
+
+class NFLCMExceptionInterrupt(Exception):
+    pass
+
+
+class NFLCMExceptionSeeOther(Exception):
+    pass
