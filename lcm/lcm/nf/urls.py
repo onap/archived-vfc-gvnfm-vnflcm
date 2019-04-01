@@ -20,6 +20,7 @@ from lcm.nf.views.terminate_vnf_view import TerminateVnfView
 from lcm.nf.views.subscriptions_view import SubscriptionsView
 from lcm.nf.views.heal_vnf_view import HealVnfView
 from lcm.nf.views.operate_vnf_view import OperateVnfView
+from lcm.nf.views.scale_vnf_view import ScaleVnfView
 from lcm.nf.views.lcm_op_occs_view import QueryMultiVnfLcmOpOccs, QuerySingleVnfLcmOpOcc
 
 urlpatterns = [
@@ -30,6 +31,7 @@ urlpatterns = [
     url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)/terminate$', TerminateVnfView.as_view()),
     url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)/heal$', HealVnfView.as_view()),
     url(r'^api/vnflcm/v1/vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)/operate$', OperateVnfView.as_view()),
+    url(r'^vnf_instances/(?P<instanceid>[0-9a-zA-Z_-]+)/scale$', ScaleVnfView.as_view()),
     url(r'^api/vnflcm/v1/vnf_lcm_op_occs$', QueryMultiVnfLcmOpOccs.as_view()),
     url(r'^api/vnflcm/v1/vnf_lcm_op_occs/(?P<lcmopoccid>[0-9a-zA-Z_-]+)$', QuerySingleVnfLcmOpOcc.as_view()),
 ]
