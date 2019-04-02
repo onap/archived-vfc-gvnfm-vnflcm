@@ -1,6 +1,5 @@
 #!/bin/bash
 
-pip install PyMySQL==0.9.3
 if [ ! -f /service/vfc/gvnfm/vnflcm/lcm/resources/bin/logs/django.log ]; then
     mkdir -p /service/vfc/gvnfm/vnflcm/lcm/resources/bin/logs/
     touch /service/vfc/gvnfm/vnflcm/lcm/resources/bin/logs/django.log
