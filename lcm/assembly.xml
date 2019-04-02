@@ -28,7 +28,7 @@
                 <include>**/*.py</include>
                 <include>**/*.json</include>
                 <include>**/*.yml</include>
-		<include>**/*.sh</include>
+                <include>**/*.sh</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -36,6 +36,14 @@
             <outputDirectory>/logs</outputDirectory>
             <includes>
                 <include>*.txt</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>resources</directory>
+            <outputDirectory>/resources</outputDirectory>
+            <includes>
+                <include>**/*.sh</include>
+                <include>**/*.sql</include>
             </includes>
         </fileSet>
         <fileSet>
