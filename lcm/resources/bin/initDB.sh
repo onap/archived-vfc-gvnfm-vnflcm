@@ -26,10 +26,9 @@ sql_path=$HOME/../
 mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -P$MYSQL_PORT -h$MYSQL_IP <$sql_path/dbscripts/mysql/onap-gvnfm-vnfres-createdb.sql
 sql_result=$?
 if [ $sql_result -ne 0 ] ; then
-    echo "failed to create gvnfm database"
+    echo "Failed to create gvnfm database"
     exit 1
-elif [ $sql_result -eq 0 ]; then
-    echo "create gvnfm database successfully"
+else
+    echo "Create gvnfm database successfully"
     exit 0
 fi
-
