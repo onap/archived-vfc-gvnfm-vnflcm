@@ -23,11 +23,16 @@ from rest_framework.views import APIView
 
 from lcm.nf.biz.create_vnf import CreateVnf
 from lcm.nf.biz.query_vnf import QueryVnf
+from lcm.nf.biz.update_vnf import UpdateVnf
 from lcm.nf.serializers.create_vnf_req import CreateVnfReqSerializer
 from lcm.nf.serializers.vnf_instance import VnfInstanceSerializer
 from lcm.nf.serializers.vnf_instances import VnfInstancesSerializer
+from lcm.nf.serializers.vnf_info_modifications import VnfInfoModificationsSerializer
+from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.exceptions import NFLCMExceptionNotFound
+from lcm.pub.database.models import NfInstModel
+from lcm.nf.const import VNF_STATUS
 
 logger = logging.getLogger(__name__)
 
@@ -138,4 +143,40 @@ class DeleteVnfAndQueryVnf(APIView):
             logger.error(e.message)
             logger.error(traceback.format_exc())
             logger.debug('Delete VNF instance[%s] failed' % instanceid)
+            return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @swagger_auto_schema(
+        request_body=VnfInfoModificationsSerializer(),
+        responses={
+            status.HTTP_202_ACCEPTED: "Successfully",
+            status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal error"
+        }
+    )
+    def patch(self, request, instanceid):
+        logger.debug("UpdateSingleVnf--patch::> %s, %s", instanceid, request.data)
+        try:
+            upd_vnf_serializer = VnfInfoModificationsSerializer(data=request.data)
+            if not upd_vnf_serializer.is_valid():
+                raise NFLCMException(upd_vnf_serializer.errors)
+
+            job_id = JobUtil.create_job('NF', 'UPDATE', instanceid)
+            JobUtil.add_job_status(job_id, 0, "UPDATE_VNF_READY")
+
+            vnf_insts = NfInstModel.objects.filter(nfinstid=instanceid)
+            if not vnf_insts.exists():
+                raise NFLCMExceptionNotFound("VNF(%s) does not exist." % instanceid)
+            vnf_insts.update(status=VNF_STATUS.UPDATING)
+
+            JobUtil.add_job_status(job_id, 15, 'Nf updating pre-check finish')
+            UpdateVnf(request.data, instanceid, job_id).start()
+
+            return Response(data=None, status=status.HTTP_202_ACCEPTED)
+        except NFLCMException as e:
+            logger.error(e.message)
+            logger.error('Update VNF instance[%s] failed' % instanceid)
+            return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            logger.error(e.message)
+            logger.error(traceback.format_exc())
+            logger.error('Update VNF instance[%s] failed' % instanceid)
             return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
