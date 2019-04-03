@@ -49,3 +49,12 @@ class ResourceList(APIView):
             # ResDeleteThread(request.data).start()
             adaptor.delete_vim_res(request.data, self.do_notify)
         return Response(data=None, status=status.HTTP_204_NO_CONTENT)
+
+
+class HealthCheckView(APIView):
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: 'Active'})
+    def get(self, request, format=None):
+        logger.debug("HealthCheck")
+        return Response({"status": "active"})

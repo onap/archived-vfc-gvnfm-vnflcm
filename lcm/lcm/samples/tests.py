@@ -390,3 +390,17 @@ class SampleViewTest(unittest.TestCase):
                                      r0_data_delete]
         resp = self.client.post(term_res_url, data=json.dumps(term_res_data), content_type='application/json')
         self.failUnlessEqual(status.HTTP_204_NO_CONTENT, resp.status_code)
+
+
+class HealthCheckViewTest(unittest.TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+    def tearDown(self):
+        pass
+
+    def test_health_check(self):
+        response = self.client.get("/api/vnflcm/v1/health_check")
+        self.assertEqual(status.HTTP_200_OK, response.status_code, response.content)
+        resp_data = json.loads(response.content)
+        self.assertEqual({"status": "active"}, resp_data)

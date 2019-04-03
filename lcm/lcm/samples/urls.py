@@ -18,4 +18,5 @@ from lcm.samples import views
 urlpatterns = [
     url(r'^api/vnflcm/v1/resources/(?P<action_type>(inst|term)+)$', views.ResourceList.as_view()),
     url(r'^samples/$', views.SampleList.as_view()),
+    url(r'^api/vnflcm/v1/health_check$', views.HealthCheckView.as_view())
 ]
