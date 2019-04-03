@@ -26,6 +26,7 @@ from lcm.pub.exceptions import NFLCMException, NFLCMExceptionNotFound, NFLCMExce
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.database.models import NfInstModel
 from lcm.nf.const import VNF_STATUS
+from lcm.nf.biz.scale_vnf_to_level import ScaleVnfToLevel
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +52,7 @@ class ScaleVnfToLevelView(APIView):
             JobUtil.add_job_status(job_id, 0, "SCALE_VNF_TO_LEVEL_READY")
             self.scale_pre_check(instanceid, job_id)
 
-            # ScaleVnfToLevel(scale_to_level_serializer.data, instanceid, job_id).start()
+            ScaleVnfToLevel(scale_to_level_serializer.data, instanceid, job_id).start()
 
             response = Response(data={"jobId": job_id},
                                 status=status.HTTP_202_ACCEPTED)
