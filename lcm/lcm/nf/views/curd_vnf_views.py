@@ -175,6 +175,8 @@ class DeleteVnfAndQueryVnf(APIView):
             logger.error(e.message)
             logger.error('Update VNF instance[%s] failed' % instanceid)
             return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except NFLCMExceptionNotFound as e:
+            return Response(data={'error': '%s' % e.message}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             logger.error(e.message)
             logger.error(traceback.format_exc())
