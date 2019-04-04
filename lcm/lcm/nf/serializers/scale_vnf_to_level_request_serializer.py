@@ -13,11 +13,7 @@
 # limitations under the License.
 
 from rest_framework import serializers
-
-
-class ScaleInfoSerializer(serializers.Serializer):
-    aspectId = serializers.CharField(help_text="Identifier of the scaling aspect.", required=True)
-    scaleLevel = serializers.IntegerField(help_text="Indicates the scale level.", required=True, min_value=0)
+from .scale_info import ScaleInfoSerializer
 
 
 class ScaleVnfToLevelRequestSerializer(serializers.Serializer):
