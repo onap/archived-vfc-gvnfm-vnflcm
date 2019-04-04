@@ -162,6 +162,25 @@ def list_vm(vim_id, tenant_id):
 def action_vm(vim_id, tenant_id, vm_id, data):
     return call(vim_id, tenant_id, "servers/%s/action" % vm_id, "POST", data)
 
+
+# List port interfaces, show port interface details of the given server.
+# Create a port interface and uses it to attach a port to the given server,
+# detach a port interface from the given server
+def list_vm_port(vim_id, tenant_id, vm_id):
+    return call(vim_id, tenant_id, "servers/%s/os-interface" % vm_id, "GET")
+
+
+def create_vm_port(vim_id, tenant_id, vm_id, data):
+    return call(vim_id, tenant_id, "servers/%s/os-interface" % vm_id, "POST", data)
+
+
+def get_vm_port(vim_id, tenant_id, vm_id, port_id):
+    return call(vim_id, tenant_id, "servers/%s/os-interface/%s" % (vm_id, port_id), "GET")
+
+
+def delete_vm_port(vim_id, tenant_id, vm_id, port_id):
+    return call(vim_id, tenant_id, "servers/%s/os-interface/%s" % (vm_id, port_id), "DELETE")
+
 ######################################################################
 
 
