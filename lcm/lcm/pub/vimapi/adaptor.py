@@ -409,3 +409,131 @@ def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
         time.sleep(2)
         retry_count = retry_count + 1
     raise VimException("Failed to create Vm(%s): %s." % (vm_name, opt_vm_status), ERR_CODE)
+
+
+def list_port_of_vm(vim_cache, res_cache, data, port, do_notify, res_type):
+    location_info = None
+    vm_id = ignore_case_get(port, "vm_id")
+    port_ref_vdu_id = ignore_case_get(port, "vdu_id")
+    for vdu in ignore_case_get(data, "vdus"):
+        if vdu["vdu_id"] == port_ref_vdu_id:
+            location_info = vdu["properties"]["location_info"]
+            if port["cp_id"] not in vdu["cps"]:
+                vdu["cps"].append(port["cp_id"])
+            break
+    if not location_info:
+        err_msg = "vdu_id(%s) for cp(%s) is not defined."
+        raise VimException(err_msg % (port_ref_vdu_id, port["cp_id"]), ERR_CODE)
+
+    vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
+    tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
+    ret = api.list_vm_port(vim_id, tenant_id, vm_id)
+    ret["nodeId"] = port["cp_id"]
+    do_notify(res_type, ret)
+    set_res_cache(res_cache, res_type, port["cp_id"], ret["id"])
+
+    return ret
+
+
+def get_port_of_vm(vim_cache, res_cache, data, port, do_notify, res_type):
+    location_info = None
+    vm_id = ignore_case_get(port, "vm_id")
+    port_id = ignore_case_get(port, "cp_id")
+    port_ref_vdu_id = ignore_case_get(port, "vdu_id")
+    for vdu in ignore_case_get(data, "vdus"):
+        if vdu["vdu_id"] == port_ref_vdu_id:
+            location_info = vdu["properties"]["location_info"]
+            if port["cp_id"] not in vdu["cps"]:
+                vdu["cps"].append(port["cp_id"])
+            break
+    if not location_info:
+        err_msg = "vdu_id(%s) for cp(%s) is not defined."
+        raise VimException(err_msg % (port_ref_vdu_id, port["cp_id"]), ERR_CODE)
+
+    vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
+    tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
+    ret = api.get_vm_port(vim_id, tenant_id, vm_id, port_id)
+    ret["nodeId"] = port["cp_id"]
+    do_notify(res_type, ret)
+    set_res_cache(res_cache, res_type, port["cp_id"], ret["id"])
+
+    return ret
+
+
+def create_port_of_vm(vim_cache, res_cache, data, port, do_notify, res_type):
+    location_info = None
+    vm_id = ignore_case_get(port, "vm_id")
+    port_id = ignore_case_get(port, "port_id")
+    port_ref_vdu_id = ignore_case_get(port, "vdu_id")
+    for vdu in ignore_case_get(data, "vdus"):
+        if vdu["vdu_id"] == port_ref_vdu_id:
+            location_info = vdu["properties"]["location_info"]
+            if port["cp_id"] not in vdu["cps"]:
+                vdu["cps"].append(port["cp_id"])
+            break
+    if not location_info:
+        err_msg = "vdu_id(%s) for cp(%s) is not defined."
+        raise VimException(err_msg % (port_ref_vdu_id, port["cp_id"]), ERR_CODE)
+    network_id = ignore_case_get(port, "networkId")
+    # subnet_id = ignore_case_get(port, "subnetId")
+    if not network_id:
+        network_id = get_res_id(res_cache, RES_NETWORK, port["vl_id"])
+    #    subnet_id = get_res_id(res_cache, RES_SUBNET, port["vl_id"])
+    # param = {
+    #     "networkId": network_id,
+    #     "name": port["cp_id"]
+    # }
+    # set_opt_val(param, "subnetId", subnet_id)
+    # set_opt_val(param, "macAddress", ignore_case_get(port["properties"], "mac_address"))
+    # ip_address = []
+    # for one_protocol_data in port["properties"]["protocol_data"]:
+    #     l3_address_data = one_protocol_data["address_data"]["l3_address_data"]  # l3 is not 13
+    #     fixed_ip_address = ignore_case_get(l3_address_data, "fixed_ip_address")
+    #     ip_address.extend(fixed_ip_address)
+    # for one_virtual_network_interface in port["properties"].get("virtual_network_interface_requirements", []):
+    #     interfaceTypeString = one_virtual_network_interface["network_interface_requirements"]["interfaceType"]
+    #     interfaceType = json.loads(interfaceTypeString)["configurationValue"]
+    #     vnic_type = ignore_case_get(port["properties"], "vnic_type")
+    #     if vnic_type == "":
+    #         if interfaceType == "SR-IOV":
+    #             set_opt_val(param, "vnicType", "direct")
+    #     else:
+    #         set_opt_val(param, "vnicType", vnic_type)
+    #
+    # set_opt_val(param, "ip", ",".join(ip_address))
+    # set_opt_val(param, "securityGroups", "")  # TODO
+    vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
+    tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
+
+    # ip_address = ignore_case_get(ignore_case_get(port, "properties"), "ip_address")
+    param = {
+        "interfaceAttachment": {
+            "port_id": port_id
+        }
+    }
+    ret = api.create_vm_port(vim_id, tenant_id, vm_id, param)
+    ret["nodeId"] = port["cp_id"]
+    do_notify(res_type, ret)
+
+
+def delete_port_of_vm(vim_cache, res_cache, data, port, do_notify, res_type):
+    location_info = None
+    vm_id = ignore_case_get(port, "vm_id")
+    port_id = ignore_case_get(port, "cp_id")
+    port_ref_vdu_id = ignore_case_get(port, "vdu_id")
+    for vdu in ignore_case_get(data, "vdus"):
+        if vdu["vdu_id"] == port_ref_vdu_id:
+            location_info = vdu["properties"]["location_info"]
+            if port["cp_id"] not in vdu["cps"]:
+                vdu["cps"].append(port["cp_id"])
+            break
+    if not location_info:
+        err_msg = "vdu_id(%s) for cp(%s) is not defined."
+        raise VimException(err_msg % (port_ref_vdu_id, port["cp_id"]), ERR_CODE)
+
+    vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
+    tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
+    ret = api.delete_vm_port(vim_id, tenant_id, vm_id, port_id)
+    ret["nodeId"] = port["cp_id"]
+    do_notify("delete", res_type, port_id)
+    set_res_cache(res_cache, res_type, port["cp_id"], ret["id"])
