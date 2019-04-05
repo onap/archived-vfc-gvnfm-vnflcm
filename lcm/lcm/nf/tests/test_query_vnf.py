@@ -147,7 +147,10 @@ class ResourceTest(TestCase):
     def test_get_vnf_not_exist(self):
         response = self.client.get("/api/vnflcm/v1/vnf_instances/x", format='json')
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        self.assertEqual({'error': 'VnfInst(x) does not exist.'}, response.data)
+        self.assertEqual({
+            'detail': 'VnfInst(x) does not exist.',
+            'status': 500
+        }, response.data)
 
     def test_get_vnf_net_not_exist(self):
         vnf_inst_id = "1"
@@ -165,7 +168,10 @@ class ResourceTest(TestCase):
                     ownertype='0').save()
         response = self.client.get("/api/vnflcm/v1/vnf_instances/%s" % vnf_inst_id, format='json')
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        self.assertEqual({'error': 'NetworkInst(x) does not exist.'}, response.data)
+        self.assertEqual({
+            'detail': 'NetworkInst(x) does not exist.',
+            'status': 500
+        }, response.data)
 
     def test_get_vnf_vm_not_exist(self):
         vnf_inst_id = "1"
@@ -182,7 +188,10 @@ class ResourceTest(TestCase):
                       vmid='x').save()
         response = self.client.get("/api/vnflcm/v1/vnf_instances/%s" % vnf_inst_id, format='json')
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        self.assertEqual({'error': 'VmInst(x) does not exist.'}, response.data)
+        self.assertEqual({
+            'detail': 'VmInst(x) does not exist.',
+            'status': 500
+        }, response.data)
 
     def test_get_vnf_storage_not_exist(self):
         vnf_inst_id = "1"
