@@ -17,18 +17,25 @@ from .scale_info import ScaleInfoSerializer
 
 
 class ScaleVnfToLevelRequestSerializer(serializers.Serializer):
-    instantiationLevelId = serializers.CharField(help_text="Identifier of the target instantiation level of"
-                                                           "the current deployment flavour to which the VNF is"
-                                                           "requested to be scaled.", required=False,
-                                                 allow_null=True)
-    scaleInfo = ScaleInfoSerializer(help_text="For each scaling aspect of the current deployment flavour,"
-                                              "indicates the target scale level to which the VNF is to be"
-                                              "scaled.", many=True)
-    additionalParams = serializers.DictField(help_text="Additional parameters passed by the NFVO as input"
-                                                       "to the scaling process,", required=False, allow_null=True,
-                                             child=serializers.CharField(help_text="KeyValue Pairs",
-                                                                         allow_blank=True))
+    instantiationLevelId = serializers.CharField(
+        help_text="Identifier of the target instantiation level of" +
+        "the current deployment flavour to which the VNF is requested to be scaled.",
+        required=False,
+        allow_null=True)
+    scaleInfo = ScaleInfoSerializer(
+        help_text="For each scaling aspect of the current deployment flavour," +
+        "indicates the target scale level to which the VNF is to be scaled.",
+        many=True)
+    additionalParams = serializers.DictField(
+        help_text="Additional parameters passed by the NFVO as input to the scaling process",
+        required=False,
+        allow_null=True,
+        child=serializers.CharField(
+            help_text="KeyValue Pairs",
+            allow_blank=True))
 
 
 class NfOperateJobSerializer(serializers.Serializer):
-    jobId = serializers.CharField(help_text="ID of NF operate job", required=True)
+    jobId = serializers.CharField(
+        help_text="ID of NF operate job",
+        required=True)
