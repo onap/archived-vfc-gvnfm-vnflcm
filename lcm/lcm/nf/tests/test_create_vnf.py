@@ -62,7 +62,10 @@ class TestNFInstantiate(TestCase):
         response = self.client.post("/api/vnflcm/v1/vnf_instances", data=data, format='json')
         self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
         context = json.loads(response.content)
-        self.assertEqual({'error': 'VNF is already exist.'}, context)
+        self.assertEqual({
+            'detail': 'VNF is already exist.',
+            'status': 500 
+        }, context)
 
     @mock.patch.object(restcall, 'call_req')
     @mock.patch.object(uuid, 'uuid4')
@@ -76,6 +79,11 @@ class TestNFInstantiate(TestCase):
             "vnfInstanceDescription": "vFW in Nanjing TIC Edge"
         }
         response = self.client.post("/api/vnflcm/v1/vnf_instances", data=data, format='json')
-        expect_data = {"id": "1", "vnfProvider": "huawei", "vnfdVersion": "1.0", "vnfPkgId": "111",
-                       "instantiationState": "NOT_INSTANTIATED"}
+        expect_data = {
+            "id": "1",
+            "vnfProvider": "huawei",
+            "vnfdVersion": "1.0",
+            "vnfPkgId": "111",
+            "instantiationState": "NOT_INSTANTIATED"
+        }
         self.assertEqual(expect_data, response.data)
