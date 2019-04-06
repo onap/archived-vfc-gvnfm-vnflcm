@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import logging
-import traceback
 
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -25,7 +24,7 @@ from lcm.nf.serializers.terminate_vnf_req import TerminateVnfRequestSerializer
 from lcm.nf.serializers.job_identifier import JobIdentifierSerializer
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.utils.jobutil import JobUtil
-
+from .common import view_safe_call_with_log
 
 logger = logging.getLogger(__name__)
 
@@ -38,26 +37,20 @@ class TerminateVnfView(APIView):
             status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal error"
         }
     )
+    @view_safe_call_with_log(logger=logger)
     def post(self, request, instanceid):
         logger.debug("TerminateVnf--post::> %s" % request.data)
-        try:
-            terminate_vnf_request_serializer = TerminateVnfRequestSerializer(data=request.data)
-            if not terminate_vnf_request_serializer.is_valid():
-                raise NFLCMException(terminate_vnf_request_serializer.errors)
 
-            job_id = JobUtil.create_job('NF', 'TERMINATE', instanceid)
-            JobUtil.add_job_status(job_id, 0, "TERM_VNF_READY")
-            TerminateVnf(terminate_vnf_request_serializer.data, instanceid, job_id).start()
+        terminate_vnf_request_serializer = TerminateVnfRequestSerializer(data=request.data)
+        if not terminate_vnf_request_serializer.is_valid():
+            raise NFLCMException(terminate_vnf_request_serializer.errors)
 
-            terminate_vnf_response_serializer = JobIdentifierSerializer(data={"jobId": job_id})
-            if not terminate_vnf_response_serializer.is_valid():
-                raise NFLCMException(terminate_vnf_response_serializer.errors)
+        job_id = JobUtil.create_job('NF', 'TERMINATE', instanceid)
+        JobUtil.add_job_status(job_id, 0, "TERM_VNF_READY")
+        TerminateVnf(terminate_vnf_request_serializer.data, instanceid, job_id).start()
 
-            return Response(data=terminate_vnf_response_serializer.data, status=status.HTTP_202_ACCEPTED)
-        except NFLCMException as e:
-            logger.error(e.message)
-            return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except Exception as e:
-            logger.error(e.message)
-            logger.error(traceback.format_exc())
-            return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        terminate_vnf_response_serializer = JobIdentifierSerializer(data={"jobId": job_id})
+        if not terminate_vnf_response_serializer.is_valid():
+            raise NFLCMException(terminate_vnf_response_serializer.errors)
+
+        return Response(data=terminate_vnf_response_serializer.data, status=status.HTTP_202_ACCEPTED)
