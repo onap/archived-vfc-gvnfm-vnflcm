@@ -15,7 +15,6 @@
 import ast
 import json
 import logging
-import traceback
 
 from drf_yasg.utils import swagger_auto_schema
 from lcm.nf.biz.create_subscription import CreateSubscription
@@ -29,6 +28,7 @@ from lcm.nf.serializers.lccn_subscription import LccnSubscriptionSerializer
 from lcm.nf.serializers.lccn_subscriptions import LccnSubscriptionsSerializer
 from lcm.nf.serializers.response import ProblemDetailsSerializer
 from lcm.pub.exceptions import NFLCMException
+from .common import view_safe_call_with_log
 
 logger = logging.getLogger(__name__)
 VALID_FILTERS = ["operationTypes", "operationStates", "notificationTypes", "vnfInstanceId"]
@@ -53,39 +53,31 @@ class SubscriptionsView(APIView):
             status.HTTP_500_INTERNAL_SERVER_ERROR: ProblemDetailsSerializer()
         }
     )
+    @view_safe_call_with_log(logger=logger)
     def post(self, request):
         logger.debug("SubscribeNotification--post::> %s" % request.data)
-        try:
-            lccn_subscription_request_serializer = LccnSubscriptionRequestSerializer(data=request.data)
-            if not lccn_subscription_request_serializer.is_valid():
-                raise NFLCMException(lccn_subscription_request_serializer.errors)
-            subscription = CreateSubscription(
-                lccn_subscription_request_serializer.data).do_biz()
-            lccn_notifications_filter = {
-                "notificationTypes": ast.literal_eval(subscription.notification_types),
-                "operationTypes": ast.literal_eval(subscription.operation_types),
-                "operationStates": ast.literal_eval(subscription.operation_states),
-                "vnfInstanceSubscriptionFilter": json.loads(subscription.vnf_instance_filter)
-            }
-            subscription_data = {
-                "id": subscription.subscription_id,
-                "callbackUri": subscription.callback_uri,
-                "_links": json.loads(subscription.links),
-                "filter": lccn_notifications_filter
-            }
-            sub_resp_serializer = LccnSubscriptionSerializer(data=subscription_data)
-            if not sub_resp_serializer.is_valid():
-                raise NFLCMException(sub_resp_serializer.errors)
-            return Response(data=sub_resp_serializer.data, status=status.HTTP_201_CREATED)
-        except NFLCMException as e:
-            logger.error(e.message)
-            if "exists" in e.message:
-                return Response(data={'error': '%s' % e.message}, status=status.HTTP_303_SEE_OTHER)
-            return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except Exception as e:
-            logger.error(e.message)
-            logger.error(traceback.format_exc())
-            return Response(data={'error': e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        lccn_subscription_request_serializer = LccnSubscriptionRequestSerializer(data=request.data)
+        if not lccn_subscription_request_serializer.is_valid():
+            raise NFLCMException(lccn_subscription_request_serializer.errors)
+        subscription = CreateSubscription(
+            lccn_subscription_request_serializer.data).do_biz()
+        lccn_notifications_filter = {
+            "notificationTypes": ast.literal_eval(subscription.notification_types),
+            "operationTypes": ast.literal_eval(subscription.operation_types),
+            "operationStates": ast.literal_eval(subscription.operation_states),
+            "vnfInstanceSubscriptionFilter": json.loads(subscription.vnf_instance_filter)
+        }
+        subscription_data = {
+            "id": subscription.subscription_id,
+            "callbackUri": subscription.callback_uri,
+            "_links": json.loads(subscription.links),
+            "filter": lccn_notifications_filter
+        }
+        sub_resp_serializer = LccnSubscriptionSerializer(data=subscription_data)
+        if not sub_resp_serializer.is_valid():
+            raise NFLCMException(sub_resp_serializer.errors)
+        return Response(data=sub_resp_serializer.data, status=status.HTTP_201_CREATED)
 
     @swagger_auto_schema(
         responses={
@@ -94,28 +86,22 @@ class SubscriptionsView(APIView):
             status.HTTP_500_INTERNAL_SERVER_ERROR: ProblemDetailsSerializer()
         }
     )
+    @view_safe_call_with_log(logger=logger)
     def get(self, request):
         logger.debug("SubscribeNotification--get::> %s" % request.query_params)
-        try:
-            if request.query_params and not set(request.query_params).issubset(set(VALID_FILTERS)):
-                problem_details_serializer = get_problem_details_serializer(status.HTTP_400_BAD_REQUEST, "Not a valid filter")
-                return Response(data=problem_details_serializer.data, status=status.HTTP_400_BAD_REQUEST)
-            resp_data = QuerySubscription(request.query_params).query_multi_subscriptions()
 
-            subscriptions_serializer = LccnSubscriptionsSerializer(data=resp_data)
-            if not subscriptions_serializer.is_valid():
-                raise NFLCMException(subscriptions_serializer.errors)
+        if request.query_params and not set(request.query_params).issubset(set(VALID_FILTERS)):
+            problem_details_serializer = get_problem_details_serializer(
+                status.HTTP_400_BAD_REQUEST,
+                "Not a valid filter"
+            )
+            return Response(data=problem_details_serializer.data,
+                            status=status.HTTP_400_BAD_REQUEST)
+        resp_data = QuerySubscription(request.query_params).query_multi_subscriptions()
 
-            logger.debug("SubscribeNotification--get::> Remove default fields if exclude_default" +
-                         " is specified")
-            return Response(data=subscriptions_serializer.data, status=status.HTTP_200_OK)
-        except NFLCMException as e:
-            logger.error(e.message)
-            problem_details_serializer = get_problem_details_serializer(status.HTTP_500_INTERNAL_SERVER_ERROR, traceback.format_exc())
-            return Response(data=problem_details_serializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        subscriptions_serializer = LccnSubscriptionsSerializer(data=resp_data)
+        if not subscriptions_serializer.is_valid():
+            raise NFLCMException(subscriptions_serializer.errors)
 
-        except Exception as e:
-            logger.error(e.message)
-            logger.error(traceback.format_exc())
-            problem_details_serializer = get_problem_details_serializer(status.HTTP_500_INTERNAL_SERVER_ERROR, traceback.format_exc())
-            return Response(data=problem_details_serializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        logger.debug("SubscribeNotification--get::> Remove default fields")
+        return Response(data=subscriptions_serializer.data, status=status.HTTP_200_OK)
