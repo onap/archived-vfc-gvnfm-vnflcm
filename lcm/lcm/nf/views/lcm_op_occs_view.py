@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import logging
-import traceback
 
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -25,6 +24,7 @@ from lcm.nf.serializers.response import ProblemDetailsSerializer
 from lcm.nf.serializers.vnf_lcm_op_occ import VNFLCMOpOccSerializer
 from lcm.nf.serializers.vnf_lcm_op_occs import VNFLCMOpOccsSerializer
 from lcm.pub.exceptions import NFLCMException
+from .common import view_safe_call_with_log
 
 logger = logging.getLogger(__name__)
 EXCLUDE_DEFAULT = ['operationParams', 'error', 'resourceChanges', 'changedInfo', 'changedExtConnectivity']
@@ -51,36 +51,26 @@ class QueryMultiVnfLcmOpOccs(APIView):
             status.HTTP_500_INTERNAL_SERVER_ERROR: ProblemDetailsSerializer()
         }
     )
+    @view_safe_call_with_log(logger=logger)
     def get(self, request):
         logger.debug("QueryMultiVnfLcmOpOccs--get::> %s" % request.query_params)
-        try:
-            if request.query_params and not set(request.query_params).issubset(set(VALID_FILTERS)):
-                problem_details_serializer = get_problem_details_serializer(status.HTTP_400_BAD_REQUEST, "Not a valid filter")
-                return Response(data=problem_details_serializer.data, status=status.HTTP_400_BAD_REQUEST)
-            resp_data = QueryVnfLcmOpOcc(request.query_params).query_multi_vnf_lcm_op_occ()
+        if request.query_params and not set(request.query_params).issubset(set(VALID_FILTERS)):
+            problem_details_serializer = get_problem_details_serializer(status.HTTP_400_BAD_REQUEST, "Not a valid filter")
+            return Response(data=problem_details_serializer.data, status=status.HTTP_400_BAD_REQUEST)
+        resp_data = QueryVnfLcmOpOcc(request.query_params).query_multi_vnf_lcm_op_occ()
 
-            vnf_lcm_op_occs_serializer = VNFLCMOpOccsSerializer(data=resp_data)
-            if not vnf_lcm_op_occs_serializer.is_valid():
-                raise NFLCMException(vnf_lcm_op_occs_serializer.errors)
+        vnf_lcm_op_occs_serializer = VNFLCMOpOccsSerializer(data=resp_data)
+        if not vnf_lcm_op_occs_serializer.is_valid():
+            raise NFLCMException(vnf_lcm_op_occs_serializer.errors)
 
-            logger.debug("QueryMultiVnfLcmOpOccs--get::> Remove default fields if exclude_default" +
-                         " is specified")
-            # TODO(bharath): Add support for "fields", "exclude_fields" in query parameters
-            if 'exclude_default' in request.query_params.keys():
-                for field in EXCLUDE_DEFAULT:
-                    for lcm_op in vnf_lcm_op_occs_serializer.data:
-                        del lcm_op[field]
-            return Response(data=vnf_lcm_op_occs_serializer.data, status=status.HTTP_200_OK)
-        except NFLCMException as e:
-            logger.error(e.message)
-            problem_details_serializer = get_problem_details_serializer(status.HTTP_500_INTERNAL_SERVER_ERROR, e.message)
-            return Response(data=problem_details_serializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        except Exception as e:
-            logger.error(e.message)
-            logger.error(traceback.format_exc())
-            problem_details_serializer = get_problem_details_serializer(status.HTTP_500_INTERNAL_SERVER_ERROR, e.message)
-            return Response(data=problem_details_serializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        logger.debug("QueryMultiVnfLcmOpOccs--get::> Remove default fields if exclude_default" +
+                     " is specified")
+        # TODO(bharath): Add support for "fields", "exclude_fields" in query parameters
+        if 'exclude_default' in request.query_params.keys():
+            for field in EXCLUDE_DEFAULT:
+                for lcm_op in vnf_lcm_op_occs_serializer.data:
+                    del lcm_op[field]
+        return Response(data=vnf_lcm_op_occs_serializer.data, status=status.HTTP_200_OK)
 
 
 class QuerySingleVnfLcmOpOcc(APIView):
@@ -90,22 +80,15 @@ class QuerySingleVnfLcmOpOcc(APIView):
             status.HTTP_500_INTERNAL_SERVER_ERROR: ProblemDetailsSerializer()
         }
     )
+    @view_safe_call_with_log(logger=logger)
     def get(self, request, lcmopoccid):
         logger.debug("QuerySingleVnfLcmOpOcc--get::> %s" % request.query_params)
-        try:
-            resp_data = QueryVnfLcmOpOcc(request.query_params, lcm_op_occ_id=lcmopoccid).query_single_vnf_lcm_op_occ()
 
-            vnf_lcm_op_occ_serializer = VNFLCMOpOccSerializer(data=resp_data)
-            if not vnf_lcm_op_occ_serializer.is_valid():
-                raise NFLCMException(vnf_lcm_op_occ_serializer.errors)
+        resp_data = QueryVnfLcmOpOcc(request.query_params,
+                                     lcm_op_occ_id=lcmopoccid).query_single_vnf_lcm_op_occ()
 
-            return Response(data=vnf_lcm_op_occ_serializer.data, status=status.HTTP_200_OK)
-        except NFLCMException as e:
-            logger.error(e.message)
-            problem_details_serializer = get_problem_details_serializer(status.HTTP_500_INTERNAL_SERVER_ERROR, e.message)
-            return Response(data=problem_details_serializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except Exception as e:
-            logger.error(e.message)
-            logger.error(traceback.format_exc())
-            problem_details_serializer = get_problem_details_serializer(status.HTTP_500_INTERNAL_SERVER_ERROR, e.message)
-            return Response(data=problem_details_serializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        vnf_lcm_op_occ_serializer = VNFLCMOpOccSerializer(data=resp_data)
+        if not vnf_lcm_op_occ_serializer.is_valid():
+            raise NFLCMException(vnf_lcm_op_occ_serializer.errors)
+
+        return Response(data=vnf_lcm_op_occ_serializer.data, status=status.HTTP_200_OK)
