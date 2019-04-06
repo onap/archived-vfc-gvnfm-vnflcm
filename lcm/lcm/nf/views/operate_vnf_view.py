@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import logging
-import traceback
 
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -27,6 +26,7 @@ from lcm.pub.exceptions import NFLCMException, NFLCMExceptionNotFound, NFLCMExce
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.database.models import NfInstModel
 from lcm.nf.const import VNF_STATUS
+from .common import view_safe_call_with_log
 
 logger = logging.getLogger(__name__)
 
@@ -41,40 +41,22 @@ class OperateVnfView(APIView):
             status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal error"
         }
     )
+    @view_safe_call_with_log(logger=logger)
     def post(self, request, instanceid):
         logger.debug("OperateVnf--post::> %s" % request.data)
-        try:
-            operate_vnf_request_serializer = OperateVnfRequestSerializer(data=request.data)
-            if not operate_vnf_request_serializer.is_valid():
-                raise NFLCMException(operate_vnf_request_serializer.errors)
 
-            job_id = JobUtil.create_job('NF', 'OPERATE', instanceid)
-            JobUtil.add_job_status(job_id, 0, "OPERATE_VNF_READY")
-            self.operate_pre_check(instanceid, job_id)
-            OperateVnf(operate_vnf_request_serializer.data, instanceid, job_id).start()
-            response = Response(data={"jobId": job_id}, status=status.HTTP_202_ACCEPTED)
-            # Location todo, it use job as the status storage
-            # response["Location"] = "/api/vnflcm/v1/vnf_lcm_op_occs/%s" % lcmopoccid
-            return response
-        except NFLCMExceptionNotFound as e:
-            probDetail = ProblemDetailsSerializer(data={"status": 404, "detail": "VNF Instance not found"})
-            resp_isvalid = probDetail.is_valid()
-            if not resp_isvalid:
-                raise NFLCMException(probDetail.errors)
-            return Response(data=probDetail.data, status=status.HTTP_404_NOT_FOUND)
-        except NFLCMExceptionConflict as e:
-            probDetail = ProblemDetailsSerializer(data={"status": 409, "detail": "VNF Instance not in Instantiated State"})
-            resp_isvalid = probDetail.is_valid()
-            if not resp_isvalid:
-                raise NFLCMException(probDetail.errors)
-            return Response(data=probDetail.data, status=status.HTTP_409_CONFLICT)
-        except NFLCMException as e:
-            logger.error(e.message)
-            return Response(data={'error': '%s' % e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except Exception as e:
-            logger.error(e.message)
-            logger.error(traceback.format_exc())
-            return Response(data={'error': 'unexpected exception'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        operate_vnf_request_serializer = OperateVnfRequestSerializer(data=request.data)
+        if not operate_vnf_request_serializer.is_valid():
+            raise NFLCMException(operate_vnf_request_serializer.errors)
+
+        job_id = JobUtil.create_job('NF', 'OPERATE', instanceid)
+        JobUtil.add_job_status(job_id, 0, "OPERATE_VNF_READY")
+        self.operate_pre_check(instanceid, job_id)
+        OperateVnf(operate_vnf_request_serializer.data, instanceid, job_id).start()
+        response = Response(data={"jobId": job_id}, status=status.HTTP_202_ACCEPTED)
+        # Location todo, it use job as the status storage
+        # response["Location"] = "/api/vnflcm/v1/vnf_lcm_op_occs/%s" % lcmopoccid
+        return response
 
     def operate_pre_check(self, nfInstId, jobId):
         vnf_insts = NfInstModel.objects.filter(nfinstid=nfInstId)
