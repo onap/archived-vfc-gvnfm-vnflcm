@@ -95,7 +95,8 @@ class TestSubscription(TestCase):
         mock_requests.return_value.status_code = 204
         mock_requests.get.return_value.status_code = 204
         expected_data = {
-            'error': 'Auth type should be BASIC'
+            'detail': 'Auth type should be BASIC',
+            'status': 500
         }
         response = self.client.post("/api/vnflcm/v1/subscriptions", data=dummy_subscription, format='json')
         self.assertEqual(500, response.status_code)
@@ -118,8 +119,9 @@ class TestSubscription(TestCase):
         mock_requests.return_value.status_code = 204
         mock_requests.get.return_value.status_code = 204
         expected_data = {
-            'error': 'If you are setting operationTypes,then ' +
-            'notificationTypes must be VnfLcmOperationOccurrenceNotification'
+            'detail': 'If you are setting operationTypes,then ' +
+            'notificationTypes must be VnfLcmOperationOccurrenceNotification',
+            'status': 500
         }
         response = self.client.post("/api/vnflcm/v1/subscriptions", data=dummy_subscription, format='json')
         self.assertEqual(500, response.status_code)
@@ -150,7 +152,3 @@ class TestSubscription(TestCase):
         self.assertEqual(temp_uuid, response.data["id"])
         response = self.client.post("/api/vnflcm/v1/subscriptions", data=dummy_subscription, format='json')
         self.assertEqual(303, response.status_code)
-        expected_data = {
-            "error": "Already Subscription exists with the same callbackUri and filter"
-        }
-        self.assertEqual(expected_data, response.data)
