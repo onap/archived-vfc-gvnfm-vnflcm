@@ -24,6 +24,7 @@ from lcm.nf.serializers.instantiate_vnf_request import InstantiateVnfRequestSeri
 from lcm.nf.serializers.job_identifier import JobIdentifierSerializer
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.utils.jobutil import JobUtil
+from .common import view_safe_call_with_log
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +37,7 @@ class InstantiateVnfView(APIView):
             status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal error"
         }
     )
+    @view_safe_call_with_log(logger=logger)
     def post(self, request, instanceid):
         logger.debug("InstantiateVnf--post::> %s" % request.data)
 
