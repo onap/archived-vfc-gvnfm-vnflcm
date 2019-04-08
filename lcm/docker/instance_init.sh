@@ -27,5 +27,6 @@ GET_VNFM_DB="show databases like 'gvnfm';"
 VNFM_DB=`mysql -u$MYSQL_ROOT_USER -p$MYSQL_ROOT_PASSWORD -P$MYSQL_PORT -h$MYSQL_IP -e "$GET_VNFM_DB"`
 if [[ "$VNFM_DB" == "" ]]; then
     create_database
-    migrate_database
+
 fi
+migrate_database
