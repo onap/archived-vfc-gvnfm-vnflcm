@@ -16,12 +16,41 @@ import json
 from lcm.pub.config import config
 from lcm.pub.utils.jobutil import enum
 
-HEAL_ACTION_TYPE = enum(START="vmCreate", RESTART="vmReset")
-ACTION_TYPE = enum(START=1, STOP=2, REBOOT=3)
-GRANT_TYPE = enum(INSTANTIATE="INSTANTIATE", TERMINATE="TERMINATE", HEAL_CREATE="Heal Create", HEAL_RESTART="Heal Restart", OPERATE="OPERATE")
-VNF_STATUS = enum(NULL='null', INSTANTIATING="instantiating", INACTIVE='inactive', ACTIVE="active",
-                  FAILED="failed", TERMINATING="terminating", SCALING="scaling", OPERATING="operating",
-                  UPDATING="updating", HEALING="healing")
+HEAL_ACTION_TYPE = enum(
+    START="vmCreate",
+    RESTART="vmReset"
+)
+
+ACTION_TYPE = enum(
+    START=1,
+    STOP=2,
+    REBOOT=3
+)
+
+GRANT_TYPE = enum(
+    INSTANTIATE="INSTANTIATE",
+    TERMINATE="TERMINATE",
+    HEAL_CREATE="Heal Create",
+    HEAL_RESTART="Heal Restart",
+    SCALE_IN="SCALE_IN",
+    SCALE_OUT="SCALE_OUT",
+    CHANGE_FLAVOUR="CHANGE_FLAVOUR",
+    OPERATE="OPERATE",
+    CHANGE_CONNECTIVITY="CHANGE_CONNECTIVITY",
+)
+
+VNF_STATUS = enum(
+    NULL='null',
+    INSTANTIATING="instantiating",
+    INACTIVE='inactive',
+    ACTIVE="active",
+    FAILED="failed",
+    TERMINATING="terminating",
+    SCALING="scaling",
+    OPERATING="operating",
+    UPDATING="updating",
+    HEALING="healing"
+)
 
 OPERATION_TYPE = enum(
     INSTANTIATE="INSTANTIATE",
