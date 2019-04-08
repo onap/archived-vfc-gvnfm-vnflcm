@@ -27,6 +27,7 @@ from lcm.pub.exceptions import NFLCMExceptionConflict
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.database.models import NfInstModel
 from lcm.nf.const import VNF_STATUS
+from lcm.nf.biz.change_ext_conn import ChangeExtConn
 from .common import view_safe_call_with_log
 
 logger = logging.getLogger(__name__)
@@ -54,7 +55,7 @@ class ChangeExtConnView(APIView):
         JobUtil.add_job_status(job_id, 0, "CHG_EXT_CONN_READY")
         self.chg_ext_conn_pre_check(instanceid, job_id)
 
-        # TODO: call biz logic
+        ChangeExtConn(chg_ext_conn_serializer.data, instanceid, job_id).start()
 
         response = Response(data={"jobId": job_id},
                             status=status.HTTP_202_ACCEPTED)
