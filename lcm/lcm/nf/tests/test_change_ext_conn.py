@@ -15,10 +15,22 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from lcm.pub.database.models import NfInstModel
+
 
 class TestChangeExtConn(TestCase):
     def setUp(self):
         self.client = APIClient()
+        NfInstModel(nfinstid='1',
+                    nf_name='VNF1',
+                    nf_desc="VNF DESC",
+                    vnfdid="1",
+                    netype="XGW",
+                    vendor="ZTE",
+                    vnfSoftwareVersion="V1",
+                    version="V1",
+                    package_id="2",
+                    status='NOT_INSTANTIATED').save()
 
     def tearDown(self):
         pass
@@ -30,3 +42,11 @@ class TestChangeExtConn(TestCase):
                                     data=req_data,
                                     format='json')
         self.failUnlessEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_change_ext_conn_conflict(self):
+        req_data = {}
+        url = "/api/vnflcm/v1/vnf_instances/1/change_ext_conn"
+        response = self.client.post(url,
+                                    data=req_data,
+                                    format='json')
+        self.failUnlessEqual(status.HTTP_409_CONFLICT, response.status_code)
