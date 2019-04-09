@@ -15,16 +15,28 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from lcm.pub.database.models import NfInstModel
+
 
 class TestFlavour(TestCase):
     def setUp(self):
         self.client = APIClient()
+        NfInstModel(nfinstid='12345',
+                    nf_name='VNF1',
+                    nf_desc="VNF DESC",
+                    vnfdid="1",
+                    netype="XGW",
+                    vendor="ZTE",
+                    vnfSoftwareVersion="V1",
+                    version="V1",
+                    package_id="2",
+                    status='NOT_INSTANTIATED').save()
         self.req_data = {
             "newFlavourId": "myFlavour_new"
         }
 
     def tearDown(self):
-        pass
+        NfInstModel.objects.filter(nfinstid='12345').delete()
 
     def test_change_flavour_not_found(self):
         url = "/api/vnflcm/v1/vnf_instances/12/change_flavour"
@@ -32,3 +44,10 @@ class TestFlavour(TestCase):
                                     data=self.req_data,
                                     format='json')
         self.failUnlessEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_change_flavour_conflict(self):
+        url = "/api/vnflcm/v1/vnf_instances/12345/change_flavour"
+        response = self.client.post(url,
+                                    data=self.req_data,
+                                    format='json')
+        self.failUnlessEqual(status.HTTP_409_CONFLICT, response.status_code)
