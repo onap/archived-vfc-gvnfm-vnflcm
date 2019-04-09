@@ -15,18 +15,71 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from lcm.pub.database.models import NfInstModel
+
 
 class TestChangeExtConn(TestCase):
     def setUp(self):
         self.client = APIClient()
+        NfInstModel(nfinstid='12345',
+                    nf_name='VNF1',
+                    nf_desc="VNF DESC",
+                    vnfdid="1",
+                    netype="XGW",
+                    vendor="ZTE",
+                    vnfSoftwareVersion="V1",
+                    version="V1",
+                    package_id="2",
+                    status='NOT_INSTANTIATED').save()
+        self.req_data = {
+            "extVirtualLinks": [{
+                "id": "string",
+                "resourceId": "329efb86-5cbb-4fc0-bc7c-6ea28f9d7389",
+                "resourceSubnetId": "429efb86-5cbb-4fc0-bc7c-6ea28f9d7389",
+                "extCps": [{
+                    "cpdId": "ext_cp",
+                    "cpConfig": [{
+                        "cpInstanceId": "",
+                        "cpProtocolData": [{
+                            "layerProtocol": "IP_OVER_ETHERNET",
+                            "ipOverEthernet": {
+                                "ipAddresses": [{
+                                    "type": "IPV4",
+                                    "numDynamicAddresses": 0,
+                                    "subnetId": "59e9ffa9-b67e-4c05-b191-ed179007536e"
+                                }]
+                            }
+                        }]
+                    }]
+                }],
+                "extLinkPorts": []
+            }],
+            "vimConnectionInfo": [{
+                "id": "tecs_RegionOne",
+                "vimType": "openstack",
+                "vimId": "tecs_RegionOne",
+                "accessInfo": {
+                    "tenant": "admin"
+                }
+            }],
+            "additionalParams": {
+                "vmid": "552ea058-6441-4de5-b4c1-b0a52c7557e8"
+            }
+        }
 
     def tearDown(self):
-        pass
+        NfInstModel.objects.filter(nfinstid='12345').delete()
 
     def test_change_ext_conn_not_found(self):
-        req_data = {}
         url = "/api/vnflcm/v1/vnf_instances/12/change_ext_conn"
         response = self.client.post(url,
-                                    data=req_data,
+                                    data=self.req_data,
                                     format='json')
         self.failUnlessEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_change_ext_conn_conflict(self):
+        url = "/api/vnflcm/v1/vnf_instances/12345/change_ext_conn"
+        response = self.client.post(url,
+                                    data=self.req_data,
+                                    format='json')
+        self.failUnlessEqual(status.HTTP_409_CONFLICT, response.status_code)

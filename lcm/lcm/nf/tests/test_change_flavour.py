@@ -19,14 +19,16 @@ from rest_framework.test import APIClient
 class TestFlavour(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.req_data = {
+            "newFlavourId": "myFlavour_new"
+        }
 
     def tearDown(self):
         pass
 
     def test_change_flavour_not_found(self):
-        req_data = {}
         url = "/api/vnflcm/v1/vnf_instances/12/change_flavour"
         response = self.client.post(url,
-                                    data=req_data,
+                                    data=self.req_data,
                                     format='json')
         self.failUnlessEqual(status.HTTP_404_NOT_FOUND, response.status_code)

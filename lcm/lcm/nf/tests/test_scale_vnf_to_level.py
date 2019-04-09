@@ -19,14 +19,17 @@ from rest_framework.test import APIClient
 class TestNfScaleToLevel(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.req_data = {
+            "instantiationLevelId": "instantiation_level_2",
+            "scaleInfo": []
+        }
 
     def tearDown(self):
         pass
 
     def test_scale_vnf_to_level_not_found(self):
-        req_data = {}
         url = "/api/vnflcm/v1/vnf_instances/12/scale_to_level"
         response = self.client.post(url,
-                                    data=req_data,
+                                    data=self.req_data,
                                     format='json')
         self.failUnlessEqual(status.HTTP_404_NOT_FOUND, response.status_code)
