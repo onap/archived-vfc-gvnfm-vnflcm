@@ -6,6 +6,7 @@ ARG HTTPS_PROXY=${HTTPS_PROXY}
 ENV http_proxy $HTTP_PROXY
 ENV https_proxy $HTTPS_PROXY
 
+
 RUN sed -i "s|set compatible|set nocompatible|" /etc/vim/vimrc.tiny
 RUN echo "set backspace=2" >> /etc/vim/vimrc.tiny
 
@@ -22,7 +23,11 @@ RUN apt-get update && \
     apt-get install -y curl && \
     apt-get install -y build-essential && \
     apt-get install -y libssl-dev && \
-    apt-get install -y libffi-dev
+    apt-get install -y libffi-dev && \
+    groupadd -r onap && useradd -r -g onap onap && \
+    chmod u+w /etc/sudoers && \
+    sed -i '/User privilege/a\\onap    ALL=(ALL:ALL) NOPASSWD:ALL' /etc/sudoers && \
+    chmod u-x /etc/sudoers
 
 ADD . /service
 WORKDIR /service
@@ -30,12 +35,13 @@ WORKDIR /service
 # get binary zip from nexus
 RUN wget -q -O vfc-gvnfm-vnflcm-lcm.zip 'https://nexus.onap.org/service/local/artifact/maven/redirect?r=snapshots&g=org.onap.vfc.gvnfm.vnflcm.lcm&a=vfc-gvnfm-vnflcm-lcm&v=LATEST&e=zip' && \
     unzip vfc-gvnfm-vnflcm-lcm.zip && \
-    rm -rf vfc-gvnfm-vnflcm-lcm.zip
+    rm -rf vfc-gvnfm-vnflcm-lcm.zip && \
+    chown onap:onap /service -R
 
 WORKDIR /service/vfc/gvnfm/vnflcm/lcm
 RUN pip install -r requirements.txt
 
 EXPOSE 8801
-
+USER onap
 WORKDIR /service
 ENTRYPOINT vfc/gvnfm/vnflcm/lcm/docker/docker-entrypoint.sh
