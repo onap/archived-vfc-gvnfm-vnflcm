@@ -85,6 +85,7 @@ class TestNFTerminate(TestCase):
         NetworkInstModel.objects.all().delete()
         SubNetworkInstModel.objects.all().delete()
         PortInstModel.objects.all().delete()
+        NfInstModel.objects.all().delete()
 
     def assert_job_result(self, job_id, job_progress, job_detail):
         jobs = JobStatusModel.objects.filter(jobid=job_id,
@@ -111,6 +112,36 @@ class TestNFTerminate(TestCase):
         mock_run.re.return_value = None
         response = self.client.post("/api/vnflcm/v1/vnf_instances/12/terminate", data=req_data, format='json')
         self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code, response.content)
+
+    @mock.patch.object(TerminateVnf, 'run')
+    def test_terminate_vnf_not_found(self, mock_run):
+        req_data = {
+            "terminationType": "GRACEFUL",
+            "gracefulTerminationTimeout": 120
+        }
+        mock_run.re.return_value = None
+        response = self.client.post("/api/vnflcm/v1/vnf_instances/567/terminate", data=req_data, format='json')
+        self.failUnlessEqual(status.HTTP_404_NOT_FOUND, response.status_code, response.content)
+
+    @mock.patch.object(TerminateVnf, 'run')
+    def test_terminate_vnf_conflict(self, mock_run):
+        req_data = {
+            "terminationType": "GRACEFUL",
+            "gracefulTerminationTimeout": 120
+        }
+        NfInstModel(nfinstid='123',
+                    nf_name='VNF1',
+                    nf_desc="VNF DESC",
+                    vnfdid="1",
+                    netype="XGW",
+                    vendor="ZTE",
+                    vnfSoftwareVersion="V1",
+                    version="V1",
+                    package_id="2",
+                    status='NOT_INSTANTIATED').save()
+        mock_run.re.return_value = None
+        response = self.client.post("/api/vnflcm/v1/vnf_instances/123/terminate", data=req_data, format='json')
+        self.failUnlessEqual(status.HTTP_409_CONFLICT, response.status_code, response.content)
 
     def test_terminate_vnf_when_inst_id_not_exist(self):
         data = {
