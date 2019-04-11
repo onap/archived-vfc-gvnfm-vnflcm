@@ -22,7 +22,9 @@ from rest_framework.views import APIView
 from lcm.nf.biz.heal_vnf import HealVnf
 from lcm.nf.serializers.heal_vnf_req import HealVnfRequestSerializer
 from lcm.nf.serializers.response import ProblemDetailsSerializer
-from lcm.pub.exceptions import NFLCMException, NFLCMExceptionNotFound
+from lcm.pub.exceptions import NFLCMException
+from lcm.pub.exceptions import NFLCMExceptionNotFound
+from lcm.pub.exceptions import NFLCMExceptionConflict
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.database.models import NfInstModel
 from lcm.nf.const import VNF_STATUS
@@ -62,6 +64,9 @@ class HealVnfView(APIView):
         vnf_insts = NfInstModel.objects.filter(nfinstid=nf_inst_id)
         if not vnf_insts.exists():
             raise NFLCMExceptionNotFound("VNF nf_inst_id does not exist.")
+
+        if vnf_insts[0].status != 'INSTANTIATED':
+            raise NFLCMExceptionConflict("VNF instantiationState is not INSTANTIATED.")
 
         NfInstModel.objects.filter(nfinstid=nf_inst_id).update(status=VNF_STATUS.HEALING)
         JobUtil.add_job_status(job_id, 15, 'Nf healing pre-check finish')
