@@ -15,6 +15,8 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from lcm.pub.database.models import NfInstModel
+
 
 class TestNfScaleToLevel(TestCase):
     def setUp(self):
@@ -23,9 +25,19 @@ class TestNfScaleToLevel(TestCase):
             "instantiationLevelId": "instantiation_level_2",
             "scaleInfo": []
         }
+        NfInstModel(nfinstid='98765',
+                    nf_name='VNF1',
+                    nf_desc="VNF DESC",
+                    vnfdid="1",
+                    netype="XGW",
+                    vendor="ZTE",
+                    vnfSoftwareVersion="V1",
+                    version="V1",
+                    package_id="2",
+                    status='NOT_INSTANTIATED').save()
 
     def tearDown(self):
-        pass
+        NfInstModel.objects.filter(nfinstid='98765').delete()
 
     def test_scale_vnf_to_level_not_found(self):
         url = "/api/vnflcm/v1/vnf_instances/12/scale_to_level"
@@ -33,3 +45,10 @@ class TestNfScaleToLevel(TestCase):
                                     data=self.req_data,
                                     format='json')
         self.failUnlessEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_scale_vnf_conflict(self):
+        url = "/api/vnflcm/v1/vnf_instances/98765/scale_to_level"
+        response = self.client.post(url,
+                                    data=self.req_data,
+                                    format='json')
+        self.failUnlessEqual(status.HTTP_409_CONFLICT, response.status_code)
