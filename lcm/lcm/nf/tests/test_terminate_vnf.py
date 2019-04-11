@@ -98,10 +98,19 @@ class TestNFTerminate(TestCase):
             "terminationType": "GRACEFUL",
             "gracefulTerminationTimeout": 120
         }
-        NfInstModel(nfinstid='12', nf_name='VNF1').save()
+        NfInstModel(nfinstid='12',
+                    nf_name='VNF1',
+                    nf_desc="VNF DESC",
+                    vnfdid="1",
+                    netype="XGW",
+                    vendor="ZTE",
+                    vnfSoftwareVersion="V1",
+                    version="V1",
+                    package_id="2",
+                    status='INSTANTIATED').save()
         mock_run.re.return_value = None
         response = self.client.post("/api/vnflcm/v1/vnf_instances/12/terminate", data=req_data, format='json')
-        self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
+        self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code, response.content)
 
     def test_terminate_vnf_when_inst_id_not_exist(self):
         data = {
