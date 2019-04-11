@@ -59,7 +59,7 @@ class TestNFInstantiate(TestCase):
         }
 
     def tearDown(self):
-        pass
+        NfInstModel.objects.all().delete()
 
     def assert_job_result(self, job_id, job_progress, job_detail):
         jobs = JobStatusModel.objects.filter(jobid=job_id,
@@ -69,10 +69,43 @@ class TestNFInstantiate(TestCase):
 
     @mock.patch.object(InstantiateVnf, 'run')
     def test_instantiate_vnf(self, mock_run):
-        NfInstModel(nfinstid='12', nf_name='VNF1', status='UN_INSTANTIATED').save()
+        NfInstModel(
+            nfinstid='12',
+            nf_name='VNF1',
+            status='NOT_INSTANTIATED'
+        ).save()
         mock_run.re.return_value = None
-        response = self.client.post('/api/vnflcm/v1/vnf_instances/12/instantiate', data=inst_req_data, format='json')
+        response = self.client.post(
+            '/api/vnflcm/v1/vnf_instances/12/instantiate',
+            data=inst_req_data,
+            format='json'
+        )
         self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
+
+    @mock.patch.object(InstantiateVnf, 'run')
+    def test_instantiate_vnf_notfound(self, mock_run):
+        mock_run.re.return_value = None
+        response = self.client.post(
+            '/api/vnflcm/v1/vnf_instances/3421/instantiate',
+            data=inst_req_data,
+            format='json'
+        )
+        self.failUnlessEqual(status.HTTP_404_NOT_FOUND, response.status_code, response.content)
+
+    @mock.patch.object(InstantiateVnf, 'run')
+    def test_instantiate_vnf_conflict(self, mock_run):
+        NfInstModel(
+            nfinstid='1123',
+            nf_name='VNF1',
+            status='INSTANTIATED'
+        ).save()
+        mock_run.re.return_value = None
+        response = self.client.post(
+            '/api/vnflcm/v1/vnf_instances/1123/instantiate',
+            data=inst_req_data,
+            format='json'
+        )
+        self.failUnlessEqual(status.HTTP_409_CONFLICT, response.status_code, response.content)
 
     def test_instantiate_vnf_when_inst_id_not_exist(self):
         self.nf_inst_id = str(uuid.uuid4())
