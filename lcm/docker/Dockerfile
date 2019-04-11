@@ -23,7 +23,6 @@ RUN apt-get update && \
     apt-get install -y unzip && \
     apt-get install -y curl && \
     apt-get install -y build-essential && \
-#    apt-get install -y libssl-dev && \
     apt-get install -y libffi-dev && \
     groupadd -r onap && useradd -r -g onap onap && \
     chmod u+w /etc/sudoers && \
@@ -36,8 +35,10 @@ WORKDIR /service
 # get binary zip from nexus
 RUN wget -q -O vfc-gvnfm-vnflcm-lcm.zip 'https://nexus.onap.org/service/local/artifact/maven/redirect?r=snapshots&g=org.onap.vfc.gvnfm.vnflcm.lcm&a=vfc-gvnfm-vnflcm-lcm&v=LATEST&e=zip' && \
     unzip vfc-gvnfm-vnflcm-lcm.zip && \
-    rm -rf vfc-gvnfm-vnflcm-lcm.zip && \
-    chown onap:onap -R /service /var/log
+    rm -rf vfc-gvnfm-vnflcm-lcm.zip
+
+# change user:group
+RUN chown onap:onap -R /service /var/log
 
 WORKDIR /service/vfc/gvnfm/vnflcm/lcm
 RUN pip install -r requirements.txt
