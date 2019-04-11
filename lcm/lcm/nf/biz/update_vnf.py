@@ -12,13 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
+import traceback
 from threading import Thread
 
 from lcm.pub.database.models import NfInstModel
+from lcm.pub.exceptions import NFLCMException
 from lcm.nf.const import OPERATION_STATE_TYPE
 from lcm.nf.const import OPERATION_TYPE
 from lcm.pub.utils.notificationsutil import NotificationsUtil
 from lcm.pub.utils.notificationsutil import prepare_notification
+from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
 
 logger = logging.getLogger(__name__)
@@ -34,19 +37,34 @@ class UpdateVnf(Thread):
     def run(self):
         logger.debug("start update for vnf %s", self.nf_inst_id)
         key = "vnfInstanceName"
-        if key in self.data and self.data[key] is not None:
-            self.vnf_insts.update(nf_name=self.data[key],
-                                  lastuptime=now_time())
+        try:
+            JobUtil.add_job_status(self.job_id, 50, "Start updating VNF.")
 
-        key = "vnfInstanceDescription"
-        if key in self.data and self.data[key] is not None:
-            self.vnf_insts.update(nf_desc=self.data[key],
-                                  lastuptime=now_time())
+            if key in self.data and self.data[key] is not None:
+                self.vnf_insts.update(nf_name=self.data[key],
+                                      lastuptime=now_time())
 
-        key = "vnfPkgId"
-        if key in self.data:
-            self.vnf_insts.update(vnfdid=self.data[key],
-                                  lastuptime=now_time())
+            key = "vnfInstanceDescription"
+            if key in self.data and self.data[key] is not None:
+                self.vnf_insts.update(nf_desc=self.data[key],
+                                      lastuptime=now_time())
+
+            key = "vnfPkgId"
+            if key in self.data:
+                self.vnf_insts.update(vnfdid=self.data[key],
+                                      lastuptime=now_time())
+
+            JobUtil.add_job_status(self.job_id, 75, "Start sending notification.")
+            self.send_notification()
+
+            JobUtil.add_job_status(self.job_id, 100, "Update VNF success.")
+        except NFLCMException as e:
+            logger.error(e.message)
+            JobUtil.add_job_status(self.job_id, 255, e.message)
+        except Exception as e:
+            logger.error(e.message)
+            logger.error(traceback.format_exc())
+            JobUtil.add_job_status(self.job_id, 255, e.message)
 
     def send_notification(self):
         notify_data = prepare_notification(nfinstid=self.nf_inst_id,
