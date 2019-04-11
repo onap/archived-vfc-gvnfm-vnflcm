@@ -24,6 +24,7 @@ from lcm.nf.serializers.instantiate_vnf_request import InstantiateVnfRequestSeri
 from lcm.nf.serializers.job_identifier import JobIdentifierSerializer
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.exceptions import NFLCMExceptionNotFound
+from lcm.pub.exceptions import NFLCMExceptionConflict
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.database.models import NfInstModel
 from .common import view_safe_call_with_log
@@ -50,6 +51,8 @@ class InstantiateVnfView(APIView):
         vnf_insts = NfInstModel.objects.filter(nfinstid=instanceid)
         if not vnf_insts.exists():
             raise NFLCMExceptionNotFound("VNF instanceid(%s) does not exist." % instanceid)
+        if vnf_insts[0].status == 'INSTANTIATED':
+            raise NFLCMExceptionConflict('VNF(%s) is already INSTANTIATED.' % instanceid)
 
         job_id = JobUtil.create_job('NF', 'INSTANTIATE', instanceid)
         JobUtil.add_job_status(job_id, 0, "INST_VNF_READY")
