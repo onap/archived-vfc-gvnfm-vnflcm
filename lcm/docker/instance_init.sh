@@ -18,15 +18,8 @@ function create_database {
 
 function migrate_database {
     cd /service/vfc/gvnfm/vnflcm/lcm
-    python manage.py makemigrations database
-    python manage.py migrate --fake
     python manage.py migrate
 }
 
-GET_VNFM_DB="show databases like 'gvnfm';"
-VNFM_DB=`mysql -u$MYSQL_ROOT_USER -p$MYSQL_ROOT_PASSWORD -P$MYSQL_PORT -h$MYSQL_IP -e "$GET_VNFM_DB"`
-if [[ "$VNFM_DB" == "" ]]; then
-    create_database
-    migrate_database
-fi
-
+create_database
+migrate_database
