@@ -1,49 +1,13 @@
-FROM ubuntu:14.04
+FROM python:2-alpine
 
 ARG HTTP_PROXY=${HTTP_PROXY}
 ARG HTTPS_PROXY=${HTTPS_PROXY}
-
 ENV http_proxy $HTTP_PROXY
 ENV https_proxy $HTTPS_PROXY
-
-
-RUN sed -i "s|set compatible|set nocompatible|" /etc/vim/vimrc.tiny
-RUN echo "set backspace=2" >> /etc/vim/vimrc.tiny
-
-RUN apt-get update && \
-    apt-get install -y wget unzip gcc libssl-dev && \
-    apt-get install -y python-virtualenv && \
-    apt-get install -y python-setuptools && \
-    apt-get install -y python-dev && \
-    apt-get install -y python-pip && \
-    apt-get install -y gcc && \
-    apt-get install -y libmysqlclient-dev && \
-    apt-get install -y mysql-client && \
-    apt-get install -y wget && \
-    apt-get install -y unzip && \
-    apt-get install -y curl && \
-    apt-get install -y build-essential && \
-    apt-get install -y libffi-dev && \
-    groupadd -r onap && useradd -r -g onap onap && \
-    chmod u+w /etc/sudoers && \
-    sed -i '/User privilege/a\\onap    ALL=(ALL:ALL) NOPASSWD:ALL' /etc/sudoers && \
-    chmod u-x /etc/sudoers
-
 ADD . /service
 WORKDIR /service
 
-# get binary zip from nexus
-RUN wget -q -O vfc-gvnfm-vnflcm-lcm.zip 'https://nexus.onap.org/service/local/artifact/maven/redirect?r=snapshots&g=org.onap.vfc.gvnfm.vnflcm.lcm&a=vfc-gvnfm-vnflcm-lcm&v=LATEST&e=zip' && \
-    unzip vfc-gvnfm-vnflcm-lcm.zip && \
-    rm -rf vfc-gvnfm-vnflcm-lcm.zip
-
-# change user:group
-RUN chown onap:onap -R /service /var/log
-
-WORKDIR /service/vfc/gvnfm/vnflcm/lcm
-RUN pip install -r requirements.txt
-
-RUN apt-get --purge remove -y wget unzip gcc libssl-dev
+RUN sh /service/docker-env-conf.sh
 
 EXPOSE 8801
 USER onap
