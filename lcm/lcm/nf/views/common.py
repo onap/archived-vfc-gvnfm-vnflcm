@@ -24,6 +24,9 @@ from lcm.pub.exceptions import NFLCMExceptionBadRequest
 from lcm.pub.exceptions import NFLCMExceptionNotFound
 from lcm.pub.exceptions import NFLCMExceptionConflict
 from lcm.pub.exceptions import NFLCMExceptionSeeOther
+from lcm.pub.database.models import NfInstModel
+from lcm.pub.utils.jobutil import JobUtil
+from lcm.nf.const import OPERATION_TYPE
 
 logger = logging.getLogger(__name__)
 
@@ -88,3 +91,31 @@ def view_safe_call_with_log(logger):
                 )
         return wrapper
     return view_safe_call
+
+
+def deal_vnf_action(logger, opt_type, opt_status, instid, req, req_serializer, act_task):
+    logger.debug("%s--post::> %s, %s", opt_type, instid, req.data)
+
+    act_vnf_req_serializer = req_serializer(data=req.data)
+    if not act_vnf_req_serializer.is_valid():
+        raise NFLCMException(act_vnf_req_serializer.errors)
+
+    vnf_insts = NfInstModel.objects.filter(nfinstid=instid)
+    if not vnf_insts.exists():
+        raise NFLCMExceptionNotFound("VNF(%s) does not exist." % instid)
+
+    if opt_type == OPERATION_TYPE.INSTANTIATE:
+        if vnf_insts[0].status == 'INSTANTIATED':
+            raise NFLCMExceptionConflict("VNF(%s) is already INSTANTIATED." % instid)
+    else:
+        if vnf_insts[0].status != 'INSTANTIATED':
+            raise NFLCMExceptionConflict("VNF(%s) is not INSTANTIATED." % instid)
+
+    job_id = JobUtil.create_job('NF', opt_type, instid)
+    JobUtil.add_job_status(job_id, 0, "VNF_%s_READY" % opt_type)
+
+    vnf_insts.update(status=opt_status)
+    act_task(req.data, instid, job_id).start()
+
+    resp = Response(data={"jobId": job_id}, status=status.HTTP_202_ACCEPTED)
+    return resp
