@@ -16,17 +16,15 @@ import logging
 
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from lcm.nf.biz.operate_vnf import OperateVnf
 from lcm.nf.serializers.operate_vnf_req import OperateVnfRequestSerializer
 from lcm.nf.serializers.response import ProblemDetailsSerializer
-from lcm.pub.exceptions import NFLCMException, NFLCMExceptionNotFound, NFLCMExceptionConflict
-from lcm.pub.utils.jobutil import JobUtil
-from lcm.pub.database.models import NfInstModel
 from lcm.nf.const import VNF_STATUS
+from lcm.nf.const import OPERATION_TYPE
 from .common import view_safe_call_with_log
+from .common import deal_vnf_action
 
 logger = logging.getLogger(__name__)
 
@@ -43,29 +41,12 @@ class OperateVnfView(APIView):
     )
     @view_safe_call_with_log(logger=logger)
     def post(self, request, instanceid):
-        logger.debug("OperateVnf--post::> %s" % request.data)
-
-        operate_vnf_request_serializer = OperateVnfRequestSerializer(data=request.data)
-        if not operate_vnf_request_serializer.is_valid():
-            raise NFLCMException(operate_vnf_request_serializer.errors)
-
-        job_id = JobUtil.create_job('NF', 'OPERATE', instanceid)
-        JobUtil.add_job_status(job_id, 0, "OPERATE_VNF_READY")
-        self.operate_pre_check(instanceid, job_id)
-        OperateVnf(operate_vnf_request_serializer.data, instanceid, job_id).start()
-        response = Response(data={"jobId": job_id}, status=status.HTTP_202_ACCEPTED)
-        # Location todo, it use job as the status storage
-        # response["Location"] = "/api/vnflcm/v1/vnf_lcm_op_occs/%s" % lcmopoccid
-        return response
-
-    def operate_pre_check(self, nfInstId, jobId):
-        vnf_insts = NfInstModel.objects.filter(nfinstid=nfInstId)
-        if not vnf_insts.exists():
-            raise NFLCMExceptionNotFound("VNF nf_inst_id does not exist.")
-
-        if vnf_insts[0].status != 'INSTANTIATED':
-            raise NFLCMExceptionConflict("VNF instantiationState is not INSTANTIATED.")
-        NfInstModel.objects.filter(nfinstid=nfInstId).update(status=VNF_STATUS.OPERATING)
-
-        JobUtil.add_job_status(jobId, 15, 'Nf operating pre-check finish')
-        logger.info("Nf operating pre-check finish")
+        return deal_vnf_action(
+            logger=logger,
+            opt_type=OPERATION_TYPE.OPERATE,
+            opt_status=VNF_STATUS.OPERATING,
+            instid=instanceid,
+            req=request,
+            req_serializer=OperateVnfRequestSerializer,
+            act_task=OperateVnf
+        )
