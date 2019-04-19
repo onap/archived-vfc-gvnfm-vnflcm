@@ -21,7 +21,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from lcm.nf.biz.instantiate_vnf import InstantiateVnf
-from lcm.nf.const import c1_data_get_tenant_id, c4_data_create_network, c2_data_create_volume, \
+from .const import c1_data_get_tenant_id, c4_data_create_network, c2_data_create_volume, \
     c5_data_create_subnet, c3_data_get_volume, c6_data_create_port, c7_data_create_flavor, c8_data_list_image, \
     c9_data_create_vm, c10_data_get_vm, inst_req_data, vnfpackage_info
 from lcm.pub.database.models import NfInstModel, JobStatusModel, SubscriptionModel

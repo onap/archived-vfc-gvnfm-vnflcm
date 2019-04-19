@@ -18,7 +18,7 @@ import mock
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
-from lcm.nf.const import vnfpackage_info
+from .const import vnfpackage_info
 from lcm.pub.database.models import NfInstModel, JobStatusModel
 from lcm.pub.utils import restcall
 from lcm.pub.utils.timeutil import now_time

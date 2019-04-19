@@ -20,7 +20,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from lcm.nf.biz.heal_vnf import HealVnf
-from lcm.nf.const import c1_data_get_tenant_id_1, c9_data_create_vm, c10_data_get_vm, vnfd_model_dict
+from .const import c1_data_get_tenant_id_1, c9_data_create_vm, c10_data_get_vm, vnfd_model_dict
 from lcm.pub.database.models import NfInstModel, JobStatusModel, VmInstModel
 from lcm.pub.utils import restcall
 from lcm.pub.utils.jobutil import JobUtil
