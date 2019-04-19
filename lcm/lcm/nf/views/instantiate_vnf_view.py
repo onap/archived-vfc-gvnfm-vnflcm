@@ -15,19 +15,16 @@
 import logging
 
 from drf_yasg.utils import swagger_auto_schema
-from lcm.nf.biz.instantiate_vnf import InstantiateVnf
 from rest_framework import status
-from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from lcm.nf.serializers.instantiate_vnf_request import InstantiateVnfRequestSerializer
 from lcm.nf.serializers.job_identifier import JobIdentifierSerializer
-from lcm.pub.exceptions import NFLCMException
-from lcm.pub.exceptions import NFLCMExceptionNotFound
-from lcm.pub.exceptions import NFLCMExceptionConflict
-from lcm.pub.utils.jobutil import JobUtil
-from lcm.pub.database.models import NfInstModel
+from lcm.nf.biz.instantiate_vnf import InstantiateVnf
+from lcm.nf.const import VNF_STATUS
+from lcm.nf.const import OPERATION_TYPE
 from .common import view_safe_call_with_log
+from .common import deal_vnf_action
 
 logger = logging.getLogger(__name__)
 
@@ -42,25 +39,12 @@ class InstantiateVnfView(APIView):
     )
     @view_safe_call_with_log(logger=logger)
     def post(self, request, instanceid):
-        logger.debug("InstantiateVnf--post::> %s" % request.data)
-
-        instantiate_vnf_request_serializer = InstantiateVnfRequestSerializer(data=request.data)
-        if not instantiate_vnf_request_serializer.is_valid():
-            raise NFLCMException(instantiate_vnf_request_serializer.errors)
-
-        vnf_insts = NfInstModel.objects.filter(nfinstid=instanceid)
-        if not vnf_insts.exists():
-            raise NFLCMExceptionNotFound("VNF instanceid(%s) does not exist." % instanceid)
-        if vnf_insts[0].status == 'INSTANTIATED':
-            raise NFLCMExceptionConflict('VNF(%s) is already INSTANTIATED.' % instanceid)
-
-        job_id = JobUtil.create_job('NF', 'INSTANTIATE', instanceid)
-        JobUtil.add_job_status(job_id, 0, "INST_VNF_READY")
-        InstantiateVnf(instantiate_vnf_request_serializer.data, instanceid, job_id).start()
-
-        job_identifier_serializer = JobIdentifierSerializer(data={"jobId": job_id})
-        resp_isvalid = job_identifier_serializer.is_valid()
-        if not resp_isvalid:
-            raise NFLCMException(job_identifier_serializer.errors)
-
-        return Response(data=job_identifier_serializer.data, status=status.HTTP_202_ACCEPTED)
+        return deal_vnf_action(
+            logger=logger,
+            opt_type=OPERATION_TYPE.INSTANTIATE,
+            opt_status=VNF_STATUS.INSTANTIATING,
+            instid=instanceid,
+            req=request,
+            req_serializer=InstantiateVnfRequestSerializer,
+            act_task=InstantiateVnf
+        )
