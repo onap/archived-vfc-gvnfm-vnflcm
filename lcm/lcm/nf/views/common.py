@@ -107,7 +107,7 @@ def deal_vnf_action(logger, opt_type, opt_status, instid, req, req_serializer, a
     if opt_type == OPERATION_TYPE.INSTANTIATE:
         if vnf_insts[0].status == 'INSTANTIATED':
             raise NFLCMExceptionConflict("VNF(%s) is already INSTANTIATED." % instid)
-    else:
+    elif opt_type != OPERATION_TYPE.MODIFY_INFO:
         if vnf_insts[0].status != 'INSTANTIATED':
             raise NFLCMExceptionConflict("VNF(%s) is not INSTANTIATED." % instid)
 
@@ -117,5 +117,4 @@ def deal_vnf_action(logger, opt_type, opt_status, instid, req, req_serializer, a
     vnf_insts.update(status=opt_status)
     act_task(req.data, instid, job_id).start()
 
-    resp = Response(data={"jobId": job_id}, status=status.HTTP_202_ACCEPTED)
-    return resp
+    return Response(data={"jobId": job_id}, status=status.HTTP_202_ACCEPTED)

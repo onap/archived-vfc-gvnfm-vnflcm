@@ -15,7 +15,6 @@
 import logging
 
 from drf_yasg.utils import swagger_auto_schema
-from lcm.nf.biz.delete_vnf import DeleteVnf
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -23,16 +22,16 @@ from rest_framework.views import APIView
 from lcm.nf.biz.create_vnf import CreateVnf
 from lcm.nf.biz.query_vnf import QueryVnf
 from lcm.nf.biz.update_vnf import UpdateVnf
+from lcm.nf.biz.delete_vnf import DeleteVnf
 from lcm.nf.serializers.create_vnf_req import CreateVnfReqSerializer
 from lcm.nf.serializers.vnf_instance import VnfInstanceSerializer
 from lcm.nf.serializers.vnf_instances import VnfInstancesSerializer
 from lcm.nf.serializers.vnf_info_modifications import VnfInfoModificationsSerializer
-from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.exceptions import NFLCMException
-from lcm.pub.exceptions import NFLCMExceptionNotFound
-from lcm.pub.database.models import NfInstModel
 from lcm.nf.const import VNF_STATUS
+from lcm.nf.const import OPERATION_TYPE
 from .common import view_safe_call_with_log
+from .common import deal_vnf_action
 
 logger = logging.getLogger(__name__)
 
@@ -123,21 +122,12 @@ class DeleteVnfAndQueryVnf(APIView):
     )
     @view_safe_call_with_log(logger=logger)
     def patch(self, request, instanceid):
-        logger.debug("UpdateSingleVnf--patch::> %s, %s", instanceid, request.data)
-
-        upd_vnf_serializer = VnfInfoModificationsSerializer(data=request.data)
-        if not upd_vnf_serializer.is_valid():
-            raise NFLCMException(upd_vnf_serializer.errors)
-
-        job_id = JobUtil.create_job('NF', 'UPDATE', instanceid)
-        JobUtil.add_job_status(job_id, 0, "UPDATE_VNF_READY")
-
-        vnf_insts = NfInstModel.objects.filter(nfinstid=instanceid)
-        if not vnf_insts.exists():
-            raise NFLCMExceptionNotFound("VNF(%s) does not exist." % instanceid)
-        vnf_insts.update(status=VNF_STATUS.UPDATING)
-
-        JobUtil.add_job_status(job_id, 15, 'Nf updating pre-check finish')
-        UpdateVnf(request.data, instanceid, job_id).start()
-
-        return Response(data=None, status=status.HTTP_202_ACCEPTED)
+        return deal_vnf_action(
+            logger=logger,
+            opt_type=OPERATION_TYPE.MODIFY_INFO,
+            opt_status=VNF_STATUS.UPDATING,
+            instid=instanceid,
+            req=request,
+            req_serializer=VnfInfoModificationsSerializer,
+            act_task=UpdateVnf
+        )
