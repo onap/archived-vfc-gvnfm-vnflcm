@@ -117,11 +117,10 @@ def deal_vnf_action(logger, opt_type, opt_status, instid, req, req_serializer, a
             raise NFLCMExceptionConflict("VNF(%s) is not INSTANTIATED." % instid)
 
     req_etag = None
-    is_upd_vnf_opt = (opt_type == "UpdateVnf")
-    if is_upd_vnf_opt:
+    if opt_type == OPERATION_TYPE.MODIFY_INFO:
         req_etag = req.META.get("HTTP_IF_MATCH")
         logger.debug("req_etag=%s, CACHE_ETAG=%s", req_etag, CACHE_ETAG)
-        if req_etag != CACHE_ETAG:
+        if req_etag and req_etag != CACHE_ETAG:
             raise NFLCMExceptionPreconditionFailed("Etag mismatch")
 
     job_id = JobUtil.create_job('NF', opt_type, instid)
@@ -131,7 +130,7 @@ def deal_vnf_action(logger, opt_type, opt_status, instid, req, req_serializer, a
     act_task(req.data, instid, job_id).start()
 
     resp = Response(data={"jobId": job_id}, status=status.HTTP_202_ACCEPTED)
-    if is_upd_vnf_opt:
+    if opt_type == OPERATION_TYPE.MODIFY_INFO:
         resp["ETag"] = req_etag
     return resp
 

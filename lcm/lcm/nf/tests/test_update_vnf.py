@@ -15,6 +15,7 @@
 import mock
 from django.test import TestCase
 from rest_framework.test import APIClient
+from rest_framework.test import RequestsClient
 from rest_framework import status
 
 from lcm.pub.utils import restcall
@@ -40,6 +41,29 @@ class TestNFUpdate(TestCase):
                                      format='json')
         self.failUnlessEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
+    def test_update_vnf_etag_not_match(self):
+        instanceid = "19"
+        NfInstModel(nfinstid=instanceid,
+                    nf_name='VNF1',
+                    nf_desc="VNF DESC",
+                    vnfdid="1",
+                    netype="XGW",
+                    vendor="ZTE",
+                    vnfSoftwareVersion="V1",
+                    version="V1",
+                    package_id="2",
+                    status='INSTANTIATED').save()
+        rc = RequestsClient()
+        response = rc.patch("http://localhost:8801/api/vnflcm/v1/vnf_instances/19",
+                            json=self.upd_data,
+                            headers={
+                                "Accept": "application/json",
+                                "Content-Type": "application/json",
+                                "If-Match": "test_etag"
+                            })
+        NfInstModel.objects.filter(nfinstid=instanceid).delete()
+        self.failUnlessEqual(status.HTTP_412_PRECONDITION_FAILED, response.status_code)
+
     @mock.patch.object(restcall, 'call_req')
     def test_update_vnf_success(self, mock_call_req):
         instanceid = "12"
@@ -57,4 +81,5 @@ class TestNFUpdate(TestCase):
         job_id = JobUtil.create_job('NF', 'UPDATETEST', instanceid)
         UpdateVnf(self.upd_data, instanceid, job_id).run()
         name = NfInstModel.objects.filter(nfinstid=instanceid).get().nf_name
+        NfInstModel.objects.filter(nfinstid=instanceid).delete()
         self.failUnlessEqual("vnf new name", name)
