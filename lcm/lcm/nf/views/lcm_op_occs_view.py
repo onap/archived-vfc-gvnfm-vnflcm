@@ -25,6 +25,7 @@ from lcm.nf.serializers.vnf_lcm_op_occ import VNFLCMOpOccSerializer
 from lcm.nf.serializers.vnf_lcm_op_occs import VNFLCMOpOccsSerializer
 from lcm.pub.exceptions import NFLCMException
 from .common import view_safe_call_with_log
+from .common import deal_indivdual_query
 
 logger = logging.getLogger(__name__)
 EXCLUDE_DEFAULT = ['operationParams', 'error', 'resourceChanges', 'changedInfo', 'changedExtConnectivity']
@@ -84,11 +85,7 @@ class QuerySingleVnfLcmOpOcc(APIView):
     def get(self, request, lcmopoccid):
         logger.debug("QuerySingleVnfLcmOpOcc--get::> %s" % request.query_params)
 
-        resp_data = QueryVnfLcmOpOcc(request.query_params,
-                                     lcm_op_occ_id=lcmopoccid).query_single_vnf_lcm_op_occ()
-
-        vnf_lcm_op_occ_serializer = VNFLCMOpOccSerializer(data=resp_data)
-        if not vnf_lcm_op_occ_serializer.is_valid():
-            raise NFLCMException(vnf_lcm_op_occ_serializer.errors)
-
-        return Response(data=vnf_lcm_op_occ_serializer.data, status=status.HTTP_200_OK)
+        return deal_indivdual_query(res_serializer=VNFLCMOpOccSerializer,
+                                    query_fun=QueryVnfLcmOpOcc(
+                                        data=request.data,
+                                        lcm_op_occ_id=lcmopoccid).query_single_vnf_lcm_op_occ)
