@@ -14,6 +14,7 @@
 
 import traceback
 import logging
+import uuid
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -27,8 +28,11 @@ from lcm.pub.exceptions import NFLCMExceptionSeeOther
 from lcm.pub.database.models import NfInstModel
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.nf.const import OPERATION_TYPE
+from lcm.nf.serializers.vnf_instance import VnfInstanceSerializer
 
 logger = logging.getLogger(__name__)
+
+CACHE_ETAG = None
 
 
 def make_error_resp(status, detail):
@@ -121,9 +125,16 @@ def deal_vnf_action(logger, opt_type, opt_status, instid, req, req_serializer, a
 
 
 def deal_indivdual_query(res_serializer, query_fun, *args):
+    global CACHE_ETAG
+
     res = query_fun(*args)
     resp_serializer = res_serializer(data=res)
     if not resp_serializer.is_valid():
         raise NFLCMException(resp_serializer.errors)
 
-    return Response(data=resp_serializer.data, status=status.HTTP_200_OK)
+    resp = Response(data=resp_serializer.data, status=status.HTTP_200_OK)
+    if res_serializer == VnfInstanceSerializer:
+        CACHE_ETAG = "%s" % uuid.uuid1()
+        logger.debug("set CACHE_ETAG = %s", CACHE_ETAG)
+        resp["ETag"] = CACHE_ETAG
+    return resp
