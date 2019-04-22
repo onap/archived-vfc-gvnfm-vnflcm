@@ -118,3 +118,12 @@ def deal_vnf_action(logger, opt_type, opt_status, instid, req, req_serializer, a
     act_task(req.data, instid, job_id).start()
 
     return Response(data={"jobId": job_id}, status=status.HTTP_202_ACCEPTED)
+
+
+def deal_indivdual_query(res_serializer, query_fun, *args):
+    res = query_fun(*args)
+    resp_serializer = res_serializer(data=res)
+    if not resp_serializer.is_valid():
+        raise NFLCMException(resp_serializer.errors)
+
+    return Response(data=resp_data, status=status.HTTP_200_OK)
