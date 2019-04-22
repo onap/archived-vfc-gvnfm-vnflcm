@@ -98,6 +98,7 @@ def view_safe_call_with_log(logger):
 
 
 def deal_vnf_action(logger, opt_type, opt_status, instid, req, req_serializer, act_task):
+    global CACHE_ETAG
     logger.debug("%s--post::> %s, %s", opt_type, instid, req.data)
 
     act_vnf_req_serializer = req_serializer(data=req.data)
@@ -115,13 +116,24 @@ def deal_vnf_action(logger, opt_type, opt_status, instid, req, req_serializer, a
         if vnf_insts[0].status != 'INSTANTIATED':
             raise NFLCMExceptionConflict("VNF(%s) is not INSTANTIATED." % instid)
 
+    req_etag = None
+    is_upd_vnf_opt = (opt_type == "UpdateVnf")
+    if is_upd_vnf_opt:
+        req_etag = req.META.get("HTTP_IF_MATCH")
+        logger.debug("req_etag=%s, CACHE_ETAG=%s", req_etag, CACHE_ETAG)
+        if req_etag != CACHE_ETAG:
+            raise NFLCMExceptionPreconditionFailed("Etag mismatch")
+
     job_id = JobUtil.create_job('NF', opt_type, instid)
     JobUtil.add_job_status(job_id, 0, "VNF_%s_READY" % opt_type)
 
     vnf_insts.update(status=opt_status)
     act_task(req.data, instid, job_id).start()
 
-    return Response(data={"jobId": job_id}, status=status.HTTP_202_ACCEPTED)
+    resp = Response(data={"jobId": job_id}, status=status.HTTP_202_ACCEPTED)
+    if is_upd_vnf_opt:
+        resp["ETag"] = req_etag
+    return resp
 
 
 def deal_indivdual_query(res_serializer, query_fun, *args):
