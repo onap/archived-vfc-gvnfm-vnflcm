@@ -32,6 +32,7 @@ from lcm.nf.const import VNF_STATUS
 from lcm.nf.const import OPERATION_TYPE
 from .common import view_safe_call_with_log
 from .common import deal_vnf_action
+from .common import deal_indivdual_query
 
 logger = logging.getLogger(__name__)
 
@@ -91,13 +92,11 @@ class DeleteVnfAndQueryVnf(APIView):
     @view_safe_call_with_log(logger=logger)
     def get(self, request, instanceid):
         logger.debug("QuerySingleVnf--get::> %s" % request.data)
-        resp_data = QueryVnf(request.data, instanceid).query_single_vnf()
 
-        vnfs_instance_serializer = VnfInstanceSerializer(data=resp_data)
-        if not vnfs_instance_serializer.is_valid():
-            raise NFLCMException(vnfs_instance_serializer.errors)
-
-        return Response(data=vnfs_instance_serializer.data, status=status.HTTP_200_OK)
+        return deal_indivdual_query(res_serializer=VnfInstanceSerializer,
+                                    query_fun=QueryVnf(
+                                        request.data,
+                                        instanceid).query_single_vnf)
 
     @swagger_auto_schema(
         responses={
