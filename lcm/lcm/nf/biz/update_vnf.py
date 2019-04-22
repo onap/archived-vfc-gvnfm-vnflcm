@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 
 class UpdateVnf(Thread):
     def __init__(self, data, instanceid, job_id):
+        super(UpdateVnf, self).__init__()
         self.data = data
         self.nf_inst_id = instanceid
         self.job_id = job_id
