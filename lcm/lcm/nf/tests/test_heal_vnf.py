@@ -64,7 +64,7 @@ class TestNFInstantiate(TestCase):
         self.failUnlessEqual(status.HTTP_409_CONFLICT, response.status_code)
         NfInstModel.objects.filter(nfinstid='1267').delete()
 
-    def test_change_ext_conn_inner_error(self):
+    def test_heal_vnf_inner_error(self):
         NfInstModel(nfinstid='345',
                     nf_name='VNF1',
                     nf_desc="VNF DESC",
@@ -79,6 +79,7 @@ class TestNFInstantiate(TestCase):
         response = self.client.post(url,
                                     data={"additionalParams": "1"},
                                     format='json')
+        NfInstModel.objects.filter(nfinstid='345').delete()
         self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
 
     @mock.patch.object(HealVnf, 'run')

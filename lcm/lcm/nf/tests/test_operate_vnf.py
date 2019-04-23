@@ -57,6 +57,24 @@ class TestNFOperate(TestCase):
         self.failUnlessEqual(status.HTTP_409_CONFLICT, response.status_code)
         NfInstModel(nfinstid='12', nf_name='VNF1', status='NOT_INSTANTIATED').delete()
 
+    def test_operate_vnf_inner_error(self):
+        NfInstModel(nfinstid='345',
+                    nf_name='VNF1',
+                    nf_desc="VNF DESC",
+                    vnfdid="1",
+                    netype="XGW",
+                    vendor="ZTE",
+                    vnfSoftwareVersion="V1",
+                    version="V1",
+                    package_id="2",
+                    status='INSTANTIATED').save()
+        url = "/api/vnflcm/v1/vnf_instances/345/operate"
+        response = self.client.post(url,
+                                    data={},
+                                    format='json')
+        NfInstModel.objects.filter(nfinstid='345').delete()
+        self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
+
     @mock.patch.object(OperateVnf, 'run')
     def test_operate_vnf_success(self, mock_run):
         req_data = {
