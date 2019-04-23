@@ -31,6 +31,16 @@ class TestChangeExtConn(TestCase):
                     version="V1",
                     package_id="2",
                     status='NOT_INSTANTIATED').save()
+        NfInstModel(nfinstid='123',
+                    nf_name='VNF1',
+                    nf_desc="VNF DESC",
+                    vnfdid="1",
+                    netype="XGW",
+                    vendor="ZTE",
+                    vnfSoftwareVersion="V1",
+                    version="V1",
+                    package_id="2",
+                    status='INSTANTIATED').save()
         self.req_data = {
             "extVirtualLinks": [{
                 "id": "string",
@@ -69,6 +79,7 @@ class TestChangeExtConn(TestCase):
 
     def tearDown(self):
         NfInstModel.objects.filter(nfinstid='12345').delete()
+        NfInstModel.objects.filter(nfinstid='123').delete()
 
     def test_change_ext_conn_not_found(self):
         url = "/api/vnflcm/v1/vnf_instances/12/change_ext_conn"
@@ -83,3 +94,10 @@ class TestChangeExtConn(TestCase):
                                     data=self.req_data,
                                     format='json')
         self.failUnlessEqual(status.HTTP_409_CONFLICT, response.status_code)
+
+    def test_change_ext_conn_inner_error(self):
+        url = "/api/vnflcm/v1/vnf_instances/123/change_ext_conn"
+        response = self.client.post(url,
+                                    data={},
+                                    format='json')
+        self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
