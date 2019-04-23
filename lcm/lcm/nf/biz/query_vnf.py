@@ -14,8 +14,12 @@
 
 import logging
 
-from lcm.pub.database.models import NfInstModel, StorageInstModel, VLInstModel, NetworkInstModel, VNFCInstModel, \
-    VmInstModel
+from lcm.pub.database.models import NfInstModel
+from lcm.pub.database.models import StorageInstModel
+from lcm.pub.database.models import VLInstModel
+from lcm.pub.database.models import NetworkInstModel
+from lcm.pub.database.models import VNFCInstModel
+from lcm.pub.database.models import VmInstModel
 from lcm.pub.exceptions import NFLCMException
 
 logger = logging.getLogger(__name__)
@@ -30,18 +34,11 @@ class QueryVnf:
         vnf_inst = NfInstModel.objects.filter(nfinstid=self.vnf_inst_id)
         if not vnf_inst.exists():
             raise NFLCMException('VnfInst(%s) does not exist.' % self.vnf_inst_id)
-        resp_data = self.fill_resp_data(vnf_inst[0])
-        return resp_data
+        return self.fill_resp_data(vnf_inst[0])
 
     def query_multi_vnf(self):
         vnf_insts = NfInstModel.objects.all()
-        # if not vnf_insts:
-        #    raise NFLCMException('VnfInsts does not exist.')
-        resp_data = []
-        if vnf_insts:
-            for vnf_inst in vnf_insts:
-                resp_data.append(self.fill_resp_data(vnf_inst))
-        return resp_data
+        return [self.fill_resp_data(vnf_inst) for vnf_inst in vnf_insts]
 
     def fill_resp_data(self, vnf):
         logger.info('Get storages')
@@ -56,6 +53,7 @@ class QueryVnf:
                 }
             }
             arr.append(storage)
+
         logger.info('Get networks')
         vl_inst = VLInstModel.objects.filter(ownerid=vnf.nfinstid)
         vl_arr = []
@@ -72,6 +70,7 @@ class QueryVnf:
                 }
             }
             vl_arr.append(v_dic)
+
         logger.info('Get vnfcs')
         vnfc_insts = VNFCInstModel.objects.filter(instid=vnf.nfinstid)
         vnfc_arr = []
@@ -93,7 +92,6 @@ class QueryVnf:
                 "storageResourceIds": [s.storageid for s in storage]
             }
             vnfc_arr.append(vnfc_dic)
-        logger.info('Get vms')
 
         resp_data = {
             "id": vnf.nfinstid,
