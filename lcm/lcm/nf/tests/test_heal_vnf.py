@@ -64,6 +64,23 @@ class TestNFInstantiate(TestCase):
         self.failUnlessEqual(status.HTTP_409_CONFLICT, response.status_code)
         NfInstModel.objects.filter(nfinstid='1267').delete()
 
+    def test_change_ext_conn_inner_error(self):
+        NfInstModel(nfinstid='345',
+                    nf_name='VNF1',
+                    nf_desc="VNF DESC",
+                    vnfdid="1",
+                    netype="XGW",
+                    vendor="ZTE",
+                    vnfSoftwareVersion="V1",
+                    version="V1",
+                    package_id="2",
+                    status='INSTANTIATED').save()
+        url = "/api/vnflcm/v1/vnf_instances/345/heal"
+        response = self.client.post(url,
+                                    data={"additionalParams": "1"},
+                                    format='json')
+        self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
+
     @mock.patch.object(HealVnf, 'run')
     def test_heal_vnf_success(self, mock_run):
         req_data = {}
