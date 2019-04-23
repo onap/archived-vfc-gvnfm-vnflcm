@@ -52,3 +52,21 @@ class TestNfScaleToLevel(TestCase):
                                     data=self.req_data,
                                     format='json')
         self.failUnlessEqual(status.HTTP_409_CONFLICT, response.status_code)
+
+    def test_scale_to_level_inner_error(self):
+        NfInstModel(nfinstid='678',
+                    nf_name='VNF1',
+                    nf_desc="VNF DESC",
+                    vnfdid="1",
+                    netype="XGW",
+                    vendor="ZTE",
+                    vnfSoftwareVersion="V1",
+                    version="V1",
+                    package_id="2",
+                    status='INSTANTIATED').save()
+        url = "/api/vnflcm/v1/vnf_instances/678/scale_to_level"
+        response = self.client.post(url,
+                                    data={},
+                                    format='json')
+        NfInstModel.objects.filter(nfinstid='678').delete()
+        self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
