@@ -56,25 +56,27 @@ class NotificationsUtil(object):
         for subscription in subscriptions:
             # set subscription id
             notification["subscriptionId"] = subscription.subscription_id
-            notification['_links']['subscription'] = {'href': '/api/vnflcm/v1/subscriptions/%s' % subscription.subscription_id}
+            notification['_links']['subscription'] = {
+                'href': '/api/vnflcm/v1/subscriptions/%s' % subscription.subscription_id
+            }
             callbackUri = subscription.callback_uri
             auth_info = json.loads(subscription.auth_info)
-            if auth_info["authType"] == const.OAUTH2_CLIENT_CREDENTIALS:
-                pass
-            try:
-                self.post_notification(callbackUri, auth_info, notification)
-            except Exception as e:
-                logger.error("Failed to post notification: %s", e.message)
+            if auth_info["authType"] != const.OAUTH2_CLIENT_CREDENTIALS:
+                try:
+                    self.post_notification(callbackUri, auth_info, notification)
+                except Exception as e:
+                    logger.error("Failed to post notification: %s", e.message)
 
     def post_notification(self, callbackUri, auth_info, notification):
         params = auth_info.get("paramsBasic", {})
         username = params.get("userName")
         password = params.get("password")
         logger.info("Sending notification to %s", callbackUri)
-        resp = requests.post(callbackUri, data=notification, auth=HTTPBasicAuth(username, password))
+        resp = requests.post(callbackUri,
+                             data=notification,
+                             auth=HTTPBasicAuth(username, password))
         if resp.status_code != status.HTTP_204_NO_CONTENT:
-            raise Exception("Unable to send the notification to %s, due to %s" % (callbackUri, resp.text))
-        return
+            raise Exception("Notify %s failed: %s" % (callbackUri, resp.text))
 
 
 def set_affected_vnfcs(affected_vnfcs, nfinstid, changetype):
