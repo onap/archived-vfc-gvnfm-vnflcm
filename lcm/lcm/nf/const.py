@@ -63,6 +63,18 @@ OPERATION_TYPE = enum(
     MODIFY_INFO="MODIFY_INFO"
 )
 
+OPERATION_TASK = enum(
+    MODIFY="",
+    INSTANTIATE="instantiate",
+    SCALE="scale",
+    SCALE_TO_LEVEL="scale_to_level",
+    CHANGE_FLAVOUR="change_flavour",
+    OPERATE="operate",
+    HEAL="heal",
+    CHANGE_EXT_CONN="change_ext_conn",
+    TERMINATE="terminate"
+)
+
 INSTANTIATION_STATE = enum(
     NOT_INSTANTIATED="NOT_INSTANTIATED",
     INSTANTIATED="INSTANTIATED"

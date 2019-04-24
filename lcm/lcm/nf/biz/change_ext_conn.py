@@ -19,7 +19,7 @@ from threading import Thread
 from lcm.nf.biz.common import port_save
 from lcm.nf.biz.grant_vnf import grant_resource
 from lcm.nf.const import RESOURCE_MAP, GRANT_TYPE, OPERATION_STATE_TYPE
-from lcm.nf.const import VNF_STATUS
+from lcm.nf.const import VNF_STATUS, OPERATION_TASK, OPERATION_TYPE
 from lcm.pub.database.models import VmInstModel, NfInstModel, PortInstModel
 from lcm.pub.utils.notificationsutil import NotificationsUtil, prepare_notification
 from lcm.pub.utils.values import ignore_case_get
@@ -27,6 +27,7 @@ from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.vimapi import adaptor
+from .operate_vnf_lcm_op_occ import VnfLcmOpOcc
 
 logger = logging.getLogger(__name__)
 
@@ -41,13 +42,21 @@ class ChangeExtConn(Thread):
         self.extVirtualLinks = ignore_case_get(self.data, "extVirtualLinks")
         self.vimConnectionInfo = ignore_case_get(self.data, "vimConnectionInfo")
         self.additionalParams = ignore_case_get(self.data, "additionalParams")
+        self.lcm_op_occ = VnfLcmOpOcc(
+            vnf_inst_id=nf_inst_id,
+            lcm_op_id=job_id,
+            operation=OPERATION_TYPE.CHANGE_EXT_CONN,
+            task=OPERATION_TASK.CHANGE_EXT_CONN
+        )
 
     def run(self):
         try:
+            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.STARTING)
             JobUtil.add_job_status(self.job_id,
                                    10,
                                    "Start to apply grant.")
             self.apply_grant()
+            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.PROCESSING)
             JobUtil.add_job_status(self.job_id,
                                    50,
                                    "Start to change ext conn.")
@@ -56,6 +65,7 @@ class ChangeExtConn(Thread):
                 status='INSTANTIATED',
                 lastuptime=now_time()
             )
+            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.COMPLETED)
             JobUtil.add_job_status(self.job_id,
                                    100,
                                    "Change ext conn success.")
@@ -246,4 +256,5 @@ class ChangeExtConn(Thread):
         logger.error('Chnage ext conn failed, detail message: %s', error_msg)
         self.vnf_insts.update(status=VNF_STATUS.FAILED,
                               lastuptime=now_time())
+        self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED)
         JobUtil.add_job_status(self.job_id, 255, error_msg)
