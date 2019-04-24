@@ -64,7 +64,6 @@ class ChangeVnfFlavour(Thread):
                 lastuptime=now_time()
             )
             self.send_notification()
-            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.COMPLETED)
             JobUtil.add_job_status(self.job_id,
                                    100,
                                    "Change vnf flavour success.")
@@ -95,7 +94,7 @@ class ChangeVnfFlavour(Thread):
         data = prepare_notification_data(nfinstid=self.nf_inst_id,
                                          jobid=self.job_id,
                                          changetype=CHANGE_TYPE.MODIFIED,
-                                         operation=self.op_type)
+                                         operation=OPERATION_TYPE.CHANGE_FLAVOUR)
         logger.debug('Notify request data = %s' % data)
         NotificationsUtil().send_notification(data)
 

@@ -65,7 +65,7 @@ class ChangeExtConn(Thread):
                 status='INSTANTIATED',
                 lastuptime=now_time()
             )
-            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.COMPLETED)
+            self.send_notification()
             JobUtil.add_job_status(self.job_id,
                                    100,
                                    "Change ext conn success.")
@@ -176,7 +176,7 @@ class ChangeExtConn(Thread):
     def send_notification(self):
         data = prepare_notification(nfinstid=self.nf_inst_id,
                                     jobid=self.job_id,
-                                    operation=self.op_type,
+                                    operation=OPERATION_TYPE.CHANGE_EXT_CONN,
                                     operation_state=OPERATION_STATE_TYPE.COMPLETED)
         self.set_ext_connectivity(data['changedExtConnectivity'])
 

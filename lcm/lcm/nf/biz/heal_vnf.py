@@ -23,6 +23,7 @@ from lcm.pub.database.models import VmInstModel
 from lcm.pub.database.models import VNFCInstModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.utils.jobutil import JobUtil
+from lcm.pub.utils.notificationsutil import NotificationsUtil
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.values import ignore_case_get
 from lcm.pub.vimapi import adaptor
@@ -70,7 +71,10 @@ class HealVnf(Thread):
                 status='INSTANTIATED',
                 lastuptime=now_time()
             )
-            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.COMPLETED)
+            self.lcm_notify(
+                LCM_NOTIFICATION_STATUS.RESULT,
+                OPERATION_STATE_TYPE.COMPLETED
+            )
         except NFLCMException as e:
             logger.error(e.message)
             self.vnf_heal_failed_handle(e.message)
@@ -134,6 +138,12 @@ class HealVnf(Thread):
         )
         self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, error_msg)
         JobUtil.add_job_status(self.job_id, 255, error_msg)
+
+    def lcm_notify(self, status, opState, err=None):
+        notification_content = self.prepareNotificationData(status, opState, err)
+        logger.info('Notify data = %s' % notification_content)
+        NotificationsUtil().send_notification(notification_content)
+        logger.info('Notify end')
 
     def prepareNotificationData(self, status, opState, err=None):
         affected_vnfcs = []
