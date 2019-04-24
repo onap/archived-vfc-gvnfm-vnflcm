@@ -15,9 +15,12 @@
 import json
 import logging
 import traceback
+import uuid
 from threading import Thread
 
-from lcm.pub.database.models import NfInstModel, VmInstModel, VNFCInstModel
+from lcm.pub.database.models import NfInstModel
+from lcm.pub.database.models import VmInstModel
+from lcm.pub.database.models import VNFCInstModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
@@ -26,9 +29,9 @@ from lcm.pub.vimapi import adaptor
 from lcm.nf.biz.grant_vnf import grant_resource
 from lcm.nf.const import VNF_STATUS, GRANT_TYPE, OPERATION_STATE_TYPE, LCM_NOTIFICATION_STATUS
 from lcm.nf.const import CHANGE_TYPE, OPERATION_TYPE, HEAL_ACTION_TYPE
+from lcm.nf.const import OPERATION_TASK
 from lcm.nf.biz import common
-import uuid
-from lcm.pub.utils.notificationsutil import NotificationsUtil
+from .operate_vnf_lcm_op_occ import VnfLcmOpOcc
 
 
 logger = logging.getLogger(__name__)
@@ -48,25 +51,33 @@ class HealVnf(Thread):
             self.grant_type = GRANT_TYPE.HEAL_CREATE
         elif self.action == HEAL_ACTION_TYPE.RESTART:
             self.grant_type = GRANT_TYPE.HEAL_RESTART
+        self.lcm_op_occ = VnfLcmOpOcc(
+            vnf_inst_id=nf_inst_id,
+            lcm_op_id=job_id,
+            operation=OPERATION_TYPE.HEAL,
+            task=OPERATION_TASK.HEAL
+        )
 
     def run(self):
         try:
             self.heal_pre()
-            self.lcm_notify(LCM_NOTIFICATION_STATUS.START, OPERATION_STATE_TYPE.STARTING)
+            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.STARTING)
             self.apply_grant()
-            self.lcm_notify(LCM_NOTIFICATION_STATUS.RESULT, OPERATION_STATE_TYPE.PROCESSING)
+            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.PROCESSING)
             self.heal_resource()
             JobUtil.add_job_status(self.job_id, 100, "Heal Vnf success.")
-            NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='INSTANTIATED', lastuptime=now_time())
-            self.lcm_notify(LCM_NOTIFICATION_STATUS.RESULT, OPERATION_STATE_TYPE.COMPLETED)
+            NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(
+                status='INSTANTIATED',
+                lastuptime=now_time()
+            )
+            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.COMPLETED)
         except NFLCMException as e:
             logger.error(e.message)
-            self.lcm_notify(LCM_NOTIFICATION_STATUS.RESULT, OPERATION_STATE_TYPE.FAILED, str(e))
             self.vnf_heal_failed_handle(e.message)
         except Exception as e:
             logger.error(e.message)
-            self.lcm_notify(LCM_NOTIFICATION_STATUS.RESULT, OPERATION_STATE_TYPE.FAILED, str(e))
-            self.vnf_heal_failed_handle(traceback.format_exc())
+            logger.error(traceback.format_exc())
+            self.vnf_heal_failed_handle(e.message)
 
     def heal_pre(self):
         if self.action not in (HEAL_ACTION_TYPE.START, HEAL_ACTION_TYPE.RESTART):
@@ -117,14 +128,12 @@ class HealVnf(Thread):
 
     def vnf_heal_failed_handle(self, error_msg):
         logger.error('VNF Healing failed, detail message: %s' % error_msg)
-        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status=VNF_STATUS.FAILED, lastuptime=now_time())
+        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(
+            status=VNF_STATUS.FAILED,
+            lastuptime=now_time()
+        )
+        self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, error_msg)
         JobUtil.add_job_status(self.job_id, 255, error_msg)
-
-    def lcm_notify(self, status, opState, err=None):
-        notification_content = self.prepareNotificationData(status, opState, err)
-        logger.info('Notify data = %s' % notification_content)
-        NotificationsUtil().send_notification(notification_content)
-        logger.info('Notify end')
 
     def prepareNotificationData(self, status, opState, err=None):
         affected_vnfcs = []

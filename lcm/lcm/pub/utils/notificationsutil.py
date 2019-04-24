@@ -171,10 +171,9 @@ def set_affected_vss(affected_vss, nfinstid, changetype):
 
 
 def get_notification_status(operation_state):
-    notification_status = const.LCM_NOTIFICATION_STATUS.START
-    if operation_state in const.RESULT_RANGE:
-        notification_status = const.LCM_NOTIFICATION_STATUS.RESULT
-    return notification_status
+    if operation_state == const.OPERATION_STATE_TYPE.STARTING:
+        return const.LCM_NOTIFICATION_STATUS.START
+    return const.LCM_NOTIFICATION_STATUS.RESULT
 
 
 def prepare_notification(nfinstid, jobid, operation, operation_state):

@@ -256,5 +256,5 @@ class ChangeExtConn(Thread):
         logger.error('Chnage ext conn failed, detail message: %s', error_msg)
         self.vnf_insts.update(status=VNF_STATUS.FAILED,
                               lastuptime=now_time())
-        self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED)
+        self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, error_msg)
         JobUtil.add_job_status(self.job_id, 255, error_msg)
