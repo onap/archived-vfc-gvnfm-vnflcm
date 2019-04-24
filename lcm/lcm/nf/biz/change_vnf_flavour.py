@@ -20,6 +20,7 @@ from threading import Thread
 from lcm.nf.biz.grant_vnf import grant_resource
 from lcm.nf.const import GRANT_TYPE, CHANGE_TYPE
 from lcm.nf.const import VNF_STATUS
+from lcm.nf.const import OPERATION_TYPE, OPERATION_TASK
 from lcm.pub.utils.notificationsutil import NotificationsUtil, prepare_notification_data
 from lcm.pub.utils.values import ignore_case_get
 from lcm.pub.utils.timeutil import now_time
@@ -37,13 +38,21 @@ class ChangeVnfFlavour(Thread):
         self.nf_inst_id = nf_inst_id
         self.job_id = job_id
         self.vnf_insts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
+        self.lcm_op_occ = VnfLcmOpOcc(
+            vnf_inst_id=nf_inst_id,
+            lcm_op_id=job_id,
+            operation=OPERATION_TYPE.CHANGE_FLAVOUR,
+            task=OPERATION_TASK.CHANGE_FLAVOUR
+        )
 
     def run(self):
         try:
+            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.STARTING)
             JobUtil.add_job_status(self.job_id,
                                    10,
                                    "Start to apply grant.")
             self.apply_grant()
+            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.PROCESSING)
             JobUtil.add_job_status(self.job_id,
                                    50,
                                    "Start to change vnf flavour.")
@@ -53,6 +62,7 @@ class ChangeVnfFlavour(Thread):
                 lastuptime=now_time()
             )
             self.send_notification()
+            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.COMPLETED)
             JobUtil.add_job_status(self.job_id,
                                    100,
                                    "Change vnf flavour success.")
@@ -91,4 +101,5 @@ class ChangeVnfFlavour(Thread):
         logger.error('Chnage vnf flavour failed, detail message: %s', error_msg)
         self.vnf_insts.update(status=VNF_STATUS.FAILED,
                               lastuptime=now_time())
+        self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED)
         JobUtil.add_job_status(self.job_id, 255, error_msg)
