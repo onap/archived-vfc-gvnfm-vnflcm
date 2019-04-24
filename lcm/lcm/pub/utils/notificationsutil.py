@@ -43,8 +43,8 @@ class NotificationsUtil(object):
     def send_notification(self, notification):
         logger.info("Send Notifications to the callbackUri")
         filters = {
-            "operationState": "operation_states",
-            "operation": "operation_types"
+            "operationStates": "operation_states",
+            "operationTypes": "operation_types"
         }
         subscriptions_filter = {v + "__contains": notification[k] for k, v in filters.iteritems()}
 
