@@ -15,9 +15,12 @@
 # import json
 import logging
 import traceback
+import uuid
 from threading import Thread
 
-from lcm.pub.database.models import NfInstModel, VmInstModel, VNFCInstModel
+from lcm.pub.database.models import NfInstModel
+from lcm.pub.database.models import VmInstModel
+from lcm.pub.database.models import VNFCInstModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
@@ -25,8 +28,15 @@ from lcm.pub.utils.notificationsutil import NotificationsUtil
 from lcm.pub.utils.values import ignore_case_get
 from lcm.pub.vimapi import adaptor
 from lcm.nf.biz.grant_vnf import grant_resource
-from lcm.nf.const import VNF_STATUS, RESOURCE_MAP, GRANT_TYPE, OPERATION_STATE_TYPE, LCM_NOTIFICATION_STATUS, CHANGE_TYPE, OPERATION_TYPE
-import uuid
+from lcm.nf.const import VNF_STATUS
+from lcm.nf.const import RESOURCE_MAP
+from lcm.nf.const import GRANT_TYPE
+from lcm.nf.const import OPERATION_STATE_TYPE
+from lcm.nf.const import LCM_NOTIFICATION_STATUS
+from lcm.nf.const import CHANGE_TYPE
+from lcm.nf.const import OPERATION_TYPE
+from lcm.nf.const import OPERATION_TASK
+from .operate_vnf_lcm_op_occ import VnfLcmOpOcc
 
 logger = logging.getLogger(__name__)
 
@@ -42,29 +52,43 @@ class OperateVnf(Thread):
         self.stopType = ignore_case_get(self.data, "stopType")
         self.gracefulStopTimeout = ignore_case_get(self.data, "gracefulStopTimeout")
         self.inst_resource = {'vm': []}
+        self.lcm_op_occ = VnfLcmOpOcc(
+            vnf_inst_id=nf_inst_id,
+            lcm_op_id=job_id,
+            operation=OPERATION_TYPE.OPERATE,
+            task=OPERATION_TASK.OPERATE
+        )
 
     def run(self):
         try:
-            self.lcm_notify(LCM_NOTIFICATION_STATUS.START, OPERATION_STATE_TYPE.STARTING)
+            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.STARTING)
             self.apply_grant()
             self.query_inst_resource()
-            self.lcm_notify(LCM_NOTIFICATION_STATUS.RESULT, OPERATION_STATE_TYPE.PROCESSING)
+            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.PROCESSING)
             self.operate_resource()
             JobUtil.add_job_status(self.job_id, 100, "Operate Vnf success.")
-            NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='INSTANTIATED', lastuptime=now_time())
-            self.lcm_notify(LCM_NOTIFICATION_STATUS.RESULT, OPERATION_STATE_TYPE.COMPLETED)
+            NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(
+                status='INSTANTIATED',
+                lastuptime=now_time()
+            )
+            self.lcm_notify(
+                LCM_NOTIFICATION_STATUS.RESULT,
+                OPERATION_STATE_TYPE.COMPLETED
+            )
         except NFLCMException as e:
-            self.lcm_notify(LCM_NOTIFICATION_STATUS.RESULT, OPERATION_STATE_TYPE.FAILED, str(e))
             self.vnf_operate_failed_handle(e.message)
         except Exception as e:
             logger.error(e.message)
-            self.lcm_notify(LCM_NOTIFICATION_STATUS.RESULT, OPERATION_STATE_TYPE.FAILED, str(e))
-            self.vnf_operate_failed_handle(traceback.format_exc())
+            logger.error(traceback.format_exc())
+            self.vnf_operate_failed_handle(e.message)
 
     def apply_grant(self):
         vdus = VmInstModel.objects.filter(instid=self.nf_inst_id)
-        apply_result = grant_resource(data=self.data, nf_inst_id=self.nf_inst_id, job_id=self.job_id,
-                                      grant_type=self.grant_type, vdus=vdus)
+        apply_result = grant_resource(data=self.data,
+                                      nf_inst_id=self.nf_inst_id,
+                                      job_id=self.job_id,
+                                      grant_type=self.grant_type,
+                                      vdus=vdus)
         logger.info("Grant resource, response: %s" % apply_result)
         JobUtil.add_job_status(self.job_id, 20, 'Nf Operate grant_resource finish')
 
@@ -89,7 +113,11 @@ class OperateVnf(Thread):
 
     def operate_resource(self):
         logger.info('Operate resource begin')
-        adaptor.operate_vim_res(self.inst_resource, self.changeStateTo, self.stopType, self.gracefulStopTimeout, self.do_notify_op)
+        adaptor.operate_vim_res(self.inst_resource,
+                                self.changeStateTo,
+                                self.stopType,
+                                self.gracefulStopTimeout,
+                                self.do_notify_op)
         logger.info('Operate resource complete')
 
     def lcm_notify(self, status, opState, err=None):
@@ -100,7 +128,11 @@ class OperateVnf(Thread):
 
     def vnf_operate_failed_handle(self, error_msg):
         logger.error('VNF Operation failed, detail message: %s' % error_msg)
-        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status=VNF_STATUS.FAILED, lastuptime=now_time())
+        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(
+            status=VNF_STATUS.FAILED,
+            lastuptime=now_time()
+        )
+        self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, error_msg)
         JobUtil.add_job_status(self.job_id, 255, error_msg)
 
     def do_notify_op(self, status, resid):

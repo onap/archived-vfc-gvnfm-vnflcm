@@ -70,7 +70,10 @@ class HealVnf(Thread):
                 status='INSTANTIATED',
                 lastuptime=now_time()
             )
-            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.COMPLETED)
+            self.lcm_notify(
+                LCM_NOTIFICATION_STATUS.RESULT,
+                OPERATION_STATE_TYPE.COMPLETED
+            )
         except NFLCMException as e:
             logger.error(e.message)
             self.vnf_heal_failed_handle(e.message)
@@ -134,6 +137,12 @@ class HealVnf(Thread):
         )
         self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, error_msg)
         JobUtil.add_job_status(self.job_id, 255, error_msg)
+
+    def lcm_notify(self, status, opState, err=None):
+        notification_content = self.prepareNotificationData(status, opState, err)
+        logger.info('Notify data = %s' % notification_content)
+        NotificationsUtil().send_notification(notification_content)
+        logger.info('Notify end')
 
     def prepareNotificationData(self, status, opState, err=None):
         affected_vnfcs = []
