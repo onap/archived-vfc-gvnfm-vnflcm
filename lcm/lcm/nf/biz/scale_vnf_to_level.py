@@ -16,8 +16,11 @@ import logging
 
 from lcm.nf.biz.scale_vnf import ScaleVnf
 from lcm.nf.const import GRANT_TYPE
+from lcm.nf.const import OPERATION_TYPE
+from lcm.nf.const import OPERATION_TASK
 from lcm.pub.database.models import VmInstModel
 from lcm.pub.exceptions import NFLCMException
+from .operate_vnf_lcm_op_occ import VnfLcmOpOcc
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +31,13 @@ class ScaleVnfToLevel(ScaleVnf):
                                               nf_inst_id=nf_inst_id,
                                               job_id=job_id)
         self.aspect_id = ''
+        self.lcm_op_occ = VnfLcmOpOcc(
+            vnf_inst_id=nf_inst_id,
+            lcm_op_id=job_id,
+            operation=OPERATION_TYPE.SCALE_TO_LEVEL,
+            task=OPERATION_TASK.SCALE_TO_LEVEL
+        )
+        self.op_type = OPERATION_TYPE.SCALE_TO_LEVEL
 
     def scale_pre(self):
         self.vnfd_info = json.loads(self.vnf_insts[0].vnfd_model)

@@ -53,6 +53,7 @@ class ScaleVnf(Thread):
             operation=OPERATION_TYPE.SCALE,
             task=OPERATION_TASK.SCALE
         )
+        self.op_type = OPERATION_TYPE.SCALE
 
     def run(self):
         try:
@@ -155,7 +156,7 @@ class ScaleVnf(Thread):
     def send_notification(self):
         data = prepare_notification(nfinstid=self.nf_inst_id,
                                     jobid=self.job_id,
-                                    operation=OPERATION_TYPE.SCALE,
+                                    operation=self.op_type,
                                     operation_state=OPERATION_STATE_TYPE.COMPLETED)
 
         # TODO: need set changedExtConnectivity for data
