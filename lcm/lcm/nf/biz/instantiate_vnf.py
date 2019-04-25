@@ -29,7 +29,10 @@ from lcm.pub.utils.values import ignore_case_get
 from lcm.pub.vimapi import adaptor
 from lcm.nf.biz.grant_vnf import grant_resource
 from lcm.nf.const import CHANGE_TYPE, GRANT_TYPE, OPERATION_TYPE
+from lcm.nf.const import OPERATION_TASK
+from lcm.nf.const import OPERATION_STATE_TYPE
 from lcm.nf.biz import common
+from .operate_vnf_lcm_op_occ import VnfLcmOpOcc
 
 logger = logging.getLogger(__name__)
 
@@ -42,11 +45,19 @@ class InstantiateVnf(Thread):
         self.job_id = job_id
         self.vim_id = ignore_case_get(ignore_case_get(self.data, "additionalParams"), "vimId")
         self.grant_type = GRANT_TYPE.INSTANTIATE
+        self.lcm_op_occ = VnfLcmOpOcc(
+            vnf_inst_id=nf_inst_id,
+            lcm_op_id=job_id,
+            operation=OPERATION_TYPE.INSTANTIATE,
+            task=OPERATION_TASK.INSTANTIATE
+        )
 
     def run(self):
         try:
             self.inst_pre()
+            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.STARTING)
             self.apply_grant()
+            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.PROCESSING)
             self.create_res()
             self.lcm_notify()
             JobUtil.add_job_status(self.job_id, 100, "Instantiate Vnf success.")
@@ -114,19 +125,30 @@ class InstantiateVnf(Thread):
 
     def apply_grant(self):
         vdus = ignore_case_get(self.vnfd_info, "vdus")
-        apply_result = grant_resource(data=self.data, nf_inst_id=self.nf_inst_id, job_id=self.job_id,
-                                      grant_type=self.grant_type, vdus=vdus)
+        apply_result = grant_resource(data=self.data,
+                                      nf_inst_id=self.nf_inst_id,
+                                      job_id=self.job_id,
+                                      grant_type=self.grant_type,
+                                      vdus=vdus)
         self.set_location(apply_result)
 
         logger.info('VnfdInfo = %s' % self.vnfd_info)
-        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='INSTANTIATED', lastuptime=now_time())
+        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(
+            status='INSTANTIATED',
+            lastuptime=now_time()
+        )
         JobUtil.add_job_status(self.job_id, 20, 'Nf instancing apply grant finish')
         logger.info("Nf instancing apply grant finish")
 
     def create_res(self):
         logger.info("Create resource start")
         vim_cache, res_cache = {}, {}
-        adaptor.create_vim_res(self.vnfd_info, self.do_notify, vim_cache=vim_cache, res_cache=res_cache)
+        adaptor.create_vim_res(
+            self.vnfd_info,
+            self.do_notify,
+            vim_cache=vim_cache,
+            res_cache=res_cache
+        )
         JobUtil.add_job_status(self.job_id, 70, '[NF instantiation] create resource finish')
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).\
             update(vimInfo=json.dumps(vim_cache),
@@ -134,7 +156,12 @@ class InstantiateVnf(Thread):
         logger.info("Create resource finish")
 
     def lcm_notify(self):
-        notification_content = prepare_notification_data(self.nf_inst_id, self.job_id, CHANGE_TYPE.ADDED, OPERATION_TYPE.INSTANTIATE)
+        notification_content = prepare_notification_data(
+            self.nf_inst_id,
+            self.job_id,
+            CHANGE_TYPE.ADDED,
+            OPERATION_TYPE.INSTANTIATE
+        )
         logger.info('Notify request data = %s' % notification_content)
         try:
             resp = notify_lcm_to_nfvo(json.dumps(notification_content))
@@ -145,7 +172,11 @@ class InstantiateVnf(Thread):
 
     def vnf_inst_failed_handle(self, error_msg):
         logger.error('VNF instantiation failed, detail message: %s' % error_msg)
-        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='NOT_INSTANTIATED', lastuptime=now_time())
+        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(
+            status='NOT_INSTANTIATED',
+            lastuptime=now_time()
+        )
+        self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, error_msg)
         JobUtil.add_job_status(self.job_id, 255, error_msg)
 
     def do_notify(self, res_type, ret):
