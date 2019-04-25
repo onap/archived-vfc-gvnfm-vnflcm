@@ -14,13 +14,16 @@
 
 import json
 import uuid
-
 import mock
+
 from django.test import TestCase, Client
 from rest_framework import status
 
 from lcm.nf.biz.operate_vnf import OperateVnf
-from lcm.pub.database.models import NfInstModel, JobStatusModel, VmInstModel, SubscriptionModel
+from lcm.pub.database.models import NfInstModel
+from lcm.pub.database.models import JobStatusModel
+from lcm.pub.database.models import VmInstModel
+from lcm.pub.database.models import SubscriptionModel
 from lcm.pub.utils import restcall
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.notificationsutil import NotificationsUtil
@@ -36,84 +39,125 @@ class TestNFOperate(TestCase):
         VmInstModel.objects.all().delete()
 
     def assert_job_result(self, job_id, job_progress, job_detail):
-        jobs = JobStatusModel.objects.filter(jobid=job_id,
-                                             progress=job_progress,
-                                             descp=job_detail)
+        jobs = JobStatusModel.objects.filter(
+            jobid=job_id,
+            progress=job_progress,
+            descp=job_detail
+        )
         self.assertEqual(1, len(jobs))
 
     def test_operate_vnf_not_found(self):
         req_data = {
             "changeStateTo": "STARTED"
         }
-        response = self.client.post("/api/vnflcm/v1/vnf_instances/12/operate", data=req_data, format='json')
+        response = self.client.post(
+            "/api/vnflcm/v1/vnf_instances/12/operate",
+            data=req_data,
+            format='json'
+        )
         self.failUnlessEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
     def test_operate_vnf_conflict(self):
         req_data = {
             "changeStateTo": "STARTED"
         }
-        NfInstModel(nfinstid='12', nf_name='VNF1', status='NOT_INSTANTIATED').save()
-        response = self.client.post("/api/vnflcm/v1/vnf_instances/12/operate", data=req_data, format='json')
+        NfInstModel(
+            nfinstid='12',
+            nf_name='VNF1',
+            status='NOT_INSTANTIATED'
+        ).save()
+        response = self.client.post(
+            "/api/vnflcm/v1/vnf_instances/12/operate",
+            data=req_data,
+            format='json'
+        )
         self.failUnlessEqual(status.HTTP_409_CONFLICT, response.status_code)
-        NfInstModel(nfinstid='12', nf_name='VNF1', status='NOT_INSTANTIATED').delete()
+        NfInstModel(
+            nfinstid='12',
+            nf_name='VNF1',
+            status='NOT_INSTANTIATED'
+        ).delete()
 
     def test_operate_vnf_inner_error(self):
-        NfInstModel(nfinstid='345',
-                    nf_name='VNF1',
-                    nf_desc="VNF DESC",
-                    vnfdid="1",
-                    netype="XGW",
-                    vendor="ZTE",
-                    vnfSoftwareVersion="V1",
-                    version="V1",
-                    package_id="2",
-                    status='INSTANTIATED').save()
+        NfInstModel(
+            nfinstid='345',
+            nf_name='VNF1',
+            nf_desc="VNF DESC",
+            vnfdid="1",
+            netype="XGW",
+            vendor="ZTE",
+            vnfSoftwareVersion="V1",
+            version="V1",
+            package_id="2",
+            status='INSTANTIATED'
+        ).save()
         url = "/api/vnflcm/v1/vnf_instances/345/operate"
-        response = self.client.post(url,
-                                    data={},
-                                    format='json')
+        response = self.client.post(
+            url,
+            data={},
+            format='json'
+        )
         NfInstModel.objects.filter(nfinstid='345').delete()
-        self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
+        self.failUnlessEqual(
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            response.status_code
+        )
 
     @mock.patch.object(OperateVnf, 'run')
     def test_operate_vnf_success(self, mock_run):
         req_data = {
             "changeStateTo": "STARTED"
         }
-        NfInstModel(nfinstid='12', nf_name='VNF1', status='INSTANTIATED').save()
-        response = self.client.post("/api/vnflcm/v1/vnf_instances/12/operate", data=req_data, format='json')
+        NfInstModel(
+            nfinstid='12',
+            nf_name='VNF1',
+            status='INSTANTIATED'
+        ).save()
+        response = self.client.post(
+            "/api/vnflcm/v1/vnf_instances/12/operate",
+            data=req_data,
+            format='json'
+        )
         mock_run.re.return_value = None
         self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
-        NfInstModel(nfinstid='12', nf_name='VNF1', status='INSTANTIATED').delete()
+        NfInstModel(
+            nfinstid='12',
+            nf_name='VNF1',
+            status='INSTANTIATED'
+        ).delete()
 
     @mock.patch.object(restcall, 'call_req')
     @mock.patch.object(api, 'call')
     @mock.patch.object(NotificationsUtil, 'post_notification')
     def test_operate_vnf_success_start(self, mock_post_notification, mock_call, mock_call_req):
-        NfInstModel.objects.create(nfinstid='1111',
-                                   nf_name='2222',
-                                   vnfminstid='1',
-                                   package_id='todo',
-                                   version='',
-                                   vendor='',
-                                   netype='',
-                                   vnfd_model='',
-                                   status='INSTANTIATED',
-                                   nf_desc='',
-                                   vnfdid='',
-                                   vnfSoftwareVersion='',
-                                   vnfConfigurableProperties='todo',
-                                   localizationLanguage='EN_US',
-                                   create_time=now_time())
+        NfInstModel.objects.create(
+            nfinstid='1111',
+            nf_name='2222',
+            vnfminstid='1',
+            package_id='todo',
+            version='',
+            vendor='',
+            netype='',
+            vnfd_model='',
+            status='INSTANTIATED',
+            nf_desc='',
+            vnfdid='',
+            vnfSoftwareVersion='',
+            vnfConfigurableProperties='todo',
+            localizationLanguage='EN_US',
+            create_time=now_time()
+        )
 
-        VmInstModel.objects.create(vmid="1",
-                                   vimid="1",
-                                   resourceid="11",
-                                   insttype=0,
-                                   instid="1111",
-                                   vmname="test_01",
-                                   is_predefined=1,
-                                   operationalstate=1)
+        VmInstModel.objects.create(
+            vmid="1",
+            vimid="1",
+            resourceid="11",
+            insttype=0,
+            instid="1111",
+            vmname="test_01",
+            is_predefined=1,
+            operationalstate=1
+        )
 
         SubscriptionModel.objects.create(
             subscription_id=str(uuid.uuid4()),
@@ -141,9 +185,7 @@ class TestNFOperate(TestCase):
         )
 
         t1_apply_grant_result = [0, json.JSONEncoder().encode(''), '200']
-        # t2_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
         t3_action_vm_start_result = [0, json.JSONEncoder().encode(''), '202']
-        # mock_call_req.side_effect = [t1_apply_grant_result, t2_lcm_notify_result, t3_action_vm_start_result]
         mock_call_req.side_effect = [t1_apply_grant_result, t3_action_vm_start_result]
         mock_call.return_value = None
         mock_post_notification.return_value = None
@@ -160,30 +202,34 @@ class TestNFOperate(TestCase):
     @mock.patch.object(api, 'call')
     @mock.patch.object(NotificationsUtil, 'post_notification')
     def test_operate_vnf_success_stop(self, mock_post_notification, mock_call, mock_call_req):
-        NfInstModel.objects.create(nfinstid='1111',
-                                   nf_name='2222',
-                                   vnfminstid='1',
-                                   package_id='todo',
-                                   version='',
-                                   vendor='',
-                                   netype='',
-                                   vnfd_model='',
-                                   status='INSTANTIATED',
-                                   nf_desc='',
-                                   vnfdid='',
-                                   vnfSoftwareVersion='',
-                                   vnfConfigurableProperties='todo',
-                                   localizationLanguage='EN_US',
-                                   create_time=now_time())
+        NfInstModel.objects.create(
+            nfinstid='1111',
+            nf_name='2222',
+            vnfminstid='1',
+            package_id='todo',
+            version='',
+            vendor='',
+            netype='',
+            vnfd_model='',
+            status='INSTANTIATED',
+            nf_desc='',
+            vnfdid='',
+            vnfSoftwareVersion='',
+            vnfConfigurableProperties='todo',
+            localizationLanguage='EN_US',
+            create_time=now_time()
+        )
 
-        VmInstModel.objects.create(vmid="1",
-                                   vimid="1",
-                                   resourceid="11",
-                                   insttype=0,
-                                   instid="1111",
-                                   vmname="test_01",
-                                   is_predefined=1,
-                                   operationalstate=1)
+        VmInstModel.objects.create(
+            vmid="1",
+            vimid="1",
+            resourceid="11",
+            insttype=0,
+            instid="1111",
+            vmname="test_01",
+            is_predefined=1,
+            operationalstate=1
+        )
 
         SubscriptionModel.objects.create(
             subscription_id=str(uuid.uuid4()),
@@ -211,9 +257,7 @@ class TestNFOperate(TestCase):
         )
 
         t1_apply_grant_result = [0, json.JSONEncoder().encode(''), '200']
-        # t2_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
         t3_action_vm_stop_result = [0, json.JSONEncoder().encode(''), '202']
-        # mock_call_req.side_effect = [t1_apply_grant_result, t2_lcm_notify_result, t3_action_vm_stop_result]
         mock_call_req.side_effect = [t1_apply_grant_result, t3_action_vm_stop_result]
         mock_call.return_value = None
         mock_post_notification.return_value = None
@@ -229,34 +273,42 @@ class TestNFOperate(TestCase):
     @mock.patch.object(restcall, 'call_req')
     @mock.patch.object(api, 'call')
     def test_operate_vnf_success_stop_graceful(self, mock_call, mock_call_req):
-        NfInstModel.objects.create(nfinstid='1111',
-                                   nf_name='2222',
-                                   vnfminstid='1',
-                                   package_id='todo',
-                                   version='',
-                                   vendor='',
-                                   netype='',
-                                   vnfd_model='',
-                                   status='INSTANTIATED',
-                                   nf_desc='',
-                                   vnfdid='',
-                                   vnfSoftwareVersion='',
-                                   vnfConfigurableProperties='todo',
-                                   localizationLanguage='EN_US',
-                                   create_time=now_time())
+        NfInstModel.objects.create(
+            nfinstid='1111',
+            nf_name='2222',
+            vnfminstid='1',
+            package_id='todo',
+            version='',
+            vendor='',
+            netype='',
+            vnfd_model='',
+            status='INSTANTIATED',
+            nf_desc='',
+            vnfdid='',
+            vnfSoftwareVersion='',
+            vnfConfigurableProperties='todo',
+            localizationLanguage='EN_US',
+            create_time=now_time()
+        )
 
-        VmInstModel.objects.create(vmid="1",
-                                   vimid="1",
-                                   resourceid="11",
-                                   insttype=0,
-                                   instid="1111",
-                                   vmname="test_01",
-                                   is_predefined=1,
-                                   operationalstate=1)
+        VmInstModel.objects.create(
+            vmid="1",
+            vimid="1",
+            resourceid="11",
+            insttype=0,
+            instid="1111",
+            vmname="test_01",
+            is_predefined=1,
+            operationalstate=1
+        )
         t1_apply_grant_result = [0, json.JSONEncoder().encode(''), '200']
         t2_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
         t3_action_vm_stop_result = [0, json.JSONEncoder().encode(''), '202']
-        mock_call_req.side_effect = [t1_apply_grant_result, t2_lcm_notify_result, t3_action_vm_stop_result]
+        mock_call_req.side_effect = [
+            t1_apply_grant_result,
+            t2_lcm_notify_result,
+            t3_action_vm_stop_result
+        ]
         mock_call.return_value = None
         req_data = {
             "changeStateTo": "STOPPED",
@@ -272,34 +324,42 @@ class TestNFOperate(TestCase):
     @mock.patch.object(restcall, 'call_req')
     @mock.patch.object(api, 'call')
     def test_operate_vnf_success_stop_forceful(self, mock_call, mock_call_req):
-        NfInstModel.objects.create(nfinstid='1111',
-                                   nf_name='2222',
-                                   vnfminstid='1',
-                                   package_id='todo',
-                                   version='',
-                                   vendor='',
-                                   netype='',
-                                   vnfd_model='',
-                                   status='INSTANTIATED',
-                                   nf_desc='',
-                                   vnfdid='',
-                                   vnfSoftwareVersion='',
-                                   vnfConfigurableProperties='todo',
-                                   localizationLanguage='EN_US',
-                                   create_time=now_time())
+        NfInstModel.objects.create(
+            nfinstid='1111',
+            nf_name='2222',
+            vnfminstid='1',
+            package_id='todo',
+            version='',
+            vendor='',
+            netype='',
+            vnfd_model='',
+            status='INSTANTIATED',
+            nf_desc='',
+            vnfdid='',
+            vnfSoftwareVersion='',
+            vnfConfigurableProperties='todo',
+            localizationLanguage='EN_US',
+            create_time=now_time()
+        )
 
-        VmInstModel.objects.create(vmid="1",
-                                   vimid="1",
-                                   resourceid="11",
-                                   insttype=0,
-                                   instid="1111",
-                                   vmname="test_01",
-                                   is_predefined=1,
-                                   operationalstate=1)
+        VmInstModel.objects.create(
+            vmid="1",
+            vimid="1",
+            resourceid="11",
+            insttype=0,
+            instid="1111",
+            vmname="test_01",
+            is_predefined=1,
+            operationalstate=1
+        )
         t1_apply_grant_result = [0, json.JSONEncoder().encode(''), '200']
         t2_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
         t3_action_vm_stop_result = [0, json.JSONEncoder().encode(''), '202']
-        mock_call_req.side_effect = [t1_apply_grant_result, t2_lcm_notify_result, t3_action_vm_stop_result]
+        mock_call_req.side_effect = [
+            t1_apply_grant_result,
+            t2_lcm_notify_result,
+            t3_action_vm_stop_result
+        ]
         mock_call.return_value = None
         req_data = {
             "changeStateTo": "STOPPED",
