@@ -19,10 +19,12 @@ from lcm.pub.database.models import NfInstModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.nf.const import OPERATION_STATE_TYPE
 from lcm.nf.const import OPERATION_TYPE
+from lcm.nf.const import OPERATION_TASK
 from lcm.pub.utils.notificationsutil import NotificationsUtil
 from lcm.pub.utils.notificationsutil import prepare_notification
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
+from .operate_vnf_lcm_op_occ import VnfLcmOpOcc
 
 logger = logging.getLogger(__name__)
 
@@ -34,11 +36,18 @@ class UpdateVnf(Thread):
         self.nf_inst_id = instanceid
         self.job_id = job_id
         self.vnf_insts = NfInstModel.objects.filter(nfinstid=instanceid)
+        self.lcm_op_occ = VnfLcmOpOcc(
+            vnf_inst_id=instanceid,
+            lcm_op_id=job_id,
+            operation=OPERATION_TYPE.MODIFY_INFO,
+            task=OPERATION_TASK.MODIFY
+        )
 
     def run(self):
         logger.debug("start update for vnf %s", self.nf_inst_id)
         key = "vnfInstanceName"
         try:
+            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.PROCESSING)
             JobUtil.add_job_status(self.job_id, 50, "Start updating VNF.")
 
             if key in self.data and self.data[key] is not None:
@@ -61,10 +70,12 @@ class UpdateVnf(Thread):
             JobUtil.add_job_status(self.job_id, 100, "Update VNF success.")
         except NFLCMException as e:
             logger.error(e.message)
+            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, e.message)
             JobUtil.add_job_status(self.job_id, 255, e.message)
         except Exception as e:
             logger.error(e.message)
             logger.error(traceback.format_exc())
+            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, e.message)
             JobUtil.add_job_status(self.job_id, 255, e.message)
 
     def send_notification(self):
