@@ -22,6 +22,8 @@ from lcm.nf.biz.grant_vnf import grant_resource
 from lcm.nf.const import VNF_STATUS, GRANT_TYPE, CHANGE_TYPE
 from lcm.nf.const import RESOURCE_MAP, OPERATION_STATE_TYPE
 from lcm.nf.const import INSTANTIATION_STATE
+from lcm.nf.const import OPERATION_TYPE
+from lcm.nf.const import OPERATION_TASK
 from lcm.pub.database.models import NfInstModel
 from lcm.pub.database.models import VNFCInstModel, PortInstModel
 from lcm.pub.database.models import VmInstModel
@@ -31,6 +33,7 @@ from lcm.pub.utils.values import ignore_case_get
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.vimapi import adaptor
+from .operate_vnf_lcm_op_occ import VnfLcmOpOcc
 
 logger = logging.getLogger(__name__)
 
@@ -44,18 +47,27 @@ class ScaleVnf(Thread):
         self.nf_inst_id = nf_inst_id
         self.job_id = job_id
         self.vnf_insts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
+        self.lcm_op_occ = VnfLcmOpOcc(
+            vnf_inst_id=nf_inst_id,
+            lcm_op_id=job_id,
+            operation=OPERATION_TYPE.SCALE,
+            task=OPERATION_TASK.SCALE
+        )
 
     def run(self):
         try:
             self.scale_pre()
+            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.STARTING)
             JobUtil.add_job_status(self.job_id,
                                    50,
                                    "Start to apply grant.")
             self.apply_grant()
+            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.PROCESSING)
             JobUtil.add_job_status(self.job_id,
                                    75,
                                    "Start to scale Vnf.")
             self.do_operation()
+            self.send_notification()
             JobUtil.add_job_status(self.job_id,
                                    100,
                                    "Scale Vnf success.")
@@ -143,7 +155,7 @@ class ScaleVnf(Thread):
     def send_notification(self):
         data = prepare_notification(nfinstid=self.nf_inst_id,
                                     jobid=self.job_id,
-                                    operation=self.op_type,
+                                    operation=OPERATION_TYPE.SCALE,
                                     operation_state=OPERATION_STATE_TYPE.COMPLETED)
 
         # TODO: need set changedExtConnectivity for data
@@ -278,4 +290,5 @@ class ScaleVnf(Thread):
         logger.error('VNF scaling failed, detail message: %s', error_msg)
         self.vnf_insts.update(status=VNF_STATUS.FAILED,
                               lastuptime=now_time())
+        self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, error_msg)
         JobUtil.add_job_status(self.job_id, 255, error_msg)
