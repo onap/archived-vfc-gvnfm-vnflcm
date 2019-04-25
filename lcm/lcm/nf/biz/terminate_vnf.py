@@ -33,6 +33,9 @@ from lcm.pub.utils.values import ignore_case_get
 from lcm.pub.vimapi import adaptor
 from lcm.nf.biz.grant_vnf import grant_resource
 from lcm.nf.const import CHANGE_TYPE, GRANT_TYPE, OPERATION_TYPE
+from lcm.nf.const import OPERATION_TASK
+from lcm.nf.const import OPERATION_STATE_TYPE
+from .operate_vnf_lcm_op_occ import VnfLcmOpOcc
 
 logger = logging.getLogger(__name__)
 
@@ -43,29 +46,67 @@ class TerminateVnf(Thread):
         self.data = data
         self.nf_inst_id = nf_inst_id
         self.job_id = job_id
-        self.terminationType = ignore_case_get(self.data, "terminationType")
-        self.gracefulTerminationTimeout = ignore_case_get(self.data, "gracefulTerminationTimeout")
-        self.inst_resource = {'volumn': [], 'network': [], 'subnet': [], 'port': [], 'flavor': [], 'vm': []}
+        self.terminationType = ignore_case_get(
+            self.data,
+            "terminationType"
+        )
+        self.gracefulTerminationTimeout = ignore_case_get(
+            self.data,
+            "gracefulTerminationTimeout"
+        )
+        self.inst_resource = {
+            'volumn': [],
+            'network': [],
+            'subnet': [],
+            'port': [],
+            'flavor': [],
+            'vm': []
+        }
         self.grant_type = GRANT_TYPE.TERMINATE
+        self.lcm_op_occ = VnfLcmOpOcc(
+            vnf_inst_id=nf_inst_id,
+            lcm_op_id=job_id,
+            operation=OPERATION_TYPE.SCALE,
+            task=OPERATION_TASK.SCALE
+        )
 
     def run(self):
         try:
             if self.term_pre():
-                vdus = VmInstModel.objects.filter(instid=self.nf_inst_id, is_predefined=1)
-                apply_result = grant_resource(data=self.data, nf_inst_id=self.nf_inst_id, job_id=self.job_id,
-                                              grant_type=self.grant_type, vdus=vdus)
+                vdus = VmInstModel.objects.filter(
+                    instid=self.nf_inst_id,
+                    is_predefined=1
+                )
+                self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.STARTING)
+                apply_result = grant_resource(
+                    data=self.data,
+                    nf_inst_id=self.nf_inst_id,
+                    job_id=self.job_id,
+                    grant_type=self.grant_type,
+                    vdus=vdus
+                )
+                self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.PROCESSING)
                 logger.info("Grant resource end, response: %s" % apply_result)
-                JobUtil.add_job_status(self.job_id, 20, 'Nf terminating grant_resource finish')
+                JobUtil.add_job_status(
+                    self.job_id,
+                    20,
+                    'Nf terminating grant_resource finish'
+                )
                 self.query_inst_resource()
                 self.query_notify_data()
                 self.delete_resource()
                 self.lcm_notify()
-            JobUtil.add_job_status(self.job_id, 100, "Terminate Vnf success.")
+            JobUtil.add_job_status(
+                self.job_id,
+                100,
+                "Terminate Vnf success."
+            )
         except NFLCMException as e:
             self.vnf_term_failed_handle(e.message)
         except Exception as e:
             logger.error(e.message)
-            self.vnf_term_failed_handle(traceback.format_exc())
+            logger.error(traceback.format_exc())
+            self.vnf_term_failed_handle(e.message)
 
     def term_pre(self):
         vnf_insts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
@@ -100,7 +141,12 @@ class TerminateVnf(Thread):
         }
 
     def query_notify_data(self):
-        self.notify_data = prepare_notification_data(self.nf_inst_id, self.job_id, CHANGE_TYPE.REMOVED, OPERATION_TYPE.TERMINATE)
+        self.notify_data = prepare_notification_data(
+            self.nf_inst_id,
+            self.job_id,
+            CHANGE_TYPE.REMOVED,
+            OPERATION_TYPE.TERMINATE
+        )
         NetworkInstModel.objects.filter(instid=self.nf_inst_id)
         StorageInstModel.objects.filter(instid=self.nf_inst_id)
         PortInstModel.objects.filter(instid=self.nf_inst_id)
@@ -110,7 +156,10 @@ class TerminateVnf(Thread):
 
     def delete_resource(self):
         logger.info('Rollback resource begin')
-        adaptor.delete_vim_res(self.inst_resource, self.do_notify_delete)
+        adaptor.delete_vim_res(
+            self.inst_resource,
+            self.do_notify_delete
+        )
         logger.info('Rollback resource complete')
 
     def do_notify_delete(self, res_type, res_id):
@@ -120,16 +169,20 @@ class TerminateVnf(Thread):
         resource_table.objects.filter(instid=self.nf_inst_id, resourceid=res_id).delete()
 
     def lcm_notify(self):
-        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(status='NOT_INSTANTIATED', lastuptime=now_time())
+        NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(
+            status='NOT_INSTANTIATED',
+            lastuptime=now_time()
+        )
         logger.info('Send notify request to nfvo')
         try:
             resp = notify_lcm_to_nfvo(json.dumps(self.notify_data))
             logger.info('Lcm notify end, response: %s' % resp)
+            NotificationsUtil().send_notification(self.notify_data)
         except Exception as e:
             logger.error("Lcm terminate notify failed: %s", e.message)
-        NotificationsUtil().send_notification(self.notify_data)
 
     def vnf_term_failed_handle(self, error_msg):
         logger.error('VNF termination failed, detail message: %s' % error_msg)
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(lastuptime=now_time())
+        self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, error_msg)
         JobUtil.add_job_status(self.job_id, 255, error_msg)
