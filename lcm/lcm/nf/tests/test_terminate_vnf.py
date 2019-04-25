@@ -12,73 +12,91 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import json
 import uuid
-
 import mock
+
 from django.test import TestCase, Client
 from rest_framework import status
 
-from lcm.nf.biz.terminate_vnf import TerminateVnf
-from lcm.pub.database.models import NfInstModel, JobStatusModel, VmInstModel, NetworkInstModel, SubNetworkInstModel, \
-    PortInstModel, FlavourInstModel, StorageInstModel, SubscriptionModel
+from lcm.pub.database.models import NfInstModel
+from lcm.pub.database.models import JobStatusModel
+from lcm.pub.database.models import VmInstModel
+from lcm.pub.database.models import NetworkInstModel
+from lcm.pub.database.models import SubNetworkInstModel
+from lcm.pub.database.models import PortInstModel
+from lcm.pub.database.models import FlavourInstModel
+from lcm.pub.database.models import StorageInstModel
+from lcm.pub.database.models import SubscriptionModel
 from lcm.pub.utils import restcall
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.notificationsutil import NotificationsUtil
 from lcm.pub.vimapi import api
+from lcm.nf.biz.terminate_vnf import TerminateVnf
 
 
 class TestNFTerminate(TestCase):
     def setUp(self):
         self.client = Client()
-        StorageInstModel.objects.create(storageid="1",
-                                        vimid="1",
-                                        resourceid="11",
-                                        insttype=0,
-                                        instid="1111",
-                                        is_predefined=1)
-        NetworkInstModel.objects.create(networkid='1',
-                                        vimid='1',
-                                        resourceid='1',
-                                        name='pnet_network',
-                                        is_predefined=1,
-                                        tenant='admin',
-                                        insttype=0,
-                                        instid='1111')
-        SubNetworkInstModel.objects.create(subnetworkid='1',
-                                           vimid='1',
-                                           resourceid='1',
-                                           networkid='1',
-                                           is_predefined=1,
-                                           name='sub_pnet',
-                                           tenant='admin',
-                                           insttype=0,
-                                           instid='1111')
-        PortInstModel.objects.create(portid='1',
-                                     networkid='1',
-                                     subnetworkid='1',
-                                     vimid='1',
-                                     resourceid='1',
-                                     is_predefined=1,
-                                     name='aaa_pnet_cp',
-                                     tenant='admin',
-                                     insttype=0,
-                                     instid='1111')
-        FlavourInstModel.objects.create(flavourid="1",
-                                        vimid="1",
-                                        resourceid="11",
-                                        instid="1111",
-                                        is_predefined=1)
-        VmInstModel.objects.create(vmid="1",
-                                   vimid="1",
-                                   resourceid="11",
-                                   insttype=0,
-                                   instid="1111",
-                                   vmname="test_01",
-                                   is_predefined=1,
-                                   operationalstate=1)
+        StorageInstModel.objects.create(
+            storageid="1",
+            vimid="1",
+            resourceid="11",
+            insttype=0,
+            instid="1111",
+            is_predefined=1
+        )
+        NetworkInstModel.objects.create(
+            networkid='1',
+            vimid='1',
+            resourceid='1',
+            name='pnet_network',
+            is_predefined=1,
+            tenant='admin',
+            insttype=0,
+            instid='1111'
+        )
+        SubNetworkInstModel.objects.create(
+            subnetworkid='1',
+            vimid='1',
+            resourceid='1',
+            networkid='1',
+            is_predefined=1,
+            name='sub_pnet',
+            tenant='admin',
+            insttype=0,
+            instid='1111'
+        )
+        PortInstModel.objects.create(
+            portid='1',
+            networkid='1',
+            subnetworkid='1',
+            vimid='1',
+            resourceid='1',
+            is_predefined=1,
+            name='aaa_pnet_cp',
+            tenant='admin',
+            insttype=0,
+            instid='1111'
+        )
+        FlavourInstModel.objects.create(
+            flavourid="1",
+            vimid="1",
+            resourceid="11",
+            instid="1111",
+            is_predefined=1
+        )
+        VmInstModel.objects.create(
+            vmid="1",
+            vimid="1",
+            resourceid="11",
+            insttype=0,
+            instid="1111",
+            vmname="test_01",
+            is_predefined=1,
+            operationalstate=1
+        )
 
     def tearDown(self):
         VmInstModel.objects.all().delete()
@@ -88,9 +106,11 @@ class TestNFTerminate(TestCase):
         NfInstModel.objects.all().delete()
 
     def assert_job_result(self, job_id, job_progress, job_detail):
-        jobs = JobStatusModel.objects.filter(jobid=job_id,
-                                             progress=job_progress,
-                                             descp=job_detail)
+        jobs = JobStatusModel.objects.filter(
+            jobid=job_id,
+            progress=job_progress,
+            descp=job_detail
+        )
         self.assertEqual(1, len(jobs))
 
     @mock.patch.object(TerminateVnf, 'run')
@@ -99,19 +119,29 @@ class TestNFTerminate(TestCase):
             "terminationType": "GRACEFUL",
             "gracefulTerminationTimeout": 120
         }
-        NfInstModel(nfinstid='12',
-                    nf_name='VNF1',
-                    nf_desc="VNF DESC",
-                    vnfdid="1",
-                    netype="XGW",
-                    vendor="ZTE",
-                    vnfSoftwareVersion="V1",
-                    version="V1",
-                    package_id="2",
-                    status='INSTANTIATED').save()
+        NfInstModel(
+            nfinstid='12',
+            nf_name='VNF1',
+            nf_desc="VNF DESC",
+            vnfdid="1",
+            netype="XGW",
+            vendor="ZTE",
+            vnfSoftwareVersion="V1",
+            version="V1",
+            package_id="2",
+            status='INSTANTIATED'
+        ).save()
         mock_run.re.return_value = None
-        response = self.client.post("/api/vnflcm/v1/vnf_instances/12/terminate", data=req_data, format='json')
-        self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code, response.content)
+        response = self.client.post(
+            "/api/vnflcm/v1/vnf_instances/12/terminate",
+            data=req_data,
+            format='json'
+        )
+        self.failUnlessEqual(
+            status.HTTP_202_ACCEPTED,
+            response.status_code,
+            response.content
+        )
 
     @mock.patch.object(TerminateVnf, 'run')
     def test_terminate_vnf_not_found(self, mock_run):
@@ -120,8 +150,16 @@ class TestNFTerminate(TestCase):
             "gracefulTerminationTimeout": 120
         }
         mock_run.re.return_value = None
-        response = self.client.post("/api/vnflcm/v1/vnf_instances/567/terminate", data=req_data, format='json')
-        self.failUnlessEqual(status.HTTP_404_NOT_FOUND, response.status_code, response.content)
+        response = self.client.post(
+            "/api/vnflcm/v1/vnf_instances/567/terminate",
+            data=req_data,
+            format='json'
+        )
+        self.failUnlessEqual(
+            status.HTTP_404_NOT_FOUND,
+            response.status_code,
+            response.content
+        )
 
     @mock.patch.object(TerminateVnf, 'run')
     def test_terminate_vnf_conflict(self, mock_run):
@@ -129,19 +167,29 @@ class TestNFTerminate(TestCase):
             "terminationType": "GRACEFUL",
             "gracefulTerminationTimeout": 120
         }
-        NfInstModel(nfinstid='123',
-                    nf_name='VNF1',
-                    nf_desc="VNF DESC",
-                    vnfdid="1",
-                    netype="XGW",
-                    vendor="ZTE",
-                    vnfSoftwareVersion="V1",
-                    version="V1",
-                    package_id="2",
-                    status='NOT_INSTANTIATED').save()
+        NfInstModel(
+            nfinstid='123',
+            nf_name='VNF1',
+            nf_desc="VNF DESC",
+            vnfdid="1",
+            netype="XGW",
+            vendor="ZTE",
+            vnfSoftwareVersion="V1",
+            version="V1",
+            package_id="2",
+            status='NOT_INSTANTIATED'
+        ).save()
         mock_run.re.return_value = None
-        response = self.client.post("/api/vnflcm/v1/vnf_instances/123/terminate", data=req_data, format='json')
-        self.failUnlessEqual(status.HTTP_409_CONFLICT, response.status_code, response.content)
+        response = self.client.post(
+            "/api/vnflcm/v1/vnf_instances/123/terminate",
+            data=req_data,
+            format='json'
+        )
+        self.failUnlessEqual(
+            status.HTTP_409_CONFLICT,
+            response.status_code,
+            response.content
+        )
 
     def test_terminate_vnf_when_inst_id_not_exist(self):
         data = {
@@ -158,21 +206,23 @@ class TestNFTerminate(TestCase):
     @mock.patch.object(api, 'call')
     @mock.patch.object(NotificationsUtil, 'post_notification')
     def test_terminate_vnf_success(self, mock_post_notification, mock_call, mock_call_req):
-        NfInstModel.objects.create(nfinstid='1111',
-                                   nf_name='2222',
-                                   vnfminstid='1',
-                                   package_id='todo',
-                                   version='',
-                                   vendor='',
-                                   netype='',
-                                   vnfd_model='',
-                                   status='VNF_INSTANTIATED',
-                                   nf_desc='',
-                                   vnfdid='',
-                                   vnfSoftwareVersion='',
-                                   vnfConfigurableProperties='todo',
-                                   localizationLanguage='EN_US',
-                                   create_time=now_time())
+        NfInstModel.objects.create(
+            nfinstid='1111',
+            nf_name='2222',
+            vnfminstid='1',
+            package_id='todo',
+            version='',
+            vendor='',
+            netype='',
+            vnfd_model='',
+            status='VNF_INSTANTIATED',
+            nf_desc='',
+            vnfdid='',
+            vnfSoftwareVersion='',
+            vnfConfigurableProperties='todo',
+            localizationLanguage='EN_US',
+            create_time=now_time()
+        )
 
         SubscriptionModel.objects.create(
             subscription_id=str(uuid.uuid4()),
@@ -213,7 +263,11 @@ class TestNFTerminate(TestCase):
             }), '200']
         t2_lcm_notify_result = [0, json.JSONEncoder().encode(''), '200']
         t3_delete_flavor = [0, json.JSONEncoder().encode({"vim_id": "vimid_1"}), '200']
-        mock_call_req.side_effect = [t1_apply_grant_result, t2_lcm_notify_result, t3_delete_flavor]
+        mock_call_req.side_effect = [
+            t1_apply_grant_result,
+            t2_lcm_notify_result,
+            t3_delete_flavor
+        ]
         mock_call.return_value = None
         mock_post_notification.return_value = None
         data = {
