@@ -13,6 +13,30 @@
 # limitations under the License.
 import json
 
+instantiate_grant_result = {
+    "vimConnections": [
+        {
+            "vimid": 'vim_1',
+            "accessInfo":
+            {
+                "tenant": 'chinamobile'
+            }
+        },
+    ],
+    "vnfId": "413aa1fe-b4d1-11e8-8268-dff5aab95c63",
+    "vimAssets":
+    {
+        "computeResourceFlavours": [
+            {
+                "resourceProviderId": "vgw",
+                "vimFlavourId": "yui",
+                "vimConnectionId": ""
+            },
+        ]
+    }
+}
+
+
 inst_req_data = {
     "flavourId": "flavour_1",
     "instantiationLevelId": "instantiationLevel_1",
