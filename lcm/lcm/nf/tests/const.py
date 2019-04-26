@@ -835,6 +835,76 @@ vnfpackage_info = {
     }
 }
 
+
+single_vnf_lcm_op = {
+    "id": "99442b18-a5c7-11e8-998c-bf1755941f16",
+    "operationState": "STARTING",
+    "stateEnteredTime": "2018-07-09",
+    "startTime": "2018-07-09",
+    "vnfInstanceId": "cd552c9c-ab6f-11e8-b354-236c32aa91a1",
+    "grantId": None,
+    "operation": "SCALE",
+    "isAutomaticInvocation": False,
+    "operationParams": {},
+    "isCancelPending": False,
+    "cancelMode": None,
+    "error": None,
+    "resourceChanges": None,
+    "changedInfo": None,
+    "changedExtConnectivity": None,
+    "_links": {
+        "self": {
+            "href": "demo"
+        },
+        "vnfInstance": "demo"
+    }
+}
+
+
+vnflcmop_with_exclude_default = [{
+    "id": "99442b18-a5c7-11e8-998c-bf1755941f16",
+    "operationState": "STARTING",
+    "stateEnteredTime": "2018-07-09",
+    "startTime": "2018-07-09",
+    "vnfInstanceId": "cd552c9c-ab6f-11e8-b354-236c32aa91a1",
+    "grantId": None,
+    "operation": "SCALE",
+    "isAutomaticInvocation": False,
+    "isCancelPending": False,
+    "cancelMode": None,
+    "_links": {
+        "self": {
+            "href": "demo"
+        },
+        "vnfInstance": "demo"
+    }
+}]
+
+
+multiple_vnf_lcm_op = [{
+    "id": "a6b9415c-ab99-11e8-9d37-dbb5e0378955",
+    "operationState": "STARTING",
+    "stateEnteredTime": "2018-07-09",
+    "startTime": "2018-07-09",
+    "vnfInstanceId": "cd552c9c-ab6f-11e8-b354-236c32aa91a1",
+    "grantId": None,
+    "operation": "INSTANTIATE",
+    "isAutomaticInvocation": False,
+    "operationParams": {},
+    "isCancelPending": False,
+    "cancelMode": None,
+    "error": None,
+    "resourceChanges": None,
+    "changedInfo": None,
+    "changedExtConnectivity": None,
+    "_links": {
+        "self": {
+            "href": "demo"
+        },
+        "vnfInstance": "demo"
+    }
+}]
+
 # # vnfd_rawdata
 # vnfd_rawdata = {
 #     "rawData": {
