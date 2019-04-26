@@ -13,21 +13,24 @@
 # limitations under the License.
 
 import json
-
+import uuid
 import mock
+
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
+
 from .const import vnfpackage_info
-from lcm.pub.database.models import NfInstModel, JobStatusModel
+from lcm.pub.database.models import NfInstModel
+from lcm.pub.database.models import JobStatusModel
 from lcm.pub.utils import restcall
 from lcm.pub.utils.timeutil import now_time
-import uuid
 
 
 class TestNFInstantiate(TestCase):
     def setUp(self):
         self.client = APIClient()
+
         self.grant_result = {
             "vimid": 'vimid_1',
             "tenant": 'tenantname_1'
@@ -37,30 +40,41 @@ class TestNFInstantiate(TestCase):
         pass
 
     def assert_job_result(self, job_id, job_progress, job_detail):
-        jobs = JobStatusModel.objects.filter(jobid=job_id,
-                                             progress=job_progress,
-                                             descp=job_detail)
+        jobs = JobStatusModel.objects.filter(
+            jobid=job_id,
+            progress=job_progress,
+            descp=job_detail
+        )
         self.assertEqual(1, len(jobs))
 
     def test_create_vnf_identifier_when_vnf_is_exist(self):
-        NfInstModel.objects.create(nfinstid='1111',
-                                   nf_name='vFW_01',
-                                   package_id='222',
-                                   version='',
-                                   vendor='',
-                                   netype='',
-                                   vnfd_model='',
-                                   status='NOT_INSTANTIATED',
-                                   nf_desc='vFW in Nanjing TIC Edge',
-                                   vnfdid='111',
-                                   create_time=now_time())
+        NfInstModel.objects.create(
+            nfinstid='1111',
+            nf_name='vFW_01',
+            package_id='222',
+            version='',
+            vendor='',
+            netype='',
+            vnfd_model='',
+            status='NOT_INSTANTIATED',
+            nf_desc='vFW in Nanjing TIC Edge',
+            vnfdid='111',
+            create_time=now_time()
+        )
         data = {
             "vnfdId": "111",
             "vnfInstanceName": "vFW_01",
             "vnfInstanceDescription": "vFW in Nanjing TIC Edge"
         }
-        response = self.client.post("/api/vnflcm/v1/vnf_instances", data=data, format='json')
-        self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
+        response = self.client.post(
+            "/api/vnflcm/v1/vnf_instances",
+            data=data,
+            format='json'
+        )
+        self.failUnlessEqual(
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            response.status_code
+        )
         context = json.loads(response.content)
         self.assertEqual({
             'detail': 'VNF is already exist.',
@@ -70,7 +84,11 @@ class TestNFInstantiate(TestCase):
     @mock.patch.object(restcall, 'call_req')
     @mock.patch.object(uuid, 'uuid4')
     def test_create_vnf_identifier(self, mock_uuid4, mock_call_req):
-        r2_get_vnfpackage_from_catalog = [0, json.JSONEncoder().encode(vnfpackage_info), '200']
+        r2_get_vnfpackage_from_catalog = [
+            0,
+            json.JSONEncoder().encode(vnfpackage_info),
+            '200'
+        ]
         mock_call_req.return_value = r2_get_vnfpackage_from_catalog
         mock_uuid4.return_value = "1"
         data = {
@@ -78,7 +96,11 @@ class TestNFInstantiate(TestCase):
             "vnfInstanceName": "vFW_01",
             "vnfInstanceDescription": "vFW in Nanjing TIC Edge"
         }
-        response = self.client.post("/api/vnflcm/v1/vnf_instances", data=data, format='json')
+        response = self.client.post(
+            "/api/vnflcm/v1/vnf_instances",
+            data=data,
+            format='json'
+        )
         expect_data = {
             "id": "1",
             "vnfProvider": "huawei",
