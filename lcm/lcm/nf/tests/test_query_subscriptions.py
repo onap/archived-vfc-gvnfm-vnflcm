@@ -67,13 +67,20 @@ class TestQuerySubscriptions(TestCase):
                 "href": "/api/v1/subscriptions/99442b18-a5c7-11e8-998c-bf1755941f16"
             }
         }
-        SubscriptionModel(subscription_id=self.subscription_id, callback_uri="http://aurl.com",
-                          auth_info="{}", notification_types="['VnfLcmOperationOccurrenceNotification']",
-                          operation_types="['INSTANTIATE']",
-                          operation_states="['STARTING']",
-                          links=json.dumps(links),
-                          vnf_instance_filter=json.dumps(vnf_instance_filter)).save()
-        response = self.client.get("/api/vnflcm/v1/subscriptions", format='json')
+        SubscriptionModel(
+            subscription_id=self.subscription_id,
+            callback_uri="http://aurl.com",
+            auth_info="{}",
+            notification_types="['VnfLcmOperationOccurrenceNotification']",
+            operation_types="['INSTANTIATE']",
+            operation_states="['STARTING']",
+            links=json.dumps(links),
+            vnf_instance_filter=json.dumps(vnf_instance_filter)
+        ).save()
+        response = self.client.get(
+            "/api/vnflcm/v1/subscriptions",
+            format='json'
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual([self.test_single_subscription], response.data)
 
@@ -91,23 +98,34 @@ class TestQuerySubscriptions(TestCase):
                 "href": "/api/v1/subscriptions/99442b18-a5c7-11e8-998c-bf1755941f16"
             }
         }
-        SubscriptionModel(subscription_id=self.subscription_id, callback_uri="http://aurl.com",
-                          auth_info="{}", notification_types="['VnfLcmOperationOccurrenceNotification']",
-                          operation_types="['INSTANTIATE']",
-                          operation_states="['STARTING']",
-                          links=json.dumps(links),
-                          vnf_instance_filter=json.dumps(vnf_instance_filter)).save()
+        SubscriptionModel(
+            subscription_id=self.subscription_id,
+            callback_uri="http://aurl.com",
+            auth_info="{}",
+            notification_types="['VnfLcmOperationOccurrenceNotification']",
+            operation_types="['INSTANTIATE']",
+            operation_states="['STARTING']",
+            links=json.dumps(links),
+            vnf_instance_filter=json.dumps(vnf_instance_filter)
+        ).save()
         dummy_vnf_id = "584b35e2-b2a2-11e8-8e11-645106374fd3"
         dummy_subscription_id = "947dcd2c-b2a2-11e8-b365-645106374fd4"
         vnf_instance_filter["vnfInstanceIds"].append(dummy_vnf_id)
-        SubscriptionModel(subscription_id=dummy_subscription_id, callback_uri="http://aurl.com",
-                          auth_info="{}", notification_types="['VnfLcmOperationOccurrenceNotification']",
-                          operation_types="['INSTANTIATE']",
-                          operation_states="['STARTING']",
-                          links=json.dumps(links),
-                          vnf_instance_filter=json.dumps(vnf_instance_filter)).save()
+        SubscriptionModel(
+            subscription_id=dummy_subscription_id,
+            callback_uri="http://aurl.com",
+            auth_info="{}",
+            notification_types="['VnfLcmOperationOccurrenceNotification']",
+            operation_types="['INSTANTIATE']",
+            operation_states="['STARTING']",
+            links=json.dumps(links),
+            vnf_instance_filter=json.dumps(vnf_instance_filter)
+        ).save()
 
-        response = self.client.get("/api/vnflcm/v1/subscriptions?vnfInstanceId=" + dummy_vnf_id, format='json')
+        response = self.client.get(
+            "/api/vnflcm/v1/subscriptions?vnfInstanceId=" + dummy_vnf_id,
+            format='json'
+        )
         expected_response = self.test_single_subscription.copy()
         expected_response["id"] = dummy_subscription_id
         expected_response["filter"]["vnfInstanceSubscriptionFilter"]["vnfInstanceIds"] = \
@@ -129,14 +147,24 @@ class TestQuerySubscriptions(TestCase):
                 "href": "/api/v1/subscriptions/99442b18-a5c7-11e8-998c-bf1755941f16"
             }
         }
-        SubscriptionModel(subscription_id=self.subscription_id, callback_uri="http://aurl.com",
-                          auth_info="{}", notification_types="['VnfLcmOperationOccurrenceNotification']",
-                          operation_types="['INSTANTIATE']",
-                          operation_states="['STARTING']",
-                          links=json.dumps(links),
-                          vnf_instance_filter=json.dumps(vnf_instance_filter)).save()
-        response = self.client.get("/api/vnflcm/v1/subscriptions?vnfInstanceId=dummy", format='json')
-        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        SubscriptionModel(
+            subscription_id=self.subscription_id,
+            callback_uri="http://aurl.com",
+            auth_info="{}",
+            notification_types="['VnfLcmOperationOccurrenceNotification']",
+            operation_types="['INSTANTIATE']",
+            operation_states="['STARTING']",
+            links=json.dumps(links),
+            vnf_instance_filter=json.dumps(vnf_instance_filter)
+        ).save()
+        response = self.client.get(
+            "/api/vnflcm/v1/subscriptions?vnfInstanceId=dummy",
+            format='json'
+        )
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
     def test_get_subscriptions_with_invalid_filter(self):
         vnf_instance_filter = {
@@ -152,13 +180,20 @@ class TestQuerySubscriptions(TestCase):
                 "href": "/api/v1/subscriptions/99442b18-a5c7-11e8-998c-bf1755941f16"
             }
         }
-        SubscriptionModel(subscription_id=self.subscription_id, callback_uri="http://aurl.com",
-                          auth_info="{}", notification_types="['VnfLcmOperationOccurrenceNotification']",
-                          operation_types="['INSTANTIATE']",
-                          operation_states="['STARTING']",
-                          links=json.dumps(links),
-                          vnf_instance_filter=json.dumps(vnf_instance_filter)).save()
-        response = self.client.get("/api/vnflcm/v1/subscriptions?dummy=dummy", format='json')
+        SubscriptionModel(
+            subscription_id=self.subscription_id,
+            callback_uri="http://aurl.com",
+            auth_info="{}",
+            notification_types="['VnfLcmOperationOccurrenceNotification']",
+            operation_types="['INSTANTIATE']",
+            operation_states="['STARTING']",
+            links=json.dumps(links),
+            vnf_instance_filter=json.dumps(vnf_instance_filter)
+        ).save()
+        response = self.client.get(
+            "/api/vnflcm/v1/subscriptions?dummy=dummy",
+            format='json'
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_subscriptions_with_operation_type_filter(self):
@@ -175,23 +210,34 @@ class TestQuerySubscriptions(TestCase):
                 "href": "/api/v1/subscriptions/99442b18-a5c7-11e8-998c-bf1755941f16"
             }
         }
-        SubscriptionModel(subscription_id=self.subscription_id, callback_uri="http://aurl.com",
-                          auth_info="{}", notification_types="['VnfLcmOperationOccurrenceNotification']",
-                          operation_types="['INSTANTIATE']",
-                          operation_states="['STARTING']",
-                          links=json.dumps(links),
-                          vnf_instance_filter=json.dumps(vnf_instance_filter)).save()
+        SubscriptionModel(
+            subscription_id=self.subscription_id,
+            callback_uri="http://aurl.com",
+            auth_info="{}",
+            notification_types="['VnfLcmOperationOccurrenceNotification']",
+            operation_types="['INSTANTIATE']",
+            operation_states="['STARTING']",
+            links=json.dumps(links),
+            vnf_instance_filter=json.dumps(vnf_instance_filter)
+        ).save()
         dummy_vnf_id = "584b35e2-b2a2-11e8-8e11-645106374fd3"
         dummy_subscription_id = "947dcd2c-b2a2-11e8-b365-645106374fd4"
         vnf_instance_filter["vnfInstanceIds"].append(dummy_vnf_id)
-        SubscriptionModel(subscription_id=dummy_subscription_id, callback_uri="http://aurl.com",
-                          auth_info="{}", notification_types="['VnfLcmOperationOccurrenceNotification']",
-                          operation_types="['SCALE']",
-                          operation_states="['STARTING']",
-                          links=json.dumps(links),
-                          vnf_instance_filter=json.dumps(vnf_instance_filter)).save()
+        SubscriptionModel(
+            subscription_id=dummy_subscription_id,
+            callback_uri="http://aurl.com",
+            auth_info="{}",
+            notification_types="['VnfLcmOperationOccurrenceNotification']",
+            operation_types="['SCALE']",
+            operation_states="['STARTING']",
+            links=json.dumps(links),
+            vnf_instance_filter=json.dumps(vnf_instance_filter)
+        ).save()
 
-        response = self.client.get("/api/vnflcm/v1/subscriptions?operationTypes=SCALE", format='json')
+        response = self.client.get(
+            "/api/vnflcm/v1/subscriptions?operationTypes=SCALE",
+            format='json'
+        )
         expected_response = self.test_single_subscription.copy()
         expected_response["id"] = dummy_subscription_id
         expected_response["filter"]["vnfInstanceSubscriptionFilter"]["vnfInstanceIds"] = \
