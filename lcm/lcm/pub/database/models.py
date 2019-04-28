@@ -326,6 +326,7 @@ class VNFLcmOpOccModel(models.Model):
     vnf_instance_id = models.CharField(db_column='VNFINSTANCEID', null=False, max_length=255)
     grant_id = models.CharField(db_column='GRANTID', null=True, max_length=255)
     operation = models.CharField(db_column='OPERATION', null=False, max_length=30)
+    sub_operation = models.CharField(db_column='SUBOPERATION', null=True, max_length=30)
     is_automatic_invocation = models.CharField(db_column='ISAUTOMATICINVOCATION', null=False, max_length=5)
     operation_params = models.TextField(db_column='OPERATIONPARAMS', null=False)
     is_cancel_pending = models.CharField(db_column='ISCANCELPENDING', null=False, max_length=5)

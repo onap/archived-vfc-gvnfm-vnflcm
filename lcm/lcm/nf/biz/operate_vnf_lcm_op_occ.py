@@ -77,11 +77,13 @@ class VnfLcmOpOcc:
                              }
                          })).save()
 
-    def upd(self, operation_state=None, error=None):
+    def upd(self, operation_state=None, sub_operation=None, error=None):
         occ = VNFLcmOpOccModel.objects.filter(id=self.lcm_op_id)
         with MUTEX_UPD_OCC:
             if operation_state:
                 occ.update(operation_state=operation_state)
+            if sub_operation:
+                occ.update(sub_operation=sub_operation)
             if error:
                 occ.update(error=json.dumps(error))
 
