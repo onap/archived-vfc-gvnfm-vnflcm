@@ -82,6 +82,8 @@ class VnfLcmOpOcc:
         with MUTEX_UPD_OCC:
             if operation_state:
                 occ.update(operation_state=operation_state)
+            if sub_operation:
+                occ.update(sub_operation=sub_operation)
             if error:
                 occ.update(error=json.dumps(error))
 
