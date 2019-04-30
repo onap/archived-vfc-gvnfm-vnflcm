@@ -20,12 +20,14 @@ from lcm.nf.biz.common import port_save
 from lcm.nf.biz.grant_vnf import grant_resource
 from lcm.nf.const import RESOURCE_MAP, GRANT_TYPE, OPERATION_STATE_TYPE
 from lcm.nf.const import VNF_STATUS, OPERATION_TASK, OPERATION_TYPE
+from lcm.nf.const import SUB_OPERATION_TASK
 from lcm.pub.database.models import VmInstModel, NfInstModel, PortInstModel
 from lcm.pub.utils.notificationsutil import NotificationsUtil, prepare_notification
 from lcm.pub.utils.values import ignore_case_get
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.exceptions import NFLCMException
+from lcm.pub.exceptions import NFLCMExceptionConflict
 from lcm.pub.vimapi import adaptor
 from .operate_vnf_lcm_op_occ import VnfLcmOpOcc
 
@@ -48,6 +50,7 @@ class ChangeExtConn(Thread):
             operation=OPERATION_TYPE.CHANGE_EXT_CONN,
             task=OPERATION_TASK.CHANGE_EXT_CONN
         )
+        self.pre_deal()
 
     def run(self):
         try:
@@ -64,6 +67,7 @@ class ChangeExtConn(Thread):
                 50,
                 "Start to change ext conn."
             )
+            self.lcm_op_occ.upd(sub_operation=SUB_OPERATION_TASK.GRANTED)
             self.do_operation()
             self.vnf_insts.update(
                 status='INSTANTIATED',
@@ -75,6 +79,7 @@ class ChangeExtConn(Thread):
                 100,
                 "Change ext conn success."
             )
+            self.lcm_op_occ.upd(sub_operation=SUB_OPERATION_TASK.SUCCESS)
         except NFLCMException as e:
             logger.error(e.message)
             self.change_ext_conn_failed_handle(e.message)
@@ -82,6 +87,16 @@ class ChangeExtConn(Thread):
             logger.error(e.message)
             logger.error(traceback.format_exc())
             self.change_ext_conn_failed_handle(e.message)
+
+    def pre_deal(self):
+        logger.debug("Start pre deal for VNF change_ext_conn task")
+
+        vnf_is_in_processing, vnf_op = self.lcm_op_occ.is_in_processing()
+        if vnf_is_in_processing:
+            raise NFLCMExceptionConflict('VNF(%s) %s in processing.' % (
+                self.nf_inst_id, vnf_op
+            ))
+        self.lcm_op_occ.add()
 
     def apply_grant(self):
         vdus = VmInstModel.objects.filter(instid=self.nf_inst_id)
@@ -287,3 +302,10 @@ class ChangeExtConn(Thread):
         )
         self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, error_msg)
         JobUtil.add_job_status(self.job_id, 255, error_msg)
+        self.lcm_op_occ.upd(
+            sub_operation=SUB_OPERATION_TASK.ERROR,
+            error={
+                "status": 500,
+                "detail": err_msg
+            }
+        )
