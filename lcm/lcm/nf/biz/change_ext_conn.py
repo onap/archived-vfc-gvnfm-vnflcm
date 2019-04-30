@@ -52,23 +52,29 @@ class ChangeExtConn(Thread):
     def run(self):
         try:
             self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.STARTING)
-            JobUtil.add_job_status(self.job_id,
-                                   10,
-                                   "Start to apply grant.")
+            JobUtil.add_job_status(
+                self.job_id,
+                10,
+                "Start to apply grant."
+            )
             self.apply_grant()
             self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.PROCESSING)
-            JobUtil.add_job_status(self.job_id,
-                                   50,
-                                   "Start to change ext conn.")
+            JobUtil.add_job_status(
+                self.job_id,
+                50,
+                "Start to change ext conn."
+            )
             self.do_operation()
             self.vnf_insts.update(
                 status='INSTANTIATED',
                 lastuptime=now_time()
             )
             self.send_notification()
-            JobUtil.add_job_status(self.job_id,
-                                   100,
-                                   "Change ext conn success.")
+            JobUtil.add_job_status(
+                self.job_id,
+                100,
+                "Change ext conn success."
+            )
         except NFLCMException as e:
             logger.error(e.message)
             self.change_ext_conn_failed_handle(e.message)
@@ -79,11 +85,13 @@ class ChangeExtConn(Thread):
 
     def apply_grant(self):
         vdus = VmInstModel.objects.filter(instid=self.nf_inst_id)
-        apply_result = grant_resource(data=self.data,
-                                      nf_inst_id=self.nf_inst_id,
-                                      job_id=self.job_id,
-                                      grant_type=GRANT_TYPE.CHANGE_CONNECTIVITY,
-                                      vdus=vdus)
+        apply_result = grant_resource(
+            data=self.data,
+            nf_inst_id=self.nf_inst_id,
+            job_id=self.job_id,
+            grant_type=GRANT_TYPE.CHANGE_CONNECTIVITY,
+            vdus=vdus
+        )
         logger.debug("Grant resource end, response: %s" % apply_result)
 
     def do_operation(self):
@@ -105,10 +113,11 @@ class ChangeExtConn(Thread):
             for ext_cp in ext_cps:
                 cpd_id = ignore_case_get(ext_cp, "cpdId")
                 cp_config = ignore_case_get(ext_cp, "cpConfig")
-                # cp_instance_id = ignore_case_get(cp_config[0], "cpInstanceId")
                 cp_protocol_data = ignore_case_get(cp_config[0], "cpProtocolData")
-                # mac_address = ignore_case_get(ignore_case_get(cp_protocol_data[0], "ipOverEthernet"), "macAddress")
-                ip_addresses = ignore_case_get(ignore_case_get(cp_protocol_data[0], "ipOverEthernet"), "ipAddresses")
+                ip_addresses = ignore_case_get(ignore_case_get(
+                    cp_protocol_data[0],
+                    "ipOverEthernet"
+                ), "ipAddresses")
                 # fixed_addresse = ignore_case_get(ip_addresses[0], "fixedAddresses")[0]
                 # addressRange = ignore_case_get(ip_addresses[0], "addressRange")
                 # minAddress = ignore_case_get(addressRange, "minAddress")
@@ -165,19 +174,33 @@ class ChangeExtConn(Thread):
                 #         adaptor.create_port_of_vm(self.vim_cache, self.res_cache, vnfd_info, port,
                 #                                   self.do_notify_op, "port")
                 # else:
-                adaptor.create_port(self.vim_cache, self.res_cache, vnfd_info, port, self.do_create_port_notify, "port")
+                adaptor.create_port(
+                    self.vim_cache,
+                    self.res_cache,
+                    vnfd_info, port,
+                    self.do_create_port_notify,
+                    "port"
+                )
                 port["port_id"] = self.port_id
                 logger.debug('create_port_of_vm request data = %s' % port)
-                adaptor.create_port_of_vm(self.vim_cache, self.res_cache, vnfd_info, port,
-                                          self.do_notify_op, "port")
+                adaptor.create_port_of_vm(
+                    self.vim_cache,
+                    self.res_cache,
+                    vnfd_info,
+                    port,
+                    self.do_notify_op,
+                    "port"
+                )
                 PortInstModel.objects.filter(resourceid=self.port_id).update(vmid=vm_id)
         logger.info('Operate resource complete')
 
     def send_notification(self):
-        data = prepare_notification(nfinstid=self.nf_inst_id,
-                                    jobid=self.job_id,
-                                    operation=OPERATION_TYPE.CHANGE_EXT_CONN,
-                                    operation_state=OPERATION_STATE_TYPE.COMPLETED)
+        data = prepare_notification(
+            nfinstid=self.nf_inst_id,
+            jobid=self.job_id,
+            operation=OPERATION_TYPE.CHANGE_EXT_CONN,
+            operation_state=OPERATION_STATE_TYPE.COMPLETED
+        )
         self.set_ext_connectivity(data['changedExtConnectivity'])
 
         logger.debug('Notify request data = %s' % data)
@@ -190,11 +213,15 @@ class ChangeExtConn(Thread):
         logger.debug('Query resource begin')
         for resource_type in RESOURCE_MAP.keys():
             resource_table = globals().get(resource_type + 'InstModel')
-            resource_insts = resource_table.objects.filter(instid=self.nf_inst_id)
+            resource_insts = resource_table.objects.filter(
+                instid=self.nf_inst_id
+            )
             for resource_inst in resource_insts:
                 if not resource_inst.resourceid:
                     continue
-                inst_resource[RESOURCE_MAP.get(resource_type)].append(self.get_resource(resource_inst))
+                inst_resource[RESOURCE_MAP.get(resource_type)].append(
+                    self.get_resource(resource_inst)
+                )
         logger.debug('Query resource end, resource=%s' % inst_resource)
 
     def get_resource(self, resource):
@@ -254,7 +281,9 @@ class ChangeExtConn(Thread):
 
     def change_ext_conn_failed_handle(self, error_msg):
         logger.error('Chnage ext conn failed, detail message: %s', error_msg)
-        self.vnf_insts.update(status=VNF_STATUS.FAILED,
-                              lastuptime=now_time())
+        self.vnf_insts.update(
+            status=VNF_STATUS.FAILED,
+            lastuptime=now_time()
+        )
         self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, error_msg)
         JobUtil.add_job_status(self.job_id, 255, error_msg)
