@@ -75,6 +75,25 @@ OPERATION_TASK = enum(
     TERMINATE="terminate"
 )
 
+SUB_OPERATION_TASK = enum(
+    RETRY="retry",
+    ROLLBACK="rollback",
+    FAIL="fail",
+    CANCEL="cancel",
+    ERROR="error",
+    SUCCESS="success",
+    GRANTED="granted",
+    UNRESOLVABLE_ERROR="unresolvable_error",
+    AUTO_ROLLBACK="auto_rollback",
+)
+
+SUB_OPERATION_TUPLE = (
+    SUB_OPERATION_TASK.RETRY,
+    SUB_OPERATION_TASK.ROLLBACK,
+    SUB_OPERATION_TASK.FAIL,
+    SUB_OPERATION_TASK.CANCEL
+)
+
 INSTANTIATION_STATE = enum(
     NOT_INSTANTIATED="NOT_INSTANTIATED",
     INSTANTIATED="INSTANTIATED"

@@ -93,6 +93,14 @@ class VnfLcmOpOcc:
             raise NFLCMExceptionNotFound('Occurrence(%s) does not exist.' % self.lcm_op_id)
         return lcm_op_occ_obj
 
+    def is_in_processing(self):
+        lcm_op_occ = VNFLcmOpOccModel.objects.filter(vnf_instance_id=self.vnf_inst_id)
+
+        for occ in lcm_op_occ:
+            if occ.operation_state not in const.FINAL_STATE_RANGE:
+                return True, occ.operation
+        return False, None
+
     def notify_lcm(self, operation_state, error=''):
         data = prepare_notification(nfinstid=self.vnf_inst_id,
                                     jobid=self.lcm_op_id,
