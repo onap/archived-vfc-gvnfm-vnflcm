@@ -22,6 +22,7 @@ from lcm.nf.const import GRANT_TYPE, CHANGE_TYPE
 from lcm.nf.const import VNF_STATUS
 from lcm.nf.const import OPERATION_TYPE, OPERATION_TASK
 from lcm.nf.const import OPERATION_STATE_TYPE
+from lcm.nf.const import SUB_OPERATION_TASK
 from lcm.pub.utils.notificationsutil import NotificationsUtil, prepare_notification_data
 from lcm.pub.utils.values import ignore_case_get
 from lcm.pub.utils.timeutil import now_time
@@ -50,23 +51,37 @@ class ChangeVnfFlavour(Thread):
     def run(self):
         try:
             self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.STARTING)
-            JobUtil.add_job_status(self.job_id,
-                                   10,
-                                   "Start to apply grant.")
+            JobUtil.add_job_status(
+                self.job_id,
+                10,
+                "Start to apply grant."
+            )
             self.apply_grant()
             self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.PROCESSING)
-            JobUtil.add_job_status(self.job_id,
-                                   50,
-                                   "Start to change vnf flavour.")
+            JobUtil.add_job_status(
+                self.job_id,
+                50,
+                "Start to change vnf flavour."
+            )
+            self.lcm_op_occ.upd(
+                sub_operation=SUB_OPERATION_TASK.GRANTED,
+                operation_state=OPERATION_STATE_TYPE.PROCESSING
+            )
             self.do_operation()
             self.vnf_insts.update(
                 status='INSTANTIATED',
                 lastuptime=now_time()
             )
             self.send_notification()
-            JobUtil.add_job_status(self.job_id,
-                                   100,
-                                   "Change vnf flavour success.")
+            JobUtil.add_job_status(
+                self.job_id,
+                100,
+                "Change vnf flavour success."
+            )
+            self.lcm_op_occ.upd(
+                sub_operation=SUB_OPERATION_TASK.SUCCESS,
+                operation_state=OPERATION_STATE_TYPE.COMPLETED
+            )
         except NFLCMException as e:
             logger.error(e.message)
             self.change_vnf_flavour_failed_handle(e.message)
@@ -75,14 +90,26 @@ class ChangeVnfFlavour(Thread):
             logger.error(traceback.format_exc())
             self.change_vnf_flavour_failed_handle(e.message)
 
+    def pre_deal(self):
+        logger.debug("Start pre deal for VNF change_vnf_flavour task")
+
+        vnf_is_in_processing, vnf_op = self.lcm_op_occ.is_in_processing()
+        if vnf_is_in_processing:
+            raise NFLCMExceptionConflict('VNF(%s) %s in processing.' % (
+                self.nf_inst_id, vnf_op
+            ))
+        self.lcm_op_occ.add()
+
     def apply_grant(self):
         logger.debug("Start change flavour apply grant")
         vdus = ignore_case_get(self.vnfd_info, "vdus")
-        grant_result = grant_resource(data=self.data,
-                                      nf_inst_id=self.nf_inst_id,
-                                      job_id=self.job_id,
-                                      grant_type=GRANT_TYPE.CHANGE_FLAVOUR,
-                                      vdus=vdus)
+        grant_result = grant_resource(
+            data=self.data,
+            nf_inst_id=self.nf_inst_id,
+            job_id=self.job_id,
+            grant_type=GRANT_TYPE.CHANGE_FLAVOUR,
+            vdus=vdus
+        )
         logger.debug("Change flavour Grant result: %s", grant_result)
 
     def do_operation(self):
@@ -91,16 +118,28 @@ class ChangeVnfFlavour(Thread):
         # TODO: Add operation logic
 
     def send_notification(self):
-        data = prepare_notification_data(nfinstid=self.nf_inst_id,
-                                         jobid=self.job_id,
-                                         changetype=CHANGE_TYPE.MODIFIED,
-                                         operation=OPERATION_TYPE.CHANGE_FLAVOUR)
+        data = prepare_notification_data(
+            nfinstid=self.nf_inst_id,
+            jobid=self.job_id,
+            changetype=CHANGE_TYPE.MODIFIED,
+            operation=OPERATION_TYPE.CHANGE_FLAVOUR
+        )
         logger.debug('Notify request data = %s' % data)
         NotificationsUtil().send_notification(data)
 
     def change_vnf_flavour_failed_handle(self, error_msg):
         logger.error('Chnage vnf flavour failed, detail message: %s', error_msg)
-        self.vnf_insts.update(status=VNF_STATUS.FAILED,
-                              lastuptime=now_time())
+        self.vnf_insts.update(
+            status=VNF_STATUS.FAILED,
+            lastuptime=now_time()
+        )
         self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, error_msg)
         JobUtil.add_job_status(self.job_id, 255, error_msg)
+        self.lcm_op_occ.upd(
+            sub_operation=SUB_OPERATION_TASK.ERROR,
+            operation_state=OPERATION_STATE_TYPE.FAILED,
+            error={
+                "status": 500,
+                "detail": error_msg
+            }
+        )
