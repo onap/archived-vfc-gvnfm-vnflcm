@@ -19,6 +19,7 @@ from threading import Thread
 
 from lcm.pub.database.models import NfInstModel
 from lcm.pub.exceptions import NFLCMException
+from lcm.pub.exceptions import NFLCMExceptionConflict
 from lcm.pub.msapi.gvnfmdriver import prepare_notification_data
 from lcm.pub.msapi.gvnfmdriver import notify_lcm_to_nfvo
 from lcm.pub.msapi.sdc_run_catalog import query_vnfpackage_by_id
@@ -31,6 +32,7 @@ from lcm.nf.biz.grant_vnf import grant_resource
 from lcm.nf.const import CHANGE_TYPE, GRANT_TYPE, OPERATION_TYPE
 from lcm.nf.const import OPERATION_TASK
 from lcm.nf.const import OPERATION_STATE_TYPE
+from lcm.nf.const import SUB_OPERATION_TASK
 from lcm.nf.biz import common
 from .operate_vnf_lcm_op_occ import VnfLcmOpOcc
 
@@ -43,7 +45,13 @@ class InstantiateVnf(Thread):
         self.data = data
         self.nf_inst_id = nf_inst_id
         self.job_id = job_id
-        self.vim_id = ignore_case_get(ignore_case_get(self.data, "additionalParams"), "vimId")
+        self.vim_id = ignore_case_get(
+            ignore_case_get(
+                self.data,
+                "additionalParams"
+            ),
+            "vimId"
+        )
         self.grant_type = GRANT_TYPE.INSTANTIATE
         self.lcm_op_occ = VnfLcmOpOcc(
             vnf_inst_id=nf_inst_id,
@@ -51,22 +59,45 @@ class InstantiateVnf(Thread):
             operation=OPERATION_TYPE.INSTANTIATE,
             task=OPERATION_TASK.INSTANTIATE
         )
+        self.pre_deal()
 
     def run(self):
         try:
             self.inst_pre()
             self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.STARTING)
             self.apply_grant()
+            self.lcm_op_occ.upd(
+                sub_operation=SUB_OPERATION_TASK.GRANTED,
+                operation_state=OPERATION_STATE_TYPE.PROCESSING
+            )
             self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.PROCESSING)
             self.create_res()
             self.lcm_notify()
-            JobUtil.add_job_status(self.job_id, 100, "Instantiate Vnf success.")
+            JobUtil.add_job_status(
+                self.job_id,
+                100,
+                "Instantiate Vnf success."
+            )
+            self.lcm_op_occ.upd(
+                sub_operation=SUB_OPERATION_TASK.SUCCESS,
+                operation_state=OPERATION_STATE_TYPE.COMPLETED
+            )
         except NFLCMException as e:
             self.vnf_inst_failed_handle(e.message)
         except Exception as e:
             logger.error(e.message)
             logger.error(traceback.format_exc())
             self.vnf_inst_failed_handle('unexpected exception')
+
+    def pre_deal(self):
+        logger.debug("Start pre deal for VNF instantiate_vnf task")
+
+        vnf_is_in_processing, vnf_op = self.lcm_op_occ.is_in_processing()
+        if vnf_is_in_processing:
+            raise NFLCMExceptionConflict('VNF(%s) %s in processing.' % (
+                self.nf_inst_id, vnf_op
+            ))
+        self.lcm_op_occ.add()
 
     def inst_pre(self):
         vnf_insts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
@@ -178,6 +209,14 @@ class InstantiateVnf(Thread):
         )
         self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, error_msg)
         JobUtil.add_job_status(self.job_id, 255, error_msg)
+        self.lcm_op_occ.upd(
+            sub_operation=SUB_OPERATION_TASK.ERROR,
+            operation_state=OPERATION_STATE_TYPE.FAILED,
+            error={
+                "status": 500,
+                "detail": error_msg
+            }
+        )
 
     def do_notify(self, res_type, ret):
         logger.info('Creating [%s] resource' % res_type)
