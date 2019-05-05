@@ -22,15 +22,18 @@ from lcm.pub.database.models import NfInstModel
 from lcm.pub.database.models import VmInstModel
 from lcm.pub.database.models import VNFCInstModel
 from lcm.pub.exceptions import NFLCMException
+from lcm.pub.exceptions import NFLCMExceptionConflict
 from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.notificationsutil import NotificationsUtil
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.values import ignore_case_get
 from lcm.pub.vimapi import adaptor
 from lcm.nf.biz.grant_vnf import grant_resource
-from lcm.nf.const import VNF_STATUS, GRANT_TYPE, OPERATION_STATE_TYPE, LCM_NOTIFICATION_STATUS
+from lcm.nf.const import VNF_STATUS, GRANT_TYPE
+from lcm.nf.const import OPERATION_STATE_TYPE, LCM_NOTIFICATION_STATUS
 from lcm.nf.const import CHANGE_TYPE, OPERATION_TYPE, HEAL_ACTION_TYPE
 from lcm.nf.const import OPERATION_TASK
+from lcm.nf.const import SUB_OPERATION_TASK
 from lcm.nf.biz import common
 from .operate_vnf_lcm_op_occ import VnfLcmOpOcc
 
@@ -44,9 +47,21 @@ class HealVnf(Thread):
         self.data = data
         self.nf_inst_id = nf_inst_id
         self.job_id = job_id
-        self.affectedvm = ignore_case_get(ignore_case_get(self.data, "additionalParams"), "affectedvm")
+        self.affectedvm = ignore_case_get(
+            ignore_case_get(
+                self.data,
+                "additionalParams"
+            ),
+            "affectedvm"
+        )
         # TODO: Check if we could move the action param into the list of affectedvm structure
-        self.action = ignore_case_get(ignore_case_get(self.data, "additionalParams"), "action")
+        self.action = ignore_case_get(
+            ignore_case_get(
+                self.data,
+                "additionalParams"
+            ),
+            "action"
+        )
         self.grant_type = ""
         if self.action == HEAL_ACTION_TYPE.START:
             self.grant_type = GRANT_TYPE.HEAL_CREATE
@@ -58,12 +73,17 @@ class HealVnf(Thread):
             operation=OPERATION_TYPE.HEAL,
             task=OPERATION_TASK.HEAL
         )
+        self.pre_deal()
 
     def run(self):
         try:
             self.heal_pre()
             self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.STARTING)
             self.apply_grant()
+            self.lcm_op_occ.upd(
+                sub_operation=SUB_OPERATION_TASK.GRANTED,
+                operation_state=OPERATION_STATE_TYPE.PROCESSING
+            )
             self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.PROCESSING)
             self.heal_resource()
             JobUtil.add_job_status(self.job_id, 100, "Heal Vnf success.")
@@ -75,6 +95,10 @@ class HealVnf(Thread):
                 LCM_NOTIFICATION_STATUS.RESULT,
                 OPERATION_STATE_TYPE.COMPLETED
             )
+            self.lcm_op_occ.upd(
+                sub_operation=SUB_OPERATION_TASK.SUCCESS,
+                operation_state=OPERATION_STATE_TYPE.COMPLETED
+            )
         except NFLCMException as e:
             logger.error(e.message)
             self.vnf_heal_failed_handle(e.message)
@@ -82,6 +106,16 @@ class HealVnf(Thread):
             logger.error(e.message)
             logger.error(traceback.format_exc())
             self.vnf_heal_failed_handle(e.message)
+
+    def pre_deal(self):
+        logger.debug("Start pre deal for VNF heal_vnf task")
+
+        vnf_is_in_processing, vnf_op = self.lcm_op_occ.is_in_processing()
+        if vnf_is_in_processing:
+            raise NFLCMExceptionConflict('VNF(%s) %s in processing.' % (
+                self.nf_inst_id, vnf_op
+            ))
+        self.lcm_op_occ.add()
 
     def heal_pre(self):
         if self.action not in (HEAL_ACTION_TYPE.START, HEAL_ACTION_TYPE.RESTART):
@@ -138,6 +172,14 @@ class HealVnf(Thread):
         )
         self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, error_msg)
         JobUtil.add_job_status(self.job_id, 255, error_msg)
+        self.lcm_op_occ.upd(
+            sub_operation=SUB_OPERATION_TASK.ERROR,
+            operation_state=OPERATION_STATE_TYPE.FAILED,
+            error={
+                "status": 500,
+                "detail": error_msg
+            }
+        )
 
     def lcm_notify(self, status, opState, err=None):
         notification_content = self.prepareNotificationData(status, opState, err)
