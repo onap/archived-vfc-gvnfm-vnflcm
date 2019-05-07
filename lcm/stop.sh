@@ -14,4 +14,4 @@
 # limitations under the License.
 
 # ps auxww | grep 'manage.py runserver 0.0.0.0:8801' | awk '{print $2}' | xargs kill -9
-ps auxww |grep 'uwsgi --http :8801 --module lcm.wsgi --master' |awk '{print $2}' |xargs kill -9
+ps auxww |grep 'uwsgi --http' |awk '{print $1}' |xargs kill -9
