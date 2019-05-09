@@ -26,8 +26,3 @@ else
     nohup uwsgi --http :8801 -t 120 --module lcm.wsgi --master --processes 4 &
 fi
 
-while [ ! -f $logDir/runtime_lcm.log ]; do
-    sleep 1
-done
-
-tail -F  $logDir/runtime_lcm.log
