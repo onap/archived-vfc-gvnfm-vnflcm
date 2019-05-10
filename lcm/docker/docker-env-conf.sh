@@ -7,8 +7,8 @@ install_sf(){
     apk --no-cache add python-dev libffi-dev musl-dev py2-virtualenv
 
     # get binary zip from nexus - vfc-nfvo-catalog
-    wget -q -O vfc-gvnfm-vnflcm-lcm.zip 'https://nexus.onap.org/service/local/artifact/maven/redirect?r=snapshots&g=org.onap.vfc.gvnfm.vnflcm.lcm&a=vfc-gvnfm-vnflcm-lcm&v=LATEST&e=zip'
-    unzip vfc-gvnfm-vnflcm-lcm.zip
+    wget -q -O vfc-gvnfm-vnflcm-lcm.zip 'https://nexus.onap.org/service/local/artifact/maven/redirect?r=snapshots&g=org.onap.vfc.gvnfm.vnflcm.lcm&a=vfc-gvnfm-vnflcm-lcm&v=${pkg_verison}-SNAPSHOT&e=zip' && \
+    unzip vfc-gvnfm-vnflcm-lcm.zip && \
     rm -rf vfc-gvnfm-vnflcm-lcm.zip
     wait
     pip install --upgrade setuptools pip 
