@@ -145,3 +145,9 @@ def vm_save(job_id, nf_inst_id, ret):
         is_predefined=ignore_case_get(ret, "returnCode"),
         instid=nf_inst_id,
         vmid=vm_id)
+    for portid in ignore_case_get(ret, "ports"):
+        PortInstModel.objects.filter(
+            resourceid=portid
+        ).update(
+            vmid=ignore_case_get(ret, "id")
+        )
