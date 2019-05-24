@@ -53,7 +53,7 @@ def view_safe_call_with_log(logger):
             except NFLCMExceptionSeeOther as e:
                 logger.error(e.message)
                 resp = Response(status=status.HTTP_303_SEE_OTHER)
-                resp["Location"] = ""
+                resp["Location"] = e.message
                 # resp["Location"] = "subscriptions/%s" % e.id
                 return resp
             except NFLCMExceptionNotFound as e:
