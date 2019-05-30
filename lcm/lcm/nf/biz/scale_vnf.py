@@ -19,7 +19,7 @@ from threading import Thread
 
 from lcm.nf.biz import common
 from lcm.nf.biz.grant_vnf import grant_resource
-from lcm.nf.const import VNF_STATUS, GRANT_TYPE, CHANGE_TYPE
+from lcm.nf.const import GRANT_TYPE, CHANGE_TYPE
 from lcm.nf.const import RESOURCE_MAP, OPERATION_STATE_TYPE
 from lcm.nf.const import INSTANTIATION_STATE
 from lcm.nf.const import OPERATION_TYPE
@@ -289,7 +289,7 @@ class ScaleVnf(Thread):
 
     def vnf_scale_failed_handle(self, error_msg):
         logger.error('VNF scaling failed, detail message: %s', error_msg)
-        self.vnf_insts.update(status=VNF_STATUS.FAILED,
-                              lastuptime=now_time())
+        self.vnf_insts.update(  # status=VNF_STATUS.FAILED,
+            lastuptime=now_time())
         self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, error_msg)
         JobUtil.add_job_status(self.job_id, 255, error_msg)

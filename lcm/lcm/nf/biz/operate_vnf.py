@@ -28,7 +28,6 @@ from lcm.pub.utils.notificationsutil import NotificationsUtil
 from lcm.pub.utils.values import ignore_case_get
 from lcm.pub.vimapi import adaptor
 from lcm.nf.biz.grant_vnf import grant_resource
-from lcm.nf.const import VNF_STATUS
 from lcm.nf.const import RESOURCE_MAP
 from lcm.nf.const import GRANT_TYPE
 from lcm.nf.const import OPERATION_STATE_TYPE
@@ -129,7 +128,7 @@ class OperateVnf(Thread):
     def vnf_operate_failed_handle(self, error_msg):
         logger.error('VNF Operation failed, detail message: %s' % error_msg)
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(
-            status=VNF_STATUS.FAILED,
+            # status=VNF_STATUS.FAILED,
             lastuptime=now_time()
         )
         self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, error_msg)
