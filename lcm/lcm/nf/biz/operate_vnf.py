@@ -129,7 +129,7 @@ class OperateVnf(Thread):
     def vnf_operate_failed_handle(self, error_msg):
         logger.error('VNF Operation failed, detail message: %s' % error_msg)
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).update(
-            status=VNF_STATUS.FAILED,
+            # status=VNF_STATUS.FAILED,
             lastuptime=now_time()
         )
         self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, error_msg)
