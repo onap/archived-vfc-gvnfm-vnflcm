@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "d564f63a_ed520656",
+        "filename": "lcm/lcm/nf/biz/common.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2019-06-03T23:41:15Z",
+      "side": 1,
+      "message": "I got your point, but the name \"is****\" is like a boolean variable.",
+      "parentUuid": "aae0b67f_87a7627d",
+      "range": {
+        "startLine": 71,
+        "startChar": 55,
+        "endLine": 71,
+        "endChar": 58
+      },
+      "revId": "fccf3487362c1497cab3a793fe70ca51007d5ce5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5ea803de_6d2cdc6f",
         "filename": "lcm/lcm/pub/vimapi/adaptor.py",
         "patchSetId": 2
