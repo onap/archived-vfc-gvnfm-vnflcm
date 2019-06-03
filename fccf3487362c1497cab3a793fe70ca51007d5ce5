@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ea803de_6d2cdc6f",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2019-06-03T02:14:50Z",
+      "side": 1,
+      "message": "I think we should return error message so that we can more easily locate the problem.",
+      "range": {
+        "startLine": 256,
+        "startChar": 8,
+        "endLine": 256,
+        "endChar": 14
+      },
+      "revId": "fccf3487362c1497cab3a793fe70ca51007d5ce5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
