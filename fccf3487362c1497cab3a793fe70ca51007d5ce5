@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "aae0b67f_87a7627d",
+        "filename": "lcm/lcm/nf/biz/common.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2019-06-03T10:10:20Z",
+      "side": 1,
+      "message": "I think we should use true or false instead of \"0\" to set default value.",
+      "range": {
+        "startLine": 71,
+        "startChar": 55,
+        "endLine": 71,
+        "endChar": 58
+      },
+      "revId": "fccf3487362c1497cab3a793fe70ca51007d5ce5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5ea803de_6d2cdc6f",
         "filename": "lcm/lcm/pub/vimapi/adaptor.py",
         "patchSetId": 2
