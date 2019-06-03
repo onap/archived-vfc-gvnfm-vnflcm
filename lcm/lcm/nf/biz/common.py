@@ -68,7 +68,7 @@ def subnet_save(job_id, nf_inst_id, ret):
         networkid=ignore_case_get(ret, "networkId"),
         cidr=ignore_case_get(ret, "cidr"),
         ipversion=ignore_case_get(ret, "ipversion"),
-        isdhcpenabled=ignore_case_get(ret, "enableDhcp"),
+        isdhcpenabled=ignore_case_get(ret, "enableDhcp", 0),
         gatewayip=ignore_case_get(ret, "gatewayIp"),
         dnsNameservers=ignore_case_get(ret, "dnsNameservers"),
         hostRoutes=ignore_case_get(ret, "hostRoutes"),
