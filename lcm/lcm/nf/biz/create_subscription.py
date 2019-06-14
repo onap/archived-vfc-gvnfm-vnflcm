@@ -62,7 +62,7 @@ class CreateSubscription:
 
     def do_biz(self):
         self.subscription_id = str(uuid.uuid4())
-        # self.check_callbackuri_connection()
+        self.check_callbackuri_connection()
         self.check_valid_auth_info()
         self.check_filter_types()
         self.check_valid()

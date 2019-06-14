@@ -174,6 +174,3 @@ class TestSubscription(TestCase):
         response = self.client.post("/api/vnflcm/v1/subscriptions", data=miss_callbackUri_subscription, format='json')
         self.assertEqual(400, response.status_code)
         self.assertEqual({'callbackUri': ['This field is required.']}, response.data['detail'])
-        # self.assertEqual(temp_uuid, response.data["id"])
-        # response = self.client.post("/api/vnflcm/v1/subscriptions", data=dummy_subscription, format='json')
-        # self.assertEqual(303, response.status_code)
