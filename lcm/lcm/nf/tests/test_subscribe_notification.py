@@ -152,3 +152,28 @@ class TestSubscription(TestCase):
         self.assertEqual(temp_uuid, response.data["id"])
         response = self.client.post("/api/vnflcm/v1/subscriptions", data=dummy_subscription, format='json')
         self.assertEqual(303, response.status_code)
+
+    @mock.patch("requests.get")
+    @mock.patch.object(uuid, 'uuid4')
+    def test_badreq_subscription(self, mock_uuid4, mock_requests):
+        temp_uuid = str(uuid.uuid4())
+        miss_callbackUri_subscription = {
+            "filter": {
+                "notificationTypes": ["VnfLcmOperationOccurrenceNotification"],
+                "operationTypes": [
+                    "INSTANTIATE"
+                ],
+                "operationStates": [
+                    "STARTING"
+                ]
+            }
+        }
+        mock_requests.return_value.status_code = 204
+        mock_requests.get.return_value.status_code = 204
+        mock_uuid4.return_value = temp_uuid
+        response = self.client.post("/api/vnflcm/v1/subscriptions", data=miss_callbackUri_subscription, format='json')
+        self.assertEqual(400, response.status_code)
+        self.assertEqual({'callbackUri': ['This field is required.']}, response.data['detail'])
+        # self.assertEqual(temp_uuid, response.data["id"])
+        # response = self.client.post("/api/vnflcm/v1/subscriptions", data=dummy_subscription, format='json')
+        # self.assertEqual(303, response.status_code)
