@@ -27,7 +27,7 @@ from lcm.nf.serializers.lccn_subscription_request import LccnSubscriptionRequest
 from lcm.nf.serializers.lccn_subscription import LccnSubscriptionSerializer
 from lcm.nf.serializers.lccn_subscriptions import LccnSubscriptionsSerializer
 from lcm.nf.serializers.response import ProblemDetailsSerializer
-from lcm.pub.exceptions import NFLCMException
+from lcm.pub.exceptions import NFLCMException, NFLCMExceptionBadRequest
 from .common import view_safe_call_with_log
 
 logger = logging.getLogger(__name__)
@@ -50,6 +50,7 @@ class SubscriptionsView(APIView):
         responses={
             status.HTTP_201_CREATED: LccnSubscriptionSerializer(),
             status.HTTP_303_SEE_OTHER: ProblemDetailsSerializer(),
+            status.HTTP_400_BAD_REQUEST: ProblemDetailsSerializer(),
             status.HTTP_500_INTERNAL_SERVER_ERROR: ProblemDetailsSerializer()
         }
     )
@@ -59,7 +60,7 @@ class SubscriptionsView(APIView):
 
         lccn_subscription_request_serializer = LccnSubscriptionRequestSerializer(data=request.data)
         if not lccn_subscription_request_serializer.is_valid():
-            raise NFLCMException(lccn_subscription_request_serializer.errors)
+            raise NFLCMExceptionBadRequest(lccn_subscription_request_serializer.errors)
         subscription = CreateSubscription(
             lccn_subscription_request_serializer.data).do_biz()
         lccn_notifications_filter = {
