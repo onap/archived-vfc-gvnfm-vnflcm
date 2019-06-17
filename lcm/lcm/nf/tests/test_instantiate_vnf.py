@@ -19,6 +19,7 @@ import mock
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
+from threading import Thread
 
 from .const import c1_data_get_tenant_id
 from .const import c4_data_create_network
@@ -42,6 +43,7 @@ from lcm.pub.utils.jobutil import JobUtil
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.notificationsutil import NotificationsUtil
 from lcm.pub.vimapi import api
+from lcm.pub.exceptions import NFLCMException
 
 from lcm.nf.biz.instantiate_vnf import InstantiateVnf
 
@@ -389,3 +391,34 @@ class TestNFInstantiate(TestCase):
             nf_inst_id=self.nf_inst_id,
             job_id=self.job_id
         ).run()
+
+    @mock.patch.object(JobUtil, 'create_job')
+    def test_instantiate_inner_error(self, mock_run):
+        NfInstModel(
+            nfinstid='144',
+            nf_name='VNF1',
+            status='NOT_INSTANTIATED'
+        ).save()
+        mock_run.return_value = NFLCMException('Boom!')
+        response = self.client.post(
+            '/api/vnflcm/v1/vnf_instances/144/instantiate',
+            data=inst_req_data,
+            format='json'
+        )
+        NfInstModel.objects.filter(nfinstid='144').delete()
+        self.assertEqual(status.HTTP_500_INTERNAL_SERVER_ERROR,
+            response.status_code)
+
+    def test_instantiate_badreq(self):
+        NfInstModel(
+            nfinstid='144',
+            nf_name='VNF1',
+            status='NOT_INSTANTIATED'
+        ).save()
+        response = self.client.post(
+            '/api/vnflcm/v1/vnf_instances/144/instantiate',
+            data={},
+            format='json'
+        )
+        NfInstModel.objects.filter(nfinstid='144').delete()
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)

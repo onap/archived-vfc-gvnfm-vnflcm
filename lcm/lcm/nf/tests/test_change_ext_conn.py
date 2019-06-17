@@ -11,11 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import mock
+
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
 from lcm.pub.database.models import NfInstModel
+from lcm.nf.biz.change_ext_conn import ChangeExtConn
+from lcm.pub.exceptions import NFLCMException
+from lcm.pub.utils.jobutil import JobUtil
 
 
 class TestChangeExtConn(TestCase):
@@ -95,9 +100,20 @@ class TestChangeExtConn(TestCase):
                                     format='json')
         self.failUnlessEqual(status.HTTP_409_CONFLICT, response.status_code)
 
-    def test_change_ext_conn_inner_error(self):
+    def test_change_ext_conn_badreq(self):
         url = "/api/vnflcm/v1/vnf_instances/123/change_ext_conn"
         response = self.client.post(url,
                                     data={},
                                     format='json')
-        self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
+        self.failUnlessEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
+    @mock.patch.object(JobUtil, 'create_job')
+    def test_change_ext_conn_inner_error(self, mock_run):
+        mock_run.return_value = NFLCMException('Boom!')
+        url = "/api/vnflcm/v1/vnf_instances/123/change_ext_conn"
+        response = self.client.post(url,
+                                    data=self.req_data,
+                                    format='json')
+        self.assertEqual(
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            response.status_code)

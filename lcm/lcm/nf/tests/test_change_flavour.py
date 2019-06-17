@@ -63,9 +63,10 @@ class TestFlavour(TestCase):
                                     format='json')
         self.failUnlessEqual(status.HTTP_409_CONFLICT, response.status_code)
 
-    def test_change_flavour_inner_error(self):
+    def test_change_flavour_badreq(self):
         url = "/api/vnflcm/v1/vnf_instances/345/change_flavour"
         response = self.client.post(url,
                                     data={},
                                     format='json')
-        self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
+        self.failUnlessEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
