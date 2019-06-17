@@ -78,7 +78,7 @@ class TestNFOperate(TestCase):
             status='NOT_INSTANTIATED'
         ).delete()
 
-    def test_operate_vnf_inner_error(self):
+    def test_operate_vnf_badreq(self):
         NfInstModel(
             nfinstid='345',
             nf_name='VNF1',
@@ -99,7 +99,7 @@ class TestNFOperate(TestCase):
         )
         NfInstModel.objects.filter(nfinstid='345').delete()
         self.failUnlessEqual(
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status.HTTP_400_BAD_REQUEST,
             response.status_code
         )
 

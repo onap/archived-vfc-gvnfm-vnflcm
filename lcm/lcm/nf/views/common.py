@@ -103,7 +103,7 @@ def deal_vnf_action(logger, opt_type, opt_status, instid, req, req_serializer, a
 
     act_vnf_req_serializer = req_serializer(data=req.data)
     if not act_vnf_req_serializer.is_valid():
-        raise NFLCMException(act_vnf_req_serializer.errors)
+        raise NFLCMExceptionBadRequest(act_vnf_req_serializer.errors)
 
     vnf_insts = NfInstModel.objects.filter(nfinstid=instid)
     if not vnf_insts.exists():

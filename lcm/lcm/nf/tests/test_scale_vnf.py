@@ -53,7 +53,7 @@ class TestNfScale(TestCase):
                                     format='json')
         self.failUnlessEqual(status.HTTP_409_CONFLICT, response.status_code)
 
-    def test_scale_vnf_inner_error(self):
+    def test_scale_vnf_badreq(self):
         NfInstModel(nfinstid='678',
                     nf_name='VNF1',
                     nf_desc="VNF DESC",
@@ -69,4 +69,4 @@ class TestNfScale(TestCase):
                                     data={},
                                     format='json')
         NfInstModel.objects.filter(nfinstid='678').delete()
-        self.failUnlessEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
+        self.failUnlessEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
