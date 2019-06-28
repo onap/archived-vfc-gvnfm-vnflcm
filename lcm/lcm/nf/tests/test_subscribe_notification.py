@@ -106,6 +106,13 @@ class TestSubscription(TestCase):
     def test_invalid_notification_type(self, mock_requests):
         dummy_subscription = {
             "callbackUri": "http://aurl.com",
+            "authentication": {
+                "authType": ["BASIC"],
+                "paramsBasic": {
+                    "username": "username",
+                    "password": "password"
+                }
+            },
             "filter": {
                 "notificationTypes": ["VnfIdentifierDeletionNotification"],
                 "operationTypes": [

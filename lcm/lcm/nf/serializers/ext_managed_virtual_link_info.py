@@ -14,8 +14,8 @@
 
 from rest_framework import serializers
 
-from resource_handle import ResourceHandleSerializer
-from vnf_link_port_info import VnfLinkPortInfoSerializer
+from .resource_handle import ResourceHandleSerializer
+from .vnf_link_port_info import VnfLinkPortInfoSerializer
 
 
 class ExtManagedVirtualLinkInfoSerializer(serializers.Serializer):

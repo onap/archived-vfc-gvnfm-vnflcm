@@ -15,7 +15,7 @@
 
 from rest_framework import serializers
 
-from vim_connection_info import VimConnectionInfoSerializer
+from .vim_connection_info import VimConnectionInfoSerializer
 
 
 class VnfInfoModificationsSerializer(serializers.Serializer):

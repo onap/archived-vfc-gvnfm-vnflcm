@@ -67,11 +67,11 @@ class QueryMultiVnfLcmOpOccs(APIView):
         logger.debug("QueryMultiVnfLcmOpOccs--get::> Remove default fields if exclude_default" +
                      " is specified")
         # TODO(bharath): Add support for "fields", "exclude_fields" in query parameters
-        if 'exclude_default' in request.query_params.keys():
+        if 'exclude_default' in list(request.query_params.keys()):
             for field in EXCLUDE_DEFAULT:
-                for lcm_op in vnf_lcm_op_occs_serializer.data:
+                for lcm_op in resp_data:
                     del lcm_op[field]
-        return Response(data=vnf_lcm_op_occs_serializer.data, status=status.HTTP_200_OK)
+        return Response(data=resp_data, status=status.HTTP_200_OK)
 
 
 class QuerySingleVnfLcmOpOcc(APIView):

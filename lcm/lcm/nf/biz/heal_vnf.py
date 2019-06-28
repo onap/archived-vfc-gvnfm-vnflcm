@@ -100,12 +100,12 @@ class HealVnf(Thread):
                 operation_state=OPERATION_STATE_TYPE.COMPLETED
             )
         except NFLCMException as e:
-            logger.error(e.message)
-            self.vnf_heal_failed_handle(e.message)
+            logger.error(e.args[0])
+            self.vnf_heal_failed_handle(e.args[0])
         except Exception as e:
-            logger.error(e.message)
+            logger.error(e.args[0])
             logger.error(traceback.format_exc())
-            self.vnf_heal_failed_handle(e.message)
+            self.vnf_heal_failed_handle(e.args[0])
 
     def pre_deal(self):
         logger.debug("Start pre deal for VNF heal_vnf task")

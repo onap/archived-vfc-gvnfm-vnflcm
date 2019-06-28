@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from rest_framework import serializers
-from ip_addresse import IpAddresseSerializer
+from .ip_addresse import IpAddresseSerializer
 
 
 class IpOverEthernetAddressDataSerializer(serializers.Serializer):

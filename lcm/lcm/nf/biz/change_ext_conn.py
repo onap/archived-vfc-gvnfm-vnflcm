@@ -87,12 +87,12 @@ class ChangeExtConn(Thread):
                 operation_state=OPERATION_STATE_TYPE.COMPLETED
             )
         except NFLCMException as e:
-            logger.error(e.message)
-            self.change_ext_conn_failed_handle(e.message)
+            logger.error(e.args[0])
+            self.change_ext_conn_failed_handle(e.args[0])
         except Exception as e:
-            logger.error(e.message)
+            logger.error(e.args[0])
             logger.error(traceback.format_exc())
-            self.change_ext_conn_failed_handle(e.message)
+            self.change_ext_conn_failed_handle(e.args[0])
 
     def pre_deal(self):
         logger.debug("Start pre deal for VNF change_ext_conn task")
@@ -232,7 +232,7 @@ class ChangeExtConn(Thread):
 
     def query_inst_resource(self, inst_resource):
         logger.debug('Query resource begin')
-        for resource_type in RESOURCE_MAP.keys():
+        for resource_type in list(RESOURCE_MAP.keys()):
             resource_table = globals().get(resource_type + 'InstModel')
             resource_insts = resource_table.objects.filter(
                 instid=self.nf_inst_id

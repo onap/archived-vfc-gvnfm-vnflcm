@@ -69,14 +69,14 @@ class UpdateVnf(Thread):
 
             JobUtil.add_job_status(self.job_id, 100, "Update VNF success.")
         except NFLCMException as e:
-            logger.error(e.message)
-            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, e.message)
-            JobUtil.add_job_status(self.job_id, 255, e.message)
+            logger.error(e.args[0])
+            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, e.args[0])
+            JobUtil.add_job_status(self.job_id, 255, e.args[0])
         except Exception as e:
-            logger.error(e.message)
+            logger.error(e.args[0])
             logger.error(traceback.format_exc())
-            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, e.message)
-            JobUtil.add_job_status(self.job_id, 255, e.message)
+            self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.FAILED, e.args[0])
+            JobUtil.add_job_status(self.job_id, 255, e.args[0])
 
     def send_notification(self):
         notify_data = prepare_notification(nfinstid=self.nf_inst_id,
