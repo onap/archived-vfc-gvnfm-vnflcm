@@ -14,13 +14,13 @@
 
 import unittest
 import mock
-import enumutil
-import fileutil
+from . import enumutil
+from . import fileutil
 import json
-import urllib2
-import syscomm
-import timeutil
-import values
+import urllib.request
+from . import syscomm
+from . import timeutil
+from . import values
 import platform
 
 from lcm.pub.database.models import JobStatusModel, JobModel, SubscriptionModel
@@ -30,7 +30,7 @@ from lcm.pub.utils.notificationsutil import NotificationsUtil
 
 class MockReq():
     def read(self):
-        return "1"
+        return b"1"
 
     def close(self):
         pass
@@ -54,7 +54,7 @@ class UtilsTest(unittest.TestCase):
         fileutil.make_dirs(dirs)
         fileutil.delete_dirs(dirs)
 
-    @mock.patch.object(urllib2, 'urlopen')
+    @mock.patch.object(urllib.request, 'urlopen')
     def test_download_file_from_http(self, mock_urlopen):
         mock_urlopen.return_value = MockReq()
         fileutil.delete_dirs("abc")
@@ -247,11 +247,11 @@ class TestNotificationUtils(unittest.TestCase):
             'vnfInstanceIds': ['99442b18-a5c7-11e8-998c-bf1755941f12'],
             'vnfInstanceNames': ['demo'],
             'vnfProductsFromProviders': {
-                'vnfProvider': u'string',
+                'vnfProvider': 'string',
                 'vnfProducts': {
                     'vnfProductName': 'string',
                     'versions': {
-                        'vnfSoftwareVersion': u'string',
+                        'vnfSoftwareVersion': 'string',
                         'vnfdVersions': 'string'
                     }
                 }

@@ -14,13 +14,13 @@
 
 from rest_framework import serializers
 
-from scale_info import ScaleInfoSerializer
-from ext_cp_info import ExtCpInfoSerializer
-from ext_virtual_link_info import ExtVirtualLinkInfoSerializer
-from ext_managed_virtual_link_info import ExtManagedVirtualLinkInfoSerializer
-from vnfc_resource_info import VnfcResourceInfoSerializer
-from vnf_virtual_link_resource_info import VnfVirtualLinkResourceInfoSerializer
-from virtual_storage_resource_info import VirtualStorageResourceInfoSerializer
+from .scale_info import ScaleInfoSerializer
+from .ext_cp_info import ExtCpInfoSerializer
+from .ext_virtual_link_info import ExtVirtualLinkInfoSerializer
+from .ext_managed_virtual_link_info import ExtManagedVirtualLinkInfoSerializer
+from .vnfc_resource_info import VnfcResourceInfoSerializer
+from .vnf_virtual_link_resource_info import VnfVirtualLinkResourceInfoSerializer
+from .virtual_storage_resource_info import VirtualStorageResourceInfoSerializer
 
 
 class InstantiatedVnfInfoSerializer(serializers.Serializer):

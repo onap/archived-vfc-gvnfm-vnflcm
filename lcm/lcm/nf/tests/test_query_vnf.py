@@ -228,7 +228,7 @@ class ResourceTest(TestCase):
                              insttype=1,
                              instid='%s' % i).save()
         response = self.client.get("/api/vnflcm/v1/vnf_instances", format='json')
-        self.failUnlessEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(self.test_data_multi_vnf, response.data)
 
     def test_get_vnfs_not_exist(self):

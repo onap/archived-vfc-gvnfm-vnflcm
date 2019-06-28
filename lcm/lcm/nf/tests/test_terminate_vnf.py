@@ -137,7 +137,7 @@ class TestNFTerminate(TestCase):
             data=req_data,
             format='json'
         )
-        self.failUnlessEqual(
+        self.assertEqual(
             status.HTTP_202_ACCEPTED,
             response.status_code,
             response.content
@@ -155,7 +155,7 @@ class TestNFTerminate(TestCase):
             data=req_data,
             format='json'
         )
-        self.failUnlessEqual(
+        self.assertEqual(
             status.HTTP_404_NOT_FOUND,
             response.status_code,
             response.content
@@ -185,7 +185,7 @@ class TestNFTerminate(TestCase):
             data=req_data,
             format='json'
         )
-        self.failUnlessEqual(
+        self.assertEqual(
             status.HTTP_409_CONFLICT,
             response.status_code,
             response.content

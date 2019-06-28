@@ -19,6 +19,9 @@ from lcm.pub.config.config import FORWARDED_FOR_FIELDS, SERVICE_NAME
 class LogContextMiddleware(object):
     #  the last IP behind multiple proxies,  if no exist proxies
     #  get local host ip.
+    def __init__(self, get_response):
+        self.get_response = get_response
+
     def _getLastIp(self, request):
 
         ip = ""
@@ -57,4 +60,10 @@ class LogContextMiddleware(object):
 
     def process_response(self, request, response):
         MDC.clear()
+        return response
+
+    def __call__(self, request):
+        self.process_request(request)
+        response = self.get_response(request)
+        self.process_response(request, response)
         return response

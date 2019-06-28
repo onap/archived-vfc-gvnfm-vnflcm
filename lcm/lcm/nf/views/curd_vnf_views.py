@@ -54,7 +54,7 @@ class CreateVnfAndQueryVnfs(APIView):
         if not vnf_instances_serializer.is_valid():
             raise NFLCMException(vnf_instances_serializer.errors)
 
-        return Response(data=vnf_instances_serializer.data, status=status.HTTP_200_OK)
+        return Response(data=resp_data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         request_body=CreateVnfReqSerializer(),
@@ -71,15 +71,16 @@ class CreateVnfAndQueryVnfs(APIView):
             raise NFLCMException(req_serializer.errors)
 
         nf_inst = CreateVnf(request.data).do_biz()
-        create_vnf_resp_serializer = VnfInstanceSerializer(
-            data={"id": nf_inst.nfinstid,
-                  "vnfProvider": nf_inst.vendor,
-                  "vnfdVersion": nf_inst.version,
-                  "vnfPkgId": nf_inst.package_id,
-                  "instantiationState": nf_inst.status})
+        rsp_data = {"id": nf_inst.nfinstid,
+                "vnfProvider": nf_inst.vendor,
+                "vnfdVersion": nf_inst.version,
+                "vnfPkgId": nf_inst.package_id,
+                "instantiationState": nf_inst.status}
+        create_vnf_resp_serializer = VnfInstanceSerializer(data=rsp_data)
         if not create_vnf_resp_serializer.is_valid():
             raise NFLCMException(create_vnf_resp_serializer.errors)
-        return Response(data=create_vnf_resp_serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(data=rsp_data, status=status.HTTP_201_CREATED)
 
 
 class DeleteVnfAndQueryVnf(APIView):

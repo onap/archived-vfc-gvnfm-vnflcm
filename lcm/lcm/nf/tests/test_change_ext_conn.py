@@ -90,21 +90,21 @@ class TestChangeExtConn(TestCase):
         response = self.client.post(url,
                                     data=self.req_data,
                                     format='json')
-        self.failUnlessEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
     def test_change_ext_conn_conflict(self):
         url = "/api/vnflcm/v1/vnf_instances/12345/change_ext_conn"
         response = self.client.post(url,
                                     data=self.req_data,
                                     format='json')
-        self.failUnlessEqual(status.HTTP_409_CONFLICT, response.status_code)
+        self.assertEqual(status.HTTP_409_CONFLICT, response.status_code)
 
     def test_change_ext_conn_badreq(self):
         url = "/api/vnflcm/v1/vnf_instances/123/change_ext_conn"
         response = self.client.post(url,
                                     data={},
                                     format='json')
-        self.failUnlessEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
     @mock.patch.object(JobUtil, 'create_job')
     def test_change_ext_conn_inner_error(self, mock_run):

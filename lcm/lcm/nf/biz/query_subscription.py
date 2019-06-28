@@ -38,10 +38,10 @@ class QuerySubscription:
     def query_multi_subscriptions(self):
         query_data = {}
         logger.debug("QueryMultiSubscriptions--get--biz::> Check for filters in query params" % self.params)
-        for query, value in self.params.iteritems():
+        for query, value in list(self.params.items()):
             if query in ROOT_FILTERS:
                 query_data[ROOT_FILTERS[query] + '__icontains'] = value
-        for query, value in self.params.iteritems():
+        for query, value in list(self.params.items()):
             if query in VNF_INSTANCE_FILTERS:
                 query_data[VNF_INSTANCE_FILTERS[query] + '__icontains'] = value
         # Query the database with filters if the request has fields in request params, else fetch all records
