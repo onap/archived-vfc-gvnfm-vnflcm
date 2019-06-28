@@ -14,8 +14,8 @@
 
 from rest_framework import serializers
 
-from resource_handle import ResourceHandleSerializer
-from vnfc_cp_info import VnfcCpInfoSerializer
+from .resource_handle import ResourceHandleSerializer
+from .vnfc_cp_info import VnfcCpInfoSerializer
 
 
 class VnfcResourceInfoSerializer(serializers.Serializer):

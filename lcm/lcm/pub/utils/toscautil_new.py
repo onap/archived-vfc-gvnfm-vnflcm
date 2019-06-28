@@ -45,7 +45,7 @@ def find_related_node(node_id, src_json_model, requirement_name):
 
 def convert_props(src_node, dest_node):
     if 'properties' in src_node and src_node['properties']:
-        for prop_name, prop_info in src_node['properties'].items():
+        for prop_name, prop_info in list(src_node['properties'].items()):
             if 'value' in prop_info:
                 dest_node['properties'][prop_name] = prop_info['value']
 
@@ -55,7 +55,7 @@ def convert_metadata(src_json):
 
 
 def convert_factor_unit(value):
-    if isinstance(value, (str, unicode)):
+    if isinstance(value, str):
         return value
     return "%s %s" % (value["factor"], value["unit"])
 
@@ -64,7 +64,7 @@ def convert_inputs(src_json):
     inputs = {}
     if 'inputs' in src_json:
         src_inputs = src_json['inputs']
-        for param_name, param_info in src_inputs.items():
+        for param_name, param_info in list(src_inputs.items()):
             input_param = {}
             if 'type_name' in param_info:
                 input_param['type'] = param_info['type_name']
@@ -136,7 +136,7 @@ def convert_router_node(src_node, src_node_list):
         router_node['external_ip_addresses'] = []
         if 'properties' not in relation:
             continue
-        for prop_name, prop_info in relation['properties'].items():
+        for prop_name, prop_info in list(relation['properties'].items()):
             if prop_name == 'router_ip_address':
                 router_node['external_ip_addresses'].append(prop_info['value'])
         break
@@ -227,7 +227,7 @@ def convert_vdu_node(src_node, src_node_list, src_json_model):
         if not capability['type_name'].endswith('.VirtualCompute'):
             continue
         vdu_node['nfv_compute']['flavor_extra_specs'] = {}
-        for prop_name, prop_info in capability['properties'].items():
+        for prop_name, prop_info in list(capability['properties'].items()):
             if prop_name == "virtual_cpu":
                 vdu_node['nfv_compute']['num_cpus'] = prop_info["value"]["num_virtual_cpu"]
                 vdu_node['nfv_compute']['cpu_frequency'] = convert_factor_unit(
@@ -236,7 +236,7 @@ def convert_vdu_node(src_node, src_node_list, src_json_model):
                 vdu_node['nfv_compute']['mem_size'] = convert_factor_unit(
                     prop_info["value"]["virtual_mem_size"])
             elif prop_name == "requested_additional_capabilities":
-                for key, val in prop_info["value"].items():
+                for key, val in list(prop_info["value"].items()):
                     vdu_node['nfv_compute']['flavor_extra_specs'].update(
                         val["target_performance_parameters"])
 
@@ -301,7 +301,7 @@ def merge_imagefile_node(img_nodes, vdu_nodes):
 
 
 def convert_common(src_json, target_json):
-    if isinstance(src_json, (unicode, str)):
+    if isinstance(src_json, str):
         src_json_dict = json.loads(src_json)
     else:
         src_json_dict = src_json
@@ -1457,4 +1457,4 @@ if __name__ == '__main__':
             }
         }
     })
-    print convert_vnfd_model(src_json)
+    print(convert_vnfd_model(src_json))

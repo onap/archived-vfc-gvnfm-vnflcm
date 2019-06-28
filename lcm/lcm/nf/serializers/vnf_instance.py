@@ -15,9 +15,9 @@
 
 from rest_framework import serializers
 
-from vim_connection_info import VimConnectionInfoSerializer
-from instantiated_vnf_info import InstantiatedVnfInfoSerializer
-from _links import _LinksSerializer
+from .vim_connection_info import VimConnectionInfoSerializer
+from .instantiated_vnf_info import InstantiatedVnfInfoSerializer
+from ._links import _LinksSerializer
 
 
 class VnfInstanceSerializer(serializers.Serializer):

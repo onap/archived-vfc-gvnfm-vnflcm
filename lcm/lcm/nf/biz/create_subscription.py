@@ -40,6 +40,8 @@ class CreateSubscription:
     def __init__(self, data):
         self.data = data
         self.filter = ignore_case_get(self.data, "filter", {})
+        logger.debug("self.data:%s" % self.data)
+        logger.debug("self.filter:%s" % self.filter)
         self.callback_uri = ignore_case_get(self.data, "callbackUri")
         self.authentication = ignore_case_get(self.data, "authentication", {})
         self.notification_types = ignore_case_get(self.filter, "notificationTypes", [])

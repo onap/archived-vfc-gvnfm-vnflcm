@@ -14,7 +14,7 @@
 
 from rest_framework import serializers
 
-from vnf_ext_cp_config import VnfExtCpConfigSerializer
+from .vnf_ext_cp_config import VnfExtCpConfigSerializer
 
 
 class VnfExtCpDataSerializer(serializers.Serializer):
