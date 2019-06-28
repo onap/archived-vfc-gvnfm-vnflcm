@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from rest_framework import serializers
-from vnf_lcm_op_occ import VNFLCMOpOccSerializer
+from .vnf_lcm_op_occ import VNFLCMOpOccSerializer
 
 
 class VNFLCMOpOccsSerializer(serializers.ListSerializer):

@@ -127,9 +127,9 @@ class TestNFTerminate(TestCase):
             create_time=now_time()
         )
         response = self.client.delete("/api/vnflcm/v1/vnf_instances/1111")
-        self.failUnlessEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
         self.assertEqual(None, response.data)
 
     def test_delete_vnf_identifier_when_vnf_not_exist(self):
         response = self.client.delete("/api/vnflcm/v1/vnf_instances/1111")
-        self.failUnlessEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)

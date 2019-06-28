@@ -103,7 +103,7 @@ def prepare_notification_data(nfinstid, jobid, changetype, operation):
             },
             'cpInstanceId': port.portid  # TODO: port.cpinstanceid is not initiated when create port resource.
         })
-    for network_id, ext_link_ports in ext_connectivity_map.items():
+    for network_id, ext_link_ports in list(ext_connectivity_map.items()):
         networks = NetworkInstModel.objects.filter(networkid=network_id)
         net_name = networks[0].name if networks else network_id
         network_resource = {

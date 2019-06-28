@@ -46,7 +46,7 @@ class NotificationsUtil(object):
             "operationState": "operation_states",
             "operation": "operation_types"
         }
-        subscriptions_filter = {v + "__contains": notification[k] for k, v in filters.iteritems()}
+        subscriptions_filter = {v + "__contains": notification[k] for k, v in list(filters.items())}
 
         subscriptions = SubscriptionModel.objects.filter(**subscriptions_filter)
         if not subscriptions.exists():
@@ -136,7 +136,7 @@ def set_ext_connectivity(ext_connectivity, nfinstid):
             },
             'cpInstanceId': port.portid  # TODO: port.cpinstanceid is not initiated when create port resource.
         })
-    for network_id, ext_link_ports in ext_connectivity_map.items():
+    for network_id, ext_link_ports in list(ext_connectivity_map.items()):
         networks = NetworkInstModel.objects.filter(networkid=network_id)
         net_name = networks[0].name if networks else network_id
         network_resource = {

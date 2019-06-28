@@ -14,7 +14,7 @@
 
 from rest_framework import serializers
 
-from link import linkSerializer
+from .link import linkSerializer
 
 
 class _LinksSerializer(serializers.Serializer):
