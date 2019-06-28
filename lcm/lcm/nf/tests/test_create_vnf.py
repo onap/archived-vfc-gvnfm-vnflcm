@@ -19,6 +19,7 @@ import mock
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
+from rest_framework.renderers import JSONRenderer
 
 from .const import vnfpackage_info
 from lcm.pub.database.models import NfInstModel
@@ -71,7 +72,7 @@ class TestNFInstantiate(TestCase):
             data=data,
             format='json'
         )
-        self.failUnlessEqual(
+        self.assertEqual(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
             response.status_code
         )
@@ -108,4 +109,5 @@ class TestNFInstantiate(TestCase):
             "vnfPkgId": "111",
             "instantiationState": "NOT_INSTANTIATED"
         }
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
         self.assertEqual(expect_data, response.data)

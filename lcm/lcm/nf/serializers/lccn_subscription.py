@@ -14,8 +14,8 @@
 
 from rest_framework import serializers
 
-from link import linkSerializer
-from lccn_filter_data import LifeCycleChangeNotificationsFilter
+from .link import linkSerializer
+from .lccn_filter_data import LifeCycleChangeNotificationsFilter
 
 
 class LinkSerializer(serializers.Serializer):

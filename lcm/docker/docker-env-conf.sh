@@ -4,14 +4,14 @@ install_sf(){
 
     apk --no-cache update
     apk --no-cache add bash curl gcc wget mysql-client openssl-dev
-    apk --no-cache add python-dev libffi-dev musl-dev py2-virtualenv
+    apk --no-cache add python3-dev libffi-dev musl-dev py3-virtualenv
 
     # get binary zip from nexus - vfc-nfvo-catalog
     wget -q -O vfc-gvnfm-vnflcm-lcm.zip "https://nexus.onap.org/service/local/artifact/maven/redirect?r=snapshots&g=org.onap.vfc.gvnfm.vnflcm.lcm&a=vfc-gvnfm-vnflcm-lcm&v=${pkg_version}-SNAPSHOT&e=zip" && \
     unzip vfc-gvnfm-vnflcm-lcm.zip && \
     rm -rf vfc-gvnfm-vnflcm-lcm.zip
     wait
-    pip install --upgrade setuptools pip 
+    pip install --upgrade setuptools pip
     pip install --no-cache-dir --pre -r  /service/vfc/gvnfm/vnflcm/lcm/requirements.txt
 }
 
@@ -44,9 +44,13 @@ clean_sf_cache(){
     rm -rf /tmp/*
 }
 
+patch_redisco_2py3(){
+    sed -i 's/raise KeyError, value/raise KeyError(value)/g' /usr/local/lib/python3.6/site-packages/redisco/containers.py
+}
 install_sf
 wait
 add_user
 config_logdir
+patch_redisco_2py3
 clean_sf_cache
 
