@@ -108,7 +108,7 @@ def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
         if vnf.vimInfo and 'vimid' not in addition_paras:
             vim_info = json.loads(vnf.vimInfo)
             vimid = ""
-            for key in vim_info.iterkeys():
+            for key in list(vim_info.keys()):
                 vimid = key
             addition_paras['vimid'] = vimid
     logger.info('Grant request data=%s' % content_args)

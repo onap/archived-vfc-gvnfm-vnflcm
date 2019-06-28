@@ -51,43 +51,43 @@ def view_safe_call_with_log(logger):
             try:
                 return func(*args, **kwargs)
             except NFLCMExceptionSeeOther as e:
-                logger.error(e.message)
+                logger.error(e.args[0])
                 resp = Response(status=status.HTTP_303_SEE_OTHER)
-                resp["Location"] = e.message
+                resp["Location"] = e.args[0]
                 # resp["Location"] = "subscriptions/%s" % e.id
                 return resp
             except NFLCMExceptionNotFound as e:
-                logger.error(e.message)
+                logger.error(e.args[0])
                 return make_error_resp(
-                    detail=e.message,
+                    detail=e.args[0],
                     status=status.HTTP_404_NOT_FOUND
                 )
             except NFLCMExceptionBadRequest as e:
-                logger.error(e.message)
+                logger.error(e.args[0])
                 return make_error_resp(
-                    detail=e.message,
+                    detail=e.args[0],
                     status=status.HTTP_400_BAD_REQUEST
                 )
             except NFLCMExceptionConflict as e:
-                logger.error(e.message)
+                logger.error(e.args[0])
                 return make_error_resp(
-                    detail=e.message,
+                    detail=e.args[0],
                     status=status.HTTP_409_CONFLICT
                 )
             except NFLCMExceptionPreconditionFailed as e:
-                logger.error(e.message)
+                logger.error(e.args[0])
                 return make_error_resp(
-                    detail=e.message,
+                    detail=e.args[0],
                     status=status.HTTP_412_PRECONDITION_FAILED
                 )
             except NFLCMException as e:
-                logger.error(e.message)
+                logger.error(e.args[0])
                 return make_error_resp(
-                    detail=e.message,
+                    detail=e.args[0],
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
             except Exception as e:
-                logger.error(e.message)
+                logger.error(e.args[0])
                 logger.error(traceback.format_exc())
                 return make_error_resp(
                     detail='Unexpected exception',
@@ -143,7 +143,7 @@ def deal_indivdual_query(res_serializer, query_fun, *args):
     if not resp_serializer.is_valid():
         raise NFLCMException(resp_serializer.errors)
 
-    resp = Response(data=resp_serializer.data, status=status.HTTP_200_OK)
+    resp = Response(data=res, status=status.HTTP_200_OK)
     if res_serializer == VnfInstanceSerializer:
         CACHE_ETAG = "%s" % uuid.uuid1()
         logger.debug("set CACHE_ETAG = %s", CACHE_ETAG)

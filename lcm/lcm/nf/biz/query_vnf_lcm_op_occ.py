@@ -38,7 +38,7 @@ class QueryVnfLcmOpOcc:
     def query_multi_vnf_lcm_op_occ(self):
         query_data = {}
         logger.debug("QueryMultiVnfLcmOpOccs--get--biz::> Check for filters in query params" % self.params)
-        for query, value in self.params.iteritems():
+        for query, value in list(self.params.items()):
             if query in FILTERS:
                 query_data[FILTERS[query]] = value
         # Query the database with filters if the request has fields in request params, else fetch all records
@@ -59,9 +59,9 @@ class QueryVnfLcmOpOcc:
             'vnfInstanceId': lcm_op.vnf_instance_id,
             'grantId': None,
             'operation': lcm_op.operation,
-            'isAutomaticInvocation': lcm_op.is_automatic_invocation,
+            'isAutomaticInvocation': False if lcm_op.is_automatic_invocation == 'False' else True,
             'operationParams': json.loads(lcm_op.operation_params),
-            'isCancelPending': lcm_op.is_cancel_pending,
+            'isCancelPending': False if lcm_op.is_cancel_pending == 'False' else True,
             'cancelMode': lcm_op.cancel_mode,
             'error': None if not lcm_op.error else json.loads(lcm_op.error),
             'resourceChanges': None if not lcm_op.resource_changes else json.loads(lcm_op.resource_changes),
