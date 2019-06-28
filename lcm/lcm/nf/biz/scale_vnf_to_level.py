@@ -86,7 +86,7 @@ class ScaleVnfToLevel(ScaleVnf):
             if policy.get("type") != "tosca.policies.nfv.InstantiationLevels":
                 continue
             levels = policy["properties"]["levels"]
-            for level_id, level_info in levels.items():
+            for level_id, level_info in list(levels.items()):
                 scale_aspect = level_info["scale_info"].get(self.aspect_id)
                 scale_level_in_vnfd = scale_aspect["scale_level"]
                 if scale_level_in_request == scale_level_in_vnfd:
@@ -99,5 +99,5 @@ class ScaleVnfToLevel(ScaleVnf):
                 continue
             levels = policy["properties"]["levels"]
             level_info = levels.get(self.instantiation_level_id)
-            return level_info.get("scale_info").keys()[0]
+            return list(level_info.get("scale_info").keys())[0]
         raise NFLCMException("Failed to get aspect_id in vnfd")

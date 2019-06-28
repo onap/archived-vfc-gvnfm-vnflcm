@@ -10,7 +10,7 @@
 # limitations under the License.
 
 from rest_framework import serializers
-from address_range import AddressRangeSerializer
+from .address_range import AddressRangeSerializer
 
 
 class IpAddresseSerializer(serializers.Serializer):
