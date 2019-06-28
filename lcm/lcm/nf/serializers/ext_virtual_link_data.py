@@ -14,8 +14,8 @@
 
 from rest_framework import serializers
 
-from vnf_ext_cp_data import VnfExtCpDataSerializer
-from ext_link_port_data import ExtLinkPortDataSerializer
+from .vnf_ext_cp_data import VnfExtCpDataSerializer
+from .ext_link_port_data import ExtLinkPortDataSerializer
 
 
 class ExtVirtualLinkDataSerizlizer(serializers.Serializer):

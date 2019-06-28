@@ -40,7 +40,7 @@ class TestNFUpdate(TestCase):
         response = self.client.patch("/api/vnflcm/v1/vnf_instances/1111",
                                      data=self.upd_data,
                                      format='json')
-        self.failUnlessEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
     def test_update_vnf_etag_not_match(self):
         instanceid = "19"
@@ -62,7 +62,7 @@ class TestNFUpdate(TestCase):
                                      "If-Match": "test_etag"
                                  })
         NfInstModel.objects.filter(nfinstid=instanceid).delete()
-        self.failUnlessEqual(status.HTTP_412_PRECONDITION_FAILED, response.status_code)
+        self.assertEqual(status.HTTP_412_PRECONDITION_FAILED, response.status_code)
 
     @mock.patch.object(UpdateVnf, 'run')
     def test_update_vnf_etag_match(self, mock_run):
@@ -87,7 +87,7 @@ class TestNFUpdate(TestCase):
                                      "If-Match": etag
                                  })
         NfInstModel.objects.filter(nfinstid=instanceid).delete()
-        self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
+        self.assertEqual(status.HTTP_202_ACCEPTED, response.status_code)
 
     @mock.patch.object(restcall, 'call_req')
     def test_update_vnf_success(self, mock_call_req):
@@ -107,4 +107,4 @@ class TestNFUpdate(TestCase):
         UpdateVnf(self.upd_data, instanceid, job_id).run()
         name = NfInstModel.objects.filter(nfinstid=instanceid).get().nf_name
         NfInstModel.objects.filter(nfinstid=instanceid).delete()
-        self.failUnlessEqual("vnf new name", name)
+        self.assertEqual("vnf new name", name)

@@ -71,7 +71,7 @@ class TestNFInstantiate(TestCase):
             data=data,
             format='json'
         )
-        self.failUnlessEqual(
+        self.assertEqual(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
             response.status_code
         )
@@ -108,4 +108,5 @@ class TestNFInstantiate(TestCase):
             "vnfPkgId": "111",
             "instantiationState": "NOT_INSTANTIATED"
         }
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
         self.assertEqual(expect_data, response.data)

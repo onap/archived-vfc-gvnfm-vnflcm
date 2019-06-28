@@ -107,7 +107,7 @@ def operate_vim_res(data, changeStateTo, stopType, gracefulStopTimeout, do_notif
                 do_notify_op("INACTIVE", res["id"])
         except VimException as e:
             logger.error("Failed to Operate %s(%s)", RES_VM, res["res_id"])
-            logger.error("%s:%s", e.http_code, e.message)
+            logger.error("%s:%s", e.http_code, e.args[0])
             raise NFLCMException("Failed to Operate %s(%s)", RES_VM, res["res_id"])
 
 
@@ -128,7 +128,7 @@ def heal_vim_res(vdus, vnfd_info, do_notify, data, vim_cache, res_cache):
             action_vm(ACTION_TYPE.REBOOT, vm_info, vimid, tenant)
     except VimException as e:
         logger.error("Failed to Heal %s(%s)", RES_VM, resid)
-        logger.error("%s:%s", e.http_code, e.message)
+        logger.error("%s:%s", e.http_code, e.args[0])
         raise NFLCMException("Failed to Heal %s(%s)" % (RES_VM, resid))
 
 
@@ -385,7 +385,7 @@ def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
             "volumeId": get_res_id(res_cache, RES_VOLUME, vol_id)
         })
 
-    user_data = base64.encodestring(ignore_case_get(vm["properties"], "user_data"))
+    user_data = base64.b64encode(bytes(ignore_case_get(vm["properties"], "user_data"), "utf-8")).decode("utf-8")
     set_opt_val(param, "availabilityZone", ignore_case_get(location_info, "availability_zone"))
     set_opt_val(param, "userdata", user_data)
     set_opt_val(param, "metadata", ignore_case_get(vm["properties"], "meta_data"))

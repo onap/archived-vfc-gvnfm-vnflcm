@@ -52,7 +52,7 @@ class TestNFInstantiate(TestCase):
     def test_heal_vnf_not_found(self):
         req_data = {}
         response = self.client.post("/api/vnflcm/v1/vnf_instances/12/heal", data=req_data, format='json')
-        self.failUnlessEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
     def test_heal_vnf_conflict(self):
         req_data = {}
@@ -61,7 +61,7 @@ class TestNFInstantiate(TestCase):
             nf_name='VNF1',
             status='NOT_INSTANTIATED').save()
         response = self.client.post("/api/vnflcm/v1/vnf_instances/1267/heal", data=req_data, format='json')
-        self.failUnlessEqual(status.HTTP_409_CONFLICT, response.status_code)
+        self.assertEqual(status.HTTP_409_CONFLICT, response.status_code)
         NfInstModel.objects.filter(nfinstid='1267').delete()
 
     def test_heal_vnf_badreq(self):
@@ -80,7 +80,7 @@ class TestNFInstantiate(TestCase):
                                     data={"additionalParams": "1"},
                                     format='json')
         NfInstModel.objects.filter(nfinstid='345').delete()
-        self.failUnlessEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
     @mock.patch.object(HealVnf, 'run')
     def test_heal_vnf_success(self, mock_run):
@@ -97,7 +97,7 @@ class TestNFInstantiate(TestCase):
                     status='INSTANTIATED').save()
         response = self.client.post("/api/vnflcm/v1/vnf_instances/12/heal", data=req_data, format='json')
         mock_run.re.return_value = None
-        self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
+        self.assertEqual(status.HTTP_202_ACCEPTED, response.status_code)
         NfInstModel(nfinstid='12').delete()
 
     @mock.patch.object(restcall, 'call_req')

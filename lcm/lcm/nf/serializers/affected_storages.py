@@ -15,7 +15,7 @@
 
 from rest_framework import serializers
 
-from resource_handle import ResourceHandleSerializer
+from .resource_handle import ResourceHandleSerializer
 from lcm.nf.const import CHANGE_TYPE
 
 CHANGE_TYPES = [
