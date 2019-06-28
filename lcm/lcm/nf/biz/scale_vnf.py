@@ -75,12 +75,12 @@ class ScaleVnf(Thread):
             self.vnf_insts.update(status=INSTANTIATION_STATE.INSTANTIATED,
                                   lastuptime=now_time())
         except NFLCMException as e:
-            logger.error(e.message)
-            self.vnf_scale_failed_handle(e.message)
+            logger.error(e.args[0])
+            self.vnf_scale_failed_handle(e.args[0])
         except Exception as e:
-            logger.error(e.message)
+            logger.error(e.args[0])
             logger.error(traceback.format_exc())
-            self.vnf_scale_failed_handle(e.message)
+            self.vnf_scale_failed_handle(e.args[0])
 
     def scale_pre(self):
         self.scale_type = self.data.get("type")
@@ -196,7 +196,7 @@ class ScaleVnf(Thread):
 
     def do_notify_del_vim_res(self, res_type, res_id):
         logger.debug('Scaling in [%s] resource, resourceid [%s]', res_type, res_id)
-        resource_type = RESOURCE_MAP.keys()[RESOURCE_MAP.values().index(res_type)]
+        resource_type = list(RESOURCE_MAP.keys())[list(RESOURCE_MAP.values()).index(res_type)]
         resource_table = globals().get(resource_type + 'InstModel')
         resource_table.objects.filter(instid=self.nf_inst_id, resourceid=res_id).delete()
         if res_type == "vm":

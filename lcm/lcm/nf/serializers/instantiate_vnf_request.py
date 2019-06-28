@@ -14,9 +14,9 @@
 
 from rest_framework import serializers
 
-from ext_virtual_link_data import ExtVirtualLinkDataSerizlizer
-from ext_managed_virtual_link_data import ExtManagedVirtualLinkDataSerizlizer
-from vim_connection_info import VimConnectionInfoSerializer
+from .ext_virtual_link_data import ExtVirtualLinkDataSerizlizer
+from .ext_managed_virtual_link_data import ExtManagedVirtualLinkDataSerizlizer
+from .vim_connection_info import VimConnectionInfoSerializer
 
 
 class InstantiateVnfRequestSerializer(serializers.Serializer):

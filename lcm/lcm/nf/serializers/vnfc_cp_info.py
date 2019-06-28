@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 
-from cp_protocol_info import CpProtocolInfoSerializer
+from .cp_protocol_info import CpProtocolInfoSerializer
 
 
 class VnfcCpInfoSerializer(serializers.Serializer):

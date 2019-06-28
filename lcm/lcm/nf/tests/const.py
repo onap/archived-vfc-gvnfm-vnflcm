@@ -125,17 +125,17 @@ inst_req_data = {
 
 vnfd_model_dict = {
     'metadata': {
-        'vendor': u'zte',
+        'vendor': 'zte',
         'is_shared': False,
         'description': '',
-        'domain_type': u'CN',
-        'version': u'v4.14.10',
+        'domain_type': 'CN',
+        'version': 'v4.14.10',
         'vmnumber_overquota_alarm': False,
         'cross_dc': False,
-        'vnf_type': u'SSS',
-        'vnfd_version': u'V00000001',
-        'id': u'sss-vnf-template',
-        'name': u'sss-vnf-template'
+        'vnf_type': 'SSS',
+        'vnfd_version': 'V00000001',
+        'id': 'sss-vnf-template',
+        'name': 'sss-vnf-template'
     },
     'vdus': [
         {
@@ -182,7 +182,7 @@ vnfd_model_dict = {
                 "inner_hugepage_size": "2048",
                 "action": "add"
             },
-            "image_file": u'sss',
+            "image_file": 'sss',
             "local_storages": [
                 "local_storage_id1",
                 "local_storage_id2"
@@ -304,7 +304,7 @@ vnfd_model_dict = {
             'targets': {
 
             },
-            'policy_id': u'policy_scale_sss-vnf-template',
+            'policy_id': 'policy_scale_sss-vnf-template',
             'properties': {
                 'policy_file': '*-vnfd.zip/*-vnf-policy.xml'
             },
@@ -315,28 +315,28 @@ vnfd_model_dict = {
         {
             'description': '',
             'properties': {
-                'name': u'opencos_sss_omm_img_release_20150723-1-disk1.vmdk',
+                'name': 'opencos_sss_omm_img_release_20150723-1-disk1.vmdk',
                 'checksum': '',
-                'disk_format': u'VMDK',
-                'file_url': u'./zte-cn-sss-main-image/OMM/opencos_sss_omm_img_release_20150723-1-disk1.vmdk',
+                'disk_format': 'VMDK',
+                'file_url': './zte-cn-sss-main-image/OMM/opencos_sss_omm_img_release_20150723-1-disk1.vmdk',
                 'container_type': 'vm',
                 'version': '',
                 'hypervisor_type': 'kvm'
             },
-            'image_file_id': u'opencos_sss_omm_img_release_20150723-1-disk1'
+            'image_file_id': 'opencos_sss_omm_img_release_20150723-1-disk1'
         },
         {
             'description': '',
             'properties': {
-                'name': u'sss.vmdk',
+                'name': 'sss.vmdk',
                 'checksum': '',
-                'disk_format': u'VMDK',
-                'file_url': u'./zte-cn-sss-main-image/NE/sss.vmdk',
+                'disk_format': 'VMDK',
+                'file_url': './zte-cn-sss-main-image/NE/sss.vmdk',
                 'container_type': 'vm',
                 'version': '',
                 'hypervisor_type': 'kvm'
             },
-            'image_file_id': u'sss'
+            'image_file_id': 'sss'
         }
     ],
     'vls': [
@@ -567,7 +567,7 @@ c8_data_list_image = {
             "status": "active",
             "id": "5e2757c1-f846-4727-915c-9a872553ed75",
             "size": 862016,
-            "name": u'sss.vmdk'
+            "name": 'sss.vmdk'
         }
     ]
 }

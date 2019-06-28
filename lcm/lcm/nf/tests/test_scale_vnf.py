@@ -44,14 +44,14 @@ class TestNfScale(TestCase):
         response = self.client.post(url,
                                     data=self.req_data,
                                     format='json')
-        self.failUnlessEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
     def test_scale_vnf_conflict(self):
         url = "/api/vnflcm/v1/vnf_instances/12345/scale"
         response = self.client.post(url,
                                     data=self.req_data,
                                     format='json')
-        self.failUnlessEqual(status.HTTP_409_CONFLICT, response.status_code)
+        self.assertEqual(status.HTTP_409_CONFLICT, response.status_code)
 
     def test_scale_vnf_badreq(self):
         NfInstModel(nfinstid='678',
@@ -69,4 +69,4 @@ class TestNfScale(TestCase):
                                     data={},
                                     format='json')
         NfInstModel.objects.filter(nfinstid='678').delete()
-        self.failUnlessEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)

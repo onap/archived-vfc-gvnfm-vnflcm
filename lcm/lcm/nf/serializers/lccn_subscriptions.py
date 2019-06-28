@@ -14,7 +14,7 @@
 
 from rest_framework import serializers
 
-from lccn_subscription import LccnSubscriptionSerializer
+from .lccn_subscription import LccnSubscriptionSerializer
 
 
 class LccnSubscriptionsSerializer(serializers.ListSerializer):

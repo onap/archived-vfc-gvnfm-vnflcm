@@ -83,9 +83,9 @@ class InstantiateVnf(Thread):
                 operation_state=OPERATION_STATE_TYPE.COMPLETED
             )
         except NFLCMException as e:
-            self.vnf_inst_failed_handle(e.message)
+            self.vnf_inst_failed_handle(e.args[0])
         except Exception as e:
-            logger.error(e.message)
+            logger.error(str(e))
             logger.error(traceback.format_exc())
             self.vnf_inst_failed_handle('unexpected exception')
 
@@ -113,9 +113,9 @@ class InstantiateVnf(Thread):
         input_parameters = []
         inputs = ignore_case_get(self.data, "additionalParams")
         if inputs:
-            if isinstance(inputs, (str, unicode)):
+            if isinstance(inputs, str):
                 inputs = json.loads(inputs)
-            for key, val in inputs.items():
+            for key, val in list(inputs.items()):
                 input_parameters.append({"key": key, "value": val})
         vnf_package = query_vnfpackage_by_id(self.vnfd_id)
         pkg_info = ignore_case_get(vnf_package, "packageInfo")
@@ -198,7 +198,7 @@ class InstantiateVnf(Thread):
             resp = notify_lcm_to_nfvo(json.dumps(notification_content))
             logger.info('Lcm notify end, response %s' % resp)
         except Exception as e:
-            logger.error("Lcm instantiate notify failed: %s", e.message)
+            logger.error("Lcm instantiate notify failed: %s", e.args[0])
         NotificationsUtil().send_notification(notification_content)
 
     def vnf_inst_failed_handle(self, error_msg):
