@@ -14,7 +14,7 @@
 
 from rest_framework import serializers
 
-from resource_handle import ResourceHandleSerializer
+from .resource_handle import ResourceHandleSerializer
 
 
 class VirtualStorageResourceInfoSerializer(serializers.Serializer):

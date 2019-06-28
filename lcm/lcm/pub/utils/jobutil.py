@@ -17,6 +17,7 @@ import logging
 import uuid
 import traceback
 
+from functools import reduce
 from lcm.pub.database.models import JobStatusModel, JobModel
 from lcm.pub.utils import idutil
 

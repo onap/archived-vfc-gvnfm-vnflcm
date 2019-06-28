@@ -14,7 +14,7 @@
 
 from rest_framework import serializers
 
-from vnf_instance_subscription_filter import VnfInstanceSubscriptionFilter
+from .vnf_instance_subscription_filter import VnfInstanceSubscriptionFilter
 from lcm.nf.const import NOTIFICATION_TYPES, LCM_OPERATION_TYPES, LCM_OPERATION_STATE_TYPES
 
 

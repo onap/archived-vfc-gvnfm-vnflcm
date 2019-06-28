@@ -76,7 +76,7 @@ class TestNFInstantiate(TestCase):
             data=inst_req_data,
             format='json'
         )
-        self.failUnlessEqual(
+        self.assertEqual(
             status.HTTP_202_ACCEPTED,
             response.status_code
         )
@@ -89,7 +89,7 @@ class TestNFInstantiate(TestCase):
             data=inst_req_data,
             format='json'
         )
-        self.failUnlessEqual(
+        self.assertEqual(
             status.HTTP_404_NOT_FOUND,
             response.status_code,
             response.content
@@ -108,7 +108,7 @@ class TestNFInstantiate(TestCase):
             data=inst_req_data,
             format='json'
         )
-        self.failUnlessEqual(
+        self.assertEqual(
             status.HTTP_409_CONFLICT,
             response.status_code,
             response.content

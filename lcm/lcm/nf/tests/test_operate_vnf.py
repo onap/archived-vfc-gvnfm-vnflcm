@@ -55,7 +55,7 @@ class TestNFOperate(TestCase):
             data=req_data,
             format='json'
         )
-        self.failUnlessEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
     def test_operate_vnf_conflict(self):
         req_data = {
@@ -71,7 +71,7 @@ class TestNFOperate(TestCase):
             data=req_data,
             format='json'
         )
-        self.failUnlessEqual(status.HTTP_409_CONFLICT, response.status_code)
+        self.assertEqual(status.HTTP_409_CONFLICT, response.status_code)
         NfInstModel(
             nfinstid='12',
             nf_name='VNF1',
@@ -98,7 +98,7 @@ class TestNFOperate(TestCase):
             format='json'
         )
         NfInstModel.objects.filter(nfinstid='345').delete()
-        self.failUnlessEqual(
+        self.assertEqual(
             status.HTTP_400_BAD_REQUEST,
             response.status_code
         )
@@ -119,7 +119,7 @@ class TestNFOperate(TestCase):
             format='json'
         )
         mock_run.re.return_value = None
-        self.failUnlessEqual(status.HTTP_202_ACCEPTED, response.status_code)
+        self.assertEqual(status.HTTP_202_ACCEPTED, response.status_code)
         NfInstModel(
             nfinstid='12',
             nf_name='VNF1',

@@ -75,11 +75,11 @@ class OperateVnf(Thread):
                 OPERATION_STATE_TYPE.COMPLETED
             )
         except NFLCMException as e:
-            self.vnf_operate_failed_handle(e.message)
+            self.vnf_operate_failed_handle(e.args[0])
         except Exception as e:
-            logger.error(e.message)
+            logger.error(e.args[0])
             logger.error(traceback.format_exc())
-            self.vnf_operate_failed_handle(e.message)
+            self.vnf_operate_failed_handle(e.args[0])
 
     def apply_grant(self):
         vdus = VmInstModel.objects.filter(instid=self.nf_inst_id)
