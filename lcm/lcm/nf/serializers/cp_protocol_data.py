@@ -14,7 +14,7 @@
 
 from rest_framework import serializers
 
-from ip_over_ethernet_address_data import IpOverEthernetAddressDataSerializer
+from .ip_over_ethernet_address_data import IpOverEthernetAddressDataSerializer
 
 
 class CpProtocolDataSerializer(serializers.Serializer):

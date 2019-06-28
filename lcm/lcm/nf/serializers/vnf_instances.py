@@ -10,7 +10,7 @@
 # limitations under the License.
 
 from rest_framework import serializers
-from vnf_instance import VnfInstanceSerializer
+from .vnf_instance import VnfInstanceSerializer
 
 
 class VnfInstancesSerializer(serializers.ListSerializer):

@@ -53,4 +53,4 @@ class JobView(APIView):
             return Response(data=resp_serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             logger.error(traceback.format_exc())
-            return Response(data={'error': e.message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(data={'error': e.args[0]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

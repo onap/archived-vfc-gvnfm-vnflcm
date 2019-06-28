@@ -15,13 +15,13 @@
 
 from rest_framework import serializers
 
-from affected_vnfcs import AffectedVnfcsSerializer
-from affected_vls import AffectedVLsSerializer
-from affected_storages import AffectedStoragesSerializer
-from link import linkSerializer
-from response import ProblemDetailsSerializer
-from ext_virtual_link_info import ExtVirtualLinkInfoSerializer
-from vnf_info_modifications import VnfInfoModificationsSerializer
+from .affected_vnfcs import AffectedVnfcsSerializer
+from .affected_vls import AffectedVLsSerializer
+from .affected_storages import AffectedStoragesSerializer
+from .link import linkSerializer
+from .response import ProblemDetailsSerializer
+from .ext_virtual_link_info import ExtVirtualLinkInfoSerializer
+from .vnf_info_modifications import VnfInfoModificationsSerializer
 
 
 LCM_OPERATION_TYPES = [

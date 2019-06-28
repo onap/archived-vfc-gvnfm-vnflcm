@@ -102,11 +102,11 @@ class TerminateVnf(Thread):
                 "Terminate Vnf success."
             )
         except NFLCMException as e:
-            self.vnf_term_failed_handle(e.message)
+            self.vnf_term_failed_handle(e.args[0])
         except Exception as e:
-            logger.error(e.message)
+            logger.error(e.args[0])
             logger.error(traceback.format_exc())
-            self.vnf_term_failed_handle(e.message)
+            self.vnf_term_failed_handle(e.args[0])
 
     def term_pre(self):
         vnf_insts = NfInstModel.objects.filter(nfinstid=self.nf_inst_id)
@@ -123,7 +123,7 @@ class TerminateVnf(Thread):
 
     def query_inst_resource(self):
         logger.info('Query resource begin')
-        for resource_type in RESOURCE_MAP.keys():
+        for resource_type in list(RESOURCE_MAP.keys()):
             resource_table = globals().get(resource_type + 'InstModel')
             resource_insts = resource_table.objects.filter(instid=self.nf_inst_id)
             for resource_inst in resource_insts:
@@ -164,7 +164,7 @@ class TerminateVnf(Thread):
 
     def do_notify_delete(self, res_type, res_id):
         logger.debug('Deleting [%s] resource, resourceid [%s]' % (res_type, res_id))
-        resource_type = RESOURCE_MAP.keys()[RESOURCE_MAP.values().index(res_type)]
+        resource_type = list(RESOURCE_MAP.keys())[list(RESOURCE_MAP.values()).index(res_type)]
         resource_table = globals().get(resource_type + 'InstModel')
         resource_table.objects.filter(instid=self.nf_inst_id, resourceid=res_id).delete()
 
@@ -179,7 +179,7 @@ class TerminateVnf(Thread):
             logger.info('Lcm notify end, response: %s' % resp)
             NotificationsUtil().send_notification(self.notify_data)
         except Exception as e:
-            logger.error("Lcm terminate notify failed: %s", e.message)
+            logger.error("Lcm terminate notify failed: %s", e.args[0])
 
     def vnf_term_failed_handle(self, error_msg):
         logger.error('VNF termination failed, detail message: %s' % error_msg)

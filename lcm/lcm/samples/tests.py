@@ -376,7 +376,7 @@ class SampleViewTest(unittest.TestCase):
                                      r4_data_create_port,
                                      r6_data_list_image, r6_data_create_vm, r6_data_get_vm]
         resp = self.client.post(inst_res_url, data=json.dumps(inst_res_data), content_type='application/json')
-        self.failUnlessEqual(status.HTTP_204_NO_CONTENT, resp.status_code)
+        self.assertEqual(status.HTTP_204_NO_CONTENT, resp.status_code)
 
     @mock.patch.object(restcall, 'call_req')
     def test_term_res(self, mock_call_req):
@@ -389,7 +389,7 @@ class SampleViewTest(unittest.TestCase):
                                      r0_data_delete,
                                      r0_data_delete]
         resp = self.client.post(term_res_url, data=json.dumps(term_res_data), content_type='application/json')
-        self.failUnlessEqual(status.HTTP_204_NO_CONTENT, resp.status_code)
+        self.assertEqual(status.HTTP_204_NO_CONTENT, resp.status_code)
 
 
 class HealthCheckViewTest(unittest.TestCase):

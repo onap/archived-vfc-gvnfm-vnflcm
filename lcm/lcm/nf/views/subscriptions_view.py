@@ -62,7 +62,7 @@ class SubscriptionsView(APIView):
         if not lccn_subscription_request_serializer.is_valid():
             raise NFLCMExceptionBadRequest(lccn_subscription_request_serializer.errors)
         subscription = CreateSubscription(
-            lccn_subscription_request_serializer.data).do_biz()
+            request.data).do_biz()
         lccn_notifications_filter = {
             "notificationTypes": ast.literal_eval(subscription.notification_types),
             "operationTypes": ast.literal_eval(subscription.operation_types),
@@ -78,7 +78,7 @@ class SubscriptionsView(APIView):
         sub_resp_serializer = LccnSubscriptionSerializer(data=subscription_data)
         if not sub_resp_serializer.is_valid():
             raise NFLCMException(sub_resp_serializer.errors)
-        return Response(data=sub_resp_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(data=subscription_data, status=status.HTTP_201_CREATED)
 
     @swagger_auto_schema(
         responses={

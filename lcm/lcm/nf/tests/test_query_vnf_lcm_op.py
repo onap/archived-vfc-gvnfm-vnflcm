@@ -33,6 +33,7 @@ class TestVNFLcmOpOccs(TestCase):
         self.test_vnflcmop_with_exclude_default = vnflcmop_with_exclude_default
         self.test_multiple_vnf_lcm_op = copy.copy(multiple_vnf_lcm_op)
         self.test_multiple_vnf_lcm_op.append(self.test_single_vnf_lcm_op)
+        self.maxdiff = None
 
     def tearDown(self):
         pass
@@ -69,6 +70,7 @@ class TestVNFLcmOpOccs(TestCase):
             response.status_code,
             status.HTTP_200_OK
         )
+        self.maxDiff = None
         self.assertEqual(
             [self.test_single_vnf_lcm_op],
             response.data
@@ -147,9 +149,9 @@ class TestVNFLcmOpOccs(TestCase):
             response.status_code,
             status.HTTP_200_OK
         )
+        self.maxDiff = None
         self.assertEqual(
             self.test_multiple_vnf_lcm_op,
-            response.data,
             response.data
         )
 
@@ -211,6 +213,7 @@ class TestVNFLcmOpOccs(TestCase):
             response.status_code,
             status.HTTP_200_OK
         )
+        self.maxDiff = None
         self.assertEqual(
             self.test_vnflcmop_with_exclude_default,
             response.data
@@ -248,6 +251,7 @@ class TestVNFLcmOpOccs(TestCase):
             response.status_code,
             status.HTTP_200_OK
         )
+        self.maxDiff = None
         self.assertEqual(
             self.test_single_vnf_lcm_op,
             response.data
