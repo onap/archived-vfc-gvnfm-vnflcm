@@ -44,13 +44,9 @@ clean_sf_cache(){
     rm -rf /tmp/*
 }
 
-patch_redisco_2py3(){
-    sed -i 's/raise KeyError, value/raise KeyError(value)/g' /usr/local/lib/python3.6/site-packages/redisco/containers.py
-}
 install_sf
 wait
 add_user
 config_logdir
-patch_redisco_2py3
 clean_sf_cache
 
