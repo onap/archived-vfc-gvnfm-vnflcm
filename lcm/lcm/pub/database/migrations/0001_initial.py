@@ -1,0 +1,358 @@
+# Copyright 2017 ZTE Corporation.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    initial = True
+
+    dependencies = [
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name='CPInstModel',
+            fields=[
+                ('cpinstanceid', models.CharField(db_column='CPINSTANCEID', max_length=255, primary_key=True, serialize=False)),
+                ('cpdid', models.CharField(db_column='CPDID', max_length=255)),
+                ('cpinstancename', models.CharField(db_column='CPINSTANCENAME', max_length=255)),
+                ('vlinstanceid', models.CharField(db_column='VLINSTANCEID', max_length=255)),
+                ('ownertype', models.IntegerField(db_column='OWNERTYPE')),
+                ('ownerid', models.CharField(db_column='OWNERID', max_length=255)),
+                ('relatedtype', models.IntegerField(db_column='RELATEDTYPE')),
+                ('relatedvl', models.CharField(blank=True, db_column='RELATEDVL', max_length=255, null=True)),
+                ('relatedcp', models.CharField(blank=True, db_column='RELATEDCP', max_length=255, null=True)),
+                ('relatedport', models.CharField(blank=True, db_column='RELATEDPORT', max_length=255, null=True)),
+            ],
+            options={
+                'db_table': 'CPINST',
+            },
+        ),
+        migrations.CreateModel(
+            name='FlavourInstModel',
+            fields=[
+                ('flavourid', models.CharField(db_column='FLAVOURID', max_length=255, primary_key=True, serialize=False)),
+                ('vimid', models.CharField(db_column='VIMID', max_length=255)),
+                ('resourceid', models.CharField(db_column='RESOURCEID', max_length=255)),
+                ('name', models.CharField(db_column='NAME', max_length=255)),
+                ('tenant', models.CharField(db_column='TENANT', max_length=255, null=True)),
+                ('vcpu', models.IntegerField(db_column='VCPU', null=True)),
+                ('memory', models.IntegerField(db_column='MEMORY', null=True)),
+                ('disk', models.IntegerField(db_column='DISK', null=True)),
+                ('ephemeral', models.IntegerField(db_column='EPHEMERAL', null=True)),
+                ('swap', models.IntegerField(db_column='SWAP', null=True)),
+                ('isPublic', models.IntegerField(db_column='ISPUBLIC', null=True)),
+                ('extraspecs', models.TextField(db_column='EXTRASPECS', max_length=4096)),
+                ('instid', models.CharField(db_column='INSTID', max_length=255)),
+                ('create_time', models.CharField(blank=True, db_column='CREATETIME', max_length=200, null=True)),
+                ('is_predefined', models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)),
+            ],
+            options={
+                'db_table': 'FLAVOURINST',
+            },
+        ),
+        migrations.CreateModel(
+            name='JobModel',
+            fields=[
+                ('jobid', models.CharField(db_column='JOBID', max_length=255, primary_key=True, serialize=False)),
+                ('jobtype', models.CharField(db_column='JOBTYPE', max_length=255)),
+                ('jobaction', models.CharField(db_column='JOBACTION', max_length=255)),
+                ('resid', models.CharField(db_column='RESID', max_length=255)),
+                ('status', models.IntegerField(blank=True, db_column='STATUS', null=True)),
+                ('starttime', models.CharField(blank=True, db_column='STARTTIME', max_length=255, null=True)),
+                ('endtime', models.CharField(blank=True, db_column='ENDTIME', max_length=255, null=True)),
+                ('progress', models.IntegerField(blank=True, db_column='PROGRESS', null=True)),
+                ('user', models.CharField(blank=True, db_column='USER', max_length=255, null=True)),
+                ('parentjobid', models.CharField(blank=True, db_column='PARENTJOBID', max_length=255, null=True)),
+                ('resname', models.CharField(blank=True, db_column='RESNAME', max_length=255, null=True)),
+            ],
+            options={
+                'db_table': 'JOB',
+            },
+        ),
+        migrations.CreateModel(
+            name='JobStatusModel',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('indexid', models.IntegerField(db_column='INDEXID')),
+                ('jobid', models.CharField(db_column='JOBID', max_length=255)),
+                ('status', models.CharField(db_column='STATUS', max_length=255)),
+                ('progress', models.IntegerField(blank=True, db_column='PROGRESS', null=True)),
+                ('descp', models.TextField(db_column='DESCP', max_length=1024)),
+                ('errcode', models.CharField(blank=True, db_column='ERRCODE', max_length=255, null=True)),
+                ('addtime', models.CharField(blank=True, db_column='ADDTIME', max_length=255, null=True)),
+            ],
+            options={
+                'db_table': 'JOB_STATUS',
+            },
+        ),
+        migrations.CreateModel(
+            name='NetworkInstModel',
+            fields=[
+                ('networkid', models.CharField(db_column='NETWORKID', max_length=255, primary_key=True, serialize=False)),
+                ('vimid', models.CharField(db_column='VIMID', max_length=255)),
+                ('resourceid', models.CharField(db_column='RESOURCEID', max_length=255)),
+                ('insttype', models.IntegerField(db_column='INSTTYPE')),
+                ('instid', models.CharField(db_column='INSTID', max_length=255)),
+                ('name', models.CharField(db_column='NAME', max_length=255)),
+                ('tenant', models.CharField(db_column='TENANT', max_length=255, null=True)),
+                ('is_predefined', models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)),
+                ('desc', models.CharField(db_column='DESC', max_length=255, null=True)),
+                ('vendor', models.CharField(db_column='VENDOR', max_length=255, null=True)),
+                ('bandwidth', models.IntegerField(db_column='BANDWIDTH', null=True)),
+                ('mtu', models.IntegerField(db_column='MTU', null=True)),
+                ('network_type', models.CharField(db_column='NETWORKTYPE', max_length=255, null=True)),
+                ('segmentid', models.CharField(db_column='SEGMENTID', max_length=255, null=True)),
+                ('networkqos', models.CharField(db_column='NETWORKQOS', max_length=255, null=True)),
+                ('create_time', models.CharField(blank=True, db_column='CREATETIME', max_length=200, null=True)),
+                ('physicalNetwork', models.CharField(db_column='PHYNETWORK', max_length=255, null=True)),
+                ('is_shared', models.IntegerField(db_column='ISSHARED', default=0, null=True)),
+                ('vlantrans', models.IntegerField(db_column='VLANTRANS', null=True)),
+                ('routerExternal', models.IntegerField(db_column='ROUTEREXTERNAL', default=0, null=True)),
+                ('nodeId', models.CharField(db_column='NODEID', max_length=255, null=True)),
+            ],
+            options={
+                'db_table': 'NETWORKINST',
+            },
+        ),
+        migrations.CreateModel(
+            name='NfInstModel',
+            fields=[
+                ('nfinstid', models.CharField(db_column='NFINSTID', max_length=200, primary_key=True, serialize=False)),
+                ('nf_name', models.CharField(blank=True, db_column='NFNAME', max_length=100, null=True)),
+                ('vnfminstid', models.CharField(db_column='VNFMINSTID', max_length=255)),
+                ('package_id', models.CharField(blank=True, db_column='PACKAGEID', max_length=200, null=True)),
+                ('status', models.CharField(blank=True, db_column='STATUS', max_length=20, null=True)),
+                ('flavour_id', models.CharField(blank=True, db_column='FLAVOURID', max_length=200, null=True)),
+                ('location', models.CharField(blank=True, db_column='LOCATION', max_length=200, null=True)),
+                ('version', models.CharField(db_column='VERSION', max_length=255, null=True)),
+                ('vendor', models.CharField(blank=True, db_column='VENDOR', max_length=255, null=True)),
+                ('netype', models.CharField(db_column='NETYPE', max_length=255, null=True)),
+                ('vnfd_model', models.TextField(blank=True, db_column='VNFDMODEL', max_length=20000, null=True)),
+                ('input_params', models.TextField(blank=True, db_column='INPUTPARAMS', max_length=2000, null=True)),
+                ('create_time', models.CharField(blank=True, db_column='CREATETIME', max_length=200, null=True)),
+                ('lastuptime', models.CharField(blank=True, db_column='LASTUPTIME', max_length=200, null=True)),
+                ('nf_desc', models.CharField(blank=True, db_column='VNFINSTANCEDESC', max_length=200, null=True)),
+                ('vnfdid', models.CharField(blank=True, db_column='VNFDID', max_length=200, null=True)),
+                ('vnfSoftwareVersion', models.CharField(blank=True, db_column='VNFSOFTWAREVER', max_length=200, null=True)),
+                ('vnfConfigurableProperties', models.TextField(blank=True, db_column='VNFCONFIGURABLEPROPERTIES', max_length=20000, null=True)),
+                ('localizationLanguage', models.CharField(db_column='LOCALIZATIONLANGUAGE', max_length=255, null=True)),
+                ('operationState', models.CharField(db_column='OPERATIONSTATE', max_length=255, null=True)),
+                ('resInfo', models.TextField(blank=True, db_column='RESINFO', max_length=20000, null=True)),
+                ('vimInfo', models.TextField(blank=True, db_column='VIMINFO', max_length=20000, null=True)),
+            ],
+            options={
+                'db_table': 'NFINST',
+            },
+        ),
+        migrations.CreateModel(
+            name='NfvoRegInfoModel',
+            fields=[
+                ('nfvoid', models.CharField(db_column='NFVOID', max_length=255, primary_key=True, serialize=False)),
+                ('vnfminstid', models.CharField(db_column='VNFMINSTID', max_length=255)),
+                ('apiurl', models.CharField(db_column='URL', max_length=255)),
+                ('nfvouser', models.CharField(db_column='USERNAME', max_length=255, null=True)),
+                ('nfvopassword', models.CharField(db_column='PASSWD', max_length=255, null=True)),
+                ('authtype', models.IntegerField(db_column='AUTHTYPE', default=2)),
+                ('clientcert', models.CharField(db_column='CLIENTCERT', max_length=255, null=True)),
+                ('servercert', models.CharField(db_column='SERVERCERT', max_length=255, null=True)),
+                ('regtime', models.CharField(db_column='REGTIME', max_length=255)),
+            ],
+            options={
+                'db_table': 'NFVOREGINFO',
+            },
+        ),
+        migrations.CreateModel(
+            name='PortInstModel',
+            fields=[
+                ('portid', models.CharField(db_column='PORTID', max_length=255, primary_key=True, serialize=False)),
+                ('networkid', models.CharField(db_column='NETWORKID', max_length=255)),
+                ('subnetworkid', models.CharField(db_column='SUBNETWORKID', max_length=255, null=True)),
+                ('vimid', models.CharField(db_column='VIMID', max_length=255)),
+                ('resourceid', models.CharField(db_column='RESOURCEID', max_length=255)),
+                ('name', models.CharField(db_column='NAME', max_length=255, null=True)),
+                ('insttype', models.IntegerField(db_column='INSTTYPE')),
+                ('instid', models.CharField(db_column='INSTID', max_length=255)),
+                ('cpinstanceid', models.CharField(db_column='CPINSTANCEID', max_length=255, null=True)),
+                ('bandwidth', models.CharField(db_column='BANDWIDTH', max_length=255, null=True)),
+                ('operationalstate', models.CharField(db_column='OPERATIONALSTATE', max_length=255, null=True)),
+                ('ipaddress', models.CharField(db_column='IPADDRESS', max_length=255)),
+                ('macaddress', models.CharField(db_column='MACADDRESS', max_length=255)),
+                ('nicorder', models.CharField(db_column='NICORDER', max_length=255)),
+                ('floatipaddress', models.CharField(db_column='FLOATIPADDRESS', max_length=255, null=True)),
+                ('serviceipaddress', models.CharField(db_column='SERVICEIPADDRESS', max_length=255, null=True)),
+                ('typevirtualnic', models.CharField(db_column='TYPEVIRTUALNIC', max_length=255, null=True)),
+                ('sfcencapsulation', models.CharField(db_column='SFCENCAPSULATION', max_length=255, null=True)),
+                ('direction', models.CharField(db_column='DIRECTION', max_length=255, null=True)),
+                ('tenant', models.CharField(db_column='TENANT', max_length=255, null=True)),
+                ('interfacename', models.CharField(blank=True, db_column='INTERFACENAME', max_length=255, null=True)),
+                ('vmid', models.CharField(blank=True, db_column='VMID', max_length=255, null=True)),
+                ('create_time', models.CharField(blank=True, db_column='CREATETIME', max_length=200, null=True)),
+                ('securityGroups', models.CharField(db_column='SECURITYGROUPS', max_length=255)),
+                ('is_predefined', models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)),
+                ('nodeId', models.CharField(db_column='NODEID', max_length=255, null=True)),
+            ],
+            options={
+                'db_table': 'PORTINST',
+            },
+        ),
+        migrations.CreateModel(
+            name='StorageInstModel',
+            fields=[
+                ('storageid', models.CharField(db_column='STORAGEID', max_length=255, primary_key=True, serialize=False)),
+                ('vimid', models.CharField(db_column='VIMID', max_length=255)),
+                ('resourceid', models.CharField(db_column='RESOURCEID', max_length=255)),
+                ('insttype', models.IntegerField(db_column='INSTTYPE')),
+                ('instid', models.CharField(db_column='INSTID', max_length=255)),
+                ('name', models.CharField(db_column='NAME', max_length=255, null=True)),
+                ('storagetype', models.CharField(db_column='STORAGETYPE', max_length=255)),
+                ('size', models.CharField(db_column='SIZE', max_length=255)),
+                ('tenant', models.CharField(db_column='TENANT', max_length=50, null=True)),
+                ('is_predefined', models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)),
+                ('create_time', models.CharField(blank=True, db_column='CREATETIME', max_length=200, null=True)),
+                ('nodeId', models.CharField(db_column='NODEID', max_length=255, null=True)),
+            ],
+            options={
+                'db_table': 'STORAGEINST',
+            },
+        ),
+        migrations.CreateModel(
+            name='SubNetworkInstModel',
+            fields=[
+                ('subnetworkid', models.CharField(db_column='SUBNETWORKID', max_length=255, primary_key=True, serialize=False)),
+                ('vimid', models.CharField(db_column='VIMID', max_length=255)),
+                ('resourceid', models.CharField(db_column='RESOURCEID', max_length=255)),
+                ('networkid', models.CharField(db_column='NETWORKID', max_length=255)),
+                ('insttype', models.IntegerField(db_column='INSTTYPE')),
+                ('instid', models.CharField(db_column='INSTID', max_length=255)),
+                ('name', models.CharField(db_column='NAME', max_length=255)),
+                ('ipversion', models.IntegerField(db_column='IPVERSION', null=True)),
+                ('gatewayip', models.CharField(db_column='GATEWAYIP', max_length=255, null=True)),
+                ('isdhcpenabled', models.IntegerField(db_column='ISDHCPENABLED', null=True)),
+                ('cidr', models.CharField(db_column='CIDR', max_length=255)),
+                ('vdsname', models.CharField(db_column='VDSNAME', max_length=255, null=True)),
+                ('operationalstate', models.CharField(db_column='OPERATIONALSTATE', max_length=255, null=True)),
+                ('tenant', models.CharField(db_column='TENANT', max_length=255, null=True)),
+                ('is_predefined', models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)),
+                ('create_time', models.CharField(blank=True, db_column='CREATETIME', max_length=200, null=True)),
+                ('dnsNameservers', models.TextField(db_column='DNSNAMESERVERS', max_length=1024)),
+                ('hostRoutes', models.TextField(db_column='HOSTROUTES', max_length=1024)),
+                ('allocationPools', models.TextField(db_column='ALLOCATIONPOOLS', max_length=1024)),
+            ],
+            options={
+                'db_table': 'SUBNETWORKINST',
+            },
+        ),
+        migrations.CreateModel(
+            name='SubscriptionModel',
+            fields=[
+                ('subscription_id', models.CharField(db_column='SUBSCRIPTIONID', max_length=255, primary_key=True, serialize=False)),
+                ('callback_uri', models.CharField(db_column='CALLBACKURI', max_length=255)),
+                ('auth_info', models.TextField(blank=True, db_column='AUTHINFO', max_length=20000, null=True)),
+                ('notification_types', models.TextField(db_column='NOTIFICATIONTYPES', null=True)),
+                ('operation_types', models.TextField(db_column='OPERATIONTYPES', null=True)),
+                ('operation_states', models.TextField(db_column='OPERATIONSTATES', null=True)),
+                ('vnf_instance_filter', models.TextField(db_column='VNFINSTANCEFILTER', null=True)),
+                ('links', models.TextField(db_column='LINKS', max_length=20000)),
+            ],
+            options={
+                'db_table': 'SUBSCRIPTION',
+            },
+        ),
+        migrations.CreateModel(
+            name='VLInstModel',
+            fields=[
+                ('vlinstanceid', models.CharField(db_column='VLINSTANCEID', max_length=255, primary_key=True, serialize=False)),
+                ('vldid', models.CharField(db_column='VLDID', max_length=255)),
+                ('vlinstancename', models.CharField(blank=True, db_column='VLINSTANCENAME', max_length=255, null=True)),
+                ('ownertype', models.IntegerField(db_column='OWNERTYPE')),
+                ('ownerid', models.CharField(db_column='OWNERID', max_length=255)),
+                ('relatednetworkid', models.CharField(blank=True, db_column='RELATEDNETWORKID', max_length=255, null=True)),
+                ('relatedsubnetworkid', models.CharField(blank=True, db_column='RELATEDSUBNETWORKID', max_length=255, null=True)),
+                ('vltype', models.IntegerField(db_column='VLTYPE', default=0)),
+                ('vimid', models.CharField(db_column='VIMID', max_length=255)),
+                ('tenant', models.CharField(db_column='TENANT', max_length=50)),
+            ],
+            options={
+                'db_table': 'VLINST',
+            },
+        ),
+        migrations.CreateModel(
+            name='VmInstModel',
+            fields=[
+                ('vmid', models.CharField(db_column='VMID', max_length=255, primary_key=True, serialize=False)),
+                ('vimid', models.CharField(db_column='VIMID', max_length=255)),
+                ('tenant', models.CharField(db_column='TENANT', max_length=255, null=True)),
+                ('resourceid', models.CharField(db_column='RESOURCEID', max_length=255)),
+                ('vmname', models.CharField(db_column='VMNAME', max_length=255)),
+                ('nic_array', models.CharField(db_column='NICARRAY', max_length=255)),
+                ('metadata', models.CharField(db_column='METADATA', max_length=255)),
+                ('volume_array', models.CharField(db_column='VOLUMEARRAY', max_length=255)),
+                ('server_group', models.CharField(db_column='SERVERGROUP', max_length=255)),
+                ('availability_zone', models.CharField(db_column='AVAILABILITYZONE', max_length=255)),
+                ('flavor_id', models.CharField(db_column='FLAVORID', max_length=255)),
+                ('security_groups', models.CharField(db_column='SECURITYGROUPS', max_length=255)),
+                ('operationalstate', models.CharField(db_column='OPERATIONALSTATE', max_length=255, null=True)),
+                ('insttype', models.IntegerField(db_column='INSTTYPE')),
+                ('is_predefined', models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)),
+                ('create_time', models.CharField(blank=True, db_column='CREATETIME', max_length=200, null=True)),
+                ('instid', models.CharField(db_column='INSTID', max_length=255)),
+                ('nodeId', models.CharField(db_column='NODEID', max_length=255, null=True)),
+            ],
+            options={
+                'db_table': 'VMINST',
+            },
+        ),
+        migrations.CreateModel(
+            name='VNFCInstModel',
+            fields=[
+                ('vnfcinstanceid', models.CharField(db_column='VNFCINSTANCEID', max_length=255, primary_key=True, serialize=False)),
+                ('vduid', models.CharField(db_column='VDUID', max_length=255)),
+                ('vdutype', models.CharField(db_column='VDUTYPE', max_length=255)),
+                ('instid', models.CharField(db_column='NFINSTID', max_length=255)),
+                ('vmid', models.CharField(db_column='VMID', max_length=255)),
+                ('is_predefined', models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)),
+            ],
+            options={
+                'db_table': 'VNFCINST',
+            },
+        ),
+        migrations.CreateModel(
+            name='VNFLcmOpOccModel',
+            fields=[
+                ('id', models.CharField(db_column='ID', max_length=255, primary_key=True, serialize=False)),
+                ('operation_state', models.CharField(db_column='OPERATIONSTATE', max_length=30)),
+                ('state_entered_time', models.CharField(db_column='STATEENTEREDTIME', max_length=30)),
+                ('start_time', models.CharField(db_column='STARTTIME', max_length=30)),
+                ('vnf_instance_id', models.CharField(db_column='VNFINSTANCEID', max_length=255)),
+                ('grant_id', models.CharField(db_column='GRANTID', max_length=255, null=True)),
+                ('operation', models.CharField(db_column='OPERATION', max_length=30)),
+                ('sub_operation', models.CharField(db_column='SUBOPERATION', max_length=30, null=True)),
+                ('is_automatic_invocation', models.CharField(db_column='ISAUTOMATICINVOCATION', max_length=5)),
+                ('operation_params', models.TextField(db_column='OPERATIONPARAMS')),
+                ('is_cancel_pending', models.CharField(db_column='ISCANCELPENDING', max_length=5)),
+                ('cancel_mode', models.TextField(db_column='CANCELMODE', null=True)),
+                ('error', models.TextField(db_column='ERROR', null=True)),
+                ('resource_changes', models.TextField(db_column='RESOURCECHANGES', null=True)),
+                ('changed_info', models.TextField(db_column='CHANGEDINFO', null=True)),
+                ('changed_ext_connectivity', models.TextField(db_column='CHANGEDEXTCONNECTIVITY', null=True)),
+                ('links', models.TextField(db_column='LINKS')),
+            ],
+            options={
+                'db_table': 'VNFLCMOPOCCS',
+            },
+        ),
+    ]
