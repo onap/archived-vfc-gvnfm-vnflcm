@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "04ec2a12_0becee0f",
+        "filename": "lcm/lcm/pub/redisco/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1389
+      },
+      "writtenOn": "2019-07-04T06:37:59Z",
+      "side": 1,
+      "message": "License hearder cannot be ZTE, should be changed to the author",
+      "range": {
+        "startLine": 2,
+        "startChar": 0,
+        "endLine": 2,
+        "endChar": 33
+      },
+      "revId": "210cb4d64fc4dbdbcd1484c781287a03b5d56b40",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
