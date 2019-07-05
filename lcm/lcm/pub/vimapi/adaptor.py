@@ -160,7 +160,7 @@ def delete_vim_res(data, do_notify):
                     res_del_fun(res["vim_id"], res["tenant_id"], res["res_id"])
             except VimException as e:
                 logger.error("Failed to delete %s(%s)", res_type, res["res_id"])
-                logger.error("%s:%s", e.http_code, e.message)
+                logger.error("%s:%s", e.http_code, e.args[0])
             do_notify(res_type, res["res_id"])
 
 

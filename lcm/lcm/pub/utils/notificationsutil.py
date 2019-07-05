@@ -65,7 +65,7 @@ class NotificationsUtil(object):
                 try:
                     self.post_notification(callbackUri, auth_info, notification)
                 except Exception as e:
-                    logger.error("Failed to post notification: %s", e.message)
+                    logger.error("Failed to post notification: %s", e.args[0])
 
     def post_notification(self, callbackUri, auth_info, notification):
         params = auth_info.get("paramsBasic", {})
