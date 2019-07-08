@@ -25,6 +25,8 @@ from lcm.pub.database.models import NfInstModel
 from lcm.pub.database.models import JobStatusModel
 from lcm.pub.utils import restcall
 from lcm.pub.utils.timeutil import now_time
+from lcm.pub.exceptions import NFLCMException
+from lcm.nf.biz.create_vnf import CreateVnf
 
 
 class TestNFInstantiate(TestCase):
@@ -110,3 +112,53 @@ class TestNFInstantiate(TestCase):
         }
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
         self.assertEqual(expect_data, response.data)
+
+    @mock.patch.object(restcall, 'call_req')
+    @mock.patch.object(uuid, 'uuid4')
+    def test_create_vnf_inner_error(self, mock_uuid4, mock_call_req):
+        mock_call_req.return_value = NFLCMException('Boom!')
+        mock_uuid4.return_value = "1"
+        data = {
+            "vnfdId": "111",
+            "vnfInstanceName": "vFW_01",
+            "vnfInstanceDescription": "vFW in Nanjing TIC Edge"
+        }
+        response = self.client.post(
+            "/api/vnflcm/v1/vnf_instances",
+            data=data,
+            format='json'
+        )
+        self.assertEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
+
+    def test_create_vnf_bad_req(self):
+        data = {
+            "vnfInstanceName": "vFW_01",
+            "vnfInstanceDescription": "vFW in Nanjing TIC Edge"
+        }
+        response = self.client.post(
+            "/api/vnflcm/v1/vnf_instances",
+            data=data,
+            format='json'
+        )
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
+    @mock.patch.object(CreateVnf, 'do_biz')
+    def test_create_vnf_bad_response(self, moc_CreateVnf_do_biz):
+        moc_CreateVnf_do_biz.return_value = {
+            # "id": "1",
+            "vnfProvider": "huawei",
+            "vnfdVersion": "1.0",
+            "vnfPkgId": "111",
+            "instantiationState": "NOT_INSTANTIATED"
+        }
+        data = {
+            "vnfdId": "111",
+            "vnfInstanceName": "vFW_01",
+            "vnfInstanceDescription": "vFW in Nanjing TIC Edge"
+        }
+        response = self.client.post(
+            "/api/vnflcm/v1/vnf_instances",
+            data=data,
+            format='json'
+        )
+        self.assertEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)

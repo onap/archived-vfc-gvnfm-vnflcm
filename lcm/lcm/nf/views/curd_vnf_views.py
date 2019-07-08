@@ -33,6 +33,7 @@ from lcm.nf.const import OPERATION_TYPE
 from .common import view_safe_call_with_log
 from .common import deal_vnf_action
 from .common import deal_indivdual_query
+from lcm.pub.exceptions import NFLCMExceptionBadRequest
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +69,7 @@ class CreateVnfAndQueryVnfs(APIView):
         logger.debug("CreateVnfIdentifier--post::> %s" % request.data)
         req_serializer = CreateVnfReqSerializer(data=request.data)
         if not req_serializer.is_valid():
-            raise NFLCMException(req_serializer.errors)
+            raise NFLCMExceptionBadRequest(req_serializer.errors)
 
         nf_inst = CreateVnf(request.data).do_biz()
         rsp_data = {"id": nf_inst.nfinstid,
