@@ -22,24 +22,24 @@ from rest_framework import status
 
 from lcm.nf import const
 from lcm.pub.database.models import SubscriptionModel
-from lcm.pub.database.models import (
-    VmInstModel, NetworkInstModel,
-    PortInstModel, StorageInstModel, VNFCInstModel
-)
+from lcm.pub.database.models VmInstModel
+from lcm.pub.database.models NetworkInstModel
+from lcm.pub.database.models PortInstModel
+from lcm.pub.database.models StorageInstModel
+from lcm.pub.database.models VNFCInstModel
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.enumutil import enum
 
 logger = logging.getLogger(__name__)
 
-NOTIFY_TYPE = enum(lCM_OP_OCC="VnfLcmOperationOccurrenceNotification",
-                   CREATION="VnfIdentifierCreationNotification",
-                   DELETION="VnfIdentifierDeletionNotification")
+NOTIFY_TYPE = enum(
+    lCM_OP_OCC="VnfLcmOperationOccurrenceNotification",
+    CREATION="VnfIdentifierCreationNotification",
+    DELETION="VnfIdentifierDeletionNotification"
+)
 
 
 class NotificationsUtil(object):
-    def __init__(self):
-        pass
-
     def send_notification(self, notification):
         logger.info("Send Notifications to the callbackUri")
         filters = {
@@ -72,11 +72,13 @@ class NotificationsUtil(object):
         username = params.get("userName")
         password = params.get("password")
         logger.info("Sending notification to %s", callbackUri)
-        resp = requests.post(callbackUri,
-                             data=notification,
-                             auth=HTTPBasicAuth(username, password))
+        resp = requests.post(
+            callbackUri,
+            data=notification,
+            auth=HTTPBasicAuth(username, password)
+        )
         if resp.status_code != status.HTTP_204_NO_CONTENT:
-            raise Exception("Notify %s failed: %s" % (callbackUri, resp.text))
+            logger.error("Notify %s failed: %s", callbackUri, resp.text)
 
 
 def set_affected_vnfcs(affected_vnfcs, nfinstid, changetype):
@@ -207,10 +209,12 @@ def prepare_notification(nfinstid, jobid, operation, operation_state):
 
 
 def prepare_notification_data(nfinstid, jobid, changetype, operation):
-    data = prepare_notification(nfinstid=nfinstid,
-                                jobid=jobid,
-                                operation=operation,
-                                operation_state=const.OPERATION_STATE_TYPE.COMPLETED)
+    data = prepare_notification(
+        nfinstid=nfinstid,
+        jobid=jobid,
+        operation=operation,
+        operation_state=const.OPERATION_STATE_TYPE.COMPLETED
+    )
 
     set_affected_vnfcs(data['affectedVnfcs'], nfinstid, changetype)
     set_affected_vls(data['affectedVirtualLinks'], nfinstid, changetype)
