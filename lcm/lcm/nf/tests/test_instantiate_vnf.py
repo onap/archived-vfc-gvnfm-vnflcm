@@ -34,7 +34,7 @@ from .const import inst_req_data
 from .const import vnfpackage_info
 from .const import instantiate_grant_result
 
-from lcm.pub.database.models import NfInstModel
+from lcm.pub.database.models import NfInstModel, VNFLcmOpOccModel
 from lcm.pub.database.models import JobStatusModel
 from lcm.pub.database.models import SubscriptionModel
 from lcm.pub.utils import restcall
@@ -45,6 +45,7 @@ from lcm.pub.vimapi import api
 from lcm.pub.exceptions import NFLCMException
 
 from lcm.nf.biz.instantiate_vnf import InstantiateVnf
+from lcm.nf import const
 
 
 class TestNFInstantiate(TestCase):
@@ -390,6 +391,11 @@ class TestNFInstantiate(TestCase):
             nf_inst_id=self.nf_inst_id,
             job_id=self.job_id
         ).run()
+        self.assert_job_result(
+            self.job_id,
+            100,
+            'Instantiate Vnf success.'
+        )
 
     @mock.patch.object(JobUtil, 'create_job')
     def test_instantiate_inner_error(self, mock_run):
@@ -420,3 +426,44 @@ class TestNFInstantiate(TestCase):
         )
         NfInstModel.objects.filter(nfinstid='144').delete()
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
+    @mock.patch.object(restcall, 'call_req')
+    def test_instantiate_operating_fail(self, mock_call_req):
+        NfInstModel.objects.create(
+            nfinstid='1111',
+            nf_name='vFW_01',
+            package_id='222',
+            version='',
+            vendor='',
+            netype='',
+            vnfd_model='',
+            status='NOT_INSTANTIATED',
+            nf_desc='vFW in Nanjing TIC Edge',
+            vnfdid='111',
+            create_time=now_time()
+        )
+        r1_get_vnfpackage_by_vnfdid = [
+            0,
+            json.JSONEncoder().encode(vnfpackage_info),
+            '200'
+        ]
+        mock_call_req.side_effect = [
+            r1_get_vnfpackage_by_vnfdid
+        ]
+        self.nf_inst_id = '1111'
+        self.job_id = JobUtil.create_job('NF', 'CREATE', self.nf_inst_id)
+        JobUtil.add_job_status(self.job_id, 0, 'INST_VNF_READY')
+        VNFLcmOpOccModel.objects.create(vnf_instance_id=self.nf_inst_id,
+                                        id=self.job_id,
+                                        operation=const.OPERATION_TYPE.INSTANTIATE,
+                                        operation_state=const.OPERATION_STATE_TYPE.PROCESSING)
+        InstantiateVnf(
+            inst_req_data,
+            nf_inst_id=self.nf_inst_id,
+            job_id=self.job_id
+        ).run()
+        self.assert_job_result(
+            self.job_id,
+            255,
+            'VNF(%s) %s in processing.' % (self.nf_inst_id,const.OPERATION_TYPE.INSTANTIATE)
+        )

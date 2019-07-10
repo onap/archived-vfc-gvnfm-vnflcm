@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import mock
 from django.test import TestCase, Client
 from rest_framework import status
 
@@ -26,6 +26,8 @@ from lcm.pub.database.models import FlavourInstModel
 from lcm.pub.database.models import StorageInstModel
 from lcm.pub.database.models import NfvoRegInfoModel
 from lcm.pub.utils.timeutil import now_time
+from lcm.nf.biz.delete_vnf import DeleteVnf
+from lcm.pub.exceptions import NFLCMException
 
 
 class TestNFTerminate(TestCase):
@@ -133,3 +135,9 @@ class TestNFTerminate(TestCase):
     def test_delete_vnf_identifier_when_vnf_not_exist(self):
         response = self.client.delete("/api/vnflcm/v1/vnf_instances/1111")
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+
+    @mock.patch.object(DeleteVnf, 'do_biz')
+    def test_delete_vnf_inner_error(self, mock_DeleteVnf_do_biz):
+        mock_DeleteVnf_do_biz.side_effect = NFLCMException('Boom!')
+        response = self.client.delete("/api/vnflcm/v1/vnf_instances/1234")
+        self.assertEqual(status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code)
