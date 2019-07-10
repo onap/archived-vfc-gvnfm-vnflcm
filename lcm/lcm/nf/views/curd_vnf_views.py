@@ -108,7 +108,7 @@ class DeleteVnfAndQueryVnf(APIView):
     )
     @view_safe_call_with_log(logger=logger)
     def delete(self, request, instanceid):
-        logger.debug("DeleteVnfIdentifier--delete::> %s" % request.data)
+        logger.debug("DeleteVnfIdentifier--delete::> %s" % instanceid)
 
         DeleteVnf(request.data, instanceid).do_biz()
 

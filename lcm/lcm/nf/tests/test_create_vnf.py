@@ -116,7 +116,7 @@ class TestNFInstantiate(TestCase):
     @mock.patch.object(restcall, 'call_req')
     @mock.patch.object(uuid, 'uuid4')
     def test_create_vnf_inner_error(self, mock_uuid4, mock_call_req):
-        mock_call_req.return_value = NFLCMException('Boom!')
+        mock_call_req.side_effect = NFLCMException('Boom!')
         mock_uuid4.return_value = "1"
         data = {
             "vnfdId": "111",
