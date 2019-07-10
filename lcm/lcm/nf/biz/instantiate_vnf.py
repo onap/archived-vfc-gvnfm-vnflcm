@@ -59,10 +59,10 @@ class InstantiateVnf(Thread):
             operation=OPERATION_TYPE.INSTANTIATE,
             task=OPERATION_TASK.INSTANTIATE
         )
+        self.pre_deal()
 
     def run(self):
         try:
-            self.pre_deal()
             self.inst_pre()
             self.lcm_op_occ.notify_lcm(OPERATION_STATE_TYPE.STARTING)
             self.apply_grant()

@@ -428,7 +428,7 @@ class TestNFInstantiate(TestCase):
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
     @mock.patch.object(restcall, 'call_req')
-    def test_instantiate_operating_fail(self, mock_call_req):
+    def test_instantiate_operating_conflict(self, mock_call_req):
         NfInstModel.objects.create(
             nfinstid='1111',
             nf_name='vFW_01',
@@ -457,13 +457,12 @@ class TestNFInstantiate(TestCase):
                                         id=self.job_id,
                                         operation=const.OPERATION_TYPE.INSTANTIATE,
                                         operation_state=const.OPERATION_STATE_TYPE.PROCESSING)
-        InstantiateVnf(
-            inst_req_data,
-            nf_inst_id=self.nf_inst_id,
-            job_id=self.job_id
-        ).run()
-        self.assert_job_result(
-            self.job_id,
-            255,
-            'VNF(%s) %s in processing.' % (self.nf_inst_id, const.OPERATION_TYPE.INSTANTIATE)
+        response = self.client.post(
+            '/api/vnflcm/v1/vnf_instances/1111/instantiate',
+            data=inst_req_data,
+            format='json'
+        )
+        self.assertEqual(
+            status.HTTP_409_CONFLICT,
+            response.status_code
         )
