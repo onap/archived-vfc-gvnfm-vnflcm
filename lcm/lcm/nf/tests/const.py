@@ -18,24 +18,23 @@ instantiate_grant_result = {
         {
             "vimid": 'vim_1',
             "accessInfo":
-            {
-                "tenant": 'chinamobile'
-            }
+                {
+                    "tenant": 'chinamobile'
+                }
         },
     ],
     "vnfId": "413aa1fe-b4d1-11e8-8268-dff5aab95c63",
     "vimAssets":
-    {
-        "computeResourceFlavours": [
-            {
-                "resourceProviderId": "vgw",
-                "vimFlavourId": "yui",
-                "vimConnectionId": ""
-            },
-        ]
-    }
+        {
+            "computeResourceFlavours": [
+                {
+                    "resourceProviderId": "vgw",
+                    "vimFlavourId": "yui",
+                    "vimConnectionId": ""
+                },
+            ]
+        }
 }
-
 
 inst_req_data = {
     "flavourId": "flavour_1",
@@ -121,7 +120,6 @@ inst_req_data = {
         "key2": "test2",
     }
 }
-
 
 vnfd_model_dict = {
     'metadata': {
@@ -442,7 +440,6 @@ c1_data_get_tenant_id_1 = {
         }
     ]
 }
-
 
 # create_volume
 c2_data_create_volume = {
@@ -835,7 +832,6 @@ vnfpackage_info = {
     }
 }
 
-
 single_vnf_lcm_op = {
     "id": "99442b18-a5c7-11e8-998c-bf1755941f16",
     "operationState": "STARTING",
@@ -860,7 +856,6 @@ single_vnf_lcm_op = {
     }
 }
 
-
 vnflcmop_with_exclude_default = [{
     "id": "99442b18-a5c7-11e8-998c-bf1755941f16",
     "operationState": "STARTING",
@@ -879,7 +874,6 @@ vnflcmop_with_exclude_default = [{
         "vnfInstance": "demo"
     }
 }]
-
 
 multiple_vnf_lcm_op = [{
     "id": "a6b9415c-ab99-11e8-9d37-dbb5e0378955",
@@ -1172,3 +1166,253 @@ multiple_vnf_lcm_op = [{
 #         }
 #     }
 # }
+vnfd_for_scale = {
+    "volume_storages": [],
+    "vnf": {
+        "type": "tosca.nodes.nfv.VNF",
+        "requirements": {
+            "virtual_link": [
+                "ext_cp",
+                "virtual_link"
+            ]
+        },
+        "properties": {
+            "descriptor_id": "b1bb0ce7-1234-4fa7-95ed-4840d70a1179",
+            "flavour_description": "simple",
+            "descriptor_verison": "1.0",
+            "software_version": "1.0.0",
+            "template_name": "test",
+            "vnfm_info": [
+                "vnfm"
+            ],
+            "descriptor_version": "1.0.0",
+            "provider": "zte",
+            "flavour_id": "simple",
+            "product_name": "test"
+        },
+        "capabilities": {
+
+        },
+        "metadata": {
+            "template_name": "test",
+            "template_version": "1.0",
+            "template_author": "ZTE"
+        }
+    },
+    "vdus": [
+        {
+            "description": "",
+            "virtual_storages": [
+
+            ],
+            "vdu_id": "sunshine",
+            "artifacts": [
+                {
+                    "artifact_name": "sw_image",
+                    "type": "tosca.artifacts.nfv.SwImage",
+                    "file": "sss.vmdk"
+                }
+            ],
+            "dependencies": [
+
+            ],
+            "virtual_compute": {
+                "virtual_cpu": {
+                    "num_virtual_cpu": 2
+                },
+                "virtual_memory": {
+                    "virtual_mem_size": "4096 MB"
+                },
+                "virtual_local_storage": [
+                    {
+                        "size_of_storage": "40 GB"
+                    }
+                ]
+            },
+            "vls": [
+
+            ],
+            "cps": [
+                "ext_cp"
+            ],
+            "type": "tosca.nodes.nfv.Vdu.Compute",
+            "properties": {
+                "vdu_profile": {
+                    "max_number_of_instances": 3,
+                    "min_number_of_instances": 1
+                },
+                "name": "sunshine1234",
+                "sw_image_data": {
+                    "operating_system": "linux",
+                    "name": "ubuntu",
+                    "checksum": {
+                        "hash": "d0e7828293355a07c2dccaaa765c80b507e60e6167067c950dc2e6b0da0dbd34",
+                        "algorithm": "SHA-256"
+                    },
+                    "min_ram": "2 GB",
+                    "disk_format": "qcow2",
+                    "version": 16.04,
+                    "container_format": "bare",
+                    "min_disk": "2 GB",
+                    "size": "2 GB"
+                },
+                "description": "vdu test",
+                "location_info": {
+                    "vimid": "",
+                    "tenant": "",
+                    "availability_zone": "",
+                    "vnfId": "",
+                    "vnfName": "",
+                    "cloudOwner": "",
+                    "cloudRegionId": "",
+                    "vduInfo": [
+                        {
+                            "vduName": "sunshine1234",
+                            "flavorId": "12345",
+                            "directive": ""
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "description": "test",
+    "inputs": {
+
+    },
+    "graph": {
+        "sunshine": [
+            "ext_cp"
+        ],
+        "ext_cp": [
+
+        ]
+    },
+    "basepath": "/tmp/tmpil6wVG",
+    "vnf_exposed": {
+        "external_cps": [
+            {
+                "key_name": "virtual_link",
+                "cpd_id": "ext_cp"
+            }
+        ],
+        "forward_cps": [
+
+        ]
+    },
+    "policies": [
+        {
+            "type": "tosca.policies.nfv.InstantiationLevels",
+            "targets": "",
+            "properties": {
+                "default_level": "instantiation_level_1",
+                "levels": {
+                    "instantiation_level_1": {
+                        "scale_info": {
+                            "sunshine_aspect": {
+                                "scale_level": 0
+                            }
+                        },
+                        "description": "vnf test instantiation_level_1"
+                    },
+                    "instantiation_level_2": {
+                        "scale_info": {
+                            "sunshine_aspect": {
+                                "scale_level": 1
+                            }
+                        },
+                        "description": "vnf test instantiation_level_2"
+                    },
+                    "instantiation_level_3": {
+                        "scale_info": {
+                            "sunshine_aspect": {
+                                "scale_level": 2
+                            }
+                        },
+                        "description": "vnf test instantiation_level_3"
+                    }
+                }
+            }
+        },
+        {
+            "type": "tosca.policies.nfv.VduInstantiationLevels",
+            "targets": [
+                "sunshine"
+            ],
+            "properties": {
+                "levels": {
+                    "instantiation_level_1": {
+                        "number_of_instances": 1
+                    },
+                    "instantiation_level_2": {
+                        "number_of_instances": 2
+                    },
+                    "instantiation_level_3": {
+                        "number_of_instances": 3
+                    }
+                }
+            }
+        },
+        {
+            "type": "tosca.policies.nfv.ScalingAspects",
+            "targets": "",
+            "properties": {
+                "aspects": {
+                    "sunshine_aspect": {
+                        "max_scale_level": 2,
+                        "description": "sunshine aspect",
+                        "name": "sunshine_aspect",
+                        "step_deltas": [
+                            "sunshine_delta"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "type": "tosca.policies.nfv.VduInitialDelta",
+            "targets": [
+                "sunshine"
+            ],
+            "properties": {
+                "initial_delta": {
+                    "number_of_instances": 1
+                }
+            }
+        },
+        {
+            "type": "tosca.policies.nfv.VduScalingAspectDeltas",
+            "targets": [
+                "sunshine"
+            ],
+            "properties": {
+                "deltas": {
+                    "sunshine_delta": {
+                        "number_of_instances": 1
+                    }
+                },
+                "aspect": "sunshine_aspect"
+            }
+        }
+    ],
+    "vls": [
+
+    ],
+    "cps": [
+        {
+            "vl_id": "",
+            "description": "",
+            "vdu_id": "sunshine",
+            "properties": {
+                "trunk_mode": "false"
+            },
+            "cp_id": "ext_cp",
+            "cpd_id": "ext_cp"
+        }
+    ],
+    "metadata": {
+        "template_name": "test",
+        "template_version": "1.0",
+        "template_author": "ZTE"
+    }
+}
