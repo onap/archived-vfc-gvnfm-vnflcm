@@ -33,6 +33,17 @@ class SampleList(APIView):
         return Response({"status": "active"})
 
 
+class CallbackSample(APIView):
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_204_NO_CONTENT: 'Successfully'
+        }
+    )
+    def get(self, request, format=None):
+        logger.debug("Callback Sample")
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class ResourceList(APIView):
     @swagger_auto_schema(
         responses={
