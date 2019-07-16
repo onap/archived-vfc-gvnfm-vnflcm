@@ -17,8 +17,6 @@ import json
 import logging
 
 from drf_yasg.utils import swagger_auto_schema
-from lcm.nf.biz.create_subscription import CreateSubscription
-from lcm.nf.biz.query_subscription import QuerySubscription
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -28,6 +26,9 @@ from lcm.nf.serializers.lccn_subscription import LccnSubscriptionSerializer
 from lcm.nf.serializers.lccn_subscriptions import LccnSubscriptionsSerializer
 from lcm.nf.serializers.response import ProblemDetailsSerializer
 from lcm.pub.exceptions import NFLCMException, NFLCMExceptionBadRequest
+from lcm.nf.biz.create_subscription import CreateSubscription
+from lcm.nf.biz.query_subscription import QuerySubscription
+from lcm.nf.biz.delete_subscription import DeleteSubscription
 from .common import view_safe_call_with_log
 
 logger = logging.getLogger(__name__)
@@ -106,3 +107,43 @@ class SubscriptionsView(APIView):
 
         logger.debug("SubscribeNotification--get::> Remove default fields")
         return Response(data=subscriptions_serializer.data, status=status.HTTP_200_OK)
+
+
+class SubscriptionDetailView(APIView):
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: LccnSubscriptionSerializer(),
+            status.HTTP_404_NOT_FOUND: ProblemDetailsSerializer(),
+            status.HTTP_500_INTERNAL_SERVER_ERROR: ProblemDetailsSerializer()
+        }
+    )
+    @view_safe_call_with_log(logger=logger)
+    def get(self, request, subscriptionid):
+        logger.debug("SubscriptionDetailView--get::> %s" % subscriptionid)
+
+        resp_data = QuerySubscription(
+            subscription_id=subscriptionid
+        ).query_single_subscription()
+
+        subscription_serializer = LccnSubscriptionSerializer(data=resp_data)
+        if not subscription_serializer.is_valid():
+            raise NFLCMException(subscription_serializer.errors)
+
+        return Response(data=resp_data, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_204_NO_CONTENT: "",
+            status.HTTP_404_NOT_FOUND: ProblemDetailsSerializer(),
+            status.HTTP_500_INTERNAL_SERVER_ERROR: ProblemDetailsSerializer()
+        }
+    )
+    @view_safe_call_with_log(logger=logger)
+    def delete(self, request, subscriptionid):
+        logger.debug("SubscriptionDetailView--delete::> %s" % subscriptionid)
+
+        DeleteSubscription(
+            subscription_id=subscriptionid
+        ).delete_single_subscription()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)

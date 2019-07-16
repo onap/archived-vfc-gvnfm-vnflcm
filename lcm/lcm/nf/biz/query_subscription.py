@@ -35,6 +35,12 @@ class QuerySubscription:
         self.subscription_id = subscription_id
         self.params = data
 
+    def query_single_subscription(self):
+        subscription = SubscriptionModel.objects.filter(subscription_id=self.subscription_id)
+        if not subscription.exists():
+            raise NFLCMException('Subscription(%s) does not exist' % self.subscription_id)
+        return self.fill_resp_data(subscription)
+
     def query_multi_subscriptions(self):
         query_data = {}
         logger.debug("QueryMultiSubscriptions--get--biz::> Check for filters in query params" % self.params)
