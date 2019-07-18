@@ -193,7 +193,6 @@ class TestNfScale(TestCase):
         ).run()
 
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).delete()
-        # print([job.descp for job in JobStatusModel.objects.filter(jobid=self.job_id)])
         self.assert_job_result(
             self.job_id,
             100,
@@ -327,7 +326,6 @@ class TestNfScale(TestCase):
         ).run()
 
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).delete()
-        print([job.descp for job in JobStatusModel.objects.filter(jobid=self.job_id)])
         self.assert_job_result(
             self.job_id,
             100,
