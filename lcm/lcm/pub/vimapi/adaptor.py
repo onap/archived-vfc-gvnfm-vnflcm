@@ -292,7 +292,7 @@ def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
     location_info = flavor["properties"]["location_info"]
     vim_id, tenant_name = location_info["vimid"], location_info["tenant"]
     virtual_compute = flavor["virtual_compute"]
-    virtual_storages = flavor["virtual_storages"]
+    virtual_storages = ignore_case_get(flavor, "virtual_storages")
     virtual_cpu = ignore_case_get(virtual_compute, "virtual_cpu")
     virtual_memory = ignore_case_get(virtual_compute, "virtual_memory")
     param = {
@@ -316,18 +316,26 @@ def create_flavor(vim_cache, res_cache, data, flavor, do_notify, res_type):
     if flavor_id:
         set_res_cache(res_cache, res_type, flavor["vdu_id"], flavor_id)
     else:
-        for virtual_storage in virtual_storages:
-            vs_id = virtual_storage["virtual_storage_id"]
-            for vs in data["volume_storages"]:
-                if vs["volume_storage_id"] == vs_id:
-                    disk_type = ignore_case_get(vs["properties"], "type_of_storage")
-                    disk_size = int(ignore_case_get(vs["properties"], "size_of_storage").replace('GB', '').replace('"', '').strip())
-                    if disk_type == "root":
-                        param["disk"] = disk_size
-                    elif disk_type == "ephemeral":
-                        param["ephemeral"] = disk_size
-                    elif disk_type == "swap":
-                        param["swap"] = disk_size
+        if virtual_storages:
+            for virtual_storage in virtual_storages:
+                vs_id = virtual_storage["virtual_storage_id"]
+                for vs in data["volume_storages"]:
+                    if vs["volume_storage_id"] == vs_id:
+                        disk_type = ignore_case_get(vs["properties"], "type_of_storage")
+                        size_of_storage = ignore_case_get(vs["properties"], "size_of_storage")
+                        disk_size = int(size_of_storage.replace('GB', '').replace('"', '').strip())
+                        if disk_type == "root":
+                            param["disk"] = disk_size
+                        elif disk_type == "ephemeral":
+                            param["ephemeral"] = disk_size
+                        elif disk_type == "swap":
+                            param["swap"] = disk_size
+        else:
+            virtual_storages = ignore_case_get(virtual_compute, "virtual_storages")
+            size_of_storage = ignore_case_get(virtual_storages[0], "size_of_storage")
+            disk_size = int(size_of_storage.replace('GB', '').replace('"', '').strip())
+            param["disk"] = disk_size
+
         tenant_id = get_tenant_id(vim_cache, vim_id, tenant_name)
         logger.debug("param:%s" % param)
         ret = api.create_flavor(vim_id, tenant_id, param)
