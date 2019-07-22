@@ -91,7 +91,7 @@ class TestNfScale(TestCase):
     def test_scale_out_vnf_success(self, mock_call, mock_call_req):
         self.nf_inst_id = '6789'
         res_cache = {"volume": {}, "flavor": {}, "port": {}}
-        # res_cache["volume"]["volume_storage1"] = "vol1"
+        res_cache["volume"]["test"] = "test"
         # res_cache["flavor"]["vdu1Id"] = "flavor1"
         res_cache["port"]["ext_cp"] = "port1"
         NfInstModel(nfinstid=self.nf_inst_id,
@@ -193,6 +193,7 @@ class TestNfScale(TestCase):
         ).run()
 
         NfInstModel.objects.filter(nfinstid=self.nf_inst_id).delete()
+        # print([{job.progress: job.descp} for job in  JobStatusModel.objects.filter( jobid=self.job_id)])
         self.assert_job_result(
             self.job_id,
             100,
