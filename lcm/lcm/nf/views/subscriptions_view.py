@@ -106,7 +106,7 @@ class SubscriptionsView(APIView):
             raise NFLCMException(subscriptions_serializer.errors)
 
         logger.debug("SubscribeNotification--get::> Remove default fields")
-        return Response(data=subscriptions_serializer.data, status=status.HTTP_200_OK)
+        return Response(data=resp_data, status=status.HTTP_200_OK)
 
 
 class SubscriptionDetailView(APIView):

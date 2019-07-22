@@ -91,6 +91,7 @@ class TestNfScaleToLevel(TestCase):
     def test_scale_out_vnf_success(self, mock_call, mock_call_req):
         self.nf_inst_id = '6789'
         res_cache = {"volume": {}, "flavor": {}, "port": {}}
+        res_cache["volume"]["test"] = "test"
         res_cache["port"]["ext_cp"] = "port1"
         NfInstModel(nfinstid=self.nf_inst_id,
                     nf_name='VNF1',
