@@ -1166,7 +1166,22 @@ multiple_vnf_lcm_op = [{
 #     }
 # }
 vnfd_for_scale = {
-    "volume_storages": [],
+    "volume_storages": [
+        {
+            "volume_storage_id": "test",
+            "properties": {
+                "location_info": {
+                    "vimid": "vim_1",
+                    "tenant": "chinamobile",
+                    "availability_zone": "test",
+                },
+                "volume_name": "test",
+                "custom_volume_type": "test",
+                "size_of_storage": "\"10 GB\"",
+            },
+            "image_file": "test",
+        },
+    ],
     "vnf": {
         "type": "tosca.nodes.nfv.VNF",
         "requirements": {
@@ -1202,7 +1217,16 @@ vnfd_for_scale = {
         {
             "description": "",
             "virtual_storages": [
-
+                {
+                    "virtual_storage_id": "test",
+                    "type_of_storage": "ephemeral",
+                    "size_of_storage": "10 GB",
+                }
+            ],
+            "volume_storages": [
+                {
+                    "volume_storage_id": "test",
+                }
             ],
             "vdu_id": "sunshine",
             "artifacts": [
@@ -1222,11 +1246,6 @@ vnfd_for_scale = {
                 "virtual_memory": {
                     "virtual_mem_size": "4096 MB"
                 },
-                "virtual_local_storage": [
-                    {
-                        "size_of_storage": "40 GB"
-                    }
-                ]
             },
             "vls": [
 
