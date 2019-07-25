@@ -92,7 +92,7 @@ class TestNfScaleToLevel(TestCase):
         self.nf_inst_id = '6789'
         res_cache = {"volume": {}, "flavor": {}, "port": {}}
         res_cache["volume"]["test"] = "test"
-        res_cache["port"]["ext_cp"] = "port1"
+        # res_cache["port"]["ext_cp"] = "port1"
         NfInstModel(nfinstid=self.nf_inst_id,
                     nf_name='VNF1',
                     nf_desc="VNF DESC",
@@ -175,6 +175,7 @@ class TestNfScaleToLevel(TestCase):
         ]
         mock_call.side_effect = [
             const.c1_data_get_tenant_id,
+            const.c6_data_create_port,
             const.c7_data_create_flavor,
             const.c8_data_list_image,
             const.c9_data_create_vm,
