@@ -1419,6 +1419,8 @@ vnfd_for_scale = {
     "cps": [
         {
             "vl_id": "",
+            "networkId": "1",
+            "subnetId": "1",
             "description": "",
             "vdu_id": "sunshine",
             "properties": {
