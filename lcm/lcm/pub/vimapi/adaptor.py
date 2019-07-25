@@ -252,9 +252,10 @@ def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
         raise VimException(err_msg % (port_ref_vdu_id, port["cp_id"]), ERR_CODE)
     network_id = ignore_case_get(port, "networkId")
     subnet_id = ignore_case_get(port, "subnetId")
-    if port["vl_id"] == "":
-        return
+
     if not network_id:
+        if port["vl_id"] == "":
+            return
         network_id = get_res_id(res_cache, RES_NETWORK, port["vl_id"])
         subnet_id = get_res_id(res_cache, RES_SUBNET, port["vl_id"])
     param = {

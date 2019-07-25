@@ -1422,7 +1422,16 @@ vnfd_for_scale = {
             "description": "",
             "vdu_id": "sunshine",
             "properties": {
-                "trunk_mode": "false"
+                "trunk_mode": "false",
+                "protocol_data": [{
+                    "address_data": {
+                        "address_type": "ip_address",
+                        "l3_address_data": {
+                            "floating_ip_activated": False,
+                            "ip_address_assignment": False
+                        }
+                    }
+                }]
             },
             "cp_id": "ext_cp",
             "cpd_id": "ext_cp"
