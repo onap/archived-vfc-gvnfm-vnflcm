@@ -167,7 +167,21 @@ class ChangeExtConn(Thread):
                         "location_info": {
                             "vimid": vim_id,
                             "tenant": tenant
-                        }
+                        },
+                        # TODO need confirm
+                        "protocol_data": [
+                            {
+                                "address_data": {
+                                    "l3_address_data": {
+                                        "fixed_ip_address":
+                                            {"ip_address_assignment": True,
+                                             "floating_ip_activated": True,
+                                             "ip_address_type": "IPV4",
+                                             "number_of_ip_address": 1}
+                                    },
+                                },
+                            },
+                        ],
                     },
                     "vl_id": network_id,
                     "vdu_id": vdu_id,
@@ -254,7 +268,7 @@ class ChangeExtConn(Thread):
 
     def do_create_port_notify(self, res_type, ret):
         self.port_id = ignore_case_get(ret, "id")
-        port_save("", self.nf_inst_id, ret)
+        port_save(self.job_id, self.nf_inst_id, ret)
 
     def do_notify_op(self, operation_type, status, resid):
         if operation_type == "delete":
