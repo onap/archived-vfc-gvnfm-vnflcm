@@ -265,6 +265,7 @@ def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
     set_opt_val(param, "subnetId", subnet_id)
     set_opt_val(param, "macAddress", ignore_case_get(port["properties"], "mac_address"))
     ip_address = []
+    logger.debug("port['properties']:%s" % port["properties"])
     for one_protocol_data in port["properties"]["protocol_data"]:
         l3_address_data = one_protocol_data["address_data"]["l3_address_data"]  # l3 is not 13
         fixed_ip_address = ignore_case_get(l3_address_data, "fixed_ip_address")
@@ -525,7 +526,7 @@ def create_port_of_vm(vim_cache, res_cache, data, port, do_notify, res_type):
     }
     ret = api.create_vm_port(vim_id, tenant_id, vm_id, param)
     ret["nodeId"] = port["cp_id"]
-    do_notify(res_type, ret)
+    do_notify("create", res_type, ret)
 
 
 def delete_port_of_vm(vim_cache, res_cache, data, port, do_notify, res_type):
