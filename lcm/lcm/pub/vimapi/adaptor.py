@@ -271,8 +271,11 @@ def create_port(vim_cache, res_cache, data, port, do_notify, res_type):
         fixed_ip_address = ignore_case_get(l3_address_data, "fixed_ip_address")
         ip_address.extend(fixed_ip_address)
     for one_virtual_network_interface in port["properties"].get("virtual_network_interface_requirements", []):
-        interfaceTypeString = one_virtual_network_interface["network_interface_requirements"]["interfaceType"]
-        interfaceType = json.loads(interfaceTypeString)["configurationValue"]
+        network_interface_requirements = one_virtual_network_interface["network_interface_requirements"]
+        interfaceTypeString = ignore_case_get(network_interface_requirements, "interfaceType")
+        interfaceType = ""
+        if interfaceTypeString != "":
+            interfaceType = json.loads(interfaceTypeString)["configurationValue"]
         vnic_type = ignore_case_get(port["properties"], "vnic_type")
         if vnic_type == "":
             if interfaceType == "SR-IOV":
