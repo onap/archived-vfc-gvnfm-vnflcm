@@ -62,7 +62,12 @@ def grant_resource(data, nf_inst_id, job_id, grant_type, vdus):
             content_args['removeResources'].append(res_def)
             res_index += 1
         if vdus and vdus[0].vimid:
-            content_args['additionalParams']['vimid'] = vdus[0].vimid
+            split_vim = vdus[0].vimid.split('_')
+            cloud_owner = split_vim[0]
+            cloud_region = "".join(split_vim[1:])
+            content_args['additionalParams']['vimid'] = json.dumps({
+                "cloud_owner":  cloud_owner,
+                'cloud_regionid': cloud_region})
     elif grant_type == GRANT_TYPE.INSTANTIATE:
         vim_id = ignore_case_get(ignore_case_get(data, "additionalParams"), "vimId")
         res_index = 1
