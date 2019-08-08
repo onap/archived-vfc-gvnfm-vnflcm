@@ -407,6 +407,8 @@ def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
 
     ret = api.create_vm(vim_id, tenant_id, param)
     ret["ports"] = [nic.get("portId") for nic in param["nicArray"]]
+    ret["vimId"] = vim_id
+    ret["tenantId"] = tenant_id
     do_notify(res_type, ret)
     vm_id = ret["id"]
     if ignore_case_get(ret, "name"):
