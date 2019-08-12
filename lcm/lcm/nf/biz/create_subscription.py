@@ -134,7 +134,7 @@ class CreateSubscription:
         }
         SubscriptionModel.objects.create(subscription_id=self.subscription_id,
                                          callback_uri=self.callback_uri,
-                                         auth_info=self.authentication,
+                                         auth_info=json.dumps(self.authentication),
                                          notification_types=json.dumps(self.notification_types),
                                          operation_types=json.dumps(self.operation_types),
                                          operation_states=json.dumps(self.operation_states),
