@@ -61,7 +61,7 @@ class NotificationsUtil(object):
             }
             callbackUri = subscription.callback_uri
             auth_info = json.loads(subscription.auth_info)
-            if auth_info["authType"] != const.OAUTH2_CLIENT_CREDENTIALS:
+            if const.BASIC in auth_info["authType"]:
                 try:
                     self.post_notification(callbackUri, auth_info, notification)
                 except Exception as e:
