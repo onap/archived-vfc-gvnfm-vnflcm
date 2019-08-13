@@ -74,8 +74,8 @@ class NotificationsUtil(object):
         logger.info("Sending notification to %s", callbackUri)
         resp = requests.post(
             callbackUri,
-            data=notification,
-            auth=HTTPBasicAuth(username, password)
+            data=notification
+            # auth=HTTPBasicAuth(username, password)
         )
         if resp.status_code != status.HTTP_204_NO_CONTENT:
             logger.error("Notify %s failed: %s", callbackUri, resp.text)
