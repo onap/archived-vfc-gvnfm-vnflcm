@@ -13,12 +13,15 @@
 # limitations under the License.
 
 import json
+import base64
+import sys
+import traceback
 import logging
+import urllib.request
+import urllib.error
+import urllib.parse
 import uuid
-
-import requests
-from requests.auth import HTTPBasicAuth
-from rest_framework import status
+import httplib2
 
 from lcm.nf import const
 from lcm.pub.database.models import SubscriptionModel
@@ -27,11 +30,16 @@ from lcm.pub.database.models import NetworkInstModel
 from lcm.pub.database.models import PortInstModel
 from lcm.pub.database.models import StorageInstModel
 from lcm.pub.database.models import VNFCInstModel
+from lcm.pub.database.models import NfInstModel
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.utils.enumutil import enum
 
 logger = logging.getLogger(__name__)
 
+rest_no_auth, rest_oneway_auth, rest_bothway_auth = 0, 1, 2
+HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_202_ACCEPTED = '200', '201', '204', '202'
+status_ok_list = [HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_202_ACCEPTED]
+HTTP_404_NOTFOUND, HTTP_403_FORBIDDEN, HTTP_401_UNAUTHORIZED, HTTP_400_BADREQUEST = '404', '403', '401', '400'
 NOTIFY_TYPE = enum(
     lCM_OP_OCC="VnfLcmOperationOccurrenceNotification",
     CREATION="VnfIdentifierCreationNotification",
@@ -63,24 +71,65 @@ class NotificationsUtil(object):
             auth_info = json.loads(subscription.auth_info)
             if const.BASIC in auth_info["authType"]:
                 try:
-                    self.post_notification(callbackUri, auth_info, notification)
+                    self.post_notification(callbackUri, notification)
                 except Exception as e:
                     logger.error("Failed to post notification: %s", e.args[0])
 
-    def post_notification(self, callbackUri, auth_info, notification):
-        params = auth_info.get("paramsBasic", {})
-        username = params.get("userName")
-        password = params.get("password")
+    def post_notification(self, callbackUri,  notification):
         logger.info("Sending notification to %s", callbackUri)
-        resp = requests.post(
-            callbackUri,
-            data=notification,
-            headers={'content-type': 'application/json'},
-            auth=HTTPBasicAuth(username, password)
-        )
-        if resp.status_code != status.HTTP_204_NO_CONTENT:
-            logger.error("Notify %s failed: %s", callbackUri, resp.text)
+        resp = self.call_req(callbackUri, "", "", "POST", json.dumps(notification))
+        if resp[0] != 0:
+            logger.error('Status code is %s, detail is %s.', resp[2], resp[1])
 
+    def call_req(self, full_url, user, passwd, method, content=''):
+        callid = str(uuid.uuid1())
+        logger.debug("[%s]call_req('%s','%s','%s',%s,'%s','%s')" % (
+            callid, full_url, user, passwd, rest_no_auth, method, content))
+        ret = None
+        resp_Location = ''
+        resp_status = ''
+        try:
+            headers = {'content-type': 'application/json', 'accept': 'application/json'}
+            if user:
+                headers['Authorization'] = 'Basic %s' % base64.b64encode(
+                    bytes('%s:%s' % (user, passwd), "utf-8")).decode()
+            ca_certs = None
+            for retry_times in range(3):
+                http = httplib2.Http(ca_certs=ca_certs, disable_ssl_certificate_validation=True)
+                http.follow_all_redirects = True
+                try:
+                    resp, resp_content = http.request(full_url, method=method.upper(), body=content, headers=headers)
+                    logger.info("resp=%s,resp_content=%s" % (resp, resp_content))
+                    resp_status, resp_body = resp['status'], resp_content.decode('UTF-8')
+                    resp_Location = resp.get('Location', "")
+                    logger.debug("[%s][%d]status=%s,resp_body=%s)" % (callid, retry_times, resp_status, resp_body))
+                    if resp_status in status_ok_list:
+                        ret = [0, resp_body, resp_status, resp_Location]
+                    else:
+                        ret = [1, resp_body, resp_status, resp_Location]
+                    break
+                except Exception as ex:
+                    if 'httplib.ResponseNotReady' in str(sys.exc_info()):
+                        logger.debug("retry_times=%d", retry_times)
+                        logger.error(traceback.format_exc())
+                        ret = [1, "Unable to connect to %s" % full_url, resp_status, resp_Location]
+                        continue
+                    raise ex
+        except urllib.error.URLError as err:
+            ret = [2, str(err), resp_status, resp_Location]
+        except Exception as ex:
+            logger.error(traceback.format_exc())
+            logger.error("[%s]ret=%s" % (callid, str(sys.exc_info())))
+            res_info = str(sys.exc_info())
+            if 'httplib.ResponseNotReady' in res_info:
+                res_info = "The URL[%s] request failed or is not responding." % full_url
+            ret = [3, res_info, resp_status, resp_Location]
+        except:
+            logger.error(traceback.format_exc())
+            ret = [4, str(sys.exc_info()), resp_status, resp_Location]
+
+        logger.debug("[%s]ret=%s" % (callid, str(ret)))
+        return ret
 
 def set_affected_vnfcs(affected_vnfcs, nfinstid, changetype):
     vnfcs = VNFCInstModel.objects.filter(instid=nfinstid)
@@ -206,6 +255,8 @@ def prepare_notification(nfinstid, jobid, operation, operation_state):
             }
         }
     }
+    nfInsts = NfInstModel.objects.filter(nfinstid=nfinstid)
+    notification_content['vnfmInstId'] = nfInsts[0].vnfminstid if nfInsts[0].vnfminstid else '1'
     return notification_content
 
 

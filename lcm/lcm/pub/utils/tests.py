@@ -21,7 +21,7 @@ import json
 from . import syscomm
 from . import timeutil
 from . import values
-# import platform
+import codecs
 
 from lcm.pub.database.models import JobStatusModel, JobModel, SubscriptionModel
 from lcm.pub.utils.jobutil import JobUtil
@@ -271,19 +271,47 @@ class TestNotificationUtils(unittest.TestCase):
     def tearDown(self):
         SubscriptionModel.objects.all().delete()
 
-    @mock.patch('requests.post')
+    @mock.patch('httplib2.Http.request')
     def test_send_notification(self, mock_post):
         dummy_notification = {
-            "vnfInstanceId": "99442b18-a5c7-11e8-998c-bf1755941f13",
+            "id": "f877e380-1c6a-402e-977b-b08cd04254fa",
+            "notificationType": "VnfLcmOperationOccurrenceNotification",
+            "timeStamp": "2019-08-12 09:24:02",
+            "notificationStatus": "START",
             "operationState": "STARTING",
+            "vnfInstanceId": "b4fb2522-82af-4ad5-8f1b-475d65713b56",
             "operation": "INSTANTIATE",
-            "_links": {}
+            "isAutomaticInvocation": False,
+            "vnfLcmOpOccId": "NF-INSTANTIATE-b4fb2522-82af-4ad5-8f1b-475d65713b56-ec4b5b46-bce2-11e9-90d0-faa53ad2ac20",
+            "subscriptionId": "1",
+            "affectedVnfcs": [
+
+            ],
+            "affectedVirtualLinks": [
+
+            ],
+            "affectedVirtualStorages": [
+
+            ],
+            "changedExtConnectivity": [
+
+            ],
+            "error": "",
+            "_links": {
+                "subscription": {'href': '/api/vnflcm/v1/subscriptions/1'},
+                "vnfInstance": {
+                    "href": "http:\/\/msb-iag:80\/api\/vnflcm\/v1\/vnf_instances\/b4fb2522-82af-4ad5-8f1b-475d65713b56"
+                },
+                "vnfLcmOpOcc": {
+                    "href": "http:\/\/msb-iag:80\/api\/vnflcm\/v1\/vnf_lcm_op_occs\/NF-INSTANTIATE-b4fb2522-82af-4ad5-8f1b-475d65713b56-ec4b5b46-bce2-11e9-90d0-faa53ad2ac20"
+                }
+            }
         }
-        mock_post.return_value.status_code = 204
+        mock_post.return_value = ({"status": "204"}, codecs.encode("1234", encoding='utf-8'))
         NotificationsUtil().send_notification(dummy_notification)
         mock_post.assert_called_once()
 
-    @mock.patch('requests.post')
+    @mock.patch('httplib2.Http.request')
     def test_send_notification_with_empty_filters(self, mock_post):
         dummy_notification = {
             "vnfInstanceId": "9fe4080c-b1a3-11e8-bb96-645106374fd3",
@@ -291,7 +319,7 @@ class TestNotificationUtils(unittest.TestCase):
             "operation": "",
             "_links": {}
         }
-        mock_post.return_value.status_code = 204
+        mock_post.return_value = ({"status": "204"}, codecs.encode("1234", encoding='utf-8'))
         NotificationsUtil().send_notification(dummy_notification)
         mock_post.assert_called_once()
 
