@@ -17,7 +17,7 @@ import logging
 import uuid
 
 import requests
-from requests.auth import HTTPBasicAuth
+# from requests.auth import HTTPBasicAuth
 from rest_framework import status
 
 from lcm.nf import const
@@ -69,13 +69,13 @@ class NotificationsUtil(object):
 
     def post_notification(self, callbackUri, auth_info, notification):
         params = auth_info.get("paramsBasic", {})
-        username = params.get("userName")
-        password = params.get("password")
+        # username = params.get("userName")
+        # password = params.get("password")
         logger.info("Sending notification to %s", callbackUri)
         resp = requests.post(
             callbackUri,
-            data=notification,
-            auth=HTTPBasicAuth(username, password)
+            data=notification
+            # auth=HTTPBasicAuth(username, password)
         )
         if resp.status_code != status.HTTP_204_NO_CONTENT:
             logger.error("Notify %s failed: %s", callbackUri, resp.text)
