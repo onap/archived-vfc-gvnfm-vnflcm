@@ -75,6 +75,7 @@ class NotificationsUtil(object):
         resp = requests.post(
             callbackUri,
             data=notification,
+            headers={'content-type': 'application/json'},
             auth=HTTPBasicAuth(username, password)
         )
         if resp.status_code != status.HTTP_204_NO_CONTENT:
