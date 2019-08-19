@@ -27,3 +27,7 @@ class VerifyVnfdTest(unittest.TestCase):
     def test_vnfd_verfify_success1(self):
         ret = verifyvnfd.verify(const.vnfd_model1)
         self.assertEqual(ret, [])
+
+    def test_vnfd_verfify_success2(self):
+        ret = verifyvnfd.verify(const.vnfd_model2)
+        self.assertEqual(ret, [])

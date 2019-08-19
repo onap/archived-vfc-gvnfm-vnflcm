@@ -326,3 +326,222 @@ vnfd_model1 = {
 
     ],
 }
+
+
+vnfd_model2 = {
+    "volume_storages": [
+        {
+            "volume_storage_id": "test",
+            "properties": {
+                "location_info": {
+                    "vimid": "vim_1",
+                    "tenant": "chinamobile",
+                    "availability_zone": "test",
+                },
+                "volume_name": "test",
+                "custom_volume_type": "test",
+                "size_of_storage": "\"10 GB\"",
+            },
+            "image_file": "test",
+        },
+    ],
+    "vls": [
+        {
+            "vl_id": "test",
+            "properties": {
+                "location_info": {
+                    "vimid": "test",
+                    "tenant": "chinamobile",
+                },
+                "vl_profile": {
+                    "networkName": "test",
+                    "networkType": "test",
+                    "physicalNetwork": "test",
+                    "vlanTransparent": "test",
+                    "segmentationId": "1",
+                    "cidr": "test",
+                    "dhcpEnabled": "test",
+                    "gatewayIp": "test",
+                    "startIp": "test",
+                    "endIp": "test",
+                },
+                "connectivity_type": {
+                    "layer_protocol": "ipv4",
+                },
+                "dns_nameservers": "test",
+                "host_routes": "test",
+            },
+            "route_external": "test",
+        }
+    ],
+    "cps": [
+        {
+            "vdu_id": "test",
+            "cp_id": "cp1",
+            "networkId": "",  # TODO
+            "subnetId": "",  # TODO
+            "vl_id": "test",
+            "properties": {
+                "name": "test",
+                "mac_address": "test",
+                "protocol_data": [
+                    {
+                        "address_data": {
+                            "l3_address_data": {
+                                "fixed_ip_address": "test"
+                            },
+                        },
+                    },
+                ],
+                "vnic_type": "direct",
+                "role": "root",
+                "virtual_network_interface_requirements": [
+                    {
+                        "network_interface_requirements": {
+                            "interfaceType": '{"schemaVersion": "0", "schemaLocation":"", "platformId": "generic", "mandatory": false, "configurationValue": "SR-IOV"}'
+                        },
+                        "support_mandatory": False,
+                        "name": "SRIOV_Port",
+                        "description": "sriov"
+                    }
+                ]
+            }
+        }
+    ],
+    "vdus": [
+        {
+            "vdu_id": "test",
+            "properties": {
+                "location_info": {
+                    "vimid": "test",
+                    "tenant": "chinamobile",
+                    "availability_zone": "test",
+                    "vnfId": "",
+                    "vnfName": "",
+                    "cloudOwner": "",
+                    "cloudRegionId": "",
+                    "vduInfo": [
+                        {
+                            "vduName": "VDU_vbng_0",
+                            "flavorId": "12345",
+                            "directive": ""
+                        }
+                    ]
+                },
+                "name": "test",
+                "inject_files": [],
+                "user_data": "test",
+                "meta_data": {},
+            },
+            "cps": [],
+            "type": "tosca.nodes.nfv.Vdu.Compute",
+            "virtual_compute": {
+                "virtual_cpu": {
+                    "num_virtual_cpu": "16",
+                },
+                "virtual_memory": {
+                    "virtual_mem_size": "8000 MB",
+                    "vdu_memory_requirements": {
+                        "memoryPageSize": "8 MB",
+                    },
+                },
+            },
+            "virtual_storages": [{
+                "virtual_storage_id": "test",
+                "type_of_storage": "ephemeral",
+                "size_of_storage": "10 GB",
+            }],
+            "type": "tosca.nodes.nfv.Vdu.Compute",
+            "artifacts": [
+                {
+                    "artifact_name": "sw_image",
+                    "file": "sss.vmdk",
+                },
+            ],
+            "volume_storages": [
+                {
+                    "volume_storage_id": "test",
+                }
+            ],
+        },
+    ],
+    "image_files": [],
+    "routers": [],
+    "local_storages": [],
+    "vnf_exposed": {
+        "external_cps": [],
+        "forward_cps": []
+    },
+    "inputs": {
+        "pe1_id": {
+            "type": "string",
+            "description": "pe1_idofunderlayvpn"
+        },
+        "pe2_id": {
+            "type": "string",
+            "description": "pe2_idofunderlayvpn"
+        },
+        "serviceType": {
+            "type": "string",
+            "description": "serviceTypeofunderlayvpn"
+        },
+        "description": {
+            "type": "string",
+            "description": "descriptionofunderlayvpn"
+        },
+        "ac2_route": {
+            "type": "string",
+            "description": "ac2_routeofunderlayvpn"
+        },
+        "ac1_route": {
+            "type": "string",
+            "description": "ac1_routeofunderlayvpn"
+        },
+        "ac1_svlan": {
+            "type": "integer",
+            "description": "ac1_svlanofunderlayvpn"
+        },
+        "ac2_ip": {
+            "type": "string",
+            "description": "ac2_ipofunderlayvpn"
+        },
+        "ac1_ip": {
+            "type": "string",
+            "description": "ac1_ipofunderlayvpn"
+        },
+        "ac2_port": {
+            "type": "string",
+            "description": "ac2_portofunderlayvpn"
+        },
+        "topology": {
+            "type": "string",
+            "description": "topologyofunderlayvpn"
+        },
+        "technology": {
+            "type": "string",
+            "description": "technologyofunderlayvpn"
+        },
+        "ac1_port": {
+            "type": "string",
+            "description": "ac1_portofunderlayvpn"
+        },
+        "ac2_svlan": {
+            "type": "integer",
+            "description": "ac2_svlanofunderlayvpn"
+        },
+        "name": {
+            "type": "string",
+            "description": "Nameofunderlayervpn"
+        }
+    },
+    "metadata": {
+        "designer": "sdno",
+        "name": "underlayervpn",
+        "csarVersion": "1.0",
+        "csarType": "SSAR",
+        "csarProvider": "huawei",
+        "version": "1.0",
+        "type": "SSAR",
+        "id": "ns_underlayervpn_1_0"
+    }
+}
