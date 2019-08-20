@@ -53,3 +53,5 @@ REG_TO_MSB_REG_PARAM = {
         "ttl": 0
     }]
 }
+QRY_MSB_REG_URL = "/api/microservices/v1/services/vnflcm/version/v1"
+UNREG_MSB_URL = "/api/microservices/v1/services/vnflcm/version/v1/nodes/%s/%s"
