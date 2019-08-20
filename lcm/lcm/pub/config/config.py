@@ -53,3 +53,4 @@ REG_TO_MSB_REG_PARAM = {
         "ttl": 0
     }]
 }
+MSB_SVC_URL = "/api/microservices/v1/services/vnflcm/version/v1"
