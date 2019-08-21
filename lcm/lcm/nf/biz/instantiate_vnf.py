@@ -35,6 +35,7 @@ from lcm.nf.const import OPERATION_STATE_TYPE
 from lcm.nf.const import SUB_OPERATION_TASK
 from lcm.nf.biz import common
 from .operate_vnf_lcm_op_occ import VnfLcmOpOcc
+from lcm.pub.verifyvnfd import verifyvnfd
 
 logger = logging.getLogger(__name__)
 
@@ -122,6 +123,7 @@ class InstantiateVnf(Thread):
         vnf_package = query_vnfpackage_by_id(self.vnfd_id)
         pkg_info = ignore_case_get(vnf_package, "packageInfo")
         self.vnfd_info = json.loads(ignore_case_get(pkg_info, "vnfdModel"))
+        verifyvnfd.verify(self.vnfd_info)
 
         self.update_cps()
         metadata = ignore_case_get(self.vnfd_info, "metadata")

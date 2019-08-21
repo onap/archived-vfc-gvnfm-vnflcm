@@ -13,12 +13,37 @@
 # limitations under the License.
 
 import json
+import re
 import os
+import six
 import logging
 import jsonschema
 from lcm.pub.exceptions import NFLCMException
 
 logger = logging.getLogger(__name__)
+
+
+def _format_validation_error(error):
+    """
+    :param error: validation error to format
+    :type error: jsonchema.exceptions.ValidationError
+    :returns: string representation of the validation error
+    :rtype: str
+    """
+    match = re.search("(.+) is a required property", error.message)
+    if match:
+        message = 'Error: missing required property {}.'.format(
+            match.group(1))
+    else:
+        message = 'Error: {}\n'.format(error.message)
+        if len(error.absolute_path) > 0:
+            message += 'Path: {}\n'.format(
+                       '.'.join(
+                           [six.text_type(path)
+                            for path in error.absolute_path]))
+        message += 'Value: {}'.format(json.dumps(error.instance))
+
+    return message
 
 
 def verify(new_vnfd):
@@ -28,8 +53,8 @@ def verify(new_vnfd):
         vnfd_schema = json.load(fvnfd_schema)
         vnfd_validator = jsonschema.validators.Draft4Validator(schema=vnfd_schema)
         for error in vnfd_validator.iter_errors(new_vnfd):
-            logger.error("vnfd verify fail:%s" % error)
-            errors_found.append(error)
-        if len(errors_found) > 0:
-            raise NFLCMException(errors_found)
-        return errors_found
+            logger.error("vnfd verify fail,%s" % _format_validation_error(error))
+            errors_found.append(_format_validation_error(error))
+    if len(errors_found) > 0:
+        raise NFLCMException(errors_found)
+    return True

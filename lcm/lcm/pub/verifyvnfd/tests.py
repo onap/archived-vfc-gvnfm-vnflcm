@@ -13,8 +13,9 @@
 # limitations under the License.
 
 import unittest
-from . import verifyvnfd
+from lcm.pub.verifyvnfd import verifyvnfd
 from . import const
+from lcm.pub.exceptions import NFLCMException
 
 
 class VerifyVnfdTest(unittest.TestCase):
@@ -26,12 +27,18 @@ class VerifyVnfdTest(unittest.TestCase):
 
     def test_vnfd_verfify_success1(self):
         ret = verifyvnfd.verify(const.vnfd_model1)
-        self.assertEqual(ret, [])
+        self.assertEqual(ret, True)
 
     def test_vnfd_verfify_success2(self):
         ret = verifyvnfd.verify(const.vnfd_model2)
-        self.assertEqual(ret, [])
+        self.assertEqual(ret, True)
 
     def test_vnfd_verfify_success3(self):
         ret = verifyvnfd.verify(const.vnfd_model3)
-        self.assertEqual(ret, [])
+        self.assertEqual(ret, True)
+
+    def test_vnfd_verfify_fail_for_missing_required(self):
+        try:
+            verifyvnfd.verify(const.vnfd_model_miss_required)
+        except NFLCMException as e:
+            self.assertNotEqual(e.args[0], "")
