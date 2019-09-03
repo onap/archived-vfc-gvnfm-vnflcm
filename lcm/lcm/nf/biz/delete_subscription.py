@@ -15,7 +15,7 @@
 import logging
 
 from lcm.pub.database.models import SubscriptionModel
-from lcm.pub.exceptions import NFLCMException
+from lcm.pub.exceptions import NFLCMExceptionNotFound
 
 logger = logging.getLogger(__name__)
 
@@ -27,5 +27,5 @@ class DeleteSubscription:
     def delete_single_subscription(self):
         subscription = SubscriptionModel.objects.filter(subscription_id=self.subscription_id)
         if not subscription.exists():
-            raise NFLCMException('Subscription(%s) does not exist' % self.subscription_id)
+            raise NFLCMExceptionNotFound('Subscription(%s) does not exist' % self.subscription_id)
         subscription.delete()
