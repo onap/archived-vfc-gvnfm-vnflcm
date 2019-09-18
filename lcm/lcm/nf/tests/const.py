@@ -638,10 +638,10 @@ vnfdModel = {
                 "connectivity_type": {
                     "layer_protocol": "ipv4",
                 },
-                "dns_nameservers": "test",
-                "host_routes": "test",
+                "dns_nameservers": ["test"],
+                "host_routes": [],
             },
-            "route_external": "test",
+            "route_external": False
         }
     ],
     "cps": [
