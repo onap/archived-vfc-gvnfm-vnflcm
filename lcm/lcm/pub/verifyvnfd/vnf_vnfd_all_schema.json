@@ -1,0 +1,2036 @@
+{
+   "definitions": {},
+   "$schema": "http://json-schema.org/draft-07/schema#",
+   "$id": "http://example.com/root.json",
+   "type": "object",
+   "title": "The Root Schema",
+   "required": [
+   ],
+   "properties": {
+     "metadata": {
+       "$id": "#/properties/metadata",
+       "type": "object",
+       "title": "The Metadata Schema",
+       "required": [
+       ],
+       "properties": {
+         "vendor": {
+           "$id": "#/properties/metadata/properties/vendor",
+           "type": "string",
+           "title": "The Vendor Schema",
+           "default": "",
+           "examples": [
+             "zte"
+           ],
+           "pattern": "^(.*)$"
+         },
+         "is_shared": {
+           "$id": "#/properties/metadata/properties/is_shared",
+           "type": "boolean",
+           "title": "The Is_shared Schema",
+           "default": false,
+           "examples": [
+             false
+           ]
+         },
+         "description": {
+           "$id": "#/properties/metadata/properties/description",
+           "type": "string",
+           "title": "The Description Schema",
+           "default": "",
+           "examples": [
+             ""
+           ],
+           "pattern": "^(.*)$"
+         },
+         "domain_type": {
+           "$id": "#/properties/metadata/properties/domain_type",
+           "type": "string",
+           "title": "The Domain_type Schema",
+           "default": "",
+           "examples": [
+             "CN"
+           ],
+           "pattern": "^(.*)$"
+         },
+         "version": {
+           "$id": "#/properties/metadata/properties/version",
+           "type": "string",
+           "title": "The Version Schema",
+           "default": "",
+           "examples": [
+             "v4.14.10"
+           ],
+           "pattern": "^(.*)$"
+         },
+         "vmnumber_overquota_alarm": {
+           "$id": "#/properties/metadata/properties/vmnumber_overquota_alarm",
+           "type": "boolean",
+           "title": "The Vmnumber_overquota_alarm Schema",
+           "default": false,
+           "examples": [
+             false
+           ]
+         },
+         "cross_dc": {
+           "$id": "#/properties/metadata/properties/cross_dc",
+           "type": "boolean",
+           "title": "The Cross_dc Schema",
+           "default": false,
+           "examples": [
+             false
+           ]
+         },
+         "vnf_type": {
+           "$id": "#/properties/metadata/properties/vnf_type",
+           "type": "string",
+           "title": "The Vnf_type Schema",
+           "default": "",
+           "examples": [
+             "SSS"
+           ],
+           "pattern": "^(.*)$"
+         },
+         "vnfd_version": {
+           "$id": "#/properties/metadata/properties/vnfd_version",
+           "type": "string",
+           "title": "The Vnfd_version Schema",
+           "default": "",
+           "examples": [
+             "V00000001"
+           ],
+           "pattern": "^(.*)$"
+         },
+         "id": {
+           "$id": "#/properties/metadata/properties/id",
+           "type": "string",
+           "title": "The Id Schema",
+           "default": "",
+           "examples": [
+             "sss-vnf-template"
+           ],
+           "pattern": "^(.*)$"
+         },
+         "name": {
+           "$id": "#/properties/metadata/properties/name",
+           "type": "string",
+           "title": "The Name Schema",
+           "default": "",
+           "examples": [
+             "sss-vnf-template"
+           ],
+           "pattern": "^(.*)$"
+         }
+       }
+     },
+     "vdus": {
+       "$id": "#/properties/vdus",
+       "type": "array",
+       "title": "The Vdus Schema",
+       "items": {
+         "$id": "#/properties/vdus/items",
+         "type": "object",
+         "title": "The Items Schema",
+         "required": [
+           "vdu_id",
+           "cps"
+         ],
+         "properties": {
+           "vdu_id": {
+             "$id": "#/properties/vdus/items/properties/vdu_id",
+             "type": "string",
+             "title": "The Vdu_id Schema",
+             "default": "",
+             "examples": [
+               "vdu1Id"
+             ],
+             "pattern": "^(.*)$"
+           },
+           "description": {
+             "$id": "#/properties/vdus/items/properties/description",
+             "type": "string",
+             "title": "The Description Schema",
+             "default": "",
+             "examples": [
+               "vdu description"
+             ],
+             "pattern": "^(.*)$"
+           },
+           "properties": {
+             "$id": "#/properties/vdus/items/properties/properties",
+             "type": "object",
+             "title": "The Properties Schema",
+             "required": [
+             ],
+             "properties": {
+               "name": {
+                 "$id": "#/properties/vdus/items/properties/properties/properties/name",
+                 "type": "string",
+                 "title": "The Name Schema",
+                 "default": "",
+                 "examples": [
+                   "vduinstname"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "vdu_type": {
+                 "$id": "#/properties/vdus/items/properties/properties/properties/vdu_type",
+                 "type": "string",
+                 "title": "The Vdu_type Schema",
+                 "default": "",
+                 "examples": [
+                   "OMP"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "key_vdu": {
+                 "$id": "#/properties/vdus/items/properties/properties/properties/key_vdu",
+                 "type": "boolean",
+                 "title": "The Key_vdu Schema",
+                 "default": false,
+                 "examples": [
+                   true
+                 ]
+               },
+               "support_scaling": {
+                 "$id": "#/properties/vdus/items/properties/properties/properties/support_scaling",
+                 "type": "boolean",
+                 "title": "The Support_scaling Schema",
+                 "default": false,
+                 "examples": [
+                   true
+                 ]
+               },
+               "location_info": {
+                 "$id": "#/properties/vdus/items/properties/properties/properties/location_info",
+                 "type": "object",
+                 "title": "The Location_info Schema",
+                 "required": [
+                 ],
+                 "properties": {
+                   "vimid": {
+                     "$id": "#/properties/vdus/items/properties/properties/properties/location_info/properties/vimid",
+                     "type": "string",
+                     "title": "The Vimid Schema",
+                     "default": "",
+                     "examples": [
+                       "vimid"
+                     ],
+                     "pattern": "^(.*)$"
+                   },
+                   "tenant": {
+                     "$id": "#/properties/vdus/items/properties/properties/properties/location_info/properties/tenant",
+                     "type": "string",
+                     "title": "The Tenant Schema",
+                     "default": "",
+                     "examples": [
+                       "tenantname"
+                     ],
+                     "pattern": "^(.*)$"
+                   },
+                   "availability_zone": {
+                     "$id": "#/properties/vdus/items/properties/properties/properties/location_info/properties/availability_zone",
+                     "type": "string",
+                     "title": "The Availability_zone Schema",
+                     "default": "",
+                     "examples": [
+                       "zone1"
+                     ],
+                     "pattern": "^(.*)$"
+                   },
+                   "host": {
+                     "$id": "#/properties/vdus/items/properties/properties/properties/location_info/properties/host",
+                     "type": "string",
+                     "title": "The Host Schema",
+                     "default": "",
+                     "examples": [
+                       "host1"
+                     ],
+                     "pattern": "^(.*)$"
+                   }
+                 }
+               },
+               "local_affinity_antiaffinity_rule": {
+                 "$id": "#/properties/vdus/items/properties/properties/properties/local_affinity_antiaffinity_rule",
+                 "type": "array",
+                 "title": "The Local_affinity_antiaffinity_rule Schema",
+                 "items": {
+                   "$id": "#/properties/vdus/items/properties/properties/properties/local_affinity_antiaffinity_rule/items",
+                   "type": "object",
+                   "title": "The Items Schema",
+                   "required": [
+                   ],
+                   "properties": {
+                     "affinity_antiaffinity": {
+                       "$id": "#/properties/vdus/items/properties/properties/properties/local_affinity_antiaffinity_rule/items/properties/affinity_antiaffinity",
+                       "type": "string",
+                       "title": "The Affinity_antiaffinity Schema",
+                       "default": "",
+                       "examples": [
+                         "anti-affinity"
+                       ],
+                       "pattern": "^(.*)$"
+                     },
+                     "scope": {
+                       "$id": "#/properties/vdus/items/properties/properties/properties/local_affinity_antiaffinity_rule/items/properties/scope",
+                       "type": "string",
+                       "title": "The Scope Schema",
+                       "default": "",
+                       "examples": [
+                         "node"
+                       ],
+                       "pattern": "^(.*)$"
+                     }
+                   }
+                 }
+               },
+               "inject_data_list": {
+                 "$id": "#/properties/vdus/items/properties/properties/properties/inject_data_list",
+                 "type": "array",
+                 "title": "The Inject_data_list Schema",
+                 "items": {
+                   "$id": "#/properties/vdus/items/properties/properties/properties/inject_data_list/items",
+                   "type": "object",
+                   "title": "The Items Schema",
+                   "required": [
+                   ],
+                   "properties": {
+                     "file_name": {
+                       "$id": "#/properties/vdus/items/properties/properties/properties/inject_data_list/items/properties/file_name",
+                       "type": "string",
+                       "title": "The File_name Schema",
+                       "default": "",
+                       "examples": [
+                         "abc.xml"
+                       ],
+                       "pattern": "^(.*)$"
+                     },
+                     "file_data": {
+                       "$id": "#/properties/vdus/items/properties/properties/properties/inject_data_list/items/properties/file_data",
+                       "type": "string",
+                       "title": "The File_data Schema",
+                       "default": "",
+                       "examples": [
+                         "<a>xxx</a><b>ssss</b>"
+                       ],
+                       "pattern": "^(.*)$"
+                     }
+                   }
+                 }
+               },
+               "storage_policy": {
+                 "$id": "#/properties/vdus/items/properties/properties/properties/storage_policy",
+                 "type": "string",
+                 "title": "The Storage_policy Schema",
+                 "default": "",
+                 "examples": [
+                   "HIGH"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "template_id": {
+                 "$id": "#/properties/vdus/items/properties/properties/properties/template_id",
+                 "type": "string",
+                 "title": "The Template_id Schema",
+                 "default": "",
+                 "examples": [
+                   "26"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "manual_scale_select_vim": {
+                 "$id": "#/properties/vdus/items/properties/properties/properties/manual_scale_select_vim",
+                 "type": "boolean",
+                 "title": "The Manual_scale_select_vim Schema",
+                 "default": false,
+                 "examples": [
+                   false
+                 ]
+               },
+               "watchdog": {
+                 "$id": "#/properties/vdus/items/properties/properties/properties/watchdog",
+                 "type": "object",
+                 "title": "The Watchdog Schema",
+                 "required": [
+                 ],
+                 "properties": {
+                   "enabledelay": {
+                     "$id": "#/properties/vdus/items/properties/properties/properties/watchdog/properties/enabledelay",
+                     "type": "integer",
+                     "title": "The Enabledelay Schema",
+                     "default": 0,
+                     "examples": [
+                       600000
+                     ]
+                   },
+                   "action": {
+                     "$id": "#/properties/vdus/items/properties/properties/properties/watchdog/properties/action",
+                     "type": "string",
+                     "title": "The Action Schema",
+                     "default": "",
+                     "examples": [
+                       "reset"
+                     ],
+                     "pattern": "^(.*)$"
+                   }
+                 }
+               },
+               "is_predefined": {
+                 "$id": "#/properties/vdus/items/properties/properties/properties/is_predefined",
+                 "type": "boolean",
+                 "title": "The Is_predefined Schema",
+                 "default": false,
+                 "examples": [
+                   false
+                 ]
+               },
+               "allow_scale_updown": {
+                 "$id": "#/properties/vdus/items/properties/properties/properties/allow_scale_updown",
+                 "type": "boolean",
+                 "title": "The Allow_scale_updown Schema",
+                 "default": false,
+                 "examples": [
+                   false
+                 ]
+               },
+               "inject_network_address": {
+                 "$id": "#/properties/vdus/items/properties/properties/properties/inject_network_address",
+                 "type": "boolean",
+                 "title": "The Inject_network_address Schema",
+                 "default": false,
+                 "examples": [
+                   true
+                 ]
+               },
+               "inner_hugepage_num": {
+                 "$id": "#/properties/vdus/items/properties/properties/properties/inner_hugepage_num",
+                 "type": "integer",
+                 "title": "The Inner_hugepage_num Schema",
+                 "default": 0,
+                 "examples": [
+                   100
+                 ]
+               },
+               "inner_hugepage_size": {
+                 "$id": "#/properties/vdus/items/properties/properties/properties/inner_hugepage_size",
+                 "type": "string",
+                 "title": "The Inner_hugepage_size Schema",
+                 "default": "",
+                 "examples": [
+                   "2048"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "action": {
+                 "$id": "#/properties/vdus/items/properties/properties/properties/action",
+                 "type": "string",
+                 "title": "The Action Schema",
+                 "default": "",
+                 "examples": [
+                   "add"
+                 ],
+                 "pattern": "^(.*)$"
+               }
+             }
+           },
+           "image_file": {
+             "$id": "#/properties/vdus/items/properties/image_file",
+             "type": "string",
+             "title": "The Image_file Schema",
+             "default": "",
+             "examples": [
+               "sss"
+             ],
+             "pattern": "^(.*)$"
+           },
+           "local_storages": {
+             "$id": "#/properties/vdus/items/properties/local_storages",
+             "type": "array",
+             "title": "The Local_storages Schema",
+             "items": {
+               "$id": "#/properties/vdus/items/properties/local_storages/items",
+               "type": "string",
+               "title": "The Items Schema",
+               "default": "",
+               "examples": [
+                 "local_storage_id1",
+                 "local_storage_id2"
+               ],
+               "pattern": "^(.*)$"
+             }
+           },
+           "virtual_storages": {
+             "$id": "#/properties/vdus/items/properties/virtual_storages",
+             "type": "array",
+             "title": "The Virtual_storages Schema",
+             "items": {
+               "$id": "#/properties/vdus/items/properties/virtual_storages/items",
+               "type": "object",
+               "title": "The Items Schema",
+               "required": [
+                 "virtual_storage_id"
+               ],
+               "properties": {
+                 "virtual_storage_id": {
+                   "$id": "#/properties/vdus/items/properties/virtual_storages/items/properties/virtual_storage_id",
+                   "type": "string",
+                   "title": "The Virtual_storage_id Schema",
+                   "default": "",
+                   "examples": [
+                     "volume_storage1"
+                   ],
+                   "pattern": "^(.*)$"
+                 },
+                 "location": {
+                   "$id": "#/properties/vdus/items/properties/virtual_storages/items/properties/location",
+                   "type": "string",
+                   "title": "The Location Schema",
+                   "default": "",
+                   "examples": [
+                     "/usr/data"
+                   ],
+                   "pattern": "^(.*)$"
+                 },
+                 "device": {
+                   "$id": "#/properties/vdus/items/properties/virtual_storages/items/properties/device",
+                   "type": "string",
+                   "title": "The Device Schema",
+                   "default": "",
+                   "examples": [
+                     "/dev/hda1"
+                   ],
+                   "pattern": "^(.*)$"
+                 }
+               }
+             }
+           },
+           "dependencies": {
+             "$id": "#/properties/vdus/items/properties/dependencies",
+             "type": "array",
+             "title": "The Dependencies Schema",
+             "items": {
+               "$id": "#/properties/vdus/items/properties/dependencies/items",
+               "type": "string",
+               "title": "The Items Schema",
+               "default": "",
+               "examples": [
+                 "vdu1Id",
+                 "vduNId"
+               ],
+               "pattern": "^(.*)$"
+             }
+           },
+           "nfv_compute": {
+             "$id": "#/properties/vdus/items/properties/nfv_compute",
+             "type": "object",
+             "title": "The Nfv_compute Schema",
+             "required": [
+             ],
+             "properties": {
+               "num_cpus": {
+                 "$id": "#/properties/vdus/items/properties/nfv_compute/properties/num_cpus",
+                 "type": "integer",
+                 "title": "The Num_cpus Schema",
+                 "default": 0,
+                 "examples": [
+                   4
+                 ]
+               },
+               "mem_size": {
+                 "$id": "#/properties/vdus/items/properties/nfv_compute/properties/mem_size",
+                 "type": "string",
+                 "title": "The Mem_size Schema",
+                 "default": "",
+                 "examples": [
+                   "1 GB"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "cpu_frequency": {
+                 "$id": "#/properties/vdus/items/properties/nfv_compute/properties/cpu_frequency",
+                 "type": "string",
+                 "title": "The Cpu_frequency Schema",
+                 "default": "",
+                 "examples": [
+                   "1GHz"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "flavor_extra_specs": {
+                 "$id": "#/properties/vdus/items/properties/nfv_compute/properties/flavor_extra_specs",
+                 "type": "object",
+                 "title": "The Flavor_extra_specs Schema",
+                 "required": [
+                 ],
+                 "properties": {
+                   "hw: cpu_policy": {
+                     "$id": "#/properties/vdus/items/properties/nfv_compute/properties/flavor_extra_specs/properties/hw: cpu_policy",
+                     "type": "string",
+                     "title": "The Hw: cpu_policy Schema",
+                     "default": "",
+                     "examples": [
+                       "shared"
+                     ],
+                     "pattern": "^(.*)$"
+                   },
+                   "hw: cpu_max_threads": {
+                     "$id": "#/properties/vdus/items/properties/nfv_compute/properties/flavor_extra_specs/properties/hw: cpu_max_threads",
+                     "type": "integer",
+                     "title": "The Hw: cpu_max_threads Schema",
+                     "default": 0,
+                     "examples": [
+                       50
+                     ]
+                   },
+                   "hw: cpu_sockets": {
+                     "$id": "#/properties/vdus/items/properties/nfv_compute/properties/flavor_extra_specs/properties/hw: cpu_sockets",
+                     "type": "integer",
+                     "title": "The Hw: cpu_sockets Schema",
+                     "default": 0,
+                     "examples": [
+                       10
+                     ]
+                   },
+                   "hw: cpu_max_sockets": {
+                     "$id": "#/properties/vdus/items/properties/nfv_compute/properties/flavor_extra_specs/properties/hw: cpu_max_sockets",
+                     "type": "integer",
+                     "title": "The Hw: cpu_max_sockets Schema",
+                     "default": 0,
+                     "examples": [
+                       20
+                     ]
+                   },
+                   "hw: cpu_max_cores": {
+                     "$id": "#/properties/vdus/items/properties/nfv_compute/properties/flavor_extra_specs/properties/hw: cpu_max_cores",
+                     "type": "integer",
+                     "title": "The Hw: cpu_max_cores Schema",
+                     "default": 0,
+                     "examples": [
+                       8
+                     ]
+                   },
+                   "hw: cpu_threads": {
+                     "$id": "#/properties/vdus/items/properties/nfv_compute/properties/flavor_extra_specs/properties/hw: cpu_threads",
+                     "type": "integer",
+                     "title": "The Hw: cpu_threads Schema",
+                     "default": 0,
+                     "examples": [
+                       30
+                     ]
+                   },
+                   "hw: numa_mem.0": {
+                     "$id": "#/properties/vdus/items/properties/nfv_compute/properties/flavor_extra_specs/properties/hw: numa_mem.0",
+                     "type": "integer",
+                     "title": "The Hw: numa_mem.0 Schema",
+                     "default": 0,
+                     "examples": [
+                       12288
+                     ]
+                   },
+                   "hw: hugepage_num": {
+                     "$id": "#/properties/vdus/items/properties/nfv_compute/properties/flavor_extra_specs/properties/hw: hugepage_num",
+                     "type": "integer",
+                     "title": "The Hw: hugepage_num Schema",
+                     "default": 0,
+                     "examples": [
+                       100
+                     ]
+                   },
+                   "hw: high_performance": {
+                     "$id": "#/properties/vdus/items/properties/nfv_compute/properties/flavor_extra_specs/properties/hw: high_performance",
+                     "type": "string",
+                     "title": "The Hw: high_performance Schema",
+                     "default": "",
+                     "examples": [
+                       "dvs_high"
+                     ],
+                     "pattern": "^(.*)$"
+                   },
+                   "hw: numa_nodes": {
+                     "$id": "#/properties/vdus/items/properties/nfv_compute/properties/flavor_extra_specs/properties/hw: numa_nodes",
+                     "type": "integer",
+                     "title": "The Hw: numa_nodes Schema",
+                     "default": 0,
+                     "examples": [
+                       1
+                     ]
+                   },
+                   "hw: numa_cpus.0": {
+                     "$id": "#/properties/vdus/items/properties/nfv_compute/properties/flavor_extra_specs/properties/hw: numa_cpus.0",
+                     "type": "string",
+                     "title": "The Hw: numa_cpus.0 Schema",
+                     "default": "",
+                     "examples": [
+                       "2,4,8"
+                     ],
+                     "pattern": "^(.*)$"
+                   },
+                   "hw: numa_pci": {
+                     "$id": "#/properties/vdus/items/properties/nfv_compute/properties/flavor_extra_specs/properties/hw: numa_pci",
+                     "type": "boolean",
+                     "title": "The Hw: numa_pci Schema",
+                     "default": false,
+                     "examples": [
+                       true
+                     ]
+                   },
+                   "hw: cpu_cores": {
+                     "$id": "#/properties/vdus/items/properties/nfv_compute/properties/flavor_extra_specs/properties/hw: cpu_cores",
+                     "type": "integer",
+                     "title": "The Hw: cpu_cores Schema",
+                     "default": 0,
+                     "examples": [
+                       4
+                     ]
+                   },
+                   "pci_passthrough: alias": {
+                     "$id": "#/properties/vdus/items/properties/nfv_compute/properties/flavor_extra_specs/properties/pci_passthrough: alias",
+                     "type": "string",
+                     "title": "The Pci_passthrough: alias Schema",
+                     "default": "",
+                     "examples": [
+                       "ColetoCreek: 1"
+                     ],
+                     "pattern": "^(.*)$"
+                   },
+                   "hw: mem_page_size": {
+                     "$id": "#/properties/vdus/items/properties/nfv_compute/properties/flavor_extra_specs/properties/hw: mem_page_size",
+                     "type": "string",
+                     "title": "The Hw: mem_page_size Schema",
+                     "default": "",
+                     "examples": [
+                       "large"
+                     ],
+                     "pattern": "^(.*)$"
+                   },
+                   "hw: mem_paging_mechanism": {
+                     "$id": "#/properties/vdus/items/properties/nfv_compute/properties/flavor_extra_specs/properties/hw: mem_paging_mechanism",
+                     "type": "string",
+                     "title": "The Hw: mem_paging_mechanism Schema",
+                     "default": "",
+                     "examples": [
+                       "EPT"
+                     ],
+                     "pattern": "^(.*)$"
+                   }
+                 }
+               }
+             }
+           },
+           "vls": {
+             "$id": "#/properties/vdus/items/properties/vls",
+             "type": "array",
+             "title": "The Vls Schema",
+             "items": {
+               "$id": "#/properties/vdus/items/properties/vls/items",
+               "type": "string",
+               "title": "The Items Schema",
+               "default": "",
+               "examples": [
+                 "vlId1"
+               ],
+               "pattern": "^(.*)$"
+             }
+           },
+           "cps": {
+             "$id": "#/properties/vdus/items/properties/cps",
+             "type": "array",
+             "title": "The Cps Schema",
+             "items": {
+               "$id": "#/properties/vdus/items/properties/cps/items",
+               "type": "string",
+               "title": "The Items Schema",
+               "default": "",
+               "examples": [
+                 "cpId1"
+               ],
+               "pattern": "^(.*)$"
+             }
+           },
+           "scalable": {
+             "$id": "#/properties/vdus/items/properties/scalable",
+             "type": "object",
+             "title": "The Scalable Schema",
+             "required": [
+             ],
+             "properties": {
+               "min_instances": {
+                 "$id": "#/properties/vdus/items/properties/scalable/properties/min_instances",
+                 "type": "integer",
+                 "title": "The Min_instances Schema",
+                 "default": 0,
+                 "examples": [
+                   1
+                 ]
+               },
+               "max_instances": {
+                 "$id": "#/properties/vdus/items/properties/scalable/properties/max_instances",
+                 "type": "integer",
+                 "title": "The Max_instances Schema",
+                 "default": 0,
+                 "examples": [
+                   2
+                 ]
+               },
+               "default_instances": {
+                 "$id": "#/properties/vdus/items/properties/scalable/properties/default_instances",
+                 "type": "integer",
+                 "title": "The Default_instances Schema",
+                 "default": 0,
+                 "examples": [
+                   1
+                 ]
+               }
+             }
+           },
+           "interfaces": {
+             "$id": "#/properties/vdus/items/properties/interfaces",
+             "type": "object",
+             "title": "The Interfaces Schema",
+             "required": [
+             ],
+             "properties": {
+               "Standard": {
+                 "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard",
+                 "type": "object",
+                 "title": "The Standard Schema",
+                 "required": [
+                 ],
+                 "properties": {
+                   "create": {
+                     "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/create",
+                     "type": "object",
+                     "title": "The Create Schema",
+                     "required": [
+                     ],
+                     "properties": {
+                       "implementation": {
+                         "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/create/properties/implementation",
+                         "type": "string",
+                         "title": "The Implementation Schema",
+                         "default": "",
+                         "examples": [
+                           "<implementationScript>"
+                         ],
+                         "pattern": "^(.*)$"
+                       },
+                       "inputs": {
+                         "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/create/properties/inputs",
+                         "type": "object",
+                         "title": "The Inputs Schema",
+                         "required": [
+                         ],
+                         "properties": {
+                           "param1Name": {
+                             "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/create/properties/inputs/properties/param1Name",
+                             "type": "string",
+                             "title": "The Param1name Schema",
+                             "default": "",
+                             "examples": [
+                               "value1"
+                             ],
+                             "pattern": "^(.*)$"
+                           },
+                           "paramNName": {
+                             "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/create/properties/inputs/properties/paramNName",
+                             "type": "string",
+                             "title": "The Paramnname Schema",
+                             "default": "",
+                             "examples": [
+                               "valueN"
+                             ],
+                             "pattern": "^(.*)$"
+                           }
+                         }
+                       }
+                     }
+                   },
+                   "configure": {
+                     "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/configure",
+                     "type": "object",
+                     "title": "The Configure Schema",
+                     "required": [
+                     ],
+                     "properties": {
+                       "implementation": {
+                         "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/configure/properties/implementation",
+                         "type": "string",
+                         "title": "The Implementation Schema",
+                         "default": "",
+                         "examples": [
+                           "<implementationScript>"
+                         ],
+                         "pattern": "^(.*)$"
+                       },
+                       "inputs": {
+                         "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/configure/properties/inputs",
+                         "type": "object",
+                         "title": "The Inputs Schema",
+                         "required": [
+                         ],
+                         "properties": {
+                           "param1Name": {
+                             "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/configure/properties/inputs/properties/param1Name",
+                             "type": "string",
+                             "title": "The Param1name Schema",
+                             "default": "",
+                             "examples": [
+                               "value1"
+                             ],
+                             "pattern": "^(.*)$"
+                           },
+                           "paramNName": {
+                             "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/configure/properties/inputs/properties/paramNName",
+                             "type": "string",
+                             "title": "The Paramnname Schema",
+                             "default": "",
+                             "examples": [
+                               "valueN"
+                             ],
+                             "pattern": "^(.*)$"
+                           }
+                         }
+                       }
+                     }
+                   },
+                   "start": {
+                     "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/start",
+                     "type": "object",
+                     "title": "The Start Schema",
+                     "required": [
+                     ],
+                     "properties": {
+                       "implementation": {
+                         "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/start/properties/implementation",
+                         "type": "string",
+                         "title": "The Implementation Schema",
+                         "default": "",
+                         "examples": [
+                           "<implementationScript>"
+                         ],
+                         "pattern": "^(.*)$"
+                       },
+                       "inputs": {
+                         "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/start/properties/inputs",
+                         "type": "object",
+                         "title": "The Inputs Schema",
+                         "required": [
+                         ],
+                         "properties": {
+                           "param1Name": {
+                             "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/start/properties/inputs/properties/param1Name",
+                             "type": "string",
+                             "title": "The Param1name Schema",
+                             "default": "",
+                             "examples": [
+                               "value1"
+                             ],
+                             "pattern": "^(.*)$"
+                           },
+                           "paramNName": {
+                             "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/start/properties/inputs/properties/paramNName",
+                             "type": "string",
+                             "title": "The Paramnname Schema",
+                             "default": "",
+                             "examples": [
+                               "valueN"
+                             ],
+                             "pattern": "^(.*)$"
+                           }
+                         }
+                       }
+                     }
+                   },
+                   "stop": {
+                     "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/stop",
+                     "type": "object",
+                     "title": "The Stop Schema",
+                     "required": [
+                     ],
+                     "properties": {
+                       "implementation": {
+                         "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/stop/properties/implementation",
+                         "type": "string",
+                         "title": "The Implementation Schema",
+                         "default": "",
+                         "examples": [
+                           "<implementationScript>"
+                         ],
+                         "pattern": "^(.*)$"
+                       },
+                       "inputs": {
+                         "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/stop/properties/inputs",
+                         "type": "object",
+                         "title": "The Inputs Schema",
+                         "required": [
+                         ],
+                         "properties": {
+                           "param1Name": {
+                             "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/stop/properties/inputs/properties/param1Name",
+                             "type": "string",
+                             "title": "The Param1name Schema",
+                             "default": "",
+                             "examples": [
+                               "value1"
+                             ],
+                             "pattern": "^(.*)$"
+                           },
+                           "paramNName": {
+                             "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/stop/properties/inputs/properties/paramNName",
+                             "type": "string",
+                             "title": "The Paramnname Schema",
+                             "default": "",
+                             "examples": [
+                               "valueN"
+                             ],
+                             "pattern": "^(.*)$"
+                           }
+                         }
+                       }
+                     }
+                   },
+                   "delete": {
+                     "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/delete",
+                     "type": "object",
+                     "title": "The Delete Schema",
+                     "required": [
+                     ],
+                     "properties": {
+                       "implementation": {
+                         "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/delete/properties/implementation",
+                         "type": "string",
+                         "title": "The Implementation Schema",
+                         "default": "",
+                         "examples": [
+                           "<implementationScript>"
+                         ],
+                         "pattern": "^(.*)$"
+                       },
+                       "inputs": {
+                         "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/delete/properties/inputs",
+                         "type": "object",
+                         "title": "The Inputs Schema",
+                         "required": [
+                         ],
+                         "properties": {
+                           "param1Name": {
+                             "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/delete/properties/inputs/properties/param1Name",
+                             "type": "string",
+                             "title": "The Param1name Schema",
+                             "default": "",
+                             "examples": [
+                               "value1"
+                             ],
+                             "pattern": "^(.*)$"
+                           },
+                           "paramNName": {
+                             "$id": "#/properties/vdus/items/properties/interfaces/properties/Standard/properties/delete/properties/inputs/properties/paramNName",
+                             "type": "string",
+                             "title": "The Paramnname Schema",
+                             "default": "",
+                             "examples": [
+                               "valueN"
+                             ],
+                             "pattern": "^(.*)$"
+                           }
+                         }
+                       }
+                     }
+                   }
+                 }
+               }
+             }
+           },
+           "artifacts": {
+             "$id": "#/properties/vdus/items/properties/artifacts",
+             "type": "array",
+             "title": "The Artifacts Schema"
+           }
+         }
+       }
+     },
+     "volume_storages": {
+       "$id": "#/properties/volume_storages",
+       "type": "array",
+       "title": "The Volume_storages Schema",
+       "items": {
+         "$id": "#/properties/volume_storages/items",
+         "type": "object",
+         "title": "The Items Schema",
+         "required": [
+           "volume_storage_id"
+         ],
+         "properties": {
+           "volume_storage_id": {
+             "$id": "#/properties/volume_storages/items/properties/volume_storage_id",
+             "type": "string",
+             "title": "The Volume_storage_id Schema",
+             "default": "",
+             "examples": [
+               "volume_storage1"
+             ],
+             "pattern": "^(.*)$"
+           },
+           "description": {
+             "$id": "#/properties/volume_storages/items/properties/description",
+             "type": "string",
+             "title": "The Description Schema",
+             "default": "",
+             "examples": [
+               ""
+             ],
+             "pattern": "^(.*)$"
+           },
+           "properties": {
+             "$id": "#/properties/volume_storages/items/properties/properties",
+             "type": "object",
+             "title": "The Properties Schema",
+             "required": [
+             ],
+             "properties": {
+               "size": {
+                 "$id": "#/properties/volume_storages/items/properties/properties/properties/size",
+                 "type": "string",
+                 "title": "The Size Schema",
+                 "default": "",
+                 "examples": [
+                   "\"100 GB\""
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "volume_id": {
+                 "$id": "#/properties/volume_storages/items/properties/properties/properties/volume_id",
+                 "type": "string",
+                 "title": "The Volume_id Schema",
+                 "default": "",
+                 "examples": [
+                   ""
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "volume_name": {
+                 "$id": "#/properties/volume_storages/items/properties/properties/properties/volume_name",
+                 "type": "string",
+                 "title": "The Volume_name Schema",
+                 "default": "",
+                 "examples": [
+                   "volumeStorage1"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "custom_volume_type": {
+                 "$id": "#/properties/volume_storages/items/properties/properties/properties/custom_volume_type",
+                 "type": "string",
+                 "title": "The Custom_volume_type Schema",
+                 "default": "",
+                 "examples": [
+                   "type1"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "disk_type": {
+                 "$id": "#/properties/volume_storages/items/properties/properties/properties/disk_type",
+                 "type": "string",
+                 "title": "The Disk_type Schema",
+                 "default": "",
+                 "examples": [
+                   "data"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "delete_on_termination_vm": {
+                 "$id": "#/properties/volume_storages/items/properties/properties/properties/delete_on_termination_vm",
+                 "type": "boolean",
+                 "title": "The Delete_on_termination_vm Schema",
+                 "default": false,
+                 "examples": [
+                   true
+                 ]
+               },
+               "location_info": {
+                 "$id": "#/properties/volume_storages/items/properties/properties/properties/location_info",
+                 "type": "object",
+                 "title": "The Location_info Schema",
+                 "required": [
+                 ],
+                 "properties": {
+                   "vimid": {
+                     "$id": "#/properties/volume_storages/items/properties/properties/properties/location_info/properties/vimid",
+                     "type": "string",
+                     "title": "The Vimid Schema",
+                     "default": "",
+                     "examples": [
+                       "vimid_1"
+                     ],
+                     "pattern": "^(.*)$"
+                   },
+                   "tenant": {
+                     "$id": "#/properties/volume_storages/items/properties/properties/properties/location_info/properties/tenant",
+                     "type": "string",
+                     "title": "The Tenant Schema",
+                     "default": "",
+                     "examples": [
+                       "tenantname_1"
+                     ],
+                     "pattern": "^(.*)$"
+                   },
+                   "availability_zone": {
+                     "$id": "#/properties/volume_storages/items/properties/properties/properties/location_info/properties/availability_zone",
+                     "type": "string",
+                     "title": "The Availability_zone Schema",
+                     "default": "",
+                     "examples": [
+                       "zone1"
+                     ],
+                     "pattern": "^(.*)$"
+                   }
+                 }
+               },
+               "is_predefined": {
+                 "$id": "#/properties/volume_storages/items/properties/properties/properties/is_predefined",
+                 "type": "boolean",
+                 "title": "The Is_predefined Schema",
+                 "default": false,
+                 "examples": [
+                   false
+                 ]
+               },
+               "is_shared": {
+                 "$id": "#/properties/volume_storages/items/properties/properties/properties/is_shared",
+                 "type": "boolean",
+                 "title": "The Is_shared Schema",
+                 "default": false,
+                 "examples": [
+                   false
+                 ]
+               }
+             }
+           },
+           "image_file": {
+             "$id": "#/properties/volume_storages/items/properties/image_file",
+             "type": "string",
+             "title": "The Image_file Schema"
+           }
+         }
+       }
+     },
+     "image_files": {
+       "$id": "#/properties/image_files",
+       "type": "array",
+       "title": "The Image_files Schema",
+       "items": {
+         "$id": "#/properties/image_files/items",
+         "type": "object",
+         "title": "The Items Schema",
+         "required": [
+         ],
+         "properties": {
+           "description": {
+             "$id": "#/properties/image_files/items/properties/description",
+             "type": "string",
+             "title": "The Description Schema",
+             "default": "",
+             "examples": [
+               ""
+             ],
+             "pattern": "^(.*)$"
+           },
+           "properties": {
+             "$id": "#/properties/image_files/items/properties/properties",
+             "type": "object",
+             "title": "The Properties Schema",
+             "required": [
+             ],
+             "properties": {
+               "name": {
+                 "$id": "#/properties/image_files/items/properties/properties/properties/name",
+                 "type": "string",
+                 "title": "The Name Schema",
+                 "default": "",
+                 "examples": [
+                   "opencos_sss_omm_img_release_20150723-1-disk1.vmdk"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "checksum": {
+                 "$id": "#/properties/image_files/items/properties/properties/properties/checksum",
+                 "type": "string",
+                 "title": "The Checksum Schema",
+                 "default": "",
+                 "examples": [
+                   ""
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "disk_format": {
+                 "$id": "#/properties/image_files/items/properties/properties/properties/disk_format",
+                 "type": "string",
+                 "title": "The Disk_format Schema",
+                 "default": "",
+                 "examples": [
+                   "VMDK"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "file_url": {
+                 "$id": "#/properties/image_files/items/properties/properties/properties/file_url",
+                 "type": "string",
+                 "title": "The File_url Schema",
+                 "default": "",
+                 "examples": [
+                   "./zte-cn-sss-main-image/OMM/opencos_sss_omm_img_release_20150723-1-disk1.vmdk"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "container_type": {
+                 "$id": "#/properties/image_files/items/properties/properties/properties/container_type",
+                 "type": "string",
+                 "title": "The Container_type Schema",
+                 "default": "",
+                 "examples": [
+                   "vm"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "version": {
+                 "$id": "#/properties/image_files/items/properties/properties/properties/version",
+                 "type": "string",
+                 "title": "The Version Schema",
+                 "default": "",
+                 "examples": [
+                   ""
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "hypervisor_type": {
+                 "$id": "#/properties/image_files/items/properties/properties/properties/hypervisor_type",
+                 "type": "string",
+                 "title": "The Hypervisor_type Schema",
+                 "default": "",
+                 "examples": [
+                   "kvm"
+                 ],
+                 "pattern": "^(.*)$"
+               }
+             }
+           },
+           "image_file_id": {
+             "$id": "#/properties/image_files/items/properties/image_file_id",
+             "type": "string",
+             "title": "The Image_file_id Schema",
+             "default": "",
+             "examples": [
+               "opencos_sss_omm_img_release_20150723-1-disk1"
+             ],
+             "pattern": "^(.*)$"
+           }
+         }
+       }
+     },
+     "vls": {
+       "$id": "#/properties/vls",
+       "type": "array",
+       "title": "The Vls Schema",
+       "items": {
+         "$id": "#/properties/vls/items",
+         "type": "object",
+         "title": "The Items Schema",
+         "required": [
+           "vl_id",
+           "properties"
+         ],
+         "properties": {
+           "vl_id": {
+             "$id": "#/properties/vls/items/properties/vl_id",
+             "type": "string",
+             "title": "The Vl_id Schema",
+             "default": "",
+             "examples": [
+               "vldId1"
+             ],
+             "pattern": "^(.*)$"
+           },
+           "description": {
+             "$id": "#/properties/vls/items/properties/description",
+             "type": "string",
+             "title": "The Description Schema",
+             "default": "",
+             "examples": [
+               ""
+             ],
+             "pattern": "^(.*)$"
+           },
+           "properties": {
+             "$id": "#/properties/vls/items/properties/properties",
+             "type": "object",
+             "title": "The Properties Schema",
+             "required": [
+             ],
+             "properties": {
+               "name": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/name",
+                 "type": "string",
+                 "title": "The Name Schema",
+                 "default": "",
+                 "examples": [
+                   "umac_241_control"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "network_name": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/network_name",
+                 "type": "string",
+                 "title": "The Network_name Schema",
+                 "default": "",
+                 "examples": [
+                   "umac_control"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "is_predefined": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/is_predefined",
+                 "type": "boolean",
+                 "title": "The Is_predefined Schema",
+                 "default": false,
+                 "examples": [
+                   false
+                 ]
+               },
+               "vendor": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/vendor",
+                 "type": "string",
+                 "title": "The Vendor Schema",
+                 "default": "",
+                 "examples": [
+                   "zte"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "netmask": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/netmask",
+                 "type": "string",
+                 "title": "The Netmask Schema",
+                 "default": "",
+                 "examples": [
+                   "255.255.255.0"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "mtu": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/mtu",
+                 "type": "integer",
+                 "title": "The Mtu Schema",
+                 "default": 0,
+                 "examples": [
+                   1500
+                 ]
+               },
+               "network_type": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/network_type",
+                 "type": "string",
+                 "title": "The Network_type Schema",
+                 "default": "",
+                 "examples": [
+                   "vlan"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "physical_network": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/physical_network",
+                 "type": "string",
+                 "title": "The Physical_network Schema",
+                 "default": "",
+                 "examples": [
+                   "phynet01"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "segmentation_id": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/segmentation_id",
+                 "type": "string",
+                 "title": "The Segmentation_id Schema",
+                 "default": "",
+                 "examples": [
+                   "30"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "vlan_transparent": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/vlan_transparent",
+                 "type": "boolean",
+                 "title": "The Vlan_transparent Schema",
+                 "default": false,
+                 "examples": [
+                   false
+                 ]
+               },
+               "vds_name": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/vds_name",
+                 "type": "string",
+                 "title": "The Vds_name Schema",
+                 "default": "",
+                 "examples": [
+                   "vds1"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "cidr": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/cidr",
+                 "type": "string",
+                 "title": "The Cidr Schema",
+                 "default": "",
+                 "examples": [
+                   "192.168.199.0/24"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "ip_version": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/ip_version",
+                 "type": "integer",
+                 "title": "The Ip_version Schema",
+                 "default": 0,
+                 "examples": [
+                   4
+                 ]
+               },
+               "gateway_ip": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/gateway_ip",
+                 "type": "string",
+                 "title": "The Gateway_ip Schema",
+                 "default": "",
+                 "examples": [
+                   "192.168.199.1"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "dhcp_enabled": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/dhcp_enabled",
+                 "type": "boolean",
+                 "title": "The Dhcp_enabled Schema",
+                 "default": false,
+                 "examples": [
+                   false
+                 ]
+               },
+               "dns_nameservers": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/dns_nameservers",
+                 "type": "array",
+                 "title": "The Dns_nameservers Schema",
+                 "items": {
+                   "$id": "#/properties/vls/items/properties/properties/properties/dns_nameservers/items",
+                   "type": "string",
+                   "title": "The Items Schema",
+                   "default": "",
+                   "examples": [
+                     "192.168.0.4",
+                     "192.168.0.10"
+                   ],
+                   "pattern": "^(.*)$"
+                 }
+               },
+               "start_ip": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/start_ip",
+                 "type": "string",
+                 "title": "The Start_ip Schema",
+                 "default": "",
+                 "examples": [
+                   "192.168.199.2"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "end_ip": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/end_ip",
+                 "type": "string",
+                 "title": "The End_ip Schema",
+                 "default": "",
+                 "examples": [
+                   "192.168.199.254"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "host_routes": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/host_routes",
+                 "type": "array",
+                 "title": "The Host_routes Schema",
+                 "items": {
+                   "$id": "#/properties/vls/items/properties/properties/properties/host_routes/items",
+                   "type": "object",
+                   "title": "The Items Schema",
+                   "required": [
+                   ],
+                   "properties": {
+                     "destination": {
+                       "$id": "#/properties/vls/items/properties/properties/properties/host_routes/items/properties/destination",
+                       "type": "string",
+                       "title": "The Destination Schema",
+                       "default": "",
+                       "examples": [
+                         "10.43.26.0/24"
+                       ],
+                       "pattern": "^(.*)$"
+                     },
+                     "nexthop": {
+                       "$id": "#/properties/vls/items/properties/properties/properties/host_routes/items/properties/nexthop",
+                       "type": "string",
+                       "title": "The Nexthop Schema",
+                       "default": "",
+                       "examples": [
+                         "10.41.23.1"
+                       ],
+                       "pattern": "^(.*)$"
+                     }
+                   }
+                 }
+               },
+               "location_info": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/location_info",
+                 "type": "object",
+                 "title": "The Location_info Schema",
+                 "required": [
+                 ],
+                 "properties": {
+                   "vimid": {
+                     "$id": "#/properties/vls/items/properties/properties/properties/location_info/properties/vimid",
+                     "type": "string",
+                     "title": "The Vimid Schema",
+                     "default": "",
+                     "examples": [
+                       "vimid_1"
+                     ],
+                     "pattern": "^(.*)$"
+                   },
+                   "tenant": {
+                     "$id": "#/properties/vls/items/properties/properties/properties/location_info/properties/tenant",
+                     "type": "string",
+                     "title": "The Tenant Schema",
+                     "default": "",
+                     "examples": [
+                       "tenantname_1"
+                     ],
+                     "pattern": "^(.*)$"
+                   }
+                 }
+               },
+               "cloud_type": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/cloud_type",
+                 "type": "string",
+                 "title": "The Cloud_type Schema",
+                 "default": "",
+                 "examples": [
+                   "IaaS"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "vl_profile": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/vl_profile",
+                 "type": "object",
+                 "title": "The Vl_profile Schema",
+                 "required": [
+                 ],
+                 "properties": {
+                   "networkName": {
+                     "$id": "#/properties/vls/items/properties/properties/properties/vl_profile/properties/networkName",
+                     "type": "string",
+                     "title": "The Networkname Schema",
+                     "default": "",
+                     "examples": [
+                       "test"
+                     ],
+                     "pattern": "^(.*)$"
+                   }
+                 }
+               },
+               "connectivity_type": {
+                 "$id": "#/properties/vls/items/properties/properties/properties/connectivity_type",
+                 "type": "object",
+                 "title": "The Connectivity_type Schema"
+               }
+             }
+           },
+           "route_id": {
+             "$id": "#/properties/vls/items/properties/route_id",
+             "type": "string",
+             "title": "The Route_id Schema",
+             "default": "",
+             "examples": [
+               "router01"
+             ],
+             "pattern": "^(.*)$"
+           },
+           "route_external": {
+             "$id": "#/properties/vls/items/properties/route_external",
+             "type": "boolean",
+             "title": "The Route_external Schema",
+             "default": false,
+             "examples": [
+               false
+             ]
+           }
+         }
+       }
+     },
+     "cps": {
+       "$id": "#/properties/cps",
+       "type": "array",
+       "title": "The Cps Schema",
+       "items": {
+         "$id": "#/properties/cps/items",
+         "type": "object",
+         "title": "The Items Schema",
+         "required": [
+           "cp_id"
+         ],
+         "properties": {
+           "cp_id": {
+             "$id": "#/properties/cps/items/properties/cp_id",
+             "type": "string",
+             "title": "The Cp_id Schema",
+             "default": "",
+             "examples": [
+               "cpId1"
+             ],
+             "pattern": "^(.*)$"
+           },
+           "description": {
+             "$id": "#/properties/cps/items/properties/description",
+             "type": "string",
+             "title": "The Description Schema",
+             "default": "",
+             "examples": [
+               ""
+             ],
+             "pattern": "^(.*)$"
+           },
+           "properties": {
+             "$id": "#/properties/cps/items/properties/properties",
+             "type": "object",
+             "title": "The Properties Schema",
+             "required": [
+               "protocol_data"
+             ],
+             "properties": {
+               "name": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/name",
+                 "type": "string",
+                 "title": "The Name Schema",
+                 "default": "",
+                 "examples": [
+                   ""
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "mac_address": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/mac_address",
+                 "type": "string",
+                 "title": "The Mac_address Schema",
+                 "default": "",
+                 "examples": [
+                   "00:d9:00:82:11:e1"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "ip_address:": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/ip_address:",
+                 "type": "string",
+                 "title": "The Ip_address: Schema",
+                 "default": "",
+                 "examples": [
+                   "192.168.1.21"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "ip_range_start": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/ip_range_start",
+                 "type": "string",
+                 "title": "The Ip_range_start Schema",
+                 "default": "",
+                 "examples": [
+                   "192.168.1.20"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "ip_range_end": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/ip_range_end",
+                 "type": "string",
+                 "title": "The Ip_range_end Schema",
+                 "default": "",
+                 "examples": [
+                   "192.168.1.29"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "floating_ip_address": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/floating_ip_address",
+                 "type": "object",
+                 "title": "The Floating_ip_address Schema",
+                 "required": [
+                 ],
+                 "properties": {
+                   "external_network": {
+                     "$id": "#/properties/cps/items/properties/properties/properties/floating_ip_address/properties/external_network",
+                     "type": "string",
+                     "title": "The External_network Schema",
+                     "default": "",
+                     "examples": [
+                       "extnet01"
+                     ],
+                     "pattern": "^(.*)$"
+                   },
+                   "ip_address": {
+                     "$id": "#/properties/cps/items/properties/properties/properties/floating_ip_address/properties/ip_address",
+                     "type": "string",
+                     "title": "The Ip_address Schema",
+                     "default": "",
+                     "examples": [
+                       "10.43.53.23"
+                     ],
+                     "pattern": "^(.*)$"
+                   }
+                 }
+               },
+               "service_ip_address": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/service_ip_address",
+                 "type": "string",
+                 "title": "The Service_ip_address Schema",
+                 "default": "",
+                 "examples": [
+                   "192.168.1.23"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "order": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/order",
+                 "type": "integer",
+                 "title": "The Order Schema",
+                 "default": 0,
+                 "examples": [
+                   1
+                 ]
+               },
+               "bandwidth": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/bandwidth",
+                 "type": "integer",
+                 "title": "The Bandwidth Schema",
+                 "default": 0,
+                 "examples": [
+                   1000
+                 ]
+               },
+               "vnic_type": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/vnic_type",
+                 "type": "string",
+                 "title": "The Vnic_type Schema",
+                 "default": "",
+                 "examples": [
+                   "normal"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "allowed_address_pairs": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/allowed_address_pairs",
+                 "type": "array",
+                 "title": "The Allowed_address_pairs Schema",
+                 "items": {
+                   "$id": "#/properties/cps/items/properties/properties/properties/allowed_address_pairs/items",
+                   "type": "object",
+                   "title": "The Items Schema",
+                   "required": [
+                   ],
+                   "properties": {
+                     "ip": {
+                       "$id": "#/properties/cps/items/properties/properties/properties/allowed_address_pairs/items/properties/ip",
+                       "type": "string",
+                       "title": "The Ip Schema",
+                       "default": "",
+                       "examples": [
+                         "192.168.1.13"
+                       ],
+                       "pattern": "^(.*)$"
+                     },
+                     "mac": {
+                       "$id": "#/properties/cps/items/properties/properties/properties/allowed_address_pairs/items/properties/mac",
+                       "type": "string",
+                       "title": "The Mac Schema",
+                       "default": "",
+                       "examples": [
+                         "00:f3:43:20:a2:a3"
+                       ],
+                       "pattern": "^(.*)$"
+                     }
+                   }
+                 }
+               },
+               "bond": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/bond",
+                 "type": "string",
+                 "title": "The Bond Schema",
+                 "default": "",
+                 "examples": [
+                   "none"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "bond_index": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/bond_index",
+                 "type": "integer",
+                 "title": "The Bond_index Schema",
+                 "default": 0,
+                 "examples": [
+                   1
+                 ]
+               },
+               "macbond": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/macbond",
+                 "type": "string",
+                 "title": "The Macbond Schema",
+                 "default": "",
+                 "examples": [
+                   "00:d9:00:82:11:d1"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "sfc_encapsulation": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/sfc_encapsulation",
+                 "type": "string",
+                 "title": "The Sfc_encapsulation Schema",
+                 "default": "",
+                 "examples": [
+                   ""
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "direction": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/direction",
+                 "type": "string",
+                 "title": "The Direction Schema",
+                 "default": "",
+                 "examples": [
+                   ""
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "gateway_ip": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/gateway_ip",
+                 "type": "string",
+                 "title": "The Gateway_ip Schema",
+                 "default": "",
+                 "examples": [
+                   "192.168.199.1"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "netmask": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/netmask",
+                 "type": "string",
+                 "title": "The Netmask Schema",
+                 "default": "",
+                 "examples": [
+                   "255.255.255.0"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "interface_name": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/interface_name",
+                 "type": "string",
+                 "title": "The Interface_name Schema",
+                 "default": "",
+                 "examples": [
+                   "fe-01-02"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "is_virtual": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/is_virtual",
+                 "type": "boolean",
+                 "title": "The Is_virtual Schema",
+                 "default": false,
+                 "examples": [
+                   false
+                 ]
+               },
+               "function": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/function",
+                 "type": "string",
+                 "title": "The Function Schema",
+                 "default": "",
+                 "examples": [
+                   "control"
+                 ],
+                 "pattern": "^(.*)$"
+               },
+               "protocol_data": {
+                 "$id": "#/properties/cps/items/properties/properties/properties/protocol_data",
+                 "type": "array",
+                 "title": "The Protocol_data Schema",
+                 "items": {
+                   "$id": "#/properties/cps/items/properties/properties/properties/protocol_data/items",
+                   "type": "object",
+                   "title": "The Items Schema",
+                   "required": [
+                     "address_data"
+                   ],
+                   "properties": {
+                     "address_data": {
+                       "$id": "#/properties/cps/items/properties/properties/properties/protocol_data/items/properties/address_data",
+                       "type": "object",
+                       "title": "The Address_data Schema",
+                       "required": [
+                         "l3_address_data"
+                       ],
+                       "properties": {
+                         "l3_address_data": {
+                           "$id": "#/properties/cps/items/properties/properties/properties/protocol_data/items/properties/address_data/properties/l3_address_data",
+                           "type": "object",
+                           "title": "The L3_address_data Schema",
+                           "required": [
+                           ],
+                           "properties": {
+                             "fixed_ip_address": {
+                               "$id": "#/properties/cps/items/properties/properties/properties/protocol_data/items/properties/address_data/properties/l3_address_data/properties/fixed_ip_address",
+                               "type": "string",
+                               "title": "The Fixed_ip_address Schema",
+                               "default": "",
+                               "examples": [
+                                 "test"
+                               ],
+                               "pattern": "^(.*)$"
+                             }
+                           }
+                         }
+                       }
+                     }
+                   }
+                 }
+               }
+             }
+           },
+           "vl_id": {
+             "$id": "#/properties/cps/items/properties/vl_id",
+             "type": "string",
+             "title": "The Vl_id Schema",
+             "default": "",
+             "examples": [
+               "vldId1"
+             ],
+             "pattern": "^(.*)$"
+           },
+           "vdu_id": {
+             "$id": "#/properties/cps/items/properties/vdu_id",
+             "type": "string",
+             "title": "The Vdu_id Schema",
+             "default": "",
+             "examples": [
+               "vdu1Id"
+             ],
+             "pattern": "^(.*)$"
+           }
+         }
+       }
+     },
+     "local_storages": {
+       "$id": "#/properties/local_storages",
+       "type": "array",
+       "title": "The Local_storages Schema"
+     }
+   }
+ }
