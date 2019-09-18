@@ -184,9 +184,7 @@ vnfd_model1 = {
                 "is_predefined": False,
                 "is_shared": False
             },
-            "image_file": [
-                "volume_image"
-            ]
+            "image_file": "volume_image"
         }
     ],
     'policies': {
@@ -368,10 +366,15 @@ vnfd_model2 = {
                 "connectivity_type": {
                     "layer_protocol": "ipv4",
                 },
-                "dns_nameservers": "test",
-                "host_routes": "test",
+                "dns_nameservers": ["test"],
+                "host_routes": [
+                    {
+                        "destination": "10.43.26.0/24",
+                        "nexthop": "10.41.23.1"
+                    }
+                ],
             },
-            "route_external": "test",
+            "route_external": False,
         }
     ],
     "cps": [
@@ -795,7 +798,6 @@ vnfd_model3 = {
         }
     ],
     "vls": [
-
     ],
     "cps": [
         {
@@ -1099,7 +1101,7 @@ vnfd_model_miss_required = {
                 "dns_nameservers": "test",
                 "host_routes": "test",
             },
-            "route_external": "test",
+            "route_external": False,
         }
     ],
     "cps": [
