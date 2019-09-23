@@ -61,6 +61,7 @@ class CreateVnfAndQueryVnfs(APIView):
         request_body=CreateVnfReqSerializer(),
         responses={
             status.HTTP_201_CREATED: VnfInstanceSerializer(),
+            status.HTTP_400_BAD_REQUEST: "Bad Request",
             status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal error"
         }
     )
