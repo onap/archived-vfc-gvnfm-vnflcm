@@ -74,10 +74,15 @@ class CreateVnfAndQueryVnfs(APIView):
 
         nf_inst = CreateVnf(request.data).do_biz()
         rsp_data = {"id": nf_inst.nfinstid,
+                    "vnfInstanceName": nf_inst.nf_name,
+                    "vnfdId": nf_inst.vnfdid,
                     "vnfProvider": nf_inst.vendor,
+                    "vnfSoftwareVersion": nf_inst.vnfSoftwareVersion,
                     "vnfdVersion": nf_inst.version,
                     "vnfPkgId": nf_inst.package_id,
-                    "instantiationState": nf_inst.status}
+                    "instantiationState": nf_inst.status,
+                    "vnfInstanceDescription": nf_inst.nf_desc
+                    }
         create_vnf_resp_serializer = VnfInstanceSerializer(data=rsp_data)
         if not create_vnf_resp_serializer.is_valid():
             raise NFLCMException(create_vnf_resp_serializer.errors)

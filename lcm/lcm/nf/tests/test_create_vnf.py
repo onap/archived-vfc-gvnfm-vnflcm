@@ -106,9 +106,13 @@ class TestNFInstantiate(TestCase):
         expect_data = {
             "id": "1",
             "vnfProvider": "huawei",
+            'vnfInstanceDescription': 'vFW in Nanjing TIC Edge',
+            'vnfInstanceName': 'vFW_01',
             "vnfdVersion": "1.0",
             "vnfPkgId": "111",
-            "instantiationState": "NOT_INSTANTIATED"
+            "instantiationState": "NOT_INSTANTIATED",
+            'vnfSoftwareVersion': '1.0',
+            'vnfdId': '111'
         }
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
         self.assertEqual(expect_data, response.data)
