@@ -12,24 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from lcm.pub.utils.jobutil import enum
+from rest_framework import serializers
 
-NOTIFICATION_TYPE = enum(
-    ThresholdCrossedNotification="ThresholdCrossedNotification",
-    PerformanceInformationAvailableNotification="PerformanceInformationAvailableNotification"
-)
 
-AUTH_TYPE = enum(
-    BASIC="BASIC",
-    OAUTH2_CLIENT_CREDENTIALS="OAUTH2_CLIENT_CREDENTIALS",
-    TLS_CERT="TLS_CERT"
-)
+class linkSerializer(serializers.Serializer):
+    href = serializers.CharField(
+        help_text="URI of the referenced resource.",
+        required=True,
+        allow_null=False,
+        allow_blank=False)
 
-CrossingDirectionType = enum(
-    UP="UP",
-    DOWN="DOWN"
-)
 
-THRESHOLDTYPE = enum(
-    SIMPLE="SIMPLE"
-)
+class LinkSerializer(serializers.Serializer):
+    self = linkSerializer(
+        help_text="URI of this resource.",
+        required=True,
+        allow_null=False)
