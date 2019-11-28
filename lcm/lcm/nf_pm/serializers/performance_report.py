@@ -12,24 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from lcm.pub.utils.jobutil import enum
+from rest_framework import serializers
 
-NOTIFICATION_TYPE = enum(
-    ThresholdCrossedNotification="ThresholdCrossedNotification",
-    PerformanceInformationAvailableNotification="PerformanceInformationAvailableNotification"
-)
 
-AUTH_TYPE = enum(
-    BASIC="BASIC",
-    OAUTH2_CLIENT_CREDENTIALS="OAUTH2_CLIENT_CREDENTIALS",
-    TLS_CERT="TLS_CERT"
-)
-
-CrossingDirectionType = enum(
-    UP="UP",
-    DOWN="DOWN"
-)
-
-THRESHOLDTYPE = enum(
-    SIMPLE="SIMPLE"
-)
+class PerformanceReportSerializer(serializers.Serializer):
+    entries = serializers.ListField(help_text="List of performance information entries",
+                                    required=True, allow_null=False)
