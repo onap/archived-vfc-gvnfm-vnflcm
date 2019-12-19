@@ -52,7 +52,8 @@ class NotificationsUtil(object):
         logger.info("Send Notifications to the callbackUri")
         filters = {
             "operationState": "operation_states",
-            "operation": "operation_types"
+            "operation": "operation_types",
+            "vnfInstanceId": "vnf_instance_filter"
         }
         subscriptions_filter = {v + "__contains": notification[k] for k, v in list(filters.items())}
 
