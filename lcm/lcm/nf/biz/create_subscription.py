@@ -53,14 +53,15 @@ class CreateSubscription:
     def check_callbackuri_connection(self):
         logger.debug("SubscribeNotification-post::> Sending GET request "
                      "to %s" % self.callback_uri)
-        try:
-            response = requests.get(self.callback_uri, timeout=2)
-            if response.status_code != status.HTTP_204_NO_CONTENT:
-                raise NFLCMException("callbackUri %s returns %s status "
-                                     "code." % (self.callback_uri, response.status_code))
-        except Exception:
-            raise NFLCMException("callbackUri %s didn't return 204 status"
-                                 "code." % self.callback_uri)
+        retry_count = 3
+        while retry_count > 0:
+            response = requests.get(self.callback_uri, timeout=10)
+            if response.status_code == status.HTTP_204_NO_CONTENT:
+                return
+            logger.debug("callbackUri %s returns %s status code." % (self.callback_uri, response.status_code))
+            retry_count = - 1
+
+        raise NFLCMException("callbackUri %s didn't return 204 status." % self.callback_uri)
 
     def do_biz(self):
         self.subscription_id = str(uuid.uuid4())

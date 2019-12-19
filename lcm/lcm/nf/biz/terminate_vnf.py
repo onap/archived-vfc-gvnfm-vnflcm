@@ -66,8 +66,8 @@ class TerminateVnf(Thread):
         self.lcm_op_occ = VnfLcmOpOcc(
             vnf_inst_id=nf_inst_id,
             lcm_op_id=job_id,
-            operation=OPERATION_TYPE.SCALE,
-            task=OPERATION_TASK.SCALE
+            operation=OPERATION_TYPE.TERMINATE,
+            task=OPERATION_TASK.TERMINATE
         )
 
     def run(self):
