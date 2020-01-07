@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "54645fcb_9a6490af",
+        "filename": "lcm/lcm/pub/vimapi/adaptor.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 5327
+      },
+      "writtenOn": "2020-01-07T07:08:15Z",
+      "side": 1,
+      "message": "it is brief by adding default value in ignore_case_get\neg: \nignore_case_get(vm[\"properties\"], \"inject_files\"， [])",
+      "range": {
+        "startLine": 393,
+        "startChar": 4,
+        "endLine": 395,
+        "endChar": 34
+      },
+      "revId": "c15832de7200f9920f801d82b78d80fb4ca22cac",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
