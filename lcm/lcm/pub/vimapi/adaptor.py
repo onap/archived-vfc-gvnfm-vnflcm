@@ -390,7 +390,7 @@ def create_vm(vim_cache, res_cache, data, vm, do_notify, res_type):
         param["nicArray"].append({
             "portId": get_res_id(res_cache, RES_PORT, cp_id)
         })
-    param["contextArray"] = ignore_case_get(vm["properties"], "inject_files")
+    param["contextArray"] = ignore_case_get(vm["properties"], "inject_files", [])
     logger.debug("contextArray:%s", param["contextArray"])
     for vol_data in ignore_case_get(vm, "volume_storages"):
         vol_id = vol_data["volume_storage_id"]
