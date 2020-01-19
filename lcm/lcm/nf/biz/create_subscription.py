@@ -27,7 +27,7 @@ from lcm.pub.database.models import SubscriptionModel
 from lcm.pub.exceptions import NFLCMException
 from lcm.pub.exceptions import NFLCMExceptionSeeOther
 from lcm.pub.utils.values import ignore_case_get
-from lcm.pub.config.config import MSB_SERVICE_IP, MSB_SERVICE_PORT
+from lcm.pub.config.config import MSB_BASE_URL
 
 logger = logging.getLogger(__name__)
 
@@ -122,7 +122,7 @@ class CreateSubscription:
         for subscription in subscriptions:
             if self.check_filter_exists(subscription):
                 links = json.loads(subscription.links)
-                raise NFLCMExceptionSeeOther("http://%s:%s/%s" % (MSB_SERVICE_IP, MSB_SERVICE_PORT, links["self"]["href"]))
+                raise NFLCMExceptionSeeOther("%s/%s" % (MSB_BASE_URL, links["self"]["href"]))
         return False
 
     def save_db(self):

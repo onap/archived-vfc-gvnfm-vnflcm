@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from lcm.pub.config import config
+from lcm.pub.config.config import MSB_BASE_URL
 from lcm.pub.utils.jobutil import enum
 
 HEAL_ACTION_TYPE = enum(
@@ -142,7 +142,7 @@ CHANGE_TYPE = enum(
 RESOURCE_MAP = {'Storage': 'volumn', 'Network': 'network', 'SubNetwork': 'subnet', 'Port': 'port',
                 'Flavour': 'flavor', 'Vm': 'vm'}
 
-URL_PREFIX = "http://%s:%s/api/vnflcm/v1" % (config.MSB_SERVICE_IP, config.MSB_SERVICE_PORT)
+URL_PREFIX = "%s/api/vnflcm/v1" % (MSB_BASE_URL)
 
 ROOT_URI = "api/vnflcm/v1/subscriptions/"
 
