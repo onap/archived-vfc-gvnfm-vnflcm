@@ -1,11 +1,17 @@
 #!/bin/bash
 
+MSB_PROTO=`echo $MSB_PROTO`
 MSB_IP=`echo $MSB_ADDR | cut -d: -f 1`
 MSB_PORT=`echo $MSB_ADDR | cut -d: -f 2`
 
 if [ $MSB_IP ]; then
     sed -i "s|MSB_SERVICE_IP = .*|MSB_SERVICE_IP = '$MSB_IP'|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
 fi
+
+if [ $MSB_PROTO ]; then
+    sed -i "s|MSB_SERVICE_PROTOCOL = .*|MSB_SERVICE_PROTOCOL = '$MSB_PROTO'|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
+fi
+
 
 if [ $MSB_PORT ]; then
     sed -i "s|MSB_SERVICE_PORT = .*|MSB_SERVICE_PORT = '$MSB_PORT'|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
