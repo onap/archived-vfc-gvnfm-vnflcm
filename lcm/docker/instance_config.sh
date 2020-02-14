@@ -12,7 +12,6 @@ if [ $MSB_PROTO ]; then
     sed -i "s|MSB_SERVICE_PROTOCOL = .*|MSB_SERVICE_PROTOCOL = '$MSB_PROTO'|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
 fi
 
-
 if [ $MSB_PORT ]; then
     sed -i "s|MSB_SERVICE_PORT = .*|MSB_SERVICE_PORT = '$MSB_PORT'|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
 fi
