@@ -33,8 +33,8 @@ done
 # Wait for DB initialization
 echo "Wait for DB initialization"
 for i in {1..5}; do
-    curl -sS -m 1 $MYSQL_ADDR > /dev/null && break
-    sleep $i
+    mysql -u$MYSQL_ROOT_USER -p$MYSQL_ROOT_PASSWORD -h`echo $MYSQL_ADDR | cut -d: -f 1` -P`echo $MYSQL_ADDR | cut -d: -f 2` -e "show databases;" > /dev/null && echo "DB initialization completed" && break
+    sleep $i && echo "`echo $MYSQL_ADDR | cut -d: -f 1` connection failed"
 done
 
 # Configure service based on docker environment variables
