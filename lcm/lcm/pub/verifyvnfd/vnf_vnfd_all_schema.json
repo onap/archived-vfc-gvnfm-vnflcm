@@ -1290,7 +1290,7 @@
                  "examples": [
                    "vm"
                  ],
-                 "pattern": "^(.*)$"
+                fix "pattern": "^(.*)$"
                },
                "version": {
                  "$id": "#/properties/image_files/items/properties/properties/properties/version",

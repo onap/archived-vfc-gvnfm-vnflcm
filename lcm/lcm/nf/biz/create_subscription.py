@@ -55,7 +55,8 @@ class CreateSubscription:
                      "to %s" % self.callback_uri)
         retry_count = 3
         while retry_count > 0:
-            response = requests.get(self.callback_uri, timeout=10)
+            requests.packages.urllib3.disable_warnings()
+            response = requests.get(self.callback_uri, timeout=10, verify=False)
             if response.status_code == status.HTTP_204_NO_CONTENT:
                 return
             logger.debug("callbackUri %s returns %s status code." % (self.callback_uri, response.status_code))
