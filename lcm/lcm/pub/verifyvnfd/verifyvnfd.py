@@ -53,7 +53,6 @@ def verify(new_vnfd):
         vnfd_schema = json.load(fvnfd_schema)
         vnfd_validator = jsonschema.validators.Draft4Validator(schema=vnfd_schema)
         for error in vnfd_validator.iter_errors(new_vnfd):
-            # print("Error:%s" % error)
             logger.error("vnfd verify fail,%s" % _format_validation_error(error))
             errors_found.append(_format_validation_error(error))
     if len(errors_found) > 0:
