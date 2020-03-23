@@ -57,5 +57,5 @@ def verify(new_vnfd):
             logger.error("vnfd verify fail,%s" % _format_validation_error(error))
             errors_found.append(_format_validation_error(error))
     if len(errors_found) > 0:
-        raise NFLCMException(errors_found)
+        logger.debug(errors_found)
     return True
