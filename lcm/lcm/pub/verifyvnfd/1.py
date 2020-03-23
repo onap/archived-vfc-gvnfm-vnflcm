@@ -18,32 +18,19 @@ import os
 import six
 import logging
 import jsonschema
+
+
 from lcm.pub.exceptions import NFLCMException
+from lcm.pub.verifyvnfd import const
+from lcm.pub.verifyvnfd.verifyvnfd import _format_validation_error
 
 logger = logging.getLogger(__name__)
+from django.db.models import Sum
 
+import os,django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lcm.settings")# project_name 项目名称
+django.setup()
 
-def _format_validation_error(error):
-    """
-    :param error: validation error to format
-    :type error: jsonchema.exceptions.ValidationError
-    :returns: string representation of the validation error
-    :rtype: str
-    """
-    match = re.search("(.+) is a required property", error.message)
-    if match:
-        message = 'Error: missing required property {}.'.format(
-            match.group(1))
-    else:
-        message = 'Error: {}\n'.format(error.message)
-        if len(error.absolute_path) > 0:
-            message += 'Path: {}\n'.format(
-                       '.'.join(
-                           [six.text_type(path)
-                            for path in error.absolute_path]))
-        message += 'Value: {}'.format(json.dumps(error.instance))
-
-    return message
 
 
 def verify(new_vnfd):
@@ -51,10 +38,15 @@ def verify(new_vnfd):
     vnfd_schema_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "vnf_vnfd_all_schema.json")
     with open(vnfd_schema_path, "r") as fvnfd_schema:
         vnfd_schema = json.load(fvnfd_schema)
+        print(vnfd_schema)
+        print(type(vnfd_schema))
         vnfd_validator = jsonschema.validators.Draft4Validator(schema=vnfd_schema)
         for error in vnfd_validator.iter_errors(new_vnfd):
+            # print("Error:%s" % error)
             logger.error("vnfd verify fail,%s" % _format_validation_error(error))
             errors_found.append(_format_validation_error(error))
     if len(errors_found) > 0:
         raise NFLCMException(errors_found)
     return True
+if __name__ == '__main__':
+    verify(const.vnfd_model_miss_required)
