@@ -38,7 +38,5 @@ class VerifyVnfdTest(unittest.TestCase):
         self.assertEqual(ret, True)
 
     def test_vnfd_verfify_fail_for_missing_required(self):
-        try:
-            verifyvnfd.verify(const.vnfd_model_miss_required)
-        except NFLCMException as e:
-            self.assertNotEqual(e.args[0], "")
+        ret = verifyvnfd.verify(const.vnfd_model_miss_required)
+        self.assertNotEqual(ret, "")
