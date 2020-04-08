@@ -13,9 +13,9 @@
 # limitations under the License.
 
 # [MSB]
-MSB_SERVICE_PROTOCOL = 'http'
-MSB_SERVICE_IP = '127.0.0.1'
-MSB_SERVICE_PORT = '443'
+MSB_SERVICE_PROTOCOL = 'https'
+MSB_SERVICE_IP = '192.168.235.77'
+MSB_SERVICE_PORT = '30283'
 MSB_BASE_URL = "%s://%s:%s" % (MSB_SERVICE_PROTOCOL, MSB_SERVICE_IP, MSB_SERVICE_PORT)
 
 # [REDIS]
@@ -24,11 +24,11 @@ REDIS_PORT = '6379'
 REDIS_PASSWD = ''
 
 # [mysql]
-DB_IP = "127.0.0.1"
-DB_PORT = 3306
+DB_IP = "192.168.235.77"
+DB_PORT = 30003
 DB_NAME = "gvnfm"
-DB_USER = "gvnfm"
-DB_PASSWD = "gvnfm"
+DB_USER = "root"
+DB_PASSWD = "MetaGope8:Citt"
 
 # [MDC]
 SERVICE_NAME = "vnflcm"

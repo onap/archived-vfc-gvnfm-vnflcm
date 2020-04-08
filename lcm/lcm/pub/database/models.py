@@ -225,6 +225,7 @@ class SubNetworkInstModel(models.Model):
     isdhcpenabled = models.IntegerField(db_column='ISDHCPENABLED', null=True)
     cidr = models.CharField(db_column='CIDR', max_length=255)
     vdsname = models.CharField(db_column='VDSNAME', max_length=255, null=True)
+    vdsname = models.CharField(db_column='VDSNAME', max_length=255, null=True)
     operationalstate = models.CharField(db_column='OPERATIONALSTATE', max_length=255, null=True)
     tenant = models.CharField(db_column='TENANT', max_length=255, null=True)
     is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
@@ -278,8 +279,7 @@ class PortInstModel(models.Model):
     vmid = models.CharField(db_column='VMID', max_length=255, blank=True, null=True)
     create_time = models.CharField(db_column='CREATETIME', max_length=200, null=True, blank=True)
     securityGroups = models.CharField(db_column='SECURITYGROUPS', max_length=255)
-    is_predefined = models.IntegerField(db_column='ISPREDEFINED', default=0, null=True)
-    nodeId = models.CharField(db_column='NODEID', max_length=255, null=True)
+
 
 
 class CPInstModel(models.Model):
