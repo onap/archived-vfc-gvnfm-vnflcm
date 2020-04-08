@@ -21,8 +21,8 @@ from lcm.pub.utils.restcall import req_by_msb
 from lcm.pub.utils.timeutil import now_time
 from lcm.pub.database.models import (
     NfInstModel, VmInstModel, NetworkInstModel,
-    PortInstModel, StorageInstModel, VNFCInstModel
-)
+    PortInstModel, StorageInstModel, VNFCInstModel,
+    VNFLcmOpOccModel)
 
 logger = logging.getLogger(__name__)
 
@@ -132,6 +132,8 @@ def prepare_notification_data(nfinstid, jobid, changetype, operation):
                 'vimLevelResourceType': 'volume'
             }
         })
+    VNFLcmOpOcc = VNFLcmOpOccModel.objects.filter(vnf_instance_id=nfinstid)
+    LCM_operation_error = VNFLcmOpOcc[0].error if VNFLcmOpOcc else None
     notification_content = {
         'id': str(uuid.uuid4()),  # shall be the same if sent multiple times due to multiple subscriptions.
         'notificationType': 'VnfLcmOperationOccurrenceNotification',
@@ -143,6 +145,7 @@ def prepare_notification_data(nfinstid, jobid, changetype, operation):
         'operation': operation,
         'isAutomaticInvocation': False,
         'vnfLcmOpOccId': jobid,
+        'error': LCM_operation_error,
         'affectedVnfcs': affected_vnfcs,
         'affectedVirtualLinks': affected_vls,
         'affectedVirtualStorages': affected_vss,
