@@ -247,7 +247,7 @@ def prepare_notification(nfinstid, jobid, operation, operation_state):
         'affectedVirtualLinks': [],
         'affectedVirtualStorages': [],
         'changedExtConnectivity': [],
-        'error': {},
+        'error': None,
         '_links': {
             'vnfInstance': {
                 'href': '%s/vnf_instances/%s' % (const.URL_PREFIX, nfinstid)
