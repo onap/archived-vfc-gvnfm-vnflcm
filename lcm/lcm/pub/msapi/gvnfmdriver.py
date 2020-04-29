@@ -36,10 +36,15 @@ def get_packageinfo_by_vnfdid(vnfdid):
 
 
 def apply_grant_to_nfvo(data):
-    ret = req_by_msb('api/gvnfmdriver/v1/resource/grant', 'PUT', data)
-    if ret[0] != 0:
-        logger.error('Status code is %s, detail is %s.', ret[2], ret[1])
-        raise NFLCMException('Nf instancing apply grant exception')
+    retry_time = 3
+    while retry_time > 0:
+        ret = req_by_msb('api/gvnfmdriver/v1/resource/grant', 'PUT', data)
+        if ret[0] != 0:
+            logger.error('Status code is %s, detail is %s, retry_count:%s', ret[2], ret[1], retry_count)
+            retry_time -= 1
+            raise NFLCMException('Nf instancing apply grant exception[retry_time: %s]' % retry_count)
+        else:
+            break
     return json.JSONDecoder().decode(ret[1])
 
 
