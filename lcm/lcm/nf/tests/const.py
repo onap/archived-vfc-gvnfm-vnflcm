@@ -81,6 +81,13 @@ inst_req_data = {
                         "resourceProviderId": "resourceProvider_1",
                         "resourceId": "resource_1",
                         "vimLevelResourceType": "vimLevelResourceType_1",
+                        "tenant": "f7b17b0afd374d48a322e95cf4258eec",
+                        "ipAddress": "10.0.101.1",
+                        "macAddress": "fa:16:3e:a3:ac:5e",
+                        "instId": "fb86af68-be48-4804-a454-3892333b9d4a",
+                        "portid": "2dddd81b-a8d4-41f4-8a90-8f334bbbbe3b",
+                        "networkid": "7d907188-46f0-4aa7-b61b-f2d349554a1b",
+                        "subnetworkid": "08ef29e0-5e61-436a-a9ee-6a4ac502a622"
                     }
                 }
             ]
