@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "be5eaf05_25a4f781",
+        "filename": "lcm/lcm/pub/msapi/gvnfmdriver.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5494
+      },
+      "writtenOn": "2020-05-12T11:17:39Z",
+      "side": 1,
+      "message": "why modify this func？",
+      "revId": "ccd94580903303d9dcfa2851012530ab6468b696",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
