@@ -99,7 +99,14 @@ def prepare_notification_data(nfinstid, jobid, changetype, operation):
                 'vimConnectionId': port.vimid,
                 'resourceId': port.resourceid,
                 'resourceProviderId': port.name,  # TODO: is resourceName mapped to resourceProviderId?
-                'vimLevelResourceType': 'port'
+                'vimLevelResourceType': 'port',
+                'tenant': port.tenant,
+                'ipAddress': port.ipaddress,
+                'macAddress': port.macaddress,
+                'instId': port.instid,
+                'portid': port.portid,
+                'networkid': port.networkid,
+                'subnetworkid': port.subnetworkid
             },
             'cpInstanceId': port.portid  # TODO: port.cpinstanceid is not initiated when create port resource.
         })
@@ -146,7 +153,7 @@ def prepare_notification_data(nfinstid, jobid, changetype, operation):
         'affectedVnfcs': affected_vnfcs,
         'affectedVirtualLinks': affected_vls,
         'affectedVirtualStorages': affected_vss,
-        'changedExtConnectivity': [],  # TODO: will add in R4
+        'changedExtConnectivity': ext_connectivity,
         '_links': {
             'vnfInstance': {'href': '/api/vnflcm/v1/vnf_instances/%s' % nfinstid},
             # set 'subscription' link after filtering for subscribers
