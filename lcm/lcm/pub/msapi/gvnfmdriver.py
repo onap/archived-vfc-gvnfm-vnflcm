@@ -36,10 +36,15 @@ def get_packageinfo_by_vnfdid(vnfdid):
 
 
 def apply_grant_to_nfvo(data):
-    ret = req_by_msb('api/gvnfmdriver/v1/resource/grant', 'PUT', data)
-    if ret[0] != 0:
-        logger.error('Status code is %s, detail is %s.', ret[2], ret[1])
-        raise NFLCMException('Nf instancing apply grant exception')
+    ret_count = 1
+    while ret_count > 0:
+        ret = req_by_msb('api/gvnfmdriver/v1/resource/grant', 'PUT', data)
+        if ret[0] != 0:
+            logger.error('Status code is %s, detail is %s.', ret[2], ret[1])
+            ret_count -= 1
+            raise NFLCMException('Nf instancing apply grant exception')
+        else:
+            break
     return json.JSONDecoder().decode(ret[1])
 
 
@@ -99,7 +104,14 @@ def prepare_notification_data(nfinstid, jobid, changetype, operation):
                 'vimConnectionId': port.vimid,
                 'resourceId': port.resourceid,
                 'resourceProviderId': port.name,  # TODO: is resourceName mapped to resourceProviderId?
-                'vimLevelResourceType': 'port'
+                'vimLevelResourceType': 'port',
+                'tenant': port.tenant,
+                'ipAddress': port.ipaddress,
+                'macAddress': port.macaddress,
+                'instId': port.instid,
+                'portid': port.portid,
+                'networkid': port.networkid,
+                'subnetworkid': port.subnetworkid
             },
             'cpInstanceId': port.portid  # TODO: port.cpinstanceid is not initiated when create port resource.
         })
@@ -146,7 +158,7 @@ def prepare_notification_data(nfinstid, jobid, changetype, operation):
         'affectedVnfcs': affected_vnfcs,
         'affectedVirtualLinks': affected_vls,
         'affectedVirtualStorages': affected_vss,
-        'changedExtConnectivity': [],  # TODO: will add in R4
+        'changedExtConnectivity': ext_connectivity,
         '_links': {
             'vnfInstance': {'href': '/api/vnflcm/v1/vnf_instances/%s' % nfinstid},
             # set 'subscription' link after filtering for subscribers
