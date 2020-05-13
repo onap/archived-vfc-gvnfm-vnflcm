@@ -16,6 +16,24 @@
       "revId": "ccd94580903303d9dcfa2851012530ab6468b696",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c979f410_46bde25e",
+        "filename": "lcm/lcm/pub/msapi/gvnfmdriver.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5275
+      },
+      "writtenOn": "2020-05-13T09:44:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "be5eaf05_25a4f781",
+      "revId": "ccd94580903303d9dcfa2851012530ab6468b696",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
