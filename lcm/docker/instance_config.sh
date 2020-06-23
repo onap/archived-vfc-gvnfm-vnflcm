@@ -24,6 +24,10 @@ if [ $REG_TO_MSB_WHEN_START ]; then
     sed -i "s|REG_TO_MSB_WHEN_START = .*|REG_TO_MSB_WHEN_START = '$REG_TO_MSB_WHEN_START'|" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
 fi
 
+if [ $SSL_ENABLED ]; then
+    sed -i "s|SSL_ENABLED.*|SSL_ENABLED = '$SSL_ENABLED'|"  vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
+fi
+
 sed -i "s/127.0.0.1:80/$MSB_IP:$MSB_PORT/" vfc/gvnfm/vnflcm/lcm/lcm/pub/config/config.py
 
 # Configure MYSQL

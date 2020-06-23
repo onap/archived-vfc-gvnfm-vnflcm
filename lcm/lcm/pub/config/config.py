@@ -42,10 +42,16 @@ AAI_PASSWD = "AAI"
 
 # [register]
 REG_TO_MSB_WHEN_START = True
+SSL_ENABLED = "true"
 REG_TO_MSB_REG_URL = "/api/microservices/v1/services"
+if SSL_ENABLED == "true":
+    enable_ssl = "true"
+else:
+    enable_ssl = "false"
 REG_TO_MSB_REG_PARAM = {
     "serviceName": "vnflcm",
     "version": "v1",
+    "enable_ssl": enable_ssl,
     "url": "/api/vnflcm/v1",
     "protocol": "REST",
     "visualRange": "1",
