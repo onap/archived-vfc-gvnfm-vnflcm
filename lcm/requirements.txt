@@ -20,7 +20,7 @@ mock==3.0.5
 unittest_xml_reporting==1.12.0
 
 # for auto-swagger
-ruamel.yaml==0.15.97
+ruamel.yaml==0.16.10
 drf-yasg==1.17.0
 flex>=6.11.1
 swagger-spec-validator>=2.1.0
