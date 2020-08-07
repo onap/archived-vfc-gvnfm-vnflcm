@@ -12,23 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# [MSB]
-MSB_SERVICE_PROTOCOL = 'http'
-MSB_SERVICE_IP = '127.0.0.1'
-MSB_SERVICE_PORT = '443'
-MSB_BASE_URL = "%s://%s:%s" % (MSB_SERVICE_PROTOCOL, MSB_SERVICE_IP, MSB_SERVICE_PORT)
+import os
 
-# [REDIS]
-REDIS_HOST = '127.0.0.1'
-REDIS_PORT = '6379'
-REDIS_PASSWD = ''
+# [MSB]
+MSB_BASE_URL = os.getenv("MSB_HOST", "http://127.0.0.1:80")
+MSB_ENABLED = os.getenv("MSB_ENABLED", True)
 
 # [mysql]
-DB_IP = "127.0.0.1"
-DB_PORT = 3306
+DB_IP = os.getenv("MYSQL_ADDR", "127.0.0.1:3306").split(':')[0]
+DB_PORT = os.getenv("MYSQL_ADDR", "127.0.0.1:3306").split(':')[1]
 DB_NAME = "gvnfm"
 DB_USER = "gvnfm"
 DB_PASSWD = "gvnfm"
+
+# [REDIS]
+REDIS_HOST = os.getenv("REDIS_HOST", DB_IP)
+REDIS_PORT = '6379'
+REDIS_PASSWD = ''
 
 # [MDC]
 SERVICE_NAME = "vnflcm"
@@ -41,17 +41,13 @@ AAI_USER = "AAI"
 AAI_PASSWD = "AAI"
 
 # [register]
-REG_TO_MSB_WHEN_START = True
-SSL_ENABLED = "true"
+REG_TO_MSB_WHEN_START = os.getenv("REG_TO_MSB_WHEN_START", "false")
+SSL_ENABLED = os.getenv("SSL_ENABLED", "false")
 REG_TO_MSB_REG_URL = "/api/microservices/v1/services"
-if SSL_ENABLED == "true":
-    enable_ssl = "true"
-else:
-    enable_ssl = "false"
 REG_TO_MSB_REG_PARAM = {
     "serviceName": "vnflcm",
     "version": "v1",
-    "enable_ssl": enable_ssl,
+    "enable_ssl": SSL_ENABLED,
     "url": "/api/vnflcm/v1",
     "protocol": "REST",
     "visualRange": "1",
