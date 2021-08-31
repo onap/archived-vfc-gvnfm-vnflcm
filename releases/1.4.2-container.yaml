@@ -1,0 +1,10 @@
+distribution_type: 'container'
+container_release_tag: '1.4.2'
+project: 'vfc-gvnfm-vnflcm'
+container_pull_registry: nexus3.onap.org:10003
+container_push_registry: nexus3.onap.org:10002
+log_dir: 'vfc-gvnfm-vnflcm-master-docker-java-version-shell-daily/1557/'
+ref: 'a05ff382bd7dffeffb9e0ac174952e2d52dcadd2'
+containers:
+    - name: 'vfc/vnflcm'
+      version: '1.4.2-STAGING-20210831T095056'
