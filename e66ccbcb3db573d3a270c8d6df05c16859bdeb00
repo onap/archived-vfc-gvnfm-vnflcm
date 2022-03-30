@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "27cbaef5_460125d7",
+        "filename": "lcm/docker/build_image.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2022-03-30T08:55:01Z",
+      "side": 1,
+      "message": "delete spaces",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 4
+      },
+      "revId": "e66ccbcb3db573d3a270c8d6df05c16859bdeb00",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
