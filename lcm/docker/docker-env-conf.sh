@@ -12,7 +12,7 @@ install_sf(){
     rm -rf vfc-gvnfm-vnflcm-lcm.zip
     wait
     pip install --upgrade setuptools pip
-    pip install --no-cache-dir --pre -r  /service/vfc/gvnfm/vnflcm/lcm/requirements.txt
+    pip install -r /service/vfc/gvnfm/vnflcm/lcm/requirements.txt
     find  /service -name '*.sh'|xargs chmod a+x
 }
 
